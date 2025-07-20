@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X, ShoppingCart, User, Heart, Search, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +21,8 @@ export const Navbar = () => {
   const [wishlistCount, setWishlistCount] = useState(0);
   const [cartItemCount, setCartItemCount] = useState(0);
   const location = useLocation();
+  const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -57,6 +59,19 @@ export const Navbar = () => {
       window.removeEventListener("cartUpdated", updateCartCount);
     };
   }, []);
+
+  useEffect(() => {
+    const onStorage = () => setIsLoggedIn(!!localStorage.getItem("token"));
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
+  const handleSignOut = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userEmail");
+    setIsLoggedIn(false);
+    navigate("/");
+  };
 
   return (
     <nav className={`bg-background border-b border-border sticky top-0 z-50 transition-all duration-300 ${
@@ -124,14 +139,20 @@ export const Navbar = () => {
             <Link to="/profile" className="p-2 hover:bg-muted rounded-lg transition-colors">
               <User className="h-5 w-5" />
             </Link>
-            <div className="flex items-center space-x-2">
-              <Button variant="ghost" size="sm" asChild>
-                <Link to="/login">Sign In</Link>
+            {isLoggedIn ? (
+              <Button size="sm" variant="outline" onClick={handleSignOut}>
+                Sign Out
               </Button>
-              <Button size="sm" asChild>
-                <Link to="/signup">Sign Up</Link>
-              </Button>
-            </div>
+            ) : (
+              <div className="flex items-center space-x-2">
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to="/login">Sign In</Link>
+                </Button>
+                <Button size="sm" asChild>
+                  <Link to="/signup">Sign Up</Link>
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Mobile menu button */}

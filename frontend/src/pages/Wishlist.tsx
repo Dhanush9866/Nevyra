@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { getWishlist, removeFromWishlist } from "@/lib/wishlist";
+import { addToCart } from "@/lib/cart";
 import { mockProducts } from "./Products";
 
 // Use the same Product type as ProductCard
@@ -67,7 +68,8 @@ const Wishlist = () => {
     });
   };
 
-  const addToCart = (item: Product) => {
+  const addToCartHandler = (item: Product) => {
+    addToCart(item.id, 1);
     toast({
       title: "Added to cart",
       description: `${item.title} has been added to your cart.`,
@@ -281,7 +283,7 @@ const Wishlist = () => {
                       size="sm"
                       className="flex-1"
                       disabled={!item.inStock}
-                      onClick={() => addToCart(item)}
+                      onClick={() => addToCartHandler(item)}
                     >
                       <ShoppingCart className="mr-2 h-4 w-4" />
                       Add to Cart
