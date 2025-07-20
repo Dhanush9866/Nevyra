@@ -4,6 +4,8 @@ import { Menu, X, ShoppingCart, User, Heart, Search, MapPin } from "lucide-react
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { getWishlist } from "@/lib/wishlist";
+import { getCart } from "@/lib/cart";
 
 const navItems = [
   { name: "Home", path: "/" },
@@ -16,6 +18,8 @@ export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("Select Location");
+  const [wishlistCount, setWishlistCount] = useState(0);
+  const [cartItemCount, setCartItemCount] = useState(0);
   const location = useLocation();
 
   const isActive = (path: string) => location.pathname === path;
@@ -28,8 +32,31 @@ export const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const cartItemCount = 3; // Mock cart count
-  const wishlistCount = 5; // Mock wishlist count
+  useEffect(() => {
+    const updateWishlistCount = () => {
+      setWishlistCount(getWishlist().length);
+    };
+    updateWishlistCount();
+    window.addEventListener("storage", updateWishlistCount);
+    window.addEventListener("wishlistUpdated", updateWishlistCount);
+    return () => {
+      window.removeEventListener("storage", updateWishlistCount);
+      window.removeEventListener("wishlistUpdated", updateWishlistCount);
+    };
+  }, []);
+
+  useEffect(() => {
+    const updateCartCount = () => {
+      setCartItemCount(getCart().reduce((sum, item) => sum + item.quantity, 0));
+    };
+    updateCartCount();
+    window.addEventListener("storage", updateCartCount);
+    window.addEventListener("cartUpdated", updateCartCount);
+    return () => {
+      window.removeEventListener("storage", updateCartCount);
+      window.removeEventListener("cartUpdated", updateCartCount);
+    };
+  }, []);
 
   return (
     <nav className={`bg-background border-b border-border sticky top-0 z-50 transition-all duration-300 ${
@@ -97,6 +124,14 @@ export const Navbar = () => {
             <Link to="/profile" className="p-2 hover:bg-muted rounded-lg transition-colors">
               <User className="h-5 w-5" />
             </Link>
+            <div className="flex items-center space-x-2">
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/login">Sign In</Link>
+              </Button>
+              <Button size="sm" asChild>
+                <Link to="/signup">Sign Up</Link>
+              </Button>
+            </div>
           </div>
 
           {/* Mobile menu button */}
@@ -169,6 +204,22 @@ export const Navbar = () => {
               >
                 <User className="h-5 w-5 mr-3" />
                 Profile
+              </Link>
+            </div>
+            <div className="border-t pt-2 mt-2 space-y-2">
+              <Link
+                to="/login"
+                className="flex items-center px-3 py-2 rounded-md text-base font-medium text-muted-foreground hover:text-foreground hover:bg-muted"
+                onClick={() => setIsOpen(false)}
+              >
+                Sign In
+              </Link>
+              <Link
+                to="/signup"
+                className="flex items-center px-3 py-2 rounded-md text-base font-medium bg-primary text-primary-foreground hover:bg-primary/90"
+                onClick={() => setIsOpen(false)}
+              >
+                Sign Up
               </Link>
             </div>
           </div>

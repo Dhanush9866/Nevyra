@@ -94,8 +94,8 @@ export const ProductFilters = ({
                     className="w-full"
                   />
                   <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                    <span>${priceRange[0]}</span>
-                    <span>${priceRange[1]}</span>
+                    <span>₹{priceRange[0]}</span>
+                    <span>₹{priceRange[1]}</span>
                   </div>
                 </div>
               </div>

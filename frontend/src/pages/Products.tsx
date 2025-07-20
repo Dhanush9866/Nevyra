@@ -8,8 +8,7 @@ import { Pagination } from "@/components/Pagination";
 import { Button } from "@/components/ui/button";
 import { Filter, Grid, List } from "lucide-react";
 
-// Mock product data - 10 products per category
-const mockProducts = [
+export const mockProducts = [
   // Medical & Pharmacy Products
   {
     id: 1,

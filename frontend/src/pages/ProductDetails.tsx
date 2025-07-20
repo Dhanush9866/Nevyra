@@ -4,13 +4,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Heart, Share2, Star, ShoppingCart } from "lucide-react";
+import { addToCart } from "@/lib/cart";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ProductDetails() {
   const { id } = useParams();
+  const { toast } = useToast();
 
   // Mock product data
   const product = {
-    id: id || "1",
+    id: Number(id) || 1,
     name: "Premium Wireless Headphones",
     price: 299,
     originalPrice: 399,
@@ -32,6 +35,14 @@ export default function ProductDetails() {
       "Weight": "250g",
       "Connectivity": "Bluetooth 5.0"
     }
+  };
+
+  const handleAddToCart = () => {
+    addToCart(product.id, 1);
+    toast({
+      title: "Added to cart!",
+      description: `${product.name} has been added to your cart.`,
+    });
   };
 
   return (
@@ -75,8 +86,8 @@ export default function ProductDetails() {
               </div>
               <h1 className="text-3xl font-bold text-foreground mb-4">{product.name}</h1>
               <div className="flex items-center gap-4 mb-6">
-                <span className="text-3xl font-bold text-foreground">${product.price}</span>
-                <span className="text-xl text-muted-foreground line-through">${product.originalPrice}</span>
+                <span className="text-3xl font-bold text-foreground">₹{product.price}</span>
+                <span className="text-xl text-muted-foreground line-through">₹{product.originalPrice}</span>
                 <Badge className="bg-accent text-accent-foreground">25% OFF</Badge>
               </div>
             </div>
@@ -84,7 +95,7 @@ export default function ProductDetails() {
             <p className="text-muted-foreground text-lg">{product.description}</p>
 
             <div className="flex gap-4">
-              <Button className="btn-primary flex-1">
+              <Button className="btn-primary flex-1" onClick={handleAddToCart}>
                 <ShoppingCart className="h-4 w-4 mr-2" />
                 Add to Cart
               </Button>
