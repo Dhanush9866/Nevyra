@@ -38,22 +38,32 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!validateForm()) return;
-
     setIsLoading(true);
-    
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Mock successful login
+      const response = await fetch("http://localhost:8000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        toast({
+          title: "Login failed",
+          description: data.message || "Invalid email or password. Please try again.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+      // Save token and email to localStorage
+      localStorage.setItem("token", data.data.token);
+      localStorage.setItem("userEmail", email);
       toast({
         title: "Welcome back!",
         description: "You have successfully logged in.",
       });
-      
-      navigate("/");
+      navigate("/profile");
     } catch (error) {
       toast({
         title: "Login failed",

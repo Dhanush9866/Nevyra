@@ -91,20 +91,36 @@ const Signup = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!validateForm()) return;
-
     setIsLoading(true);
-    
+    console.log(formData);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      const response = await fetch("http://localhost:8000/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          password: formData.password,
+          address: "", // You can add an address field to the form if needed
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        toast({
+          title: "Signup failed",
+          description: data.message || "Something went wrong. Please try again.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
       toast({
         title: "Account created successfully!",
         description: "Welcome to Nevyra. Please check your email to verify your account.",
       });
-      
       navigate("/login");
     } catch (error) {
       toast({

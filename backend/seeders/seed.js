@@ -6,10 +6,12 @@ async function seed() {
 
   const adminPassword = await bcrypt.hash("admin123", 10);
   await User.create({
-    name: "Admin",
+    firstName: "Admin",
+    lastName: "User",
     email: "admin@nevyra.com",
     password: adminPassword,
     isAdmin: true,
+    phone: null,
   });
 
   const categories = await Category.bulkCreate([

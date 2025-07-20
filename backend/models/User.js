@@ -9,7 +9,11 @@ module.exports = (sequelize) => {
         autoIncrement: true,
         primaryKey: true,
       },
-      name: {
+      firstName: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      lastName: {
         type: DataTypes.STRING,
         allowNull: false,
       },
@@ -18,6 +22,11 @@ module.exports = (sequelize) => {
         allowNull: false,
         unique: true,
         validate: { isEmail: true },
+      },
+      phone: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        unique: true,
       },
       password: {
         type: DataTypes.STRING,
