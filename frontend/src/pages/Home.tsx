@@ -1,5 +1,5 @@
 import { HeroCarousel } from "@/components/HeroCarousel";
-import { LocationSelector } from "@/components/LocationSelector";
+//import { LocationSelector } from "@/components/LocationSelector";
 import { TrendingDeals } from "@/components/TrendingDeals";
 import { ProductGrid } from "@/components/ProductGrid";
 import { CategoryGrid } from "@/components/CategoryGrid";
@@ -18,9 +18,7 @@ export default function Home() {
       </section>
 
       {/* Location Selector */}
-      <section>
-        <LocationSelector />
-      </section>
+     
 
       {/* Trending Now / Flash Deals */}
       <section className="bg-background">

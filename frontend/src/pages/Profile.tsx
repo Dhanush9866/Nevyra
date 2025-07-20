@@ -11,7 +11,7 @@ export default function Profile() {
   const userStats = [
     { label: "Total Orders", value: "24", icon: "📦" },
     { label: "Saved Items", value: "12", icon: "❤️" },
-    { label: "Reward Points", value: "1,250", icon: "⭐" },
+    //{ label: "Reward Points", value: "1,250", icon: "⭐" },
     { label: "Member Since", value: "2023", icon: "🎉" }
   ];
 
@@ -100,55 +100,9 @@ export default function Profile() {
 
           {/* Account Settings */}
           <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Account Status</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="flex items-center">
-                    <Mail className="h-4 w-4 mr-2" />
-                    Email Verified
-                  </span>
-                  <Badge>Verified</Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="flex items-center">
-                    <Phone className="h-4 w-4 mr-2" />
-                    Phone Verified
-                  </span>
-                  <Badge variant="outline">Pending</Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="flex items-center">
-                    <Shield className="h-4 w-4 mr-2" />
-                    2FA Enabled
-                  </span>
-                  <Badge variant="secondary">Active</Badge>
-                </div>
-              </CardContent>
-            </Card>
+            
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <CreditCard className="h-5 w-5 mr-2" />
-                  Payment Methods
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between p-3 border rounded-lg">
-                  <div>
-                    <p className="font-medium">•••• •••• •••• 1234</p>
-                    <p className="text-sm text-muted-foreground">Expires 12/26</p>
-                  </div>
-                  <Badge variant="outline">Primary</Badge>
-                </div>
-                <Button variant="outline" className="w-full">
-                  Add Payment Method
-                </Button>
-              </CardContent>
-            </Card>
+            
 
             <Card>
               <CardHeader>

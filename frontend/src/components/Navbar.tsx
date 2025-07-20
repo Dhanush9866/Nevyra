@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 
 const navItems = [
   { name: "Home", path: "/" },
-  { name: "Categories", path: "/categories" },
+  { name: "Products", path: "/categories" },
   { name: "Orders", path: "/orders" },
 ];
 
@@ -59,14 +59,7 @@ export const Navbar = () => {
             </div>
           </div>
 
-          {/* Location Selector - Desktop */}
-          <div className="hidden lg:flex items-center space-x-2 text-sm">
-            <MapPin className="h-4 w-4 text-muted-foreground" />
-            <span className="text-muted-foreground">Deliver to:</span>
-            <Button variant="ghost" size="sm" className="font-medium">
-              {selectedLocation}
-            </Button>
-          </div>
+          
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
