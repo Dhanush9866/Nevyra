@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Heart, ShoppingCart, Star, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
+import { addToWishlist, removeFromWishlist, isWishlisted as isWishlistedUtil } from "@/lib/wishlist";
+import { addToCart } from "@/lib/cart";
 
 interface Product {
   id: number;
@@ -30,29 +32,35 @@ export const ProductCard = ({ product, viewMode }: ProductCardProps) => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleAddToCart = async () => {
+  useEffect(() => {
+    setIsWishlisted(isWishlistedUtil(product.id));
+  }, [product.id]);
+
+  const handleAddToCart = () => {
     if (!product.inStock) return;
-
-    setIsLoading(true);
-
-    // Simulate API call
-    setTimeout(() => {
-      toast({
-        title: "Added to cart!",
-        description: `${product.title} has been added to your cart.`,
-      });
-      setIsLoading(false);
-    }, 500);
+    addToCart(product.id, 1);
+    toast({
+      title: "Added to cart!",
+      description: `${product.title} has been added to your cart.`,
+    });
   };
 
   const handleWishlistToggle = () => {
-    setIsWishlisted(!isWishlisted);
-    toast({
-      title: isWishlisted ? "Removed from wishlist" : "Added to wishlist",
-      description: `${product.title} ${
-        isWishlisted ? "removed from" : "added to"
-      } your wishlist.`,
-    });
+    if (isWishlisted) {
+      removeFromWishlist(product.id);
+      setIsWishlisted(false);
+      toast({
+        title: "Removed from wishlist",
+        description: `${product.title} removed from your wishlist.`,
+      });
+    } else {
+      addToWishlist(product.id);
+      setIsWishlisted(true);
+      toast({
+        title: "Added to wishlist",
+        description: `${product.title} added to your wishlist.`,
+      });
+    }
   };
 
   const discountPercentage = product.originalPrice
@@ -147,11 +155,11 @@ export const ProductCard = ({ product, viewMode }: ProductCardProps) => {
                   {/* Price */}
                   <div className="flex items-center space-x-2 mb-4">
                     <span className="text-2xl font-bold text-foreground">
-                      ${product.price}
+                      ₹{product.price}
                     </span>
                     {product.originalPrice && (
                       <span className="text-lg text-muted-foreground line-through">
-                        ${product.originalPrice}
+                        ₹{product.originalPrice}
                       </span>
                     )}
                   </div>
@@ -212,32 +220,6 @@ export const ProductCard = ({ product, viewMode }: ProductCardProps) => {
             ) : (
               <span className="text-6xl">🖼️</span>
             )}
-            {/* Quick Actions - Show on Hover */}
-            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <div className="flex space-x-2">
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleWishlistToggle();
-                  }}
-                >
-                  <Heart
-                    className={`h-4 w-4 ${
-                      isWishlisted ? "fill-red-500 text-red-500" : ""
-                    }`}
-                  />
-                </Button>
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  onClick={(e) => e.preventDefault()}
-                >
-                  <Eye className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
             {/* Badges */}
             <div className="absolute top-2 left-2 space-y-1">
               {product.isNew && (
@@ -307,11 +289,11 @@ export const ProductCard = ({ product, viewMode }: ProductCardProps) => {
             {/* Price */}
             <div className="flex items-center space-x-2">
               <span className="text-lg font-bold text-foreground">
-                ${product.price}
+                ₹{product.price}
               </span>
               {product.originalPrice && (
                 <span className="text-sm text-muted-foreground line-through">
-                  ${product.originalPrice}
+                  ₹{product.originalPrice}
                 </span>
               )}
             </div>

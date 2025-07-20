@@ -89,7 +89,7 @@ export default function Orders() {
                   </div>
                   <div className="text-right">
                     {getStatusBadge(order.status)}
-                    <p className="text-lg font-semibold mt-1">${order.total}</p>
+                    <p className="text-lg font-semibold mt-1">₹{order.total}</p>
                   </div>
                 </div>
               </CardHeader>
@@ -101,7 +101,7 @@ export default function Orders() {
                         <p className="font-medium">{item.name}</p>
                         <p className="text-sm text-muted-foreground">Quantity: {item.quantity}</p>
                       </div>
-                      <span className="font-medium">${item.price * item.quantity}</span>
+                      <span className="font-medium">₹{item.price * item.quantity}</span>
                     </div>
                   ))}
                 </div>

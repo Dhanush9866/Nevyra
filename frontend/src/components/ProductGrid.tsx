@@ -179,10 +179,10 @@ export const ProductGrid = () => {
 
                   {/* Price */}
                   <div className="flex items-center space-x-2">
-                    <span className="text-lg font-bold text-foreground">${product.price}</span>
+                    <span className="text-lg font-bold text-foreground">₹{product.price}</span>
                     {product.originalPrice && (
                       <span className="text-sm text-muted-foreground line-through">
-                        ${product.originalPrice}
+                        ₹{product.originalPrice}
                       </span>
                     )}
                   </div>

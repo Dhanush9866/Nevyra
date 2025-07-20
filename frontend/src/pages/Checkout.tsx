@@ -58,36 +58,6 @@ export default function Checkout() {
               </CardContent>
             </Card>
 
-            {/* Payment Information */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <CreditCard className="h-5 w-5 mr-2" />
-                  Payment Information
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="cardNumber">Card Number</Label>
-                  <Input id="cardNumber" placeholder="1234 5678 9012 3456" />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="expiryDate">Expiry Date</Label>
-                    <Input id="expiryDate" placeholder="MM/YY" />
-                  </div>
-                  <div>
-                    <Label htmlFor="cvv">CVV</Label>
-                    <Input id="cvv" placeholder="123" />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="cardName">Name on Card</Label>
-                  <Input id="cardName" placeholder="John Doe" />
-                </div>
-              </CardContent>
-            </Card>
-
             {/* Security Note */}
             <div className="flex items-center p-4 bg-success/10 rounded-lg border border-success/20">
               <Shield className="h-5 w-5 text-success mr-3" />
@@ -114,7 +84,7 @@ export default function Checkout() {
                       <p className="font-medium">Premium Wireless Headphones</p>
                       <p className="text-sm text-muted-foreground">Qty: 1</p>
                     </div>
-                    <span className="font-medium">$299</span>
+                    <span className="font-medium">₹299</span>
                   </div>
                   
                   <div className="flex items-center space-x-4">
@@ -125,7 +95,7 @@ export default function Checkout() {
                       <p className="font-medium">Smart Watch Pro</p>
                       <p className="text-sm text-muted-foreground">Qty: 2</p>
                     </div>
-                    <span className="font-medium">$898</span>
+                    <span className="font-medium">₹898</span>
                   </div>
                 </div>
 
@@ -135,20 +105,20 @@ export default function Checkout() {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Subtotal</span>
-                    <span>$1,197</span>
+                    <span>₹1,197</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Shipping</span>
-                    <span>$15</span>
+                    <span>₹15</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Tax</span>
-                    <span>$96</span>
+                    <span>₹96</span>
                   </div>
                   <Separator />
                   <div className="flex justify-between text-lg font-semibold">
                     <span>Total</span>
-                    <span>$1,308</span>
+                    <span>₹1,308</span>
                   </div>
                 </div>
 

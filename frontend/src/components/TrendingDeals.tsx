@@ -128,10 +128,10 @@ export const TrendingDeals = () => {
                         <div className="space-y-2">
                           <div className="flex items-center justify-center space-x-2">
                             <span className="text-lg font-bold text-foreground">
-                              ${item.salePrice}
+                              ₹{item.salePrice}
                             </span>
                             <span className="text-sm text-muted-foreground line-through">
-                              ${item.originalPrice}
+                              ₹{item.originalPrice}
                             </span>
                           </div>
                           <Badge className="bg-destructive text-destructive-foreground">
