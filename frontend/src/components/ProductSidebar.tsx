@@ -18,7 +18,7 @@ interface Subcategory {
 
 const categories: Category[] = [
   {
-    id: "medical",
+    id: "Medical",
     name: "Medical & Pharmacy",
     icon: "🏥",
     subcategories: [
@@ -30,7 +30,7 @@ const categories: Category[] = [
     ]
   },
   {
-    id: "groceries",
+    id: "Groceries",
     name: "Groceries",
     icon: "🛒",
     subcategories: [
@@ -41,7 +41,7 @@ const categories: Category[] = [
     ]
   },
   {
-    id: "fashion",
+    id: "FashionBeauty",
     name: "Fashion & Beauty",
     icon: "👗",
     subcategories: [
@@ -53,7 +53,7 @@ const categories: Category[] = [
     ]
   },
   {
-    id: "devices",
+    id: "Devices",
     name: "Devices",
     icon: "📱",
     subcategories: [
@@ -65,7 +65,7 @@ const categories: Category[] = [
     ]
   },
   {
-    id: "electrical",
+    id: "Electrical",
     name: "Electrical",
     icon: "⚡",
     subcategories: [
@@ -77,7 +77,7 @@ const categories: Category[] = [
     ]
   },
   {
-    id: "automotive",
+    id: "Automotive",
     name: "Automotive",
     icon: "🚗",
     subcategories: [
@@ -88,7 +88,7 @@ const categories: Category[] = [
     ]
   },
   {
-    id: "sports",
+    id: "Sports",
     name: "Sports",
     icon: "⚽",
     subcategories: [
@@ -99,7 +99,7 @@ const categories: Category[] = [
     ]
   },
   {
-    id: "interior",
+    id: "HomeInterior",
     name: "Home Interior",
     icon: "🏠",
     subcategories: [

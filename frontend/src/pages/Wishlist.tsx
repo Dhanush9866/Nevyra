@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { getWishlist, removeFromWishlist } from "@/lib/wishlist";
 import { addToCart } from "@/lib/cart";
-import { mockProducts } from "./Products";
+// Removed mockProducts import
 
 // Use the same Product type as ProductCard
 interface Product {
@@ -31,19 +31,44 @@ const Wishlist = () => {
   const [filteredItems, setFilteredItems] = useState<Product[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const { toast } = useToast();
+
+  // Fetch all products from backend
+  useEffect(() => {
+    setLoading(true);
+    setError("");
+    fetch("http://localhost:8000/api/products/all")
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch products");
+        return res.json();
+      })
+      .then((data) => {
+        if (data.success && Array.isArray(data.data)) {
+          setAllProducts(data.data);
+        } else {
+          setError("Invalid data format from server");
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message || "Error fetching products");
+        setLoading(false);
+      });
+  }, []);
 
   useEffect(() => {
     const updateWishlist = () => {
       const wishlistIds = getWishlist();
-      const allProducts: Product[] = mockProducts;
       const items = allProducts.filter((p) => wishlistIds.includes(p.id));
       setWishlistItems(items);
     };
     updateWishlist();
     window.addEventListener("storage", updateWishlist);
     return () => window.removeEventListener("storage", updateWishlist);
-  }, []);
+  }, [allProducts]);
 
   useEffect(() => {
     setFilteredItems(
@@ -91,6 +116,13 @@ const Wishlist = () => {
       description: `${inStockItems.length} items have been added to your cart.`,
     });
   };
+
+  if (loading) {
+    return <div className="text-center py-12">Loading wishlist...</div>;
+  }
+  if (error) {
+    return <div className="text-center py-12 text-red-500">{error}</div>;
+  }
 
   if (wishlistItems.length === 0) {
     return (

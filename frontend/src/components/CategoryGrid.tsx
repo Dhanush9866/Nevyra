@@ -7,7 +7,7 @@ export const CategoryGrid = () => {
   const categories = [
     {
       id: 1,
-      name: "Medical & Pharmacy",
+      name: "Medical",
       description: "Personal Care, Skin Care, Hair Care, Makeup & more",
       icon: Heart,
       itemCount: 245,
@@ -23,7 +23,7 @@ export const CategoryGrid = () => {
     },
     {
       id: 3,
-      name: "Fashion & Beauty",
+      name: "FashionBeauty",
       description: "Menswear, Women's Wear, Kids Wear, Shoes & Accessories",
       icon: Shirt,
       itemCount: 850,
@@ -63,7 +63,7 @@ export const CategoryGrid = () => {
     },
     {
       id: 8,
-      name: "Home Interior",
+      name: "HomeInterior",
       description: "Ceiling, Doors, Paint, Curtains, Tiles & decor",
       icon: HomeIcon,
       itemCount: 420,
@@ -81,9 +81,9 @@ export const CategoryGrid = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {categories.map((category) => (
-            <Link key={category.id} to={`/products?category=${category.name.toLowerCase().replace(/\s+/g, '-').replace('&', '')}`}>
+            <Link key={category.id} to={`/products?category=${category.name}`}>
               <Card className="card-hover cursor-pointer h-full">
-                <CardHeader>
+                <CardHeader> 
                   <div className="flex items-center justify-between">
                     <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
                       <category.icon className="h-6 w-6 text-primary" />

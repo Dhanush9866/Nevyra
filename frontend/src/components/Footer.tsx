@@ -20,25 +20,7 @@ export const Footer = () => {
             </p>
             
             {/* App Store Badges */}
-            <div className="space-y-3">
-              <p className="text-sm font-medium">Download our app:</p>
-              <div className="flex space-x-3">
-                <div className="flex items-center space-x-2 bg-primary-foreground/10 hover:bg-primary-foreground/20 px-4 py-2 rounded-lg cursor-pointer transition-colors">
-                  <Smartphone className="h-5 w-5" />
-                  <div className="text-sm">
-                    <div className="text-xs">Download on the</div>
-                    <div className="font-semibold">App Store</div>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2 bg-primary-foreground/10 hover:bg-primary-foreground/20 px-4 py-2 rounded-lg cursor-pointer transition-colors">
-                  <Monitor className="h-5 w-5" />
-                  <div className="text-sm">
-                    <div className="text-xs">Get it on</div>
-                    <div className="font-semibold">Google Play</div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            
           </div>
 
           {/* Customer Service */}
