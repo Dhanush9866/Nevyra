@@ -2,10 +2,9 @@ const { CartItem, Product } = require("../models");
 
 exports.list = async (req, res, next) => {
   try {
-    const items = await CartItem.findAll({
-      where: { userId: req.user.id },
-      include: [Product],
-    });
+    const items = await CartItem.find({ userId: req.user.id }).populate(
+      "productId"
+    );
     res.json({ success: true, message: "Cart items fetched", data: items });
   } catch (err) {
     next(err);
@@ -23,18 +22,13 @@ exports.add = async (req, res, next) => {
           message: "Product and quantity required",
           data: null,
         });
-    let item = await CartItem.findOne({
-      where: { userId: req.user.id, productId },
-    });
+    let item = await CartItem.findOne({ userId: req.user.id, productId });
     if (item) {
       item.quantity += quantity;
       await item.save();
     } else {
-      item = await CartItem.create({
-        userId: req.user.id,
-        productId,
-        quantity,
-      });
+      item = new CartItem({ userId: req.user.id, productId, quantity });
+      await item.save();
     }
     res
       .status(201)
@@ -48,7 +42,8 @@ exports.update = async (req, res, next) => {
   try {
     const { quantity } = req.body;
     const item = await CartItem.findOne({
-      where: { id: req.params.itemId, userId: req.user.id },
+      _id: req.params.itemId,
+      userId: req.user.id,
     });
     if (!item)
       return res
@@ -65,13 +60,14 @@ exports.update = async (req, res, next) => {
 exports.remove = async (req, res, next) => {
   try {
     const item = await CartItem.findOne({
-      where: { id: req.params.itemId, userId: req.user.id },
+      _id: req.params.itemId,
+      userId: req.user.id,
     });
     if (!item)
       return res
         .status(404)
         .json({ success: false, message: "Cart item not found", data: null });
-    await item.destroy();
+    await item.deleteOne();
     res.json({ success: true, message: "Cart item removed", data: null });
   } catch (err) {
     next(err);

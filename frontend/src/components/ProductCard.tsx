@@ -9,7 +9,7 @@ import { addToWishlist, removeFromWishlist, isWishlisted as isWishlistedUtil } f
 import { addToCart, getCart } from "@/lib/cart";
 
 interface Product {
-  id: number;
+  id: string;
   title: string;
   price: number;
   originalPrice?: number;
@@ -55,7 +55,8 @@ export const ProductCard = ({ product, viewMode }: ProductCardProps) => {
     });
     setInCart(true);
   };
-
+  console.log(product);
+  
   const handleWishlistToggle = () => {
     if (isWishlisted) {
       removeFromWishlist(product.id);
@@ -102,7 +103,9 @@ export const ProductCard = ({ product, viewMode }: ProductCardProps) => {
                       className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
                     />
                   ) : (
-                    <span className="text-6xl">🖼️</span>
+                    <span className="text-6xl">🖼️
+          
+                    </span>
                   )}
                 </Link>
 
@@ -301,6 +304,7 @@ export const ProductCard = ({ product, viewMode }: ProductCardProps) => {
             <div className="flex items-center space-x-2">
               <span className="text-lg font-bold text-foreground">
                 ₹{product.price}
+          
               </span>
               {product.originalPrice && (
                 <span className="text-sm text-muted-foreground line-through">
@@ -312,7 +316,7 @@ export const ProductCard = ({ product, viewMode }: ProductCardProps) => {
             {inCart ? (
               <Button
                 className="w-full group-hover:scale-105 transition-transform duration-200"
-                onClick={e => {
+                onClick={(e) => {
                   e.preventDefault();
                   navigate("/cart");
                 }}
@@ -323,7 +327,7 @@ export const ProductCard = ({ product, viewMode }: ProductCardProps) => {
               <Button
                 className="w-full group-hover:scale-105 transition-transform duration-200"
                 disabled={!product.inStock || isLoading}
-                onClick={e => {
+                onClick={(e) => {
                   e.preventDefault();
                   handleAddToCart();
                 }}

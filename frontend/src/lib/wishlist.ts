@@ -6,7 +6,7 @@ function dispatchWishlistUpdated() {
   window.dispatchEvent(new Event("wishlistUpdated"));
 }
 
-export function getWishlist(): number[] {
+export function getWishlist(): string[] {
   try {
     const data = localStorage.getItem(WISHLIST_KEY);
     return data ? JSON.parse(data) : [];
@@ -15,12 +15,12 @@ export function getWishlist(): number[] {
   }
 }
 
-export function setWishlist(ids: number[]) {
+export function setWishlist(ids: string[]) {
   localStorage.setItem(WISHLIST_KEY, JSON.stringify(ids));
   dispatchWishlistUpdated();
 }
 
-export function addToWishlist(id: number) {
+export function addToWishlist(id: string) {
   const wishlist = getWishlist();
   if (!wishlist.includes(id)) {
     wishlist.push(id);
@@ -28,11 +28,11 @@ export function addToWishlist(id: number) {
   }
 }
 
-export function removeFromWishlist(id: number) {
+export function removeFromWishlist(id: string) {
   const wishlist = getWishlist().filter((itemId) => itemId !== id);
   setWishlist(wishlist);
 }
 
-export function isWishlisted(id: number): boolean {
+export function isWishlisted(id: string): boolean {
   return getWishlist().includes(id);
-} 
+}

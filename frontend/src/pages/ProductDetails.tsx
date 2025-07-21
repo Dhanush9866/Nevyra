@@ -28,6 +28,8 @@ export default function ProductDetails() {
       })
       .then((data) => {
         if (data.success && data.data) {
+          console.log(data.data);
+          
           setProduct(data.data);
         } else {
           setError("Product not found");

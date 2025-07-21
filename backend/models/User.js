@@ -1,56 +1,16 @@
-const { DataTypes } = require("sequelize");
+const mongoose = require("mongoose");
 
-module.exports = (sequelize) => {
-  const User = sequelize.define(
-    "User",
-    {
-      id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-      },
-      firstName: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      lastName: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      email: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-        validate: { isEmail: true },
-      },
-      phone: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        unique: true,
-      },
-      password: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      isAdmin: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-      },
-      address: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-    },
-    {
-      timestamps: true,
-      tableName: "users",
-    }
-  );
+const userSchema = new mongoose.Schema(
+  {
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    email: { type: String, required: true, unique: true, match: /.+\@.+\..+/ },
+    phone: { type: String, unique: true, sparse: true },
+    password: { type: String, required: true },
+    isAdmin: { type: Boolean, default: false },
+    address: { type: String },
+  },
+  { timestamps: true }
+);
 
-  User.associate = (models) => {
-    User.hasMany(models.Order, { foreignKey: "userId" });
-    User.hasMany(models.CartItem, { foreignKey: "userId" });
-  };
-
-  return User;
-};
+module.exports = mongoose.model("User", userSchema);

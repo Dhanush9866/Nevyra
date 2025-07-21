@@ -1,13 +1,13 @@
-const { Product, sequelize } = require("../models");
+const { Product } = require("../models");
 const { categorySchemas } = require("../categorySchemas");
+const connectDB = require("../config/mongodb");
 
 async function seedProducts() {
-  // Force sync: drops and recreates all tables to match models
-  await sequelize.sync({ force: true });
+  // Remove all existing products
+  await Product.deleteMany({});
   const products = [
     // Medical
     {
-      id: 1,
       title: "Paracetamol Tablets",
       price: 4.99,
       category: "Medical",
@@ -31,12 +31,13 @@ async function seedProducts() {
     },
     // Groceries
     {
-      id: 2,
       title: "Basmati Rice 5kg",
       price: 12.99,
       category: "Groceries",
       subCategory: "Rice",
-      images: [ "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400"],
+      images: [
+        "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400",
+      ],
       inStock: true,
       rating: 4.7,
       reviews: 80,
@@ -51,13 +52,12 @@ async function seedProducts() {
     },
     // FashionBeauty
     {
-      id: 3,
       title: "Men's Cotton T-Shirt",
       price: 9.99,
       category: "FashionBeauty",
       subCategory: "T-Shirts",
       images: [
-"https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=400",
+        "https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=400",
         "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400",
       ],
       inStock: true,
@@ -76,12 +76,13 @@ async function seedProducts() {
     },
     // Devices
     {
-      id: 4,
       title: "Smartphone X100",
       price: 299.99,
       category: "Devices",
       subCategory: "Smartphones",
-      images: ["https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400"],
+      images: [
+        "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400",
+      ],
       inStock: true,
       rating: 4.8,
       reviews: 210,
@@ -97,12 +98,13 @@ async function seedProducts() {
     },
     // Electrical
     {
-      id: 5,
       title: "LED Bulb 12W",
       price: 2.49,
       category: "Electrical",
       subCategory: "Bulbs",
-      images: ["https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400"],
+      images: [
+        "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400",
+      ],
       inStock: true,
       rating: 4.1,
       reviews: 30,
@@ -118,12 +120,13 @@ async function seedProducts() {
     },
     // Automotive
     {
-      id: 6,
       title: "Car Battery 60Ah",
       price: 89.99,
       category: "Automotive",
       subCategory: "Batteries",
-      images: ["https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400"],
+      images: [
+        "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400",
+      ],
       inStock: true,
       rating: 4.6,
       reviews: 60,
@@ -139,12 +142,13 @@ async function seedProducts() {
     },
     // Sports
     {
-      id: 7,
       title: "Cricket Bat Pro",
       price: 49.99,
       category: "Sports",
       subCategory: "Cricket",
-      images: ["https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400"],
+      images: [
+        "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400",
+      ],
       inStock: true,
       rating: 4.9,
       reviews: 33,
@@ -159,12 +163,13 @@ async function seedProducts() {
     },
     // HomeInterior
     {
-      id: 8,
       title: "Modern Sofa Set",
       price: 499.99,
       category: "HomeInterior",
       subCategory: "Sofas",
-      images: ["https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400"],
+      images: [
+        "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400",
+      ],
       inStock: true,
       rating: 4.3,
       reviews: 18,
@@ -180,14 +185,20 @@ async function seedProducts() {
     },
   ];
 
-  await Product.bulkCreate(products);
+  await Product.insertMany(products);
   console.log("Seeded products successfully!");
-  const data = await Product.findAll();
+  const data = await Product.find();
   console.log(data);
   process.exit();
 }
 
-seedProducts().catch((err) => {
-  console.error("Seeding failed:", err);
-  process.exit(1);
-});
+// Connect to DB, then seed
+(async () => {
+  try {
+    await connectDB();
+    await seedProducts();
+  } catch (err) {
+    console.error("Seeding failed:", err);
+    process.exit(1);
+  }
+})();
