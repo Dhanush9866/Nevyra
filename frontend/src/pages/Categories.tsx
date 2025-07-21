@@ -338,7 +338,7 @@ export default function Categories() {
             >
               {currentProducts.map((product, index) => (
                 <div
-                  key={product.id}
+                  key={product._id}
                   className="animate-fade-in"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >

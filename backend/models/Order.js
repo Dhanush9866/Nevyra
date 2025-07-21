@@ -1,43 +1,21 @@
-const { DataTypes } = require("sequelize");
+const mongoose = require("mongoose");
 
-module.exports = (sequelize) => {
-  const Order = sequelize.define(
-    "Order",
-    {
-      id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-      },
-      userId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: { model: "users", key: "id" },
-      },
-      totalAmount: {
-        type: DataTypes.DECIMAL(10, 2),
-        allowNull: false,
-      },
-      status: {
-        type: DataTypes.ENUM("Pending", "Shipped", "Delivered"),
-        defaultValue: "Pending",
-      },
-      createdAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW,
-      },
+const orderSchema = new mongoose.Schema(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
-    {
-      timestamps: false,
-      tableName: "orders",
-    }
-  );
+    totalAmount: { type: Number, required: true },
+    status: {
+      type: String,
+      enum: ["Pending", "Shipped", "Delivered"],
+      default: "Pending",
+    },
+    createdAt: { type: Date, default: Date.now },
+  },
+  { timestamps: false }
+);
 
-  Order.associate = (models) => {
-    Order.hasMany(models.OrderItem, { foreignKey: "orderId" });
-    Order.belongsTo(models.User, { foreignKey: "userId" });
-  };
-
-  return Order;
-};
+module.exports = mongoose.model("Order", orderSchema);

@@ -1,44 +1,21 @@
-const { DataTypes } = require("sequelize");
+const mongoose = require("mongoose");
 
-module.exports = (sequelize) => {
-  const OrderItem = sequelize.define(
-    "OrderItem",
-    {
-      id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-      },
-      orderId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: { model: "orders", key: "id" },
-      },
-      productId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: { model: "products", key: "id" },
-      },
-      quantity: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: 1,
-      },
-      price: {
-        type: DataTypes.DECIMAL(10, 2),
-        allowNull: false,
-      },
+const orderItemSchema = new mongoose.Schema(
+  {
+    orderId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Order",
+      required: true,
     },
-    {
-      timestamps: true,
-      tableName: "order_items",
-    }
-  );
+    productId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Product",
+      required: true,
+    },
+    quantity: { type: Number, required: true, default: 1 },
+    price: { type: Number, required: true },
+  },
+  { timestamps: true }
+);
 
-  OrderItem.associate = (models) => {
-    OrderItem.belongsTo(models.Order, { foreignKey: "orderId" });
-    OrderItem.belongsTo(models.Product, { foreignKey: "productId" });
-  };
-
-  return OrderItem;
-};
+module.exports = mongoose.model("OrderItem", orderItemSchema);

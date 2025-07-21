@@ -1,40 +1,20 @@
-const { DataTypes } = require("sequelize");
+const mongoose = require("mongoose");
 
-module.exports = (sequelize) => {
-  const CartItem = sequelize.define(
-    "CartItem",
-    {
-      id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-      },
-      userId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: { model: "users", key: "id" },
-      },
-      productId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: { model: "products", key: "id" },
-      },
-      quantity: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: 1,
-      },
+const cartItemSchema = new mongoose.Schema(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
-    {
-      timestamps: true,
-      tableName: "cart_items",
-    }
-  );
+    productId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Product",
+      required: true,
+    },
+    quantity: { type: Number, required: true, default: 1 },
+  },
+  { timestamps: true }
+);
 
-  CartItem.associate = (models) => {
-    CartItem.belongsTo(models.User, { foreignKey: "userId" });
-    CartItem.belongsTo(models.Product, { foreignKey: "productId" });
-  };
-
-  return CartItem;
-};
+module.exports = mongoose.model("CartItem", cartItemSchema);

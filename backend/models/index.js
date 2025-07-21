@@ -1,22 +1,10 @@
-const fs = require("fs");
 const path = require("path");
-const { sequelize } = require("../config/database");
 
-const db = {};
-
-fs.readdirSync(__dirname)
-  .filter((file) => file !== "index.js" && file.endsWith(".js"))
-  .forEach((file) => {
-    const model = require(path.join(__dirname, file))(sequelize);
-    db[model.name] = model;
-  });
-
-Object.keys(db).forEach((modelName) => {
-  if (db[modelName].associate) {
-    db[modelName].associate(db);
-  }
-});
-
-db.sequelize = sequelize;
-
-module.exports = db;
+module.exports = {
+  User: require(path.join(__dirname, "User.js")),
+  Product: require(path.join(__dirname, "Product.js")),
+  Order: require(path.join(__dirname, "Order.js")),
+  OrderItem: require(path.join(__dirname, "OrderItem.js")),
+  CartItem: require(path.join(__dirname, "CartItem.js")),
+  Category: require(path.join(__dirname, "Category.js")),
+};

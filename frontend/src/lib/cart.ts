@@ -4,7 +4,7 @@ function dispatchCartUpdated() {
   window.dispatchEvent(new Event("cartUpdated"));
 }
 
-export function getCart(): { id: number; quantity: number }[] {
+export function getCart(): { id: string; quantity: number }[] {
   try {
     const data = localStorage.getItem(CART_KEY);
     return data ? JSON.parse(data) : [];
@@ -13,14 +13,14 @@ export function getCart(): { id: number; quantity: number }[] {
   }
 }
 
-export function setCart(items: { id: number; quantity: number }[]) {
+export function setCart(items: { id: string; quantity: number }[]) {
   localStorage.setItem(CART_KEY, JSON.stringify(items));
   dispatchCartUpdated();
 }
 
-export function addToCart(id: number, quantity: number = 1) {
+export function addToCart(id: string, quantity: number = 1) {
   const cart = getCart();
-  const existing = cart.find(item => item.id === id);
+  const existing = cart.find((item) => item.id === id);
   if (existing) {
     existing.quantity += quantity;
   } else {
@@ -29,14 +29,14 @@ export function addToCart(id: number, quantity: number = 1) {
   setCart(cart);
 }
 
-export function removeFromCart(id: number) {
-  const cart = getCart().filter(item => item.id !== id);
+export function removeFromCart(id: string) {
+  const cart = getCart().filter((item) => item.id !== id);
   setCart(cart);
 }
 
-export function updateCartQuantity(id: number, quantity: number) {
+export function updateCartQuantity(id: string, quantity: number) {
   const cart = getCart();
-  const item = cart.find(item => item.id === id);
+  const item = cart.find((item) => item.id === id);
   if (item) {
     item.quantity = quantity;
     if (item.quantity <= 0) {
@@ -44,4 +44,4 @@ export function updateCartQuantity(id: number, quantity: number) {
     }
     setCart(cart);
   }
-} 
+}
