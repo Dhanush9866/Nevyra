@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Heart, Share2, Star, ShoppingCart } from "lucide-react";
-import { addToCart } from "@/lib/cart";
+import { addToCart, getCart } from "@/lib/cart";
 import { useToast } from "@/hooks/use-toast";
 
 export default function ProductDetails() {
@@ -16,6 +16,7 @@ export default function ProductDetails() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [inCart, setInCart] = useState(() => product ? getCart().some(item => item.id === product.id) : false);
 
   useEffect(() => {
     setLoading(true);
@@ -39,6 +40,15 @@ export default function ProductDetails() {
       });
   }, [id]);
 
+  useEffect(() => {
+    if (!product) return;
+    function updateInCart() {
+      setInCart(getCart().some(item => item.id === product.id));
+    }
+    window.addEventListener("cartUpdated", updateInCart);
+    return () => window.removeEventListener("cartUpdated", updateInCart);
+  }, [product]);
+
   const handleAddToCart = () => {
     if (!product) return;
     addToCart(product.id, 1);
@@ -46,6 +56,7 @@ export default function ProductDetails() {
       title: "Added to cart!",
       description: `${product.title} has been added to your cart.`,
     });
+    setInCart(true);
   };
 
   if (loading) {
@@ -179,14 +190,25 @@ export default function ProductDetails() {
             )}
 
             <div className="flex gap-4 mb-6">
-              <Button
-                className="btn-primary flex-1"
-                onClick={handleAddToCart}
-                disabled={!product.inStock}
-              >
-                <ShoppingCart className="h-4 w-4 mr-2" />
-                Add to Cart
-              </Button>
+              {inCart ? (
+                <Button
+                  className="btn-primary flex-1"
+                  onClick={() => navigate("/cart")}
+                  disabled={!product.inStock}
+                >
+                  <ShoppingCart className="h-4 w-4 mr-2" />
+                  Go to Cart
+                </Button>
+              ) : (
+                <Button
+                  className="btn-primary flex-1"
+                  onClick={handleAddToCart}
+                  disabled={!product.inStock}
+                >
+                  <ShoppingCart className="h-4 w-4 mr-2" />
+                  Add to Cart
+                </Button>
+              )}
               <Button variant="outline" size="icon">
                 <Heart className="h-4 w-4" />
               </Button>

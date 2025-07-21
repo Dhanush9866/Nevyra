@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { getWishlist } from "@/lib/wishlist";
 import { getCart } from "@/lib/cart";
+import { useRef } from "react";
 
 const navItems = [
   { name: "Home", path: "/" },
@@ -23,6 +24,13 @@ export const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
+  const [allProducts, setAllProducts] = useState([]);
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchFocused, setSearchFocused] = useState(false);
+  const searchInputRefDesktop = useRef(null);
+  const searchInputRefMobile = useRef(null);
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -66,6 +74,62 @@ export const Navbar = () => {
     return () => window.removeEventListener("storage", onStorage);
   }, []);
 
+  // Fetch all products on mount
+  useEffect(() => {
+    setSearchLoading(true);
+    fetch("http://localhost:8000/api/products/all")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.data)) {
+          setAllProducts(data.data);
+        }
+        setSearchLoading(false);
+      })
+      .catch(() => setSearchLoading(false));
+  }, []);
+
+  // Filter products as user types
+  useEffect(() => {
+    if (searchQuery.trim() === "") {
+      setSearchResults([]);
+      setIsSearching(false);
+      return;
+    }
+    setIsSearching(true);
+    const q = searchQuery.toLowerCase();
+    const results = allProducts.filter(
+      (p) =>
+        p.title?.toLowerCase().includes(q) ||
+        p.category?.toLowerCase().includes(q) ||
+        p.subcategory?.toLowerCase().includes(q)
+    );
+    setSearchResults(results.slice(0, 8)); // limit to 8 results
+  }, [searchQuery, allProducts]);
+
+  // Hide dropdown on outside click
+  useEffect(() => {
+    function handleClick(e) {
+      if (
+        searchInputRefDesktop.current &&
+        !searchInputRefDesktop.current.contains(e.target)
+      ) {
+        setSearchFocused(false);
+      }
+      if (
+        searchInputRefMobile.current &&
+        !searchInputRefMobile.current.contains(e.target)
+      ) {
+        setSearchFocused(false);
+      }
+    }
+    if (searchFocused) {
+      document.addEventListener("mousedown", handleClick);
+    } else {
+      document.removeEventListener("mousedown", handleClick);
+    }
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [searchFocused]);
+
   const handleSignOut = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("userEmail");
@@ -88,16 +152,77 @@ export const Navbar = () => {
           </Link>
 
           {/* Search Bar - Desktop */}
-          <div className="hidden md:flex flex-1 max-w-lg mx-8">
+          <div className="hidden md:flex flex-1 max-w-lg mx-8 relative">
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
+                ref={searchInputRefDesktop}
                 type="search"
                 placeholder="Search products, brands, categories..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 pr-4 w-full"
+                onFocus={() => setSearchFocused(true)}
+                autoComplete="off"
               />
+              {/* Dropdown */}
+              {searchFocused && searchQuery && (
+                <div className="absolute left-0 right-0 mt-2 bg-background border border-border rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+                  {searchLoading ? (
+                    <div className="p-4 text-center text-muted-foreground">Loading...</div>
+                  ) : isSearching && searchResults.length === 0 ? (
+                    <div className="p-4 text-center text-muted-foreground">No products found</div>
+                  ) : (
+                    searchResults.map((product) => (
+                      <div
+                        key={product.id}
+                        className="flex items-center gap-3 px-4 py-2 hover:bg-muted transition-colors border-b last:border-b-0"
+                      >
+                        <img
+                          src={product.image}
+                          alt={product.title}
+                          className="w-10 h-10 object-cover rounded cursor-pointer"
+                          onClick={() => {
+                            navigate(`/products/${product.id}`);
+                            setTimeout(() => setSearchFocused(false), 200);
+                          }}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <span
+                            className="font-medium truncate text-primary hover:underline cursor-pointer"
+                            onMouseDown={e => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              const params = new URLSearchParams();
+                              params.set("q", product.title);
+                              if (product.category) params.set("category", product.category);
+                              if (product.subcategory) params.set("subcategory", product.subcategory);
+                              console.log("Navigating to search:", params.toString());
+                              navigate(`/search?${params.toString()}`);
+                              setSearchFocused(false);
+                              setSearchQuery(""); // Clear the search bar
+                              if (searchInputRefDesktop.current) searchInputRefDesktop.current.blur();
+                              if (searchInputRefMobile.current) searchInputRefMobile.current.blur();
+                            }}
+                          >
+                            {product.title}
+                          </span>
+                          <div className="text-xs text-muted-foreground truncate">{product.category}</div>
+                        </div>
+                        <div
+                          className="font-semibold whitespace-nowrap cursor-pointer"
+                          onClick={() => {
+                            navigate(`/products/${product.id}`);
+                            setTimeout(() => setSearchFocused(false), 200);
+                          }}
+                        >
+                          ₹{product.price}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
@@ -177,16 +302,52 @@ export const Navbar = () => {
         </div>
 
         {/* Mobile Search */}
-        <div className="md:hidden pb-3">
+        <div className="md:hidden pb-3 relative">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
+              ref={searchInputRefMobile}
               type="search"
               placeholder="Search products..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 pr-4 w-full"
+              onFocus={() => setSearchFocused(true)}
+              autoComplete="off"
             />
+            {/* Dropdown */}
+            {searchFocused && searchQuery && (
+              <div className="absolute left-0 right-0 mt-2 bg-background border border-border rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+                {searchLoading ? (
+                  <div className="p-4 text-center text-muted-foreground">Loading...</div>
+                ) : isSearching && searchResults.length === 0 ? (
+                  <div className="p-4 text-center text-muted-foreground">No products found</div>
+                ) : (
+                  searchResults.map((product) => (
+                    <Link
+                      to={`/products/${product.id}`}
+                      key={product.id}
+                      className="flex items-center gap-3 px-4 py-2 hover:bg-muted transition-colors border-b last:border-b-0"
+                      onClick={() => {
+                        navigate(`/products/${product.id}`);
+                        setTimeout(() => setSearchFocused(false), 100);
+                      }}
+                    >
+                      <img
+                        src={product.image}
+                        alt={product.title}
+                        className="w-10 h-10 object-cover rounded"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium truncate">{product.title}</div>
+                        <div className="text-xs text-muted-foreground truncate">{product.category}</div>
+                      </div>
+                      <div className="font-semibold whitespace-nowrap">₹{product.price}</div>
+                    </Link>
+                  ))
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

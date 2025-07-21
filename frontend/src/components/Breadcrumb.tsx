@@ -8,14 +8,14 @@ interface BreadcrumbProps {
 
 const categoryNames: Record<string, string> = {
   'all': 'All Products',
-  'medical': 'Medical & Pharmacy',
-  'groceries': 'Groceries',
-  'fashion': 'Fashion & Beauty',
-  'devices': 'Devices',
-  'electrical': 'Electrical',
-  'automotive': 'Automotive',
-  'sports': 'Sports',
-  'interior': 'Home Interior',
+  'Medical': 'Medical & Pharmacy',
+  'Groceries': 'Groceries',
+  'FashionBeauty': 'Fashion & Beauty',
+  'Devices': 'Devices',
+  'Electrical': 'Electrical',
+  'Automotive': 'Automotive',
+  'Sports': 'Sports',
+  'HomeInterior': 'Home Interior',
 };
 
 const subcategoryNames: Record<string, string> = {

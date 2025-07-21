@@ -6,17 +6,43 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import { getCart, removeFromCart, updateCartQuantity } from "@/lib/cart";
-import { mockProducts } from "./Products";
+// Removed mockProducts import
 
 export default function Cart() {
   const [cartItems, setCartItems] = useState<any[]>([]);
+  const [allProducts, setAllProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  // Fetch all products from backend
+  useEffect(() => {
+    setLoading(true);
+    setError("");
+    fetch("http://localhost:8000/api/products/all")
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch products");
+        return res.json();
+      })
+      .then((data) => {
+        if (data.success && Array.isArray(data.data)) {
+          setAllProducts(data.data);
+        } else {
+          setError("Invalid data format from server");
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message || "Error fetching products");
+        setLoading(false);
+      });
+  }, []);
 
   useEffect(() => {
     const updateCart = () => {
       const cart = getCart();
-      // Merge cart with product details
+      // Merge cart with product details from API
       const items = cart.map(({ id, quantity }) => {
-        const product = mockProducts.find((p) => p.id === id);
+        const product = allProducts.find((p) => p.id === id);
         return product ? { ...product, quantity } : null;
       }).filter(Boolean);
       setCartItems(items);
@@ -24,7 +50,7 @@ export default function Cart() {
     updateCart();
     window.addEventListener("cartUpdated", updateCart);
     return () => window.removeEventListener("cartUpdated", updateCart);
-  }, []);
+  }, [allProducts]);
 
   const handleRemove = (id: number) => {
     removeFromCart(id);
@@ -40,6 +66,13 @@ export default function Cart() {
   const shipping = cartItems.length > 0 ? 15 : 0;
   const tax = Math.round(subtotal * 0.08);
   const total = subtotal + shipping + tax;
+
+  if (loading) {
+    return <div className="text-center py-12">Loading cart...</div>;
+  }
+  if (error) {
+    return <div className="text-center py-12 text-red-500">{error}</div>;
+  }
 
   return (
     <div className="page-transition">

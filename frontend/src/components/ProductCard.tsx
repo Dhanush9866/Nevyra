@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Heart, ShoppingCart, Star, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 import { addToWishlist, removeFromWishlist, isWishlisted as isWishlistedUtil } from "@/lib/wishlist";
-import { addToCart } from "@/lib/cart";
+import { addToCart, getCart } from "@/lib/cart";
 
 interface Product {
   id: number;
@@ -31,9 +31,19 @@ interface ProductCardProps {
 export const ProductCard = ({ product, viewMode }: ProductCardProps) => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const [inCart, setInCart] = useState(() => getCart().some(item => item.id === product.id));
 
   useEffect(() => {
     setIsWishlisted(isWishlistedUtil(product.id));
+  }, [product.id]);
+
+  useEffect(() => {
+    function updateInCart() {
+      setInCart(getCart().some(item => item.id === product.id));
+    }
+    window.addEventListener("cartUpdated", updateInCart);
+    return () => window.removeEventListener("cartUpdated", updateInCart);
   }, [product.id]);
 
   const handleAddToCart = () => {
@@ -43,6 +53,7 @@ export const ProductCard = ({ product, viewMode }: ProductCardProps) => {
       title: "Added to cart!",
       description: `${product.title} has been added to your cart.`,
     });
+    setInCart(true);
   };
 
   const handleWishlistToggle = () => {
@@ -297,22 +308,34 @@ export const ProductCard = ({ product, viewMode }: ProductCardProps) => {
                 </span>
               )}
             </div>
-            {/* Add to Cart Button */}
-            <Button
-              className="w-full group-hover:scale-105 transition-transform duration-200"
-              disabled={!product.inStock || isLoading}
-              onClick={(e) => {
-                e.preventDefault();
-                handleAddToCart();
-              }}
-            >
-              <ShoppingCart className="h-4 w-4 mr-2" />
-              {isLoading
-                ? "Adding..."
-                : product.inStock
-                ? "Add to Cart"
-                : "Out of Stock"}
-            </Button>
+            {/* Add to Cart or Go to Cart Button */}
+            {inCart ? (
+              <Button
+                className="w-full group-hover:scale-105 transition-transform duration-200"
+                onClick={e => {
+                  e.preventDefault();
+                  navigate("/cart");
+                }}
+              >
+                Go to Cart
+              </Button>
+            ) : (
+              <Button
+                className="w-full group-hover:scale-105 transition-transform duration-200"
+                disabled={!product.inStock || isLoading}
+                onClick={e => {
+                  e.preventDefault();
+                  handleAddToCart();
+                }}
+              >
+                <ShoppingCart className="h-4 w-4 mr-2" />
+                {isLoading
+                  ? "Adding..."
+                  : product.inStock
+                  ? "Add to Cart"
+                  : "Out of Stock"}
+              </Button>
+            )}
           </div>
         </CardContent>
       </Link>
