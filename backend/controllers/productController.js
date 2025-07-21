@@ -1,26 +1,53 @@
-const { Product, Category } = require("../models");
-const paginate = require("../utils/pagination");
+const { Product } = require("../models");
+const { validateAttributes } = require("../utils/validateAttributes");
 
 exports.list = async (req, res, next) => {
   try {
     const { page = 1, limit = 10, category, search } = req.query;
     const where = {};
-    if (category) where.categoryId = category;
-    if (search) where.name = { $iLike: `%${search}%` };
-    const products = await Product.findAndCountAll(
-      paginate({ where, include: [Category] }, { page: +page, limit: +limit })
-    );
-    res.json({ success: true, message: "Products fetched", data: products });
+    if (category) where.category = category;
+    if (search) where.title = { $iLike: `%${search}%` };
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+    const { count, rows } = await Product.findAndCountAll({
+      where,
+      offset,
+      limit: parseInt(limit),
+      attributes: [
+        "id",
+        "title",
+        "price",
+        "category",
+        "subCategory",
+        "images",
+        "inStock",
+        "rating",
+        "reviews",
+        "stockQuantity",
+        "soldCount",
+        "attributes",
+      ],
+    });
+    res.json({
+      success: true,
+      message: "Products fetched",
+      data: rows,
+      pagination: {
+        total: count,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        totalPages: Math.ceil(count / limit),
+      },
+    });
   } catch (err) {
     next(err);
   }
 };
 
 exports.details = async (req, res, next) => {
+  console.log(req.params.id);
+  
   try {
-    const product = await Product.findByPk(req.params.id, {
-      include: [Category],
-    });
+    const product = await Product.findByPk(req.params.id);
     if (!product)
       return res
         .status(404)
@@ -33,22 +60,44 @@ exports.details = async (req, res, next) => {
 
 exports.create = async (req, res, next) => {
   try {
-    const { name, price, description, imageUrl, stock, categoryId } = req.body;
-    if (!name || !price || !categoryId)
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Missing required fields",
-          data: null,
-        });
-    const product = await Product.create({
-      name,
+    const {
+      title,
       price,
-      description,
-      imageUrl,
-      stock,
-      categoryId,
+      category,
+      subCategory,
+      images,
+      inStock,
+      rating,
+      reviews,
+      stockQuantity,
+      soldCount,
+      attributes,
+    } = req.body;
+    if (!title || !price || !category || !attributes || !images || !subCategory)
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields",
+        data: null,
+      });
+    if (!validateAttributes(category, attributes)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid attributes for category",
+        data: null,
+      });
+    }
+    const product = await Product.create({
+      title,
+      price,
+      category,
+      subCategory,
+      images,
+      inStock,
+      rating,
+      reviews,
+      stockQuantity,
+      soldCount,
+      attributes,
     });
     res
       .status(201)
@@ -65,7 +114,39 @@ exports.update = async (req, res, next) => {
       return res
         .status(404)
         .json({ success: false, message: "Product not found", data: null });
-    await product.update(req.body);
+    const {
+      title,
+      price,
+      category,
+      subCategory,
+      images,
+      inStock,
+      rating,
+      reviews,
+      stockQuantity,
+      soldCount,
+      attributes,
+    } = req.body;
+    if (category && attributes && !validateAttributes(category, attributes)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid attributes for category",
+        data: null,
+      });
+    }
+    await product.update({
+      title,
+      price,
+      category,
+      subCategory,
+      images,
+      inStock,
+      rating,
+      reviews,
+      stockQuantity,
+      soldCount,
+      attributes,
+    });
     res.json({ success: true, message: "Product updated", data: product });
   } catch (err) {
     next(err);
@@ -83,5 +164,18 @@ exports.remove = async (req, res, next) => {
     res.json({ success: true, message: "Product deleted", data: null });
   } catch (err) {
     next(err);
+  }
+};
+
+exports.getAll = async (req, res, next) => {
+  try {
+    const products = await Product.findAll();
+    res.json({
+      success: true,
+      message: "All products fetched",
+      data: products,
+    });
+  } catch (err) {
+    next(err);  
   }
 };

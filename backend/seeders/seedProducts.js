@@ -1,0 +1,193 @@
+const { Product, sequelize } = require("../models");
+const { categorySchemas } = require("../categorySchemas");
+
+async function seedProducts() {
+  // Force sync: drops and recreates all tables to match models
+  await sequelize.sync({ force: true });
+  const products = [
+    // Medical
+    {
+      id: 1,
+      title: "Paracetamol Tablets",
+      price: 4.99,
+      category: "Medical",
+      subCategory: "Pain Relief",
+      images: [
+        "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=400",
+        "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400",
+      ],
+      inStock: true,
+      rating: 4.5,
+      reviews: 120,
+      stockQuantity: 200,
+      soldCount: 500,
+      attributes: {
+        brand: "MediCure",
+        expiryDate: "2025-12-31",
+        drugName: "Paracetamol",
+        dosage: "500mg",
+        packSize: "20 tablets",
+      },
+    },
+    // Groceries
+    {
+      id: 2,
+      title: "Basmati Rice 5kg",
+      price: 12.99,
+      category: "Groceries",
+      subCategory: "Rice",
+      images: [ "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400"],
+      inStock: true,
+      rating: 4.7,
+      reviews: 80,
+      stockQuantity: 100,
+      soldCount: 300,
+      attributes: {
+        brand: "GoldenGrain",
+        weight: "5kg",
+        type: "Basmati",
+        expiryDate: "2024-11-01",
+      },
+    },
+    // FashionBeauty
+    {
+      id: 3,
+      title: "Men's Cotton T-Shirt",
+      price: 9.99,
+      category: "FashionBeauty",
+      subCategory: "T-Shirts",
+      images: [
+"https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=400",
+        "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400",
+      ],
+      inStock: true,
+      rating: 4.2,
+      reviews: 45,
+      stockQuantity: 150,
+      soldCount: 90,
+      attributes: {
+        size: "L",
+        color: "Blue",
+        material: "Cotton",
+        brand: "StyleMan",
+        gender: "Male",
+        occasion: "Casual",
+      },
+    },
+    // Devices
+    {
+      id: 4,
+      title: "Smartphone X100",
+      price: 299.99,
+      category: "Devices",
+      subCategory: "Smartphones",
+      images: ["https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400"],
+      inStock: true,
+      rating: 4.8,
+      reviews: 210,
+      stockQuantity: 50,
+      soldCount: 120,
+      attributes: {
+        brand: "TechBrand",
+        model: "X100",
+        warranty: "2 years",
+        batteryLife: "24h",
+        storage: "128GB",
+      },
+    },
+    // Electrical
+    {
+      id: 5,
+      title: "LED Bulb 12W",
+      price: 2.49,
+      category: "Electrical",
+      subCategory: "Bulbs",
+      images: ["https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400"],
+      inStock: true,
+      rating: 4.1,
+      reviews: 30,
+      stockQuantity: 500,
+      soldCount: 200,
+      attributes: {
+        voltage: "220V",
+        wattage: "12W",
+        brand: "BrightLite",
+        type: "LED",
+        useCase: "Home",
+      },
+    },
+    // Automotive
+    {
+      id: 6,
+      title: "Car Battery 60Ah",
+      price: 89.99,
+      category: "Automotive",
+      subCategory: "Batteries",
+      images: ["https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400"],
+      inStock: true,
+      rating: 4.6,
+      reviews: 60,
+      stockQuantity: 40,
+      soldCount: 25,
+      attributes: {
+        brand: "AutoPower",
+        compatibleWith: "Sedan",
+        material: "Lead-Acid",
+        warranty: "1 year",
+        type: "Car Battery",
+      },
+    },
+    // Sports
+    {
+      id: 7,
+      title: "Cricket Bat Pro",
+      price: 49.99,
+      category: "Sports",
+      subCategory: "Cricket",
+      images: ["https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400"],
+      inStock: true,
+      rating: 4.9,
+      reviews: 33,
+      stockQuantity: 20,
+      soldCount: 10,
+      attributes: {
+        sport: "Cricket",
+        material: "Willow Wood",
+        brand: "Sporty",
+        size: "Full Size",
+      },
+    },
+    // HomeInterior
+    {
+      id: 8,
+      title: "Modern Sofa Set",
+      price: 499.99,
+      category: "HomeInterior",
+      subCategory: "Sofas",
+      images: ["https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400"],
+      inStock: true,
+      rating: 4.3,
+      reviews: 18,
+      stockQuantity: 5,
+      soldCount: 2,
+      attributes: {
+        material: "Leather",
+        dimensions: "200x90x80cm",
+        color: "Brown",
+        style: "Modern",
+        brand: "HomeLux",
+      },
+    },
+  ];
+
+  await Product.bulkCreate(products);
+  console.log("Seeded products successfully!");
+  const data = await Product.findAll();
+  console.log(data);
+  process.exit();
+}
+
+seedProducts().catch((err) => {
+  console.error("Seeding failed:", err);
+  process.exit(1);
+});

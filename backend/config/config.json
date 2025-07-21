@@ -1,0 +1,16 @@
+{
+    "development": {
+      "username": "ecomestore_user",
+      "password": "zZydoqQS91HGUcfUnVJhuhgGsiv23UBp",
+      "database": "ecomestore",
+      "host": "dpg-d1tv083e5dus73e1ksug-a.oregon-postgres.render.com",
+      "dialect": "postgres",
+      "dialectOptions": {
+        "ssl": {
+          "require": true,
+          "rejectUnauthorized": false
+        }
+      }
+    }
+  }
+  

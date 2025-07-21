@@ -2,7 +2,7 @@ const { sequelize, User, Category, Product } = require("../models");
 const bcrypt = require("bcrypt");
 
 async function seed() {
-  await sequelize.sync({ force: true });
+ // await sequelize.sync({ force: true });
 
   const adminPassword = await bcrypt.hash("admin123", 10);
   await User.create({
