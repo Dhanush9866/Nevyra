@@ -9,42 +9,61 @@ module.exports = (sequelize) => {
         autoIncrement: true,
         primaryKey: true,
       },
-      name: {
-        type: DataTypes.STRING,
+      title: {
+        type: DataTypes.TEXT,
         allowNull: false,
       },
       price: {
-        type: DataTypes.DECIMAL(10, 2),
+        type: DataTypes.NUMERIC,
         allowNull: false,
       },
-      description: {
+      category: {
         type: DataTypes.TEXT,
-        allowNull: true,
-      },
-      imageUrl: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      stock: {
-        type: DataTypes.INTEGER,
         allowNull: false,
+      },
+      subCategory: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+      },
+      images: {
+        type: DataTypes.ARRAY(DataTypes.TEXT),
+        allowNull: false,
+      },
+      inStock: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+      },
+      rating: {
+        type: DataTypes.FLOAT,
+        allowNull: true,
         defaultValue: 0,
       },
-      categoryId: {
+      reviews: {
         type: DataTypes.INTEGER,
-        allowNull: false,
-        references: { model: "categories", key: "id" },
+        allowNull: true,
+        defaultValue: 0,
+      },
+      stockQuantity: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        defaultValue: 0,
+      },
+      soldCount: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        defaultValue: 0,
+      },
+      attributes: {
+        type: DataTypes.JSONB,
+        allowNull: true,
       },
     },
     {
-      timestamps: true,
+      timestamps: false,
       tableName: "products",
     }
   );
-
-  Product.associate = (models) => {
-    Product.belongsTo(models.Category, { foreignKey: "categoryId" });
-  };
 
   return Product;
 };

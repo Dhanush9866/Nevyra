@@ -13,8 +13,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Logger middleware (optional)
-// const logger = require('./middlewares/logger');
-// app.use(logger);
+const logger = require("./middlewares/logger");
+app.use(logger);
 
 // Register API routes
 app.use("/api", routes);
