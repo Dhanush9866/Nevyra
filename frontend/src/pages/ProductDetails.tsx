@@ -1,4 +1,5 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,50 +11,72 @@ import { useToast } from "@/hooks/use-toast";
 export default function ProductDetails() {
   const { id } = useParams();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
-  // Mock product data
-  const product = {
-    id: Number(id) || 1,
-    name: "Premium Wireless Headphones",
-    price: 299,
-    originalPrice: 399,
-    rating: 4.8,
-    reviews: 124,
-    inStock: true,
-    description: "Experience crystal-clear audio with our premium wireless headphones. Featuring advanced noise cancellation technology and up to 30 hours of battery life.",
-    features: [
-      "Active Noise Cancellation",
-      "30-hour battery life",
-      "Premium build quality",
-      "Wireless charging case",
-      "Touch controls"
-    ],
-    specifications: {
-      "Brand": "Nevyra Audio",
-      "Model": "NA-WH1000",
-      "Color": "Midnight Black",
-      "Weight": "250g",
-      "Connectivity": "Bluetooth 5.0"
-    }
-  };
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    setLoading(true);
+    setError("");
+    fetch(`http://localhost:8000/api/products/${id}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch product");
+        return res.json();
+      })
+      .then((data) => {
+        if (data.success && data.data) {
+          setProduct(data.data);
+        } else {
+          setError("Product not found");
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message || "Error fetching product");
+        setLoading(false);
+      });
+  }, [id]);
 
   const handleAddToCart = () => {
+    if (!product) return;
     addToCart(product.id, 1);
     toast({
       title: "Added to cart!",
-      description: `${product.name} has been added to your cart.`,
+      description: `${product.title} has been added to your cart.`,
     });
   };
+
+  if (loading) {
+    return (
+      <div className="page-transition">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
+          Loading product details...
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !product) {
+    return (
+      <div className="page-transition">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center text-red-500">
+          {error || "Product not found"}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="page-transition">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Breadcrumb */}
-        <div className="mb-6">
-          <Link to="/categories" className="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors">
+        {/* Back to Products */}
+        <div className="mb-6 flex items-center gap-4">
+          <Button variant="outline" onClick={() => navigate(-1)}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Categories
-          </Link>
+            Back to Products
+          </Button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -61,13 +84,34 @@ export default function ProductDetails() {
           <div>
             <Card>
               <CardContent className="p-8">
-                <div className="aspect-square bg-gradient-to-br from-muted to-accent/20 rounded-lg flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="w-32 h-32 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <span className="text-4xl">🎧</span>
-                    </div>
-                    <p className="text-muted-foreground">Product Image</p>
-                  </div>
+                <div className="aspect-square rounded-lg flex items-center justify-center bg-white">
+                  {product.images && product.images.length > 0 ? (
+                    <img
+                      src={product.images[0]}
+                      alt={product.title}
+                      className="object-cover w-full h-full rounded-lg"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = "/placeholder.svg";
+                      }}
+                    />
+                  ) : (
+                    <img
+                      src="/placeholder.svg"
+                      alt="No product image"
+                      className="object-cover w-full h-full rounded-lg"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.style.display = "none";
+                        // fallback to icon if even placeholder fails
+                        const parent = e.currentTarget.parentElement;
+                        if (parent) {
+                          parent.innerHTML =
+                            '<span style="font-size:2rem;display:flex;align-items:center;justify-content:center;width:100%;height:100%;">🖼️</span>';
+                        }
+                      }}
+                    />
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -77,25 +121,69 @@ export default function ProductDetails() {
           <div className="space-y-6">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <Badge variant="secondary">In Stock</Badge>
-                <div className="flex items-center">
-                  <Star className="h-4 w-4 fill-accent text-accent" />
-                  <span className="ml-1 text-sm font-medium">{product.rating}</span>
-                  <span className="ml-1 text-sm text-muted-foreground">({product.reviews} reviews)</span>
-                </div>
+                {product.inStock ? (
+                  <Badge variant="secondary">In Stock</Badge>
+                ) : (
+                  <Badge variant="destructive">Out of Stock</Badge>
+                )}
+                {product.rating && (
+                  <div className="flex items-center">
+                    <Star className="h-4 w-4 fill-accent text-accent" />
+                    <span className="ml-1 text-sm font-medium">
+                      {product.rating}
+                    </span>
+                    {product.reviews && (
+                      <span className="ml-1 text-sm text-muted-foreground">
+                        ({product.reviews} reviews)
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
-              <h1 className="text-3xl font-bold text-foreground mb-4">{product.name}</h1>
+              <h1 className="text-3xl font-bold text-foreground mb-4">
+                {product.title}
+              </h1>
               <div className="flex items-center gap-4 mb-6">
-                <span className="text-3xl font-bold text-foreground">₹{product.price}</span>
-                <span className="text-xl text-muted-foreground line-through">₹{product.originalPrice}</span>
-                <Badge className="bg-accent text-accent-foreground">25% OFF</Badge>
+                <span className="text-3xl font-bold text-foreground">
+                  ₹{product.price}
+                </span>
+                {product.originalPrice && (
+                  <span className="text-xl text-muted-foreground line-through">
+                    ₹{product.originalPrice}
+                  </span>
+                )}
+                {product.originalPrice && product.price && (
+                  <Badge className="bg-accent text-accent-foreground">
+                    {Math.round(
+                      100 - (product.price / product.originalPrice) * 100
+                    )}
+                    % OFF
+                  </Badge>
+                )}
               </div>
             </div>
 
-            <p className="text-muted-foreground text-lg">{product.description}</p>
+            <div className="flex flex-wrap gap-4 mb-4">
+              <Badge variant="outline">Category: {product.category}</Badge>
+              {product.subCategory && (
+                <Badge variant="outline">
+                  Subcategory: {product.subCategory}
+                </Badge>
+              )}
+            </div>
 
-            <div className="flex gap-4">
-              <Button className="btn-primary flex-1" onClick={handleAddToCart}>
+            {product.description && (
+              <p className="text-muted-foreground text-lg mb-4">
+                {product.description}
+              </p>
+            )}
+
+            <div className="flex gap-4 mb-6">
+              <Button
+                className="btn-primary flex-1"
+                onClick={handleAddToCart}
+                disabled={!product.inStock}
+              >
                 <ShoppingCart className="h-4 w-4 mr-2" />
                 Add to Cart
               </Button>
@@ -107,35 +195,31 @@ export default function ProductDetails() {
               </Button>
             </div>
 
-            {/* Features */}
-            <Card>
-              <CardContent className="p-6">
-                <h3 className="font-semibold text-foreground mb-4">Key Features</h3>
-                <ul className="space-y-2">
-                  {product.features.map((feature, index) => (
-                    <li key={index} className="flex items-center text-muted-foreground">
-                      <div className="w-2 h-2 bg-accent rounded-full mr-3"></div>
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-
-            {/* Specifications */}
-            <Card>
-              <CardContent className="p-6">
-                <h3 className="font-semibold text-foreground mb-4">Specifications</h3>
-                <dl className="space-y-2">
-                  {Object.entries(product.specifications).map(([key, value]) => (
-                    <div key={key} className="flex justify-between">
-                      <dt className="text-muted-foreground">{key}:</dt>
-                      <dd className="font-medium">{value}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </CardContent>
-            </Card>
+            {/* Attributes */}
+            {product.attributes &&
+              Object.keys(product.attributes).length > 0 && (
+                <Card>
+                  <CardContent className="p-6">
+                    <h3 className="font-semibold text-foreground mb-4">
+                      Product Attributes
+                    </h3>
+                    <ul className="space-y-2">
+                      {Object.entries(product.attributes).map(
+                        ([key, value]) => (
+                          <li
+                            key={key}
+                            className="flex items-center text-muted-foreground"
+                          >
+                            <div className="w-2 h-2 bg-accent rounded-full mr-3"></div>
+                            <span className="font-medium mr-2">{key}:</span>{" "}
+                            {String(value)}
+                          </li>
+                        )
+                      )}
+                    </ul>
+                  </CardContent>
+                </Card>
+              )}
           </div>
         </div>
       </div>
