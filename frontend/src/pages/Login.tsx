@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Mail, Lock, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,16 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -16,6 +26,72 @@ const Login = () => {
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [forgotOpen, setForgotOpen] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [showOTPDialog, setShowOTPDialog] = useState(false);
+  const [showResetDialog, setShowResetDialog] = useState(false);
+  const [resetOTP, setResetOTP] = useState("");
+  const [resetPassword, setResetPassword] = useState("");
+  const [resetConfirmPassword, setResetConfirmPassword] = useState("");
+  const [otpLoading, setOTPLoading] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resendTimer, setResendTimer] = useState(30);
+  const resendInterval = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    if (showOTPDialog) {
+      setResendTimer(30);
+      if (resendInterval.current) clearInterval(resendInterval.current);
+      resendInterval.current = setInterval(() => {
+        setResendTimer((prev) => {
+          if (prev <= 1) {
+            if (resendInterval.current) clearInterval(resendInterval.current);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } else {
+      if (resendInterval.current) clearInterval(resendInterval.current);
+    }
+    return () => {
+      if (resendInterval.current) clearInterval(resendInterval.current);
+    };
+  }, [showOTPDialog]);
+
+  const handleResendOTP = async () => {
+    setForgotLoading(true);
+    try {
+      const response = await fetch("http://localhost:8000/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: forgotEmail }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        toast({
+          title: "Error",
+          description: data.message || "Failed to resend OTP.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "OTP Resent",
+          description: "A new OTP has been sent to your email.",
+        });
+        setResendTimer(30);
+      }
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to resend OTP.",
+        variant: "destructive",
+      });
+    } finally {
+      setForgotLoading(false);
+    }
+  };
 
   const validateForm = () => {
     const newErrors: { email?: string; password?: string } = {};
@@ -87,6 +163,125 @@ const Login = () => {
       title: "Facebook login",
       description: "Facebook login functionality would be implemented here.",
     });
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setForgotLoading(true);
+    try {
+      const response = await fetch("http://localhost:8000/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: forgotEmail }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        toast({
+          title: "Error",
+          description: data.message || "Failed to send OTP.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "OTP Sent",
+          description: "An OTP has been sent to your email.",
+        });
+        setForgotOpen(false);
+        setShowOTPDialog(true);
+        setResetOTP("");
+        setResetPassword("");
+        setResetConfirmPassword("");
+      }
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to send OTP.",
+        variant: "destructive",
+      });
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
+  const handleVerifyOTP = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setOTPLoading(true);
+    try {
+      const response = await fetch("http://localhost:8000/api/auth/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: forgotEmail, otp: resetOTP }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        toast({
+          title: "Error",
+          description: data.message || "Invalid or expired OTP.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "OTP Verified",
+          description: "You can now reset your password.",
+        });
+        setShowOTPDialog(false);
+        setShowResetDialog(true);
+      }
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to verify OTP.",
+        variant: "destructive",
+      });
+    } finally {
+      setOTPLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (resetPassword !== resetConfirmPassword) {
+      toast({
+        title: "Error",
+        description: "Passwords do not match.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setResetLoading(true);
+    try {
+      const response = await fetch("http://localhost:8000/api/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: forgotEmail, otp: resetOTP, newPassword: resetPassword }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        toast({
+          title: "Error",
+          description: data.message || "Failed to reset password.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Password Reset",
+          description: "Your password has been reset. Please log in.",
+        });
+        setShowResetDialog(false);
+        setForgotEmail("");
+        setResetOTP("");
+        setResetPassword("");
+        setResetConfirmPassword("");
+      }
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to reset password.",
+        variant: "destructive",
+      });
+    } finally {
+      setResetLoading(false);
+    }
   };
 
   return (
@@ -180,8 +375,9 @@ const Login = () => {
                   </Label>
                 </div>
                 <Link
-                  to="/forgot-password"
+                  to="#"
                   className="text-sm text-primary hover:underline"
+                  onClick={e => { e.preventDefault(); setForgotOpen(true); }}
                 >
                   Forgot password?
                 </Link>
@@ -259,6 +455,125 @@ const Login = () => {
           </CardContent>
         </Card>
       </div>
+
+      <Dialog open={forgotOpen} onOpenChange={setForgotOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Forgot Password</DialogTitle>
+            <DialogDescription>
+              Enter your email address to receive an OTP for password reset.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleForgotPassword} className="space-y-4">
+            <div>
+              <Label htmlFor="forgot-email">Email</Label>
+              <Input
+                id="forgot-email"
+                type="email"
+                placeholder="Enter your email"
+                value={forgotEmail}
+                onChange={e => setForgotEmail(e.target.value)}
+                required
+              />
+            </div>
+            <DialogFooter>
+              <Button type="submit" disabled={forgotLoading}>
+                {forgotLoading ? "Sending..." : "Send OTP"}
+              </Button>
+              <DialogClose asChild>
+                <Button type="button" variant="outline">Cancel</Button>
+              </DialogClose>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* OTP Dialog */}
+      <Dialog open={showOTPDialog} onOpenChange={setShowOTPDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Enter OTP</DialogTitle>
+            <DialogDescription>
+              Enter the OTP sent to your email to verify your identity.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleVerifyOTP} className="space-y-4">
+            <div>
+              <Label htmlFor="otp">OTP</Label>
+              <Input
+                id="otp"
+                type="text"
+                placeholder="Enter OTP"
+                value={resetOTP}
+                onChange={e => setResetOTP(e.target.value)}
+                required
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={handleResendOTP}
+                disabled={resendTimer > 0 || forgotLoading}
+              >
+                {resendTimer > 0 ? `Resend OTP (${resendTimer}s)` : "Resend OTP"}
+              </Button>
+            </div>
+            <DialogFooter>
+              <Button type="submit" disabled={otpLoading}>
+                {otpLoading ? "Verifying..." : "Verify OTP"}
+              </Button>
+              <DialogClose asChild>
+                <Button type="button" variant="outline">Cancel</Button>
+              </DialogClose>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reset Password Dialog */}
+      <Dialog open={showResetDialog} onOpenChange={setShowResetDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reset My Password</DialogTitle>
+            <DialogDescription>
+              Enter your new password below.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleResetPassword} className="space-y-4">
+            <div>
+              <Label htmlFor="new-password">New Password</Label>
+              <Input
+                id="new-password"
+                type="password"
+                placeholder="Enter new password"
+                value={resetPassword}
+                onChange={e => setResetPassword(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="confirm-password">Confirm Password</Label>
+              <Input
+                id="confirm-password"
+                type="password"
+                placeholder="Confirm new password"
+                value={resetConfirmPassword}
+                onChange={e => setResetConfirmPassword(e.target.value)}
+                required
+              />
+            </div>
+            <DialogFooter>
+              <Button type="submit" disabled={resetLoading}>
+                {resetLoading ? "Resetting..." : "Reset Password"}
+              </Button>
+              <DialogClose asChild>
+                <Button type="button" variant="outline">Cancel</Button>
+              </DialogClose>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

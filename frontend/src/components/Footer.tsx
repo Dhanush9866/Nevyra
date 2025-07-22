@@ -9,9 +9,7 @@ export const Footer = () => {
           {/* Brand Section */}
           <div className="lg:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-primary-foreground rounded-lg flex items-center justify-center">
-                <span className="text-primary font-bold text-lg">N</span>
-              </div>
+              <img src="/logo.jpg" alt="Nevyra Logo" className="w-8 h-8 rounded-lg object-contain" />
               <span className="text-xl font-bold">Nevyra</span>
             </div>
             <p className="text-primary-foreground/80 mb-6 max-w-md">

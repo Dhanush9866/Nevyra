@@ -9,7 +9,7 @@ async function seedProducts() {
     // Medical
     {
       title: "Paracetamol Tablets",
-      price: 4.99,
+      price: 5,
       category: "Medical",
       subCategory: "Pain Relief",
       images: [
@@ -32,7 +32,7 @@ async function seedProducts() {
     // Groceries
     {
       title: "Basmati Rice 5kg",
-      price: 12.99,
+      price: 13,
       category: "Groceries",
       subCategory: "Rice",
       images: [
@@ -53,7 +53,7 @@ async function seedProducts() {
     // FashionBeauty
     {
       title: "Men's Cotton T-Shirt",
-      price: 9.99,
+      price: 10,
       category: "FashionBeauty",
       subCategory: "T-Shirts",
       images: [
@@ -77,7 +77,7 @@ async function seedProducts() {
     // Devices
     {
       title: "Smartphone X100",
-      price: 299.99,
+      price: 300,
       category: "Devices",
       subCategory: "Smartphones",
       images: [
@@ -99,7 +99,7 @@ async function seedProducts() {
     // Electrical
     {
       title: "LED Bulb 12W",
-      price: 2.49,
+      price: 2,
       category: "Electrical",
       subCategory: "Bulbs",
       images: [
@@ -121,7 +121,7 @@ async function seedProducts() {
     // Automotive
     {
       title: "Car Battery 60Ah",
-      price: 89.99,
+      price: 90,
       category: "Automotive",
       subCategory: "Batteries",
       images: [
@@ -143,7 +143,7 @@ async function seedProducts() {
     // Sports
     {
       title: "Cricket Bat Pro",
-      price: 49.99,
+      price: 50,
       category: "Sports",
       subCategory: "Cricket",
       images: [
@@ -164,7 +164,7 @@ async function seedProducts() {
     // HomeInterior
     {
       title: "Modern Sofa Set",
-      price: 499.99,
+      price: 500,
       category: "HomeInterior",
       subCategory: "Sofas",
       images: [

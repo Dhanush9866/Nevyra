@@ -9,6 +9,9 @@ const userSchema = new mongoose.Schema(
     password: { type: String, required: true },
     isAdmin: { type: Boolean, default: false },
     address: { type: String },
+    // Forgot password fields
+    resetPasswordOTP: { type: String },
+    resetPasswordOTPExpires: { type: Date },
   },
   { timestamps: true }
 );

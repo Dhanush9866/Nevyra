@@ -33,21 +33,12 @@ export default function Home() {
       {/* Top Picks For You */}
       <section className="bg-background">
         <ProductGrid />
+        
       </section>
 
       {/* Featured Brands */}
       <section className="bg-muted/30">
         <BrandCarousel />
-      </section>
-
-      {/* Promotional Section */}
-      <section>
-        <PromoBanner />
-      </section>
-
-      {/* Newsletter Signup */}
-      <section>
-        <NewsletterSignup />
       </section>
     </div>
   );

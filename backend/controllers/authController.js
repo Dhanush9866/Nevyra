@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { User } = require("../models");
 const { isEmail, isStrongPassword } = require("../utils/validators");
+const { sendOTPEmail } = require("../utils/emailService");
 
 exports.register = async (req, res, next) => {
   try {
@@ -183,6 +184,79 @@ exports.updateProfile = async (req, res, next) => {
       message: "Profile updated",
       data: userData,
     });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ success: false, message: "Email is required" });
+    }
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ success: false, message: "Email not found" });
+    }
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    user.resetPasswordOTP = otp;
+    user.resetPasswordOTPExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 min
+    await user.save();
+    await sendOTPEmail(email, otp);
+    return res.json({ success: true, message: "OTP sent to your email" });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.resetPassword = async (req, res, next) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+    if (!email || !otp || !newPassword) {
+      return res.status(400).json({ success: false, message: "All fields are required" });
+    }
+    const user = await User.findOne({ email });
+    if (!user || !user.resetPasswordOTP || !user.resetPasswordOTPExpires) {
+      return res.status(400).json({ success: false, message: "Invalid request" });
+    }
+    if (user.resetPasswordOTP !== otp) {
+      return res.status(400).json({ success: false, message: "Invalid OTP" });
+    }
+    if (user.resetPasswordOTPExpires < new Date()) {
+      return res.status(400).json({ success: false, message: "OTP expired" });
+    }
+    if (!isStrongPassword(newPassword)) {
+      return res.status(400).json({ success: false, message: "Password too weak" });
+    }
+    user.password = await bcrypt.hash(newPassword, 10);
+    user.resetPasswordOTP = undefined;
+    user.resetPasswordOTPExpires = undefined;
+    await user.save();
+    return res.json({ success: true, message: "Password reset successful" });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.verifyOTP = async (req, res, next) => {
+  try {
+    const { email, otp } = req.body;
+    if (!email || !otp) {
+      return res.status(400).json({ success: false, message: "Email and OTP are required" });
+    }
+    const user = await User.findOne({ email });
+    if (!user || !user.resetPasswordOTP || !user.resetPasswordOTPExpires) {
+      return res.status(400).json({ success: false, message: "Invalid request" });
+    }
+    if (user.resetPasswordOTP !== otp) {
+      return res.status(400).json({ success: false, message: "Invalid OTP" });
+    }
+    if (user.resetPasswordOTPExpires < new Date()) {
+      return res.status(400).json({ success: false, message: "OTP expired" });
+    }
+    return res.json({ success: true, message: "OTP verified" });
   } catch (err) {
     next(err);
   }
