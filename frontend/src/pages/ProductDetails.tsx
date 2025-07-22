@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Heart, Share2, Star, ShoppingCart } from "lucide-react";
 import { addToCart, getCart } from "@/lib/cart";
+import { addToWishlist, removeFromWishlist, isWishlisted } from "@/lib/wishlist";
 import { useToast } from "@/hooks/use-toast";
 
 export default function ProductDetails() {
@@ -17,6 +18,7 @@ export default function ProductDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [inCart, setInCart] = useState(() => product ? getCart().some(item => item.id === product.id) : false);
+  const [wishlisted, setWishlisted] = useState(() => (product ? isWishlisted(product.id) : false));
 
   useEffect(() => {
     setLoading(true);
@@ -44,11 +46,22 @@ export default function ProductDetails() {
 
   useEffect(() => {
     if (!product) return;
+    setWishlisted(isWishlisted(product.id));
     function updateInCart() {
       setInCart(getCart().some(item => item.id === product.id));
     }
     window.addEventListener("cartUpdated", updateInCart);
     return () => window.removeEventListener("cartUpdated", updateInCart);
+  }, [product]);
+
+  useEffect(() => {
+    if (!product) return;
+    setWishlisted(isWishlisted(product.id));
+    function updateWishlist() {
+      setWishlisted(isWishlisted(product.id));
+    }
+    window.addEventListener("wishlistUpdated", updateWishlist);
+    return () => window.removeEventListener("wishlistUpdated", updateWishlist);
   }, [product]);
 
   const handleAddToCart = () => {
@@ -59,6 +72,25 @@ export default function ProductDetails() {
       description: `${product.title} has been added to your cart.`,
     });
     setInCart(true);
+  };
+
+  const handleWishlist = () => {
+    if (!product) return;
+    if (wishlisted) {
+      removeFromWishlist(product.id);
+      toast({
+        title: "Removed from wishlist",
+        description: `${product.title} has been removed from your wishlist.`,
+      });
+      setWishlisted(false);
+    } else {
+      addToWishlist(product.id);
+      toast({
+        title: "Added to wishlist",
+        description: `${product.title} has been added to your wishlist.`,
+      });
+      setWishlisted(true);
+    }
   };
 
   if (loading) {
@@ -211,8 +243,8 @@ export default function ProductDetails() {
                   Add to Cart
                 </Button>
               )}
-              <Button variant="outline" size="icon">
-                <Heart className="h-4 w-4" />
+              <Button variant={wishlisted ? "secondary" : "outline"} size="icon" onClick={handleWishlist} aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}>
+                <Heart className={`h-4 w-4 ${wishlisted ? "fill-red-500 text-red-500" : ""}`} />
               </Button>
               <Button variant="outline" size="icon">
                 <Share2 className="h-4 w-4" />

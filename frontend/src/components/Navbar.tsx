@@ -145,9 +145,7 @@ export const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 flex-shrink-0">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-lg">N</span>
-            </div>
+            <img src="/logo.jpg" alt="Nevyra Logo" className="w-8 h-8 rounded-lg object-contain" />
             <span className="text-xl font-bold text-foreground hidden sm:block">Nevyra</span>
           </Link>
 
