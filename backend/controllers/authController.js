@@ -261,3 +261,34 @@ exports.verifyOTP = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.getAddresses = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found", data: null });
+    }
+    return res.json({ success: true, message: "Addresses fetched", data: user.addresses || [] });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.addAddress = async (req, res, next) => {
+  try {
+    const { firstName, lastName, email, phone, address, city, zipCode } = req.body;
+    if (!firstName || !lastName || !email || !phone || !address || !city || !zipCode) {
+      return res.status(400).json({ success: false, message: "All address fields required", data: null });
+    }
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found", data: null });
+    }
+    user.addresses = user.addresses || [];
+    user.addresses.push({ firstName, lastName, email, phone, address, city, zipCode });
+    await user.save();
+    return res.status(201).json({ success: true, message: "Address added", data: user.addresses });
+  } catch (err) {
+    next(err);
+  }
+};
