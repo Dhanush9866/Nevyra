@@ -14,8 +14,10 @@ import { CommandPalette } from "@/components/CommandPalette";
 import { FloatingDock } from "@/components/FloatingDock";
 import { TileNavigation } from "@/components/TileNavigation";
 import { FloatingNotifications } from "@/components/FloatingNotifications";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
+  const navigate = useNavigate();
   const navigationTiles = [
     {
       title: "Products",
@@ -29,7 +31,8 @@ const Index = () => {
         { label: "Low Stock", value: "23", trend: "-12" },
         { label: "Best Seller", value: "iPhone 15" }
       ],
-      delay: 0
+      delay: 0,
+      onClick: () => navigate("/products"),
     },
     {
       title: "Orders",
@@ -42,7 +45,8 @@ const Index = () => {
         { label: "Processing", value: "34" },
         { label: "Shipped", value: "156" }
       ],
-      delay: 100
+      delay: 100,
+      onClick: () => navigate("/orders"),
     },
     {
       title: "Customers",
@@ -55,7 +59,8 @@ const Index = () => {
         { label: "New Today", value: "12" },
         { label: "VIP Members", value: "1,847" }
       ],
-      delay: 200
+      delay: 200,
+      onClick: () => navigate("/customers"),
     },
     {
       title: "Analytics",
@@ -64,61 +69,62 @@ const Index = () => {
       gradient: "bg-gradient-to-br from-blue-500/20 to-cyan-500/20",
       size: "wide" as const,
       stats: [
-        { label: "Revenue", value: "$847K", trend: "+12.5%" },
+        { label: "Revenue", value: "₹847K", trend: "+12.5%" },
         { label: "Conversion", value: "3.24%" },
         { label: "Page Views", value: "284K" },
         { label: "Bounce Rate", value: "2.4%" }
       ],
-      delay: 300
+      delay: 300,
+      onClick: () => navigate("/analytics"),
     },
-    {
-      title: "Inventory",
-      description: "Stock management & logistics",
-      icon: Warehouse,
-      gradient: "bg-gradient-to-br from-violet-500/20 to-purple-500/20",
-      size: "small" as const,
-      stats: [
-        { label: "Items in Stock", value: "98.2%" },
-        { label: "Warehouses", value: "8" }
-      ],
-      delay: 400
-    },
-    {
-      title: "Reviews",
-      description: "Customer feedback management",
-      icon: Star,
-      gradient: "bg-gradient-to-br from-yellow-500/20 to-orange-500/20",
-      size: "small" as const,
-      stats: [
-        { label: "Average Rating", value: "4.8★" },
-        { label: "New Reviews", value: "67" }
-      ],
-      delay: 500
-    },
-    {
-      title: "Wishlist",
-      description: "Customer preferences & trends",
-      icon: Heart,
-      gradient: "bg-gradient-to-br from-pink-500/20 to-rose-500/20",
-      size: "small" as const,
-      stats: [
-        { label: "Items Added", value: "1,249" },
-        { label: "Conversion", value: "23%" }
-      ],
-      delay: 600
-    },
-    {
-      title: "Performance",
-      description: "Real-time system metrics",
-      icon: TrendingUp,
-      gradient: "bg-gradient-to-br from-green-500/20 to-emerald-500/20",
-      size: "small" as const,
-      stats: [
-        { label: "Uptime", value: "99.9%" },
-        { label: "Response", value: "1.2ms" }
-      ],
-      delay: 700
-    }
+    // {
+    //   title: "Inventory",
+    //   description: "Stock management & logistics",
+    //   icon: Warehouse,
+    //   gradient: "bg-gradient-to-br from-violet-500/20 to-purple-500/20",
+    //   size: "small" as const,
+    //   stats: [
+    //     { label: "Items in Stock", value: "98.2%" },
+    //     { label: "Warehouses", value: "8" }
+    //   ],
+    //   delay: 400
+    // },
+    // {
+    //   title: "Reviews",
+    //   description: "Customer feedback management",
+    //   icon: Star,
+    //   gradient: "bg-gradient-to-br from-yellow-500/20 to-orange-500/20",
+    //   size: "small" as const,
+    //   stats: [
+    //     { label: "Average Rating", value: "4.8★" },
+    //     { label: "New Reviews", value: "67" }
+    //   ],
+    //   delay: 500
+    // },
+    // {
+    //   title: "Wishlist",
+    //   description: "Customer preferences & trends",
+    //   icon: Heart,
+    //   gradient: "bg-gradient-to-br from-pink-500/20 to-rose-500/20",
+    //   size: "small" as const,
+    //   stats: [
+    //     { label: "Items Added", value: "1,249" },
+    //     { label: "Conversion", value: "23%" }
+    //   ],
+    //   delay: 600
+    // },
+    // {
+    //   title: "Performance",
+    //   description: "Real-time system metrics",
+    //   icon: TrendingUp,
+    //   gradient: "bg-gradient-to-br from-green-500/20 to-emerald-500/20",
+    //   size: "small" as const,
+    //   stats: [
+    //     { label: "Uptime", value: "99.9%" },
+    //     { label: "Response", value: "1.2ms" }
+    //   ],
+    //   delay: 700
+    // }
   ];
 
   return (
@@ -173,7 +179,7 @@ const Index = () => {
               <TileNavigation
                 key={tile.title}
                 {...tile}
-                onClick={() => console.log(`Navigate to ${tile.title}`)}
+                onClick={tile.onClick}
               />
             ))}
           </div>
@@ -184,7 +190,7 @@ const Index = () => {
           <div className="glass rounded-2xl p-6 animate-slide-in-up" style={{ animationDelay: "800ms" }}>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 text-center">
               <div className="space-y-1">
-                <p className="text-2xl font-bold text-primary">$2.8M</p>
+                <p className="text-2xl font-bold text-primary">₹2.8M</p>
                 <p className="text-xs text-muted-foreground">Monthly Revenue</p>
               </div>
               <div className="space-y-1">

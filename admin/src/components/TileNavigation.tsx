@@ -90,7 +90,7 @@ export function NavigationTile({
       </CardContent>
 
       {/* Floating decorations */}
-      <div className="absolute top-4 right-4 w-2 h-2 rounded-full bg-primary/40 float" />
+      <div className="absolute top-6 right-6 w-2 h-2 rounded-full bg-primary/40 float" />
       <div className="absolute bottom-6 left-6 w-1 h-1 rounded-full bg-accent/60 float-delayed" />
     </Card>
   );
