@@ -17,6 +17,8 @@ import Signup from "./pages/Signup";
 import Wishlist from "./pages/Wishlist";
 import NotFound from "./pages/NotFound";
 import SearchResults from "./pages/SearchResults";
+import Payment from "./pages/Payment";
+import About from "./pages/About";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +40,8 @@ const App = () => (
             <Route path="profile" element={<Profile />} />
             <Route path="search" element={<SearchResults />} />
             <Route path="/wishlist" element={<Wishlist />} />
+            <Route path="payment" element={<Payment />} />
+            <Route path="about" element={<About />} />
           </Route>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />

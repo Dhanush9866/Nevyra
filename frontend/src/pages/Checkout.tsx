@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { CreditCard, Truck, Shield } from "lucide-react";
+import { CreditCard, Truck, Shield, Pencil, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { getCart, setCart } from "@/lib/cart";
 import { useNavigate } from "react-router-dom";
@@ -58,6 +58,21 @@ export default function Checkout() {
   const [addresses, setAddressesState] = useState<Address[]>([]);
   const [selectedAddressIdx, setSelectedAddressIdx] = useState<number | null>(null);
   const [showAddressForm, setShowAddressForm] = useState(false);
+  // Payment & coupon state
+  const [paymentMethod, setPaymentMethod] = useState<string>("");
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
+  const [couponError, setCouponError] = useState("");
+
+  function handleApplyCoupon() {
+    if (!couponCode.trim()) {
+      setCouponError("Please enter a coupon code");
+      return;
+    }
+    // For demo, accept any non-empty code as valid
+    setAppliedCoupon(couponCode.trim());
+    setCouponError("");
+  }
 
   // Load addresses from localStorage on mount
   useEffect(() => {
@@ -88,6 +103,13 @@ export default function Checkout() {
     }
   }, [step]);
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login", { replace: true, state: { from: "/checkout" } });
+    }
+  }, [navigate]);
+
   // Add new address handler
   async function handleAddAddress(e: React.FormEvent) {
     e.preventDefault();
@@ -105,40 +127,95 @@ export default function Checkout() {
     else if (!/^\d{4,10}$/.test(zipCode)) newErrors.zipCode = "Invalid ZIP code";
     setErrors((prev) => ({ ...prev, ...newErrors }));
     if (Object.keys(newErrors).length > 0) return;
-    // POST to backend
     const token = localStorage.getItem("token");
     if (!token) return;
     try {
-      const response = await fetch("http://localhost:8000/api/users/addresses", {
-        method: "POST",
+      if (selectedAddressIdx !== null && showAddressForm) {
+        // Editing: update the address at the selected index using the new endpoint
+        const response = await fetch(`http://localhost:8000/api/users/addresses/${selectedAddressIdx}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ firstName, lastName, email, phone, address, city, zipCode }),
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          setErrors((prev) => ({ ...prev, form: data.message || "Failed to update address" }));
+          return;
+        }
+        setAddressesState(data.data);
+        setShowAddressForm(data.data.length === 0);
+        setSelectedAddressIdx(null);
+      } else {
+        // Adding new address
+        const response = await fetch("http://localhost:8000/api/users/addresses", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ firstName, lastName, email, phone, address, city, zipCode }),
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          setErrors((prev) => ({ ...prev, form: data.message || "Failed to add address" }));
+          return;
+        }
+        // Refresh address list
+        fetch("http://localhost:8000/api/users/addresses", {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success && Array.isArray(data.data)) {
+              setAddressesState(data.data);
+              setShowAddressForm(data.data.length === 0);
+            }
+          });
+        setSelectedAddressIdx(null);
+      }
+      setFirstName(""); setLastName(""); setEmail(""); setPhone(""); setAddress(""); setCity(""); setZipCode("");
+    } catch (err) {
+      setErrors((prev) => ({ ...prev, form: "Failed to save address" }));
+    }
+  }
+
+  // Edit address handler
+  function handleEditAddress(idx: number) {
+    const addr = addresses[idx];
+    setFirstName(addr.firstName);
+    setLastName(addr.lastName);
+    setEmail(addr.email);
+    setPhone(addr.phone);
+    setAddress(addr.address);
+    setCity(addr.city);
+    setZipCode(addr.zipCode);
+    setShowAddressForm(true);
+    setSelectedAddressIdx(idx);
+  }
+
+  // Delete address handler
+  async function handleDeleteAddress(idx: number) {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+    try {
+      const response = await fetch(`http://localhost:8000/api/users/addresses/${idx}`, {
+        method: "DELETE",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ firstName, lastName, email, phone, address, city, zipCode }),
       });
       const data = await response.json();
-      console.log("Add address response:", data);
-      if (!response.ok) {
-        setErrors((prev) => ({ ...prev, form: data.message || "Failed to add address" }));
-        return;
+      if (response.ok) {
+        setAddressesState(data.data);
+        setShowAddressForm((data.data || []).length === 0);
+        setSelectedAddressIdx(null);
       }
-      // Refresh address list
-      fetch("http://localhost:8000/api/users/addresses", {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-        .then(res => res.json())
-        .then(data => {
-          console.log("Refetched addresses after add:", data);
-          if (data.success && Array.isArray(data.data)) {
-            setAddressesState(data.data);
-            setShowAddressForm(data.data.length === 0);
-          }
-        });
-      setFirstName(""); setLastName(""); setEmail(""); setPhone(""); setAddress(""); setCity(""); setZipCode("");
-      setSelectedAddressIdx(null);
     } catch (err) {
-      setErrors((prev) => ({ ...prev, form: "Failed to add address" }));
+      // Optionally show error
     }
   }
 
@@ -155,10 +232,7 @@ export default function Checkout() {
     if (!zipCode.trim()) newErrors.zipCode = "ZIP code is required";
     else if (!/^\d{4,10}$/.test(zipCode)) newErrors.zipCode = "Invalid ZIP code";
     // Payment validation
-    if (!cardName.trim()) newErrors.cardName = "Name on card is required";
-    if (!/^\d{16}$/.test(cardNumber.replace(/\s/g, ""))) newErrors.cardNumber = "Card number must be 16 digits";
-    if (!/^\d{2}\/\d{2}$/.test(expiry)) newErrors.expiry = "Expiry must be MM/YY";
-    if (!/^\d{3,4}$/.test(cvv)) newErrors.cvv = "CVV must be 3 or 4 digits";
+    if (!paymentMethod) newErrors.paymentMethod = "Please select a payment method";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }
@@ -167,6 +241,10 @@ export default function Checkout() {
     e.preventDefault();
     setSubmitAttempted(true);
     if (!validateAll()) return;
+    if (!paymentMethod) {
+      setErrors((prev) => ({ ...prev, paymentMethod: "Please select a payment method" }));
+      return;
+    }
     setIsPlacingOrder(true);
     try {
       const token = localStorage.getItem("token");
@@ -184,10 +262,8 @@ export default function Checkout() {
         },
         body: JSON.stringify({
           payment: {
-            cardName,
-            cardNumber: cardNumber.replace(/\s/g, ""),
-            expiry,
-            cvv,
+            method: paymentMethod,
+            coupon: appliedCoupon,
           },
           shipping: {
             firstName,
@@ -236,9 +312,14 @@ export default function Checkout() {
                     <div className="text-sm text-muted-foreground">{addr.address}, {addr.city}, {addr.zipCode}</div>
                     <div className="text-xs text-muted-foreground">{addr.email}</div>
                   </div>
-                  {selectedAddressIdx === idx && (
-                    <Button className="ml-4" size="sm" onClick={() => setStep(2)}>Deliver Here</Button>
-                  )}
+                  <div className="flex gap-2 ml-2">
+                    <Button type="button" size="icon" variant="ghost" onClick={() => handleEditAddress(idx)} aria-label="Edit address">
+                      <Pencil className="w-4 h-4" />
+                    </Button>
+                    <Button type="button" size="icon" variant="ghost" onClick={() => handleDeleteAddress(idx)} aria-label="Delete address">
+                      <Trash2 className="w-4 h-4 text-destructive" />
+                    </Button>
+                  </div>
                 </div>
               ))}
               <Button variant="outline" className="mt-2" onClick={() => setShowAddressForm(true)}>+ Add a new address</Button>
@@ -314,42 +395,36 @@ export default function Checkout() {
     );
   }
 
-  // Step 3: Payment (existing payment form)
+  // Step 3: Payment & coupon options
   function renderPaymentStep() {
     return (
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Payment Information</CardTitle>
+          <CardTitle>Payment & Offers</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6">
+          {/* Coupon code */}
           <div>
-            <Label htmlFor="cardName">Name on Card</Label>
-            <Input id="cardName" placeholder="John Doe" value={cardName} onChange={e => setCardName(e.target.value)} />
-            {submitAttempted && errors.cardName && (
-              <div className="text-destructive text-xs mt-1">{errors.cardName}</div>
-            )}
-          </div>
-          <div>
-            <Label htmlFor="cardNumber">Card Number</Label>
-            <Input id="cardNumber" placeholder="1234 5678 9012 3456" maxLength={19} value={cardNumber} onChange={e => setCardNumber(e.target.value)} />
-            {submitAttempted && errors.cardNumber && (
-              <div className="text-destructive text-xs mt-1">{errors.cardNumber}</div>
-            )}
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="expiry">Expiry Date</Label>
-              <Input id="expiry" placeholder="MM/YY" maxLength={5} value={expiry} onChange={e => setExpiry(e.target.value)} />
-              {submitAttempted && errors.expiry && (
-                <div className="text-destructive text-xs mt-1">{errors.expiry}</div>
-              )}
+            <Label htmlFor="coupon">Coupon Code</Label>
+            <div className="flex gap-2 mt-1">
+              <Input id="coupon" placeholder="Enter coupon code" value={couponCode} onChange={e => setCouponCode(e.target.value)} disabled={!!appliedCoupon} />
+              <Button type="button" onClick={handleApplyCoupon} disabled={!!appliedCoupon}>Apply</Button>
             </div>
-            <div>
-              <Label htmlFor="cvv">CVV</Label>
-              <Input id="cvv" placeholder="123" maxLength={4} type="password" value={cvv} onChange={e => setCvv(e.target.value)} />
-              {submitAttempted && errors.cvv && (
-                <div className="text-destructive text-xs mt-1">{errors.cvv}</div>
-              )}
+            {appliedCoupon && <div className="text-success text-xs mt-1">Coupon "{appliedCoupon}" applied!</div>}
+            {couponError && <div className="text-destructive text-xs mt-1">{couponError}</div>}
+          </div>
+          {/* Payment method */}
+          <div>
+            <Label className="mb-2 block">Select Payment Method</Label>
+            <div className="flex flex-col gap-2">
+              <label className="flex items-center gap-2">
+                <input type="radio" name="paymentMethod" value="razorpay" checked={paymentMethod === "razorpay"} onChange={() => setPaymentMethod("razorpay")} />
+                Razorpay (UPI, Card, Netbanking)
+              </label>
+              <label className="flex items-center gap-2">
+                <input type="radio" name="paymentMethod" value="cod" checked={paymentMethod === "cod"} onChange={() => setPaymentMethod("cod")} />
+                Cash on Delivery
+              </label>
             </div>
           </div>
         </CardContent>
@@ -414,9 +489,23 @@ export default function Checkout() {
               </div>
             </div>
 
-            <Button className="w-full btn-accent text-lg py-3" type="submit" disabled={isPlacingOrder}>
-              {isPlacingOrder ? "Placing Order..." : "Complete Order"}
-            </Button>
+            {step === 1 && addresses.length > 0 && selectedAddressIdx !== null && !showAddressForm && (
+              <Button
+                className="w-full btn-accent text-lg py-3"
+                type="button"
+                onClick={() => {
+                  const selectedAddress = addresses[selectedAddressIdx];
+                  navigate("/payment", { state: { address: selectedAddress, orderSummary } });
+                }}
+              >
+                Continue
+              </Button>
+            )}
+            {step === 3 && (
+              <Button className="w-full btn-accent text-lg py-3" type="submit" disabled={isPlacingOrder}>
+                {isPlacingOrder ? "Placing Order..." : "Complete Order"}
+              </Button>
+            )}
 
             <p className="text-xs text-muted-foreground text-center">
               By placing your order, you agree to our Terms of Service and Privacy Policy
@@ -426,6 +515,18 @@ export default function Checkout() {
       </div>
     );
   }
+
+  // Placeholder order summary (replace with real cart/order data)
+  const orderSummary = {
+    items: [
+      { name: "Premium Wireless Headphones", qty: 1, price: 299 },
+      { name: "Smart Watch Pro", qty: 2, price: 449 },
+    ],
+    subtotal: 1197,
+    shipping: 15,
+    tax: 96,
+    total: 1308,
+  };
 
   return (
     <div className="page-transition">
