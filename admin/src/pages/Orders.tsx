@@ -59,31 +59,31 @@ const Orders: React.FC = () => {
   return (
     <>
       <FloatingDock />
-      <div className="min-h-screen bg-background py-12 px-4 md:px-12">
+      <div className="min-h-screen bg-background py-8 sm:py-12 px-4 sm:px-6 md:px-12 pb-20 sm:pb-12">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-3xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent">Orders</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 bg-gradient-primary bg-clip-text text-transparent">Orders</h1>
           <Card className="glass border-0 shadow-xl">
             <CardContent className="p-0">
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-border">
                   <thead className="bg-muted">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Order ID</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Customer</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Date</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Total</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Status</th>
+                      <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Order ID</th>
+                      <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Customer</th>
+                      <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Date</th>
+                      <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Total</th>
+                      <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Status</th>
                     </tr>
                   </thead>
                   <tbody className="bg-card divide-y divide-border">
                     {dummyOrders.map((order) => (
                       <tr key={order.id} className="hover:bg-muted/50 transition-smooth">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">{order.id}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">{order.customer}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">{order.date}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">{order.total}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm">
-                          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusColor(order.status)}`}>{order.status}</span>
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-foreground">{order.id}</td>
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-foreground">{order.customer}</td>
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-muted-foreground">{order.date}</td>
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-foreground">{order.total}</td>
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm">
+                          <span className={`px-2 sm:px-3 py-1 rounded-full text-xs font-semibold ${statusColor(order.status)}`}>{order.status}</span>
                         </td>
                       </tr>
                     ))}

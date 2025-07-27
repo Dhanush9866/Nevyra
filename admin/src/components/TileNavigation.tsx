@@ -25,48 +25,38 @@ export function NavigationTile({
 }: NavigationTileProps) {
   return (
     <Card 
-      className={cn(
-        "glass border-0 overflow-hidden cursor-pointer group transition-smooth hover-lift animate-scale-in",
-        size === "small" && "col-span-1 row-span-1",
-        size === "medium" && "col-span-1 row-span-2", 
-        size === "large" && "col-span-2 row-span-2",
-        size === "wide" && "col-span-2 row-span-1"
-      )}
+      className="glass border-0 overflow-hidden cursor-pointer group transition-smooth hover-lift animate-scale-in w-full"
       onClick={onClick}
       style={{ animationDelay: `${delay}ms` }}
     >
       <div className={cn("absolute inset-0 opacity-10 group-hover:opacity-20 transition-smooth", gradient)} />
       
-      <CardContent className="relative p-6 h-full flex flex-col">
+      <CardContent className="relative p-4 sm:p-6 h-full flex flex-col">
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
-          <div className="space-y-1">
-            <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-smooth">
+          <div className="space-y-1 flex-1">
+            <h3 className="text-base sm:text-lg font-bold text-foreground group-hover:text-primary transition-smooth">
               {title}
             </h3>
-            <p className="text-sm text-muted-foreground">{description}</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">{description}</p>
           </div>
           <div className={cn(
-            "p-3 rounded-2xl transition-smooth group-hover:scale-110",
-            "bg-white/10 backdrop-blur-sm"
+            "p-2 sm:p-3 rounded-xl sm:rounded-2xl transition-smooth group-hover:scale-110 ml-2",
+            "bg-white/10 backdrop-blur-sm flex-shrink-0"
           )}>
-            <Icon className="h-6 w-6 text-primary" />
+            <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
           </div>
         </div>
 
         {/* Stats */}
-        <div className={cn(
-          "grid gap-4 flex-1",
-          size === "large" ? "grid-cols-2" : "grid-cols-1",
-          size === "wide" ? "grid-cols-4" : ""
-        )}>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 flex-1">
           {stats.map((stat, index) => (
             <div key={index} className="space-y-1">
-              <div className="flex items-baseline gap-2">
-                <p className="text-2xl font-bold text-foreground">{stat.value}</p>
+              <div className="flex items-baseline gap-1 sm:gap-2">
+                <p className="text-lg sm:text-2xl font-bold text-foreground">{stat.value}</p>
                 {stat.trend && (
                   <span className={cn(
-                    "text-xs px-2 py-1 rounded-full font-medium",
+                    "text-xs px-1 sm:px-2 py-0.5 sm:py-1 rounded-full font-medium",
                     stat.trend.startsWith('+') 
                       ? "bg-green-100 text-green-700" 
                       : "bg-red-100 text-red-700"
