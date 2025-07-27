@@ -54,25 +54,25 @@ const Analytics: React.FC = () => {
   return (
     <>
       <FloatingDock />
-      <div className="min-h-screen bg-background py-12 px-4 md:px-12">
+      <div className="min-h-screen bg-background py-8 sm:py-12 px-4 sm:px-6 md:px-12 pb-20 sm:pb-12">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent">Analytics</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 bg-gradient-primary bg-clip-text text-transparent">Analytics</h1>
           {/* Summary Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
             {summaryStats.map((stat) => (
               <Card key={stat.label} className="glass border-0 shadow-md">
-                <CardContent className="py-6 text-center">
-                  <div className={`text-2xl font-bold ${stat.color}`}>{stat.value}</div>
+                <CardContent className="py-4 sm:py-6 text-center">
+                  <div className={`text-lg sm:text-2xl font-bold ${stat.color}`}>{stat.value}</div>
                   <div className="text-xs text-muted-foreground mt-1">{stat.label}</div>
                 </CardContent>
               </Card>
             ))}
           </div>
           {/* Charts */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 mb-6 sm:mb-8">
             <Card className="glass border-0 shadow-lg">
-              <CardContent className="p-6">
-                <h2 className="text-lg font-semibold mb-4 text-purple-700">Monthly Revenue</h2>
+              <CardContent className="p-4 sm:p-6">
+                <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-purple-700">Monthly Revenue</h2>
                 <ChartContainer config={{ revenue: { color: "#7c3aed", label: "Revenue" } }}>
                   <BarChart data={revenueData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                     <XAxis dataKey="month" />
@@ -84,8 +84,8 @@ const Analytics: React.FC = () => {
               </CardContent>
             </Card>
             <Card className="glass border-0 shadow-lg">
-              <CardContent className="p-6">
-                <h2 className="text-lg font-semibold mb-4 text-pink-500">Orders This Week</h2>
+              <CardContent className="p-4 sm:p-6">
+                <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-pink-500">Orders This Week</h2>
                 <ChartContainer config={{ orders: { color: "#f472b6", label: "Orders" } }}>
                   <LineChart data={ordersData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                     <XAxis dataKey="day" />
@@ -97,10 +97,10 @@ const Analytics: React.FC = () => {
               </CardContent>
             </Card>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8">
             <Card className="glass border-0 shadow-lg">
-              <CardContent className="p-6 flex flex-col items-center">
-                <h2 className="text-lg font-semibold mb-4 text-green-500">Category Distribution</h2>
+              <CardContent className="p-4 sm:p-6 flex flex-col items-center">
+                <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-green-500">Category Distribution</h2>
                 <ChartContainer config={{ Electronics: { color: "#7c3aed", label: "Electronics" }, Fashion: { color: "#f472b6", label: "Fashion" }, Home: { color: "#34d399", label: "Home" }, Other: { color: "#fbbf24", label: "Other" } }}>
                   <PieChart width={320} height={220}>
                     <Pie

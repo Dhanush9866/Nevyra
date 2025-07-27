@@ -10,6 +10,10 @@
           "require": true,
           "rejectUnauthorized": false
         }
+      },
+      "razorpay": {
+        "key_id": "rzp_test_Hi1GYpZ5GO1ona",
+        "key_secret": "MD1ZzE5z6dXc5LovE5byCQTm"
       }
     }
   }

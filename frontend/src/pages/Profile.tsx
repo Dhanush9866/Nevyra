@@ -5,10 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { User, Mail, Phone, MapPin, CreditCard, Shield, Bell } from "lucide-react";
+import { User, Mail, Phone, MapPin, CreditCard, Shield, Bell, ShoppingCart, Heart, Package, ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { getWishlist } from "@/lib/wishlist";
+import { getCart } from "@/lib/cart";
 
 export default function Profile() {
   const [profile, setProfile] = useState<any>(null);
@@ -16,6 +18,8 @@ export default function Profile() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const [editProfile, setEditProfile] = useState<any>(null);
+  const [wishlistCount, setWishlistCount] = useState(0);
+  const [cartItemCount, setCartItemCount] = useState(0);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -43,12 +47,38 @@ export default function Profile() {
       });
   }, [navigate]);
 
+  // Update wishlist and cart counts
+  useEffect(() => {
+    const updateWishlistCount = () => {
+      setWishlistCount(getWishlist().length);
+    };
+    const updateCartCount = () => {
+      setCartItemCount(getCart().reduce((sum, item) => sum + item.quantity, 0));
+    };
+    
+    updateWishlistCount();
+    updateCartCount();
+    
+    window.addEventListener("storage", updateWishlistCount);
+    window.addEventListener("wishlistUpdated", updateWishlistCount);
+    window.addEventListener("storage", updateCartCount);
+    window.addEventListener("cartUpdated", updateCartCount);
+    
+    return () => {
+      window.removeEventListener("storage", updateWishlistCount);
+      window.removeEventListener("wishlistUpdated", updateWishlistCount);
+      window.removeEventListener("storage", updateCartCount);
+      window.removeEventListener("cartUpdated", updateCartCount);
+    };
+  }, []);
+
   if (loading) return <div className="text-center py-12">Loading profile...</div>;
   if (error) return <div className="text-center py-12 text-destructive">{error}</div>;
 
   const userStats = [
     { label: "Total Orders", value: "24", icon: "📦" },
-    { label: "Saved Items", value: "12", icon: "❤️" },
+    { label: "Saved Items", value: wishlistCount.toString(), icon: "❤️" },
+    { label: "Cart Items", value: cartItemCount.toString(), icon: "🛒" },
     { label: "Member Since", value: profile?.createdAt?.slice(0, 4) || "-", icon: "🎉" },
   ];
 
@@ -107,6 +137,56 @@ export default function Profile() {
                   </CardContent>
                 </Card>
               ))}
+            </div>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="lg:col-span-3">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+              <Card className="cursor-pointer hover:shadow-lg transition-all duration-300" onClick={() => navigate("/orders")}>
+                <CardContent className="p-6 flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-3 bg-blue-100 rounded-lg">
+                      <Package className="h-6 w-6 text-blue-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-foreground">My Orders</h3>
+                      <p className="text-sm text-muted-foreground">Track your orders</p>
+                    </div>
+                  </div>
+                  <ArrowRight className="h-5 w-5 text-muted-foreground" />
+                </CardContent>
+              </Card>
+
+              <Card className="cursor-pointer hover:shadow-lg transition-all duration-300" onClick={() => navigate("/wishlist")}>
+                <CardContent className="p-6 flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-3 bg-pink-100 rounded-lg">
+                      <Heart className="h-6 w-6 text-pink-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-foreground">Wishlist</h3>
+                      <p className="text-sm text-muted-foreground">{wishlistCount} saved items</p>
+                    </div>
+                  </div>
+                  <ArrowRight className="h-5 w-5 text-muted-foreground" />
+                </CardContent>
+              </Card>
+
+              <Card className="cursor-pointer hover:shadow-lg transition-all duration-300" onClick={() => navigate("/cart")}>
+                <CardContent className="p-6 flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-3 bg-green-100 rounded-lg">
+                      <ShoppingCart className="h-6 w-6 text-green-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-foreground">Shopping Cart</h3>
+                      <p className="text-sm text-muted-foreground">{cartItemCount} items</p>
+                    </div>
+                  </div>
+                  <ArrowRight className="h-5 w-5 text-muted-foreground" />
+                </CardContent>
+              </Card>
             </div>
           </div>
 

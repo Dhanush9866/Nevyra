@@ -11,7 +11,6 @@ import { useRef } from "react";
 const navItems = [
   { name: "Home", path: "/" },
   { name: "Products", path: "/categories" },
-  { name: "Orders", path: "/orders" },
 ];
 
 export const Navbar = () => {
@@ -150,7 +149,7 @@ export const Navbar = () => {
           </Link>
 
           {/* Search Bar - Desktop */}
-          <div className="hidden md:flex flex-1 max-w-lg mx-8 relative">
+          <div className="hidden md:flex flex-1 max-w-lg mx-4 relative">
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -224,10 +223,8 @@ export const Navbar = () => {
             </div>
           </div>
 
-          
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-1">
+          {/* Desktop Navigation & Actions */}
+          <div className="hidden md:flex items-center space-x-4">
             {navItems.map((item) => (
               <Link
                 key={item.path}
@@ -239,29 +236,11 @@ export const Navbar = () => {
                 {item.name}
               </Link>
             ))}
-          </div>
-
-          {/* Desktop Actions */}
-          <div className="hidden md:flex items-center space-x-3">
-            <Link to="/wishlist" className="relative p-2 hover:bg-muted rounded-lg transition-colors">
-              <Heart className="h-5 w-5" />
-              {wishlistCount > 0 && (
-                <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs">
-                  {wishlistCount}
-                </Badge>
-              )}
-            </Link>
-            <Link to="/cart" className="relative p-2 hover:bg-muted rounded-lg transition-colors">
-              <ShoppingCart className="h-5 w-5" />
-              {cartItemCount > 0 && (
-                <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs">
-                  {cartItemCount}
-                </Badge>
-              )}
-            </Link>
+            
             <Link to="/profile" className="p-2 hover:bg-muted rounded-lg transition-colors">
               <User className="h-5 w-5" />
             </Link>
+            
             {isLoggedIn ? (
               <Button size="sm" variant="outline" onClick={handleSignOut}>
                 Sign Out
@@ -280,14 +259,6 @@ export const Navbar = () => {
 
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center space-x-2">
-            <Link to="/cart" className="relative p-2">
-              <ShoppingCart className="h-5 w-5" />
-              {cartItemCount > 0 && (
-                <Badge className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center text-xs">
-                  {cartItemCount}
-                </Badge>
-              )}
-            </Link>
             <Button
               variant="ghost"
               size="sm"
@@ -369,14 +340,6 @@ export const Navbar = () => {
               </Link>
             ))}
             <div className="border-t pt-2 mt-2">
-              <Link
-                to="/wishlist"
-                className="flex items-center px-3 py-2 rounded-md text-base font-medium text-muted-foreground hover:text-foreground hover:bg-muted"
-                onClick={() => setIsOpen(false)}
-              >
-                <Heart className="h-5 w-5 mr-3" />
-                Wishlist ({wishlistCount})
-              </Link>
               <Link
                 to="/profile"
                 className="flex items-center px-3 py-2 rounded-md text-base font-medium text-muted-foreground hover:text-foreground hover:bg-muted"

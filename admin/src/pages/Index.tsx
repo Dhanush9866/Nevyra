@@ -20,19 +20,19 @@ const Index = () => {
   const navigate = useNavigate();
   const navigationTiles = [
     {
-      title: "Products",
-      description: "Manage your entire product catalog",
-      icon: Package,
-      gradient: "bg-gradient-to-br from-purple-500/20 to-pink-500/20",
-      size: "large" as const,
+      title: "Analytics",
+      description: "Business intelligence & insights",
+      icon: BarChart3,
+      gradient: "bg-gradient-to-br from-blue-500/20 to-cyan-500/20",
+      size: "wide" as const,
       stats: [
-        { label: "Total Products", value: "12,847", trend: "+156" },
-        { label: "Categories", value: "24" },
-        { label: "Low Stock", value: "23", trend: "-12" },
-        { label: "Best Seller", value: "iPhone 15" }
+        { label: "Revenue", value: "₹847K", trend: "+12.5%" },
+        { label: "Conversion", value: "3.24%" },
+        { label: "Page Views", value: "284K" },
+        { label: "Bounce Rate", value: "2.4%" }
       ],
       delay: 0,
-      onClick: () => navigate("/products"),
+      onClick: () => navigate("/analytics"),
     },
     {
       title: "Orders",
@@ -49,6 +49,21 @@ const Index = () => {
       onClick: () => navigate("/orders"),
     },
     {
+      title: "Products",
+      description: "Manage your entire product catalog",
+      icon: Package,
+      gradient: "bg-gradient-to-br from-purple-500/20 to-pink-500/20",
+      size: "large" as const,
+      stats: [
+        { label: "Total Products", value: "12,847", trend: "+156" },
+        { label: "Categories", value: "24" },
+        { label: "Low Stock", value: "23", trend: "-12" },
+        { label: "Best Seller", value: "iPhone 15" }
+      ],
+      delay: 200,
+      onClick: () => navigate("/products"),
+    },
+    {
       title: "Customers",
       description: "Customer relationship management",
       icon: Users,
@@ -59,23 +74,8 @@ const Index = () => {
         { label: "New Today", value: "12" },
         { label: "VIP Members", value: "1,847" }
       ],
-      delay: 200,
-      onClick: () => navigate("/customers"),
-    },
-    {
-      title: "Analytics",
-      description: "Business intelligence & insights",
-      icon: BarChart3,
-      gradient: "bg-gradient-to-br from-blue-500/20 to-cyan-500/20",
-      size: "wide" as const,
-      stats: [
-        { label: "Revenue", value: "₹847K", trend: "+12.5%" },
-        { label: "Conversion", value: "3.24%" },
-        { label: "Page Views", value: "284K" },
-        { label: "Bounce Rate", value: "2.4%" }
-      ],
       delay: 300,
-      onClick: () => navigate("/analytics"),
+      onClick: () => navigate("/customers"),
     },
     // {
     //   title: "Inventory",
@@ -141,21 +141,21 @@ const Index = () => {
       <FloatingNotifications />
 
       {/* Main Content Area */}
-      <main className="pt-20 pb-32 px-6">
+      <main className="pt-20 pb-20 sm:pb-32 px-4 sm:px-6">
         {/* Hero Section */}
-        <div className="max-w-7xl mx-auto mb-12">
-          <div className="glass rounded-3xl p-8 text-center animate-slide-in-up">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <Sparkles className="h-8 w-8 text-primary animate-pulse" />
-              <h1 className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+        <div className="max-w-7xl mx-auto mb-8 sm:mb-12">
+          <div className="glass rounded-2xl sm:rounded-3xl p-4 sm:p-8 text-center animate-slide-in-up">
+            <div className="flex items-center justify-center gap-2 sm:gap-3 mb-4">
+              <Sparkles className="h-6 w-6 sm:h-8 sm:w-8 text-primary animate-pulse" />
+              <h1 className="text-2xl sm:text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
                 EcoAdmin Dashboard
               </h1>
-              <Zap className="h-8 w-8 text-accent animate-bounce" />
+              <Zap className="h-6 w-6 sm:h-8 sm:w-8 text-accent animate-bounce" />
             </div>
-            <p className="text-xl text-muted-foreground mb-6">
+            <p className="text-base sm:text-xl text-muted-foreground mb-4 sm:mb-6">
               Revolutionary command-driven ecommerce management
             </p>
-            <div className="flex items-center justify-center gap-8 text-sm text-muted-foreground">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 text-xs sm:text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                 <span>All systems operational</span>
@@ -174,7 +174,7 @@ const Index = () => {
 
         {/* Navigation Tiles Grid */}
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-6 auto-rows-fr">
+          <div className="grid grid-cols-1 gap-4 sm:gap-6">
             {navigationTiles.map((tile, index) => (
               <TileNavigation
                 key={tile.title}
@@ -186,9 +186,9 @@ const Index = () => {
         </div>
 
         {/* Quick Stats Bar */}
-        <div className="max-w-7xl mx-auto mt-12">
-          <div className="glass rounded-2xl p-6 animate-slide-in-up" style={{ animationDelay: "800ms" }}>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 text-center">
+        <div className="max-w-7xl mx-auto mt-8 sm:mt-12">
+          <div className="glass rounded-2xl p-4 sm:p-6 animate-slide-in-up" style={{ animationDelay: "800ms" }}>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6 text-center">
               <div className="space-y-1">
                 <p className="text-2xl font-bold text-primary">₹2.8M</p>
                 <p className="text-xs text-muted-foreground">Monthly Revenue</p>
