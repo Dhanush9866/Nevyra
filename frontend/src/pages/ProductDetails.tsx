@@ -8,6 +8,7 @@ import { ArrowLeft, Heart, Share2, Star, ShoppingCart } from "lucide-react";
 import { addToCart, getCart } from "@/lib/cart";
 import { addToWishlist, removeFromWishlist, isWishlisted } from "@/lib/wishlist";
 import { useToast } from "@/hooks/use-toast";
+import { productAPI } from "@/lib/api";
 
 export default function ProductDetails() {
   const { id } = useParams();
@@ -23,15 +24,11 @@ export default function ProductDetails() {
   useEffect(() => {
     setLoading(true);
     setError("");
-    fetch(`http://localhost:8000/api/products/${id}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch product");
-        return res.json();
-      })
+    
+    productAPI.getProductById(id)
       .then((data) => {
         if (data.success && data.data) {
           console.log(data.data);
-          
           setProduct(data.data);
         } else {
           setError("Product not found");

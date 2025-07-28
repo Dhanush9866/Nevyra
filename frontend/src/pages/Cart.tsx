@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import { getCart, removeFromCart, updateCartQuantity } from "@/lib/cart";
+import { productAPI } from "@/lib/api";
 // Removed mockProducts import
 
 export default function Cart() {
@@ -18,11 +19,8 @@ export default function Cart() {
   useEffect(() => {
     setLoading(true);
     setError("");
-    fetch("http://localhost:8000/api/products/all")
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch products");
-        return res.json();
-      })
+    
+    productAPI.getAllProducts()
       .then((data) => {
         if (data.success && Array.isArray(data.data)) {
           setAllProducts(data.data);

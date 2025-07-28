@@ -5,6 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ProductCard } from "@/components/ProductCard";
 import { Pagination } from "@/components/Pagination";
+import { Loader2, AlertCircle } from "lucide-react";
+import { productAPI } from "@/lib/api";
 
 interface Product {
   id: number;
@@ -18,26 +20,55 @@ interface Product {
   inStock: boolean;
 }
 
-export const ProductGrid = () => {
-  const [products, setProducts] = useState([]);
+interface ProductGridProps {
+  products?: any[];
+  loading?: boolean;
+  error?: string;
+  showPagination?: boolean;
+  itemsPerPage?: number;
+}
+
+export function ProductGrid({ 
+  products: propProducts, 
+  loading: propLoading, 
+  error: propError,
+  showPagination = true,
+  itemsPerPage = 12 
+}: ProductGridProps) {
+  const [products, setProducts] = useState<any[]>([]);
   const [wishlistedItems, setWishlistedItems] = useState<Set<string>>(new Set());
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [loading, setLoading] = useState(true);
-  const itemsPerPage = 12;
 
+  // If products are passed as props, use them; otherwise fetch from API
   useEffect(() => {
+    if (propProducts) {
+      setProducts(propProducts);
+      setLoading(false);
+      setError("");
+      return;
+    }
+
     setLoading(true);
-    fetch(`http://localhost:8000/api/products?page=${currentPage}&limit=${itemsPerPage}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.success && Array.isArray(data.data)) {
-          setProducts(data.data);
-          setTotalPages(data.pagination?.totalPages || 1);
+    setError("");
+    
+    productAPI.getProducts(currentPage, itemsPerPage)
+      .then((data) => {
+        if (data.success && data.data) {
+          setProducts(data.data.products || data.data);
+          setTotalPages(data.data.totalPages || Math.ceil((data.data.total || data.data.length) / itemsPerPage));
+        } else {
+          setError("Invalid data format from server");
         }
         setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message || "Error fetching products");
+        setLoading(false);
       });
-  }, [currentPage]);
+  }, [propProducts, currentPage, itemsPerPage]);
 
   const toggleWishlist = (productId: string) => {
     setWishlistedItems(prev => {

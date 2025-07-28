@@ -1,5 +1,5 @@
-// API Base URL
-const API_BASE_URL = 'http://localhost:8000/api';
+// API Base URL - Updated to deployed backend URL
+const API_BASE_URL = 'https://nevback.onrender.com/api';
 
 // Helper function to get auth token
 const getAuthToken = () => {
@@ -17,16 +17,28 @@ const getAuthHeaders = () => {
 
 // Helper function to handle API responses
 const handleResponse = async (response) => {
-  const data = await response.json();
-  
+  // Check if response is ok before trying to parse JSON
   if (!response.ok) {
-    throw new Error(data.message || `HTTP error! status: ${response.status}`);
+    let errorMessage = `HTTP error! status: ${response.status}`;
+    try {
+      const errorData = await response.json();
+      errorMessage = errorData.message || errorMessage;
+    } catch (e) {
+      // If response is not JSON, use status text
+      errorMessage = response.statusText || errorMessage;
+    }
+    throw new Error(errorMessage);
   }
   
-  return data;
+  try {
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    throw new Error('Invalid JSON response from server');
+  }
 };
 
-// Helper function to make API requests
+// Helper function to make API requests with better error handling
 const apiRequest = async (endpoint, options = {}) => {
   const url = `${API_BASE_URL}${endpoint}`;
   const config = {
@@ -34,8 +46,16 @@ const apiRequest = async (endpoint, options = {}) => {
     ...options,
   };
 
-  const response = await fetch(url, config);
-  return handleResponse(response);
+  try {
+    const response = await fetch(url, config);
+    return handleResponse(response);
+  } catch (error) {
+    // Handle network errors, CORS issues, etc.
+    if (error.name === 'TypeError' && error.message.includes('fetch')) {
+      throw new Error('Network error: Unable to connect to server. Please check your internet connection.');
+    }
+    throw error;
+  }
 };
 
 // ==================== AUTHENTICATION APIs ====================

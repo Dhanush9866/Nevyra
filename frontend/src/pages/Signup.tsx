@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
+import { authAPI, setAuthToken, setUserEmail } from "@/lib/api";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -95,37 +96,33 @@ const Signup = () => {
     setIsLoading(true);
     console.log(formData);
     try {
-      const response = await fetch("http://localhost:8000/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
-          phone: formData.phone,
-          password: formData.password,
-          address: "", // You can add an address field to the form if needed
-        }),
+      const response = await authAPI.register({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password,
       });
-      const data = await response.json();
-      if (!response.ok) {
+
+      if (response.success) {
+        setAuthToken(response.data.token);
+        setUserEmail(formData.email);
+        toast({
+          title: "Success",
+          description: "Account created successfully! Welcome to Nevyra.",
+        });
+        navigate("/");
+      } else {
         toast({
           title: "Signup failed",
-          description: data.message || "Something went wrong. Please try again.",
+          description: response.message || "Something went wrong. Please try again.",
           variant: "destructive",
         });
-        setIsLoading(false);
-        return;
       }
-      toast({
-        title: "Account created successfully!",
-        description: "Welcome to Nevyra. Please check your email to verify your account.",
-      });
-      navigate("/login");
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Signup failed",
-        description: "Something went wrong. Please try again.",
+        description: error.message || "Something went wrong. Please try again.",
         variant: "destructive",
       });
     } finally {

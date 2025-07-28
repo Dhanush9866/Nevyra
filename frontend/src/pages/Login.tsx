@@ -17,6 +17,7 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
+import { authAPI, setAuthToken, setUserEmail } from "@/lib/api";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -63,26 +64,21 @@ const Login = () => {
   const handleResendOTP = async () => {
     setForgotLoading(true);
     try {
-      const response = await fetch("http://localhost:8000/api/auth/forgot-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: forgotEmail }),
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        toast({
-          title: "Error",
-          description: data.message || "Failed to resend OTP.",
-          variant: "destructive",
-        });
-      } else {
+      const response = await authAPI.forgotPassword(forgotEmail);
+      if (response.success) {
         toast({
           title: "OTP Resent",
           description: "A new OTP has been sent to your email.",
         });
         setResendTimer(30);
+      } else {
+        toast({
+          title: "Error",
+          description: response.message || "Failed to resend OTP.",
+          variant: "destructive",
+        });
       }
-    } catch (err) {
+    } catch (err: any) {
       toast({
         title: "Error",
         description: "Failed to resend OTP.",
@@ -117,30 +113,23 @@ const Login = () => {
     if (!validateForm()) return;
     setIsLoading(true);
     try {
-      const response = await fetch("http://localhost:8000/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await response.json();
-      if (!response.ok) {
+      const response = await authAPI.login({ email, password });
+      if (response.success) {
+        setAuthToken(response.data.token);
+        setUserEmail(email);
+        toast({
+          title: "Welcome back!",
+          description: "You have successfully logged in.",
+        });
+        navigate("/profile");
+      } else {
         toast({
           title: "Login failed",
-          description: data.message || "Invalid email or password. Please try again.",
+          description: response.message || "Invalid email or password. Please try again.",
           variant: "destructive",
         });
-        setIsLoading(false);
-        return;
       }
-      // Save token and email to localStorage
-      localStorage.setItem("token", data.data.token);
-      localStorage.setItem("userEmail", email);
-      toast({
-        title: "Welcome back!",
-        description: "You have successfully logged in.",
-      });
-      navigate("/profile");
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Login failed",
         description: "Invalid email or password. Please try again.",
@@ -168,20 +157,10 @@ const Login = () => {
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setForgotLoading(true);
+
     try {
-      const response = await fetch("http://localhost:8000/api/auth/forgot-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: forgotEmail }),
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        toast({
-          title: "Error",
-          description: data.message || "Failed to send OTP.",
-          variant: "destructive",
-        });
-      } else {
+      const response = await authAPI.forgotPassword(forgotEmail);
+      if (response.success) {
         toast({
           title: "OTP Sent",
           description: "An OTP has been sent to your email.",
@@ -191,8 +170,14 @@ const Login = () => {
         setResetOTP("");
         setResetPassword("");
         setResetConfirmPassword("");
+      } else {
+        toast({
+          title: "Error",
+          description: response.message || "Failed to send OTP.",
+          variant: "destructive",
+        });
       }
-    } catch (err) {
+    } catch (err: any) {
       toast({
         title: "Error",
         description: "Failed to send OTP.",
@@ -206,28 +191,24 @@ const Login = () => {
   const handleVerifyOTP = async (e: React.FormEvent) => {
     e.preventDefault();
     setOTPLoading(true);
+
     try {
-      const response = await fetch("http://localhost:8000/api/auth/verify-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: forgotEmail, otp: resetOTP }),
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        toast({
-          title: "Error",
-          description: data.message || "Invalid or expired OTP.",
-          variant: "destructive",
-        });
-      } else {
+      const response = await authAPI.verifyOTP(forgotEmail, resetOTP);
+      if (response.success) {
         toast({
           title: "OTP Verified",
           description: "You can now reset your password.",
         });
         setShowOTPDialog(false);
         setShowResetDialog(true);
+      } else {
+        toast({
+          title: "Error",
+          description: response.message || "Invalid or expired OTP.",
+          variant: "destructive",
+        });
       }
-    } catch (err) {
+    } catch (err: any) {
       toast({
         title: "Error",
         description: "Failed to verify OTP.",
@@ -240,29 +221,21 @@ const Login = () => {
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
+    setResetLoading(true);
+
     if (resetPassword !== resetConfirmPassword) {
       toast({
         title: "Error",
         description: "Passwords do not match.",
         variant: "destructive",
       });
+      setResetLoading(false);
       return;
     }
-    setResetLoading(true);
+
     try {
-      const response = await fetch("http://localhost:8000/api/auth/reset-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: forgotEmail, otp: resetOTP, newPassword: resetPassword }),
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        toast({
-          title: "Error",
-          description: data.message || "Failed to reset password.",
-          variant: "destructive",
-        });
-      } else {
+      const response = await authAPI.resetPassword(forgotEmail, resetOTP, resetPassword);
+      if (response.success) {
         toast({
           title: "Password Reset",
           description: "Your password has been reset. Please log in.",
@@ -272,8 +245,14 @@ const Login = () => {
         setResetOTP("");
         setResetPassword("");
         setResetConfirmPassword("");
+      } else {
+        toast({
+          title: "Error",
+          description: response.message || "Failed to reset password.",
+          variant: "destructive",
+        });
       }
-    } catch (err) {
+    } catch (err: any) {
       toast({
         title: "Error",
         description: "Failed to reset password.",
