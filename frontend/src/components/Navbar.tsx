@@ -1,11 +1,35 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, ShoppingCart, User, Heart, Search, MapPin } from "lucide-react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { getWishlist } from "@/lib/wishlist";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Search,
+  ShoppingCart,
+  Heart,
+  User,
+  Menu,
+  X,
+  LogOut,
+  Settings,
+  Package,
+  Bell,
+  ChevronDown,
+} from "lucide-react";
 import { getCart } from "@/lib/cart";
+import { getWishlist } from "@/lib/wishlist";
+import { useToast } from "@/hooks/use-toast";
+import { logout, getUserEmail, isAuthenticated } from "@/lib/api";
+import { productAPI } from "@/lib/api";
 import { useRef } from "react";
 
 const navItems = [
@@ -13,18 +37,22 @@ const navItems = [
   { name: "Products", path: "/categories" },
 ];
 
-export const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
+export function Navbar() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState("Select Location");
-  const [wishlistCount, setWishlistCount] = useState(0);
+  const [searchResults, setSearchResults] = useState([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
   const [cartItemCount, setCartItemCount] = useState(0);
-  const location = useLocation();
+  const [wishlistCount, setWishlistCount] = useState(0);
+  const [userEmail, setUserEmail] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const { toast } = useToast();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState("Select Location");
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
   const [allProducts, setAllProducts] = useState([]);
-  const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
@@ -76,11 +104,10 @@ export const Navbar = () => {
   // Fetch all products on mount
   useEffect(() => {
     setSearchLoading(true);
-    fetch("http://localhost:8000/api/products/all")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success && Array.isArray(data.data)) {
-          setAllProducts(data.data);
+    productAPI.getAllProducts()
+      .then((res) => {
+        if (res.success && Array.isArray(res.data)) {
+          setAllProducts(res.data);
         }
         setSearchLoading(false);
       })
@@ -129,9 +156,59 @@ export const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClick);
   }, [searchFocused]);
 
+  // Check authentication status
+  useEffect(() => {
+    if (isAuthenticated()) {
+      setUserEmail(getUserEmail() || "");
+    }
+  }, []);
+
+  // Update cart and wishlist counts
+  useEffect(() => {
+    const updateCounts = () => {
+      const cart = getCart();
+      const wishlist = getWishlist();
+      setCartItemCount(cart.length);
+      setWishlistCount(wishlist.length);
+    };
+
+    updateCounts();
+    window.addEventListener("cartUpdated", updateCounts);
+    window.addEventListener("wishlistUpdated", updateCounts);
+
+    return () => {
+      window.removeEventListener("cartUpdated", updateCounts);
+      window.removeEventListener("wishlistUpdated", updateCounts);
+    };
+  }, []);
+
+  // Search functionality
+  const handleSearch = async (query: string) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      setShowSearchResults(false);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await productAPI.searchProducts(query);
+      if (response.success && response.data) {
+        setSearchResults(response.data);
+        setShowSearchResults(true);
+      } else {
+        setSearchResults([]);
+      }
+    } catch (error) {
+      console.error("Search error:", error);
+      setSearchResults([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSignOut = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userEmail");
+    logout();
     setIsLoggedIn(false);
     navigate("/");
   };
@@ -262,10 +339,10 @@ export const Navbar = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setIsOpen(!isOpen)}
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="p-2"
             >
-              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
           </div>
         </div>
@@ -322,7 +399,7 @@ export const Navbar = () => {
       </div>
 
       {/* Mobile Navigation */}
-      {isOpen && (
+      {isMenuOpen && (
         <div className="md:hidden border-t border-border">
           <div className="px-2 pt-2 pb-3 space-y-1">
             {navItems.map((item) => (
@@ -334,7 +411,7 @@ export const Navbar = () => {
                     ? "bg-primary text-primary-foreground"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 }`}
-                onClick={() => setIsOpen(false)}
+                onClick={() => setIsMenuOpen(false)}
               >
                 {item.name}
               </Link>
@@ -343,7 +420,7 @@ export const Navbar = () => {
               <Link
                 to="/profile"
                 className="flex items-center px-3 py-2 rounded-md text-base font-medium text-muted-foreground hover:text-foreground hover:bg-muted"
-                onClick={() => setIsOpen(false)}
+                onClick={() => setIsMenuOpen(false)}
               >
                 <User className="h-5 w-5 mr-3" />
                 Profile
@@ -353,14 +430,14 @@ export const Navbar = () => {
               <Link
                 to="/login"
                 className="flex items-center px-3 py-2 rounded-md text-base font-medium text-muted-foreground hover:text-foreground hover:bg-muted"
-                onClick={() => setIsOpen(false)}
+                onClick={() => setIsMenuOpen(false)}
               >
                 Sign In
               </Link>
               <Link
                 to="/signup"
                 className="flex items-center px-3 py-2 rounded-md text-base font-medium bg-primary text-primary-foreground hover:bg-primary/90"
-                onClick={() => setIsOpen(false)}
+                onClick={() => setIsMenuOpen(false)}
               >
                 Sign Up
               </Link>

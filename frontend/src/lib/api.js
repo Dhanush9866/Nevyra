@@ -1,5 +1,5 @@
-// API Base URL
-const API_BASE_URL = 'http://localhost:8000/api';
+// API Base URL - Updated to deployed backend URL
+const API_BASE_URL = 'https://nevyraback.onrender.com/api';
 
 // Helper function to get auth token
 const getAuthToken = () => {
@@ -17,16 +17,28 @@ const getAuthHeaders = () => {
 
 // Helper function to handle API responses
 const handleResponse = async (response) => {
-  const data = await response.json();
-  
+  // Check if response is ok before trying to parse JSON
   if (!response.ok) {
-    throw new Error(data.message || `HTTP error! status: ${response.status}`);
+    let errorMessage = `HTTP error! status: ${response.status}`;
+    try {
+      const errorData = await response.json();
+      errorMessage = errorData.message || errorMessage;
+    } catch (e) {
+      // If response is not JSON, use status text
+      errorMessage = response.statusText || errorMessage;
+    }
+    throw new Error(errorMessage);
   }
   
-  return data;
+  try {
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    throw new Error('Invalid JSON response from server');
+  }
 };
 
-// Helper function to make API requests
+// Helper function to make API requests with better error handling
 const apiRequest = async (endpoint, options = {}) => {
   const url = `${API_BASE_URL}${endpoint}`;
   const config = {
@@ -34,8 +46,16 @@ const apiRequest = async (endpoint, options = {}) => {
     ...options,
   };
 
-  const response = await fetch(url, config);
-  return handleResponse(response);
+  try {
+    const response = await fetch(url, config);
+    return handleResponse(response);
+  } catch (error) {
+    // Handle network errors, CORS issues, etc.
+    if (error.name === 'TypeError' && error.message.includes('fetch')) {
+      throw new Error('Network error: Unable to connect to server. Please check your internet connection.');
+    }
+    throw error;
+  }
 };
 
 // ==================== AUTHENTICATION APIs ====================
@@ -138,6 +158,81 @@ export const categoryAPI = {
   },
 };
 
+// ==================== CART APIs ====================
+
+export const cartAPI = {
+  // Get user cart items
+  getCartItems: async () => {
+    return apiRequest('/cart');
+  },
+
+  // Add item to cart
+  addToCart: async (productId, quantity = 1) => {
+    return apiRequest('/cart', {
+      method: 'POST',
+      body: JSON.stringify({ productId, quantity }),
+    });
+  },
+
+  // Update cart item quantity
+  updateCartItem: async (itemId, quantity) => {
+    return apiRequest(`/cart/${itemId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ quantity }),
+    });
+  },
+
+  // Remove item from cart
+  removeFromCart: async (itemId) => {
+    return apiRequest(`/cart/${itemId}`, {
+      method: 'DELETE',
+    });
+  },
+
+  // Clear entire cart
+  clearCart: async () => {
+    return apiRequest('/cart/clear', {
+      method: 'DELETE',
+    });
+  },
+};
+
+// ==================== WISHLIST APIs ====================
+
+export const wishlistAPI = {
+  // Get user wishlist
+  getWishlist: async () => {
+    return apiRequest('/wishlist');
+  },
+
+  // Add item to wishlist
+  addToWishlist: async (productId) => {
+    return apiRequest('/wishlist', {
+      method: 'POST',
+      body: JSON.stringify({ productId }),
+    });
+  },
+
+  // Remove item from wishlist
+  removeFromWishlist: async (productId) => {
+    return apiRequest(`/wishlist/${productId}`, {
+      method: 'DELETE',
+    });
+  },
+
+  // Check if item is in wishlist
+  isInWishlist: async (productId) => {
+    return apiRequest(`/wishlist/${productId}/check`);
+  },
+
+  // Clear entire wishlist
+  clearWishlist: async () => {
+    return apiRequest('/wishlist/clear', {
+      method: 'DELETE',
+    });
+  },
+};
+
 // ==================== USER APIs ====================
 
 export const userAPI = {
@@ -154,25 +249,39 @@ export const userAPI = {
     });
   },
 
-  // Update address
-  updateAddress: async (addressId, addressData) => {
-    return apiRequest(`/users/addresses/${addressId}`, {
+  // Update address by index
+  updateAddressByIndex: async (index, addressData) => {
+    return apiRequest(`/users/addresses/${index}`, {
       method: 'PUT',
       body: JSON.stringify(addressData),
     });
   },
 
-  // Delete address
-  deleteAddress: async (addressId) => {
-    return apiRequest(`/users/addresses/${addressId}`, {
+  // Delete address by index
+  deleteAddressByIndex: async (index) => {
+    return apiRequest(`/users/addresses/${index}`, {
       method: 'DELETE',
     });
   },
 
-  // Set default address
-  setDefaultAddress: async (addressId) => {
-    return apiRequest(`/users/addresses/${addressId}/default`, {
+  // Get user profile
+  getUserProfile: async () => {
+    return apiRequest('/users/profile');
+  },
+
+  // Update user profile
+  updateUserProfile: async (profileData) => {
+    return apiRequest('/users/profile', {
       method: 'PUT',
+      body: JSON.stringify(profileData),
+    });
+  },
+
+  // Change password
+  changePassword: async (currentPassword, newPassword) => {
+    return apiRequest('/users/change-password', {
+      method: 'PUT',
+      body: JSON.stringify({ currentPassword, newPassword }),
     });
   },
 };
@@ -190,19 +299,16 @@ export const orderAPI = {
     return apiRequest(`/orders/${orderId}`);
   },
 
-  // Create new order
-  createOrder: async (orderData) => {
+  // Create new order (creates order from cart items)
+  createOrder: async () => {
     return apiRequest('/orders', {
       method: 'POST',
-      body: JSON.stringify(orderData),
     });
   },
 
-  // Cancel order
-  cancelOrder: async (orderId) => {
-    return apiRequest(`/orders/${orderId}/cancel`, {
-      method: 'PUT',
-    });
+  // Get order details with items
+  getOrderDetails: async (orderId) => {
+    return apiRequest(`/orders/${orderId}`);
   },
 };
 
@@ -282,6 +388,37 @@ export const adminAPI = {
   getAnalytics: async () => {
     return apiRequest('/admin/analytics');
   },
+
+  // Create product (admin)
+  createProduct: async (productData) => {
+    return apiRequest('/admin/products', {
+      method: 'POST',
+      body: JSON.stringify(productData),
+    });
+  },
+
+  // Update product (admin)
+  updateProduct: async (productId, productData) => {
+    return apiRequest(`/admin/products/${productId}`, {
+      method: 'PUT',
+      body: JSON.stringify(productData),
+    });
+  },
+
+  // Delete product (admin)
+  deleteProduct: async (productId) => {
+    return apiRequest(`/admin/products/${productId}`, {
+      method: 'DELETE',
+    });
+  },
+
+  // Update order status (admin)
+  updateOrderStatus: async (orderId, status) => {
+    return apiRequest(`/admin/orders/${orderId}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status }),
+    });
+  },
 };
 
 // ==================== UTILITY FUNCTIONS ====================
@@ -347,6 +484,8 @@ export default {
   auth: authAPI,
   products: productAPI,
   categories: categoryAPI,
+  cart: cartAPI,
+  wishlist: wishlistAPI,
   users: userAPI,
   orders: orderAPI,
   payments: paymentAPI,

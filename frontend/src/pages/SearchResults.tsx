@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { ProductCard } from "@/components/ProductCard";
 import { Pagination } from "@/components/Pagination";
 import { Button } from "@/components/ui/button";
+import { productAPI } from "@/lib/api";
 
 export default function SearchResults() {
   const [searchParams] = useSearchParams();
@@ -20,11 +21,8 @@ export default function SearchResults() {
   useEffect(() => {
     setLoading(true);
     setError("");
-    fetch("http://localhost:8000/api/products/all")
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch products");
-        return res.json();
-      })
+    
+    productAPI.getAllProducts()
       .then((data) => {
         if (data.success && Array.isArray(data.data)) {
           setAllProducts(data.data);

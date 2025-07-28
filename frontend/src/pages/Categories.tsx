@@ -21,10 +21,11 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Filter, Grid, List, Star } from "lucide-react";
+import { productAPI } from "@/lib/api";
 
 export default function Categories() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [allProducts, setAllProducts] = useState([]); // fetched from API
+  const [products, setProducts] = useState([]); // fetched from API
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(
     searchParams.get("category") || "all"
@@ -57,14 +58,11 @@ export default function Categories() {
   useEffect(() => {
     setLoading(true);
     setError("");
-    fetch("http://localhost:8000/api/products/all")
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch products");
-        return res.json();
-      })
+    
+    productAPI.getAllProducts()
       .then((data) => {
         if (data.success && Array.isArray(data.data)) {
-          setAllProducts(data.data);
+          setProducts(data.data);
         } else {
           setError("Invalid data format from server");
         }
@@ -78,7 +76,7 @@ export default function Categories() {
 
   // Filter and sort products
   useEffect(() => {
-    let filtered = [...allProducts];
+    let filtered = [...products];
 
     // Category filter
     if (selectedCategory !== "all") {
@@ -148,7 +146,7 @@ export default function Categories() {
     setFilteredProducts(filtered);
     setCurrentPage(1);
   }, [
-    allProducts,
+    products,
     selectedCategory,
     sortBy,
     priceRange,

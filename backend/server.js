@@ -8,7 +8,25 @@ const connectDB = require("./config/mongodb");
 
 const app = express();
 
-app.use(cors());
+// Configure CORS to allow requests from frontend
+const corsOptions = {
+  origin: [
+    'http://localhost:8080', // Your frontend development server
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'https://nevyraback.onrender.com', // Your new backend URL
+    'https://nevfront.onrender.com', // Your previous deployed frontend URL
+    'https://nevyrafront.onrender.com', // Your new deployed frontend URL
+    'https://nevyraui.onrender.com', // Your latest deployed frontend URL
+    'https://nevyra-frontend.vercel.app', // Alternative deployed frontend URL
+    'https://nevyra.vercel.app', // Alternative deployed frontend URL
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+};
+
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 

@@ -7,6 +7,7 @@ import { Breadcrumb } from "@/components/Breadcrumb";
 import { Pagination } from "@/components/Pagination";
 import { Button } from "@/components/ui/button";
 import { Filter, Grid, List } from "lucide-react";
+import { productAPI } from "@/lib/api";
 
 // Removed mockProducts
 
@@ -32,11 +33,8 @@ export default function Products() {
   useEffect(() => {
     setLoading(true);
     setError("");
-    fetch("http://localhost:8000/api/products/all")
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch products");
-        return res.json();
-      })
+    
+    productAPI.getAllProducts()
       .then((data) => {
         if (data.success && Array.isArray(data.data)) {
           setProducts(data.data);

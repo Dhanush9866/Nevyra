@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { getWishlist } from "@/lib/wishlist";
 import { getCart } from "@/lib/cart";
+import { authAPI, isAuthenticated } from "@/lib/api";
 
 export default function Profile() {
   const [profile, setProfile] = useState<any>(null);
@@ -23,15 +24,12 @@ export default function Profile() {
   const { toast } = useToast();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+    if (!isAuthenticated()) {
       navigate("/login");
       return;
     }
-    fetch("http://localhost:8000/api/auth/profile", {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
+    
+    authAPI.getProfile()
       .then((data) => {
         if (!data.success) {
           setError(data.message || "Failed to fetch profile");
@@ -41,8 +39,8 @@ export default function Profile() {
         }
         setLoading(false);
       })
-      .catch(() => {
-        setError("Failed to fetch profile");
+      .catch((err) => {
+        setError(err.message || "Failed to fetch profile");
         setLoading(false);
       });
   }, [navigate]);
