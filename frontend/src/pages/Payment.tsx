@@ -8,6 +8,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { initializeDummyPayment } from "@/lib/dummyRazorpay";
 import { useToast } from "@/hooks/use-toast";
 import { getCart, setCart } from "@/lib/cart";
+import { productAPI, cartAPI, orderAPI } from "@/lib/api";
 
 interface CartItem {
   id: string;
@@ -41,11 +42,8 @@ export default function Payment() {
           setLoading(false);
           return;
         }
-
-        // Fetch all products to get details for cart items
-        const response = await fetch('http://localhost:8000/api/products/all');
-        const data = await response.json();
-        
+        // Fetch all products using productAPI
+        const data = await productAPI.getAllProducts();
         if (data.success && Array.isArray(data.data)) {
           const products = data.data;
           const itemsWithDetails: CartItem[] = cart.map(cartItem => {
@@ -187,47 +185,13 @@ export default function Payment() {
       console.log("Syncing cart items to backend:", localCart);
       for (const cartItem of localCart) {
         console.log("Syncing item:", cartItem);
-        const cartResponse = await fetch("http://localhost:8000/api/cart", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            productId: cartItem.id,
-            quantity: cartItem.quantity,
-          }),
-        });
-        
-        if (!cartResponse.ok) {
-          const errorData = await cartResponse.json();
-          console.error("Cart sync error:", errorData);
-          throw new Error(`Failed to sync cart items to backend: ${errorData.message || 'Unknown error'}`);
-        }
-        
-        const cartData = await cartResponse.json();
-        console.log("Cart sync response:", cartData);
+        await cartAPI.addToCart(cartItem.id, cartItem.quantity);
       }
 
       // Now place the order
-      const response = await fetch("http://localhost:8000/api/orders", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          payment: {
-            method: "cod",
-            coupon: appliedCoupon,
-          },
-          shipping: location.state?.address || {},
-        }),
-      });
-
-      const data = await response.json();
+      const data = await orderAPI.createOrder();
       
-      if (!response.ok) {
+      if (!data.success) {
         throw new Error(data.message || "Order failed. Please try again.");
       }
 

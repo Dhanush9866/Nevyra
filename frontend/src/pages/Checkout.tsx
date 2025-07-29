@@ -8,6 +8,7 @@ import { CreditCard, Truck, Shield, Pencil, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { getCart, setCart } from "@/lib/cart";
 import { useNavigate } from "react-router-dom";
+import { userAPI } from "@/lib/api";
 
 // Address type
 const ADDRESS_KEY = "addresses";
@@ -81,10 +82,7 @@ export default function Checkout() {
     console.log("Token:", token);
     if (step === 1) {
       if (!token) return;
-      fetch("http://localhost:8000/api/users/addresses", {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-        .then(res => res.json())
+      userAPI.getAddresses()
         .then(data => {
           console.log("Fetched addresses:", data);
           if (data.success && Array.isArray(data.data)) {
@@ -132,16 +130,8 @@ export default function Checkout() {
     try {
       if (selectedAddressIdx !== null && showAddressForm) {
         // Editing: update the address at the selected index using the new endpoint
-        const response = await fetch(`http://localhost:8000/api/users/addresses/${selectedAddressIdx}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ firstName, lastName, email, phone, address, city, zipCode }),
-        });
-        const data = await response.json();
-        if (!response.ok) {
+        const data = await userAPI.updateAddressByIndex(selectedAddressIdx, { firstName, lastName, email, phone, address, city, zipCode });
+        if (!data.success) {
           setErrors((prev) => ({ ...prev, form: data.message || "Failed to update address" }));
           return;
         }
@@ -150,30 +140,17 @@ export default function Checkout() {
         setSelectedAddressIdx(null);
       } else {
         // Adding new address
-        const response = await fetch("http://localhost:8000/api/users/addresses", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ firstName, lastName, email, phone, address, city, zipCode }),
-        });
-        const data = await response.json();
-        if (!response.ok) {
+        const data = await userAPI.addAddress({ firstName, lastName, email, phone, address, city, zipCode });
+        if (!data.success) {
           setErrors((prev) => ({ ...prev, form: data.message || "Failed to add address" }));
           return;
         }
         // Refresh address list
-        fetch("http://localhost:8000/api/users/addresses", {
-          headers: { Authorization: `Bearer ${token}` }
-        })
-          .then(res => res.json())
-          .then(data => {
-            if (data.success && Array.isArray(data.data)) {
-              setAddressesState(data.data);
-              setShowAddressForm(data.data.length === 0);
-            }
-          });
+        const addrData = await userAPI.getAddresses();
+        if (addrData.success && Array.isArray(addrData.data)) {
+          setAddressesState(addrData.data);
+          setShowAddressForm(addrData.data.length === 0);
+        }
         setSelectedAddressIdx(null);
       }
       setFirstName(""); setLastName(""); setEmail(""); setPhone(""); setAddress(""); setCity(""); setZipCode("");
@@ -201,15 +178,8 @@ export default function Checkout() {
     const token = localStorage.getItem("token");
     if (!token) return;
     try {
-      const response = await fetch(`http://localhost:8000/api/users/addresses/${idx}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = await response.json();
-      if (response.ok) {
+      const data = await userAPI.deleteAddressByIndex(idx);
+      if (data.success) {
         setAddressesState(data.data);
         setShowAddressForm((data.data || []).length === 0);
         setSelectedAddressIdx(null);
