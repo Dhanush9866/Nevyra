@@ -5,6 +5,8 @@ declare global {
   }
 }
 
+import { paymentAPI } from "@/lib/api";
+
 export interface RazorpayOptions {
   key: string;
   amount: number;
@@ -64,29 +66,7 @@ export const createPaymentOrder = async (amount: number, currency: string = 'INR
   if (!token) {
     throw new Error('User not authenticated');
   }
-
-  const response = await fetch('http://localhost:8000/api/payments/create-order', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-    },
-    body: JSON.stringify({
-      amount,
-      currency,
-      receipt: `receipt_${Date.now()}`,
-      notes: {
-        source: 'nevyra-ecommerce'
-      }
-    }),
-  });
-
-  const data = await response.json();
-  
-  if (!response.ok) {
-    throw new Error(data.message || 'Failed to create payment order');
-  }
-
+  const data = await paymentAPI.createOrder({ amount, currency });
   return data.data;
 };
 
@@ -100,27 +80,12 @@ export const verifyPayment = async (
   if (!token) {
     throw new Error('User not authenticated');
   }
-
-  const response = await fetch('http://localhost:8000/api/payments/verify', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-    },
-    body: JSON.stringify({
-      razorpay_order_id,
-      razorpay_payment_id,
-      razorpay_signature,
-    }),
+  const data = await paymentAPI.verifyPayment({
+    razorpay_order_id,
+    razorpay_payment_id,
+    razorpay_signature
   });
-
-  const data = await response.json();
-  
-  if (!response.ok) {
-    throw new Error(data.message || 'Payment verification failed');
-  }
-
-  return data.data;
+  return data;
 };
 
 // Initialize payment
