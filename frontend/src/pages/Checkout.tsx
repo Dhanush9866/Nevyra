@@ -253,7 +253,42 @@ export default function Checkout() {
         setIsPlacingOrder(false);
         return;
       }
-      // Place order API call
+
+      // First, sync local cart items to backend
+      const localCart = getCart();
+      if (localCart.length === 0) {
+        alert("Cart is empty. Please add items to your cart before placing an order.");
+        setIsPlacingOrder(false);
+        return;
+      }
+
+      // Sync each cart item to backend
+      console.log("Syncing cart items to backend:", localCart);
+      for (const cartItem of localCart) {
+        console.log("Syncing item:", cartItem);
+        const cartResponse = await fetch("http://localhost:8000/api/cart", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            productId: cartItem.id,
+            quantity: cartItem.quantity,
+          }),
+        });
+        
+        if (!cartResponse.ok) {
+          const errorData = await cartResponse.json();
+          console.error("Cart sync error:", errorData);
+          throw new Error(`Failed to sync cart items to backend: ${errorData.message || 'Unknown error'}`);
+        }
+        
+        const cartData = await cartResponse.json();
+        console.log("Cart sync response:", cartData);
+      }
+
+      // Now place the order
       const response = await fetch("http://localhost:8000/api/orders", {
         method: "POST",
         headers: {
@@ -282,7 +317,11 @@ export default function Checkout() {
         return;
       }
       setCart([]);
-      navigate("/order-success");
+      navigate("/orders", { 
+        state: { 
+          showSuccessMessage: true
+        } 
+      });
     } catch (err) {
       alert("Order failed. Please try again.");
     } finally {

@@ -3,8 +3,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Package, Truck, CheckCircle, Clock } from "lucide-react";
+import { useLocation } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+import { useEffect } from "react";
 
 export default function Orders() {
+  const location = useLocation();
+  const { toast } = useToast();
+
+  // Show success message if redirected from payment
+  useEffect(() => {
+    if (location.state?.showSuccessMessage) {
+      toast({
+        title: "Order Placed Successfully! 🎉",
+        description: "Your order has been placed and will be processed soon. You'll receive a confirmation email shortly.",
+      });
+    }
+  }, [location.state, toast]);
+
   const orders = [
     {
       id: "ORD-001",
