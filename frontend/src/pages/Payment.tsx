@@ -123,13 +123,14 @@ export default function Payment() {
             description: `Dummy Payment ID: ${response.razorpay_payment_id}`,
           });
           
-          // Clear cart and redirect to success page
+          // Clear cart and redirect to orders page
           setCart([]);
-          navigate("/order-success", { 
+          navigate("/orders", { 
             state: { 
               paymentId: response.razorpay_payment_id,
               orderId: response.razorpay_order_id,
-              paymentMethod: "dummy_razorpay"
+              paymentMethod: "dummy_razorpay",
+              showSuccessMessage: true
             } 
           });
         },
@@ -171,7 +172,44 @@ export default function Payment() {
         return;
       }
 
-      // Place order API call
+      // First, sync local cart items to backend
+      const localCart = getCart();
+      if (localCart.length === 0) {
+        toast({
+          title: "Cart is Empty",
+          description: "Please add items to your cart before placing an order",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Sync each cart item to backend
+      console.log("Syncing cart items to backend:", localCart);
+      for (const cartItem of localCart) {
+        console.log("Syncing item:", cartItem);
+        const cartResponse = await fetch("http://localhost:8000/api/cart", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            productId: cartItem.id,
+            quantity: cartItem.quantity,
+          }),
+        });
+        
+        if (!cartResponse.ok) {
+          const errorData = await cartResponse.json();
+          console.error("Cart sync error:", errorData);
+          throw new Error(`Failed to sync cart items to backend: ${errorData.message || 'Unknown error'}`);
+        }
+        
+        const cartData = await cartResponse.json();
+        console.log("Cart sync response:", cartData);
+      }
+
+      // Now place the order
       const response = await fetch("http://localhost:8000/api/orders", {
         method: "POST",
         headers: {
@@ -193,12 +231,13 @@ export default function Payment() {
         throw new Error(data.message || "Order failed. Please try again.");
       }
 
-      // Clear cart and redirect to success page
+      // Clear cart and redirect to orders page
       setCart([]);
-      navigate("/order-success", { 
+      navigate("/orders", { 
         state: { 
           paymentMethod: "cod",
-          orderId: data.orderId 
+          orderId: data.orderId,
+          showSuccessMessage: true
         } 
       });
 

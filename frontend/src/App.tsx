@@ -19,6 +19,7 @@ import NotFound from "./pages/NotFound";
 import SearchResults from "./pages/SearchResults";
 import Payment from "./pages/Payment";
 import About from "./pages/About";
+import OrderSuccess from "./pages/OrderSuccess";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
             <Route path="search" element={<SearchResults />} />
             <Route path="/wishlist" element={<Wishlist />} />
             <Route path="payment" element={<Payment />} />
+            <Route path="order-success" element={<OrderSuccess />} />
             <Route path="about" element={<About />} />
           </Route>
           <Route path="/login" element={<Login />} />
