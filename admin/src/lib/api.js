@@ -1,5 +1,5 @@
 // API Base URL - Update to your deployed backend URL
-const API_BASE_URL = 'https://nevyraback.onrender.com/api';
+const API_BASE_URL = 'https://nevyra-9b9y.onrender.com/api';
 
 // Helper function to handle API responses
 const handleResponse = async (response) => {
