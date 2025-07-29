@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { toast } from "@/hooks/use-toast";
+import { adminAPI } from "@/lib/api";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Enter a valid email address" }),
@@ -33,13 +34,8 @@ const Login: React.FC = () => {
     setError(null);
     setLoading(true);
     try {
-      const res = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-      });
-      const data = await res.json();
-      if (!res.ok || !data.success) {
+      const data = await adminAPI.login(values);
+      if (!data.success) {
         setError(data.message || "Login failed");
         toast({ title: "Login failed", description: data.message || "Invalid credentials", });
         setLoading(false);
