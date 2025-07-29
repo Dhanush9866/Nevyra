@@ -12,6 +12,7 @@ const app = express();
 const corsOptions = {
   origin: [
     "https://nevyrafron.onrender.com",
+    "https://nevyrafron.onrender.com",
 'https://nevyrafrontend.onrender.com',
 'https://nevyra.onrender.com',
     'http://localhost:8080', // Your frontend development server
