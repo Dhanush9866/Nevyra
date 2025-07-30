@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { getWishlist, removeFromWishlist } from "@/lib/wishlist";
 import { addToCart } from "@/lib/cart";
-// Removed mockProducts import
+import { API_BASE_URL } from "@/lib/api";
 
 // Use the same Product type as ProductCard
 interface Product {
@@ -40,7 +40,7 @@ const Wishlist = () => {
   useEffect(() => {
     setLoading(true);
     setError("");
-    fetch("http://localhost:8000/api/products/all")
+    fetch(`${API_BASE_URL}/products/all`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch products");
         return res.json();
@@ -62,7 +62,7 @@ const Wishlist = () => {
   useEffect(() => {
     const updateWishlist = () => {
       const wishlistIds = getWishlist();
-      const items = allProducts.filter((p) => wishlistIds.includes(p.id));
+      const items = allProducts.filter((p) => wishlistIds.includes(p.id.toString()));
       setWishlistItems(items);
     };
     updateWishlist();
@@ -84,7 +84,7 @@ const Wishlist = () => {
   const categories = ["All", ...Array.from(new Set(wishlistItems.map(item => item.category)))];
 
   const handleRemoveFromWishlist = (itemId: number) => {
-    removeFromWishlist(itemId);
+    removeFromWishlist(itemId.toString());
     setWishlistItems(prev => prev.filter(item => item.id !== itemId));
     setFilteredItems(prev => prev.filter(item => item.id !== itemId));
     toast({
@@ -94,7 +94,7 @@ const Wishlist = () => {
   };
 
   const addToCartHandler = (item: Product) => {
-    addToCart(item.id, 1);
+    addToCart(item.id.toString(), 1);
     toast({
       title: "Added to cart",
       description: `${item.title} has been added to your cart.`,

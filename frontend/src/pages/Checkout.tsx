@@ -8,7 +8,7 @@ import { CreditCard, Truck, Shield, Pencil, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { getCart, setCart } from "@/lib/cart";
 import { useNavigate } from "react-router-dom";
-import { userAPI } from "@/lib/api";
+import { userAPI, API_BASE_URL } from "@/lib/api";
 
 // Address type
 const ADDRESS_KEY = "addresses";
@@ -236,7 +236,7 @@ export default function Checkout() {
       console.log("Syncing cart items to backend:", localCart);
       for (const cartItem of localCart) {
         console.log("Syncing item:", cartItem);
-        const cartResponse = await fetch("http://localhost:8000/api/cart", {
+        const cartResponse = await fetch(`${API_BASE_URL}/cart`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -259,7 +259,7 @@ export default function Checkout() {
       }
 
       // Now place the order
-      const response = await fetch("http://localhost:8000/api/orders", {
+      const response = await fetch(`${API_BASE_URL}/orders`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
