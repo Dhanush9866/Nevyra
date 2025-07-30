@@ -3,6 +3,7 @@ import { HeroCarousel } from "@/components/HeroCarousel";
 import { TrendingDeals } from "@/components/TrendingDeals";
 import { ProductGrid } from "@/components/ProductGrid";
 import { CategoryGrid } from "@/components/CategoryGrid";
+import { CategoryNavBar } from "@/components/CategoryNavBar";
 import { BrandCarousel } from "@/components/BrandCarousel";
 import { PromoBanner } from "@/components/PromoBanner";
 import { NewsletterSignup } from "@/components/NewsletterSignup";
@@ -10,6 +11,9 @@ import { NewsletterSignup } from "@/components/NewsletterSignup";
 export default function Home() {
   return (
     <div className="page-transition">
+      {/* Category Navigation Bar - Flipkart Style */}
+      <CategoryNavBar />
+
       {/* Hero Banner Carousel */}
       <section className="px-4 sm:px-6 lg:px-8 py-8">
         <div className="max-w-7xl mx-auto">

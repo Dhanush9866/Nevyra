@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { getWishlist } from "@/lib/wishlist";
 import { getCart } from "@/lib/cart";
-import { authAPI, isAuthenticated } from "@/lib/api";
+import { authAPI, isAuthenticated, API_BASE_URL } from "@/lib/api";
 
 export default function Profile() {
   const [profile, setProfile] = useState<any>(null);
@@ -88,7 +88,7 @@ export default function Profile() {
     e.preventDefault();
     const token = localStorage.getItem("token");
     try {
-      const response = await fetch("http://localhost:8000/api/auth/profile", {
+      const response = await fetch(`${API_BASE_URL}/auth/profile`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

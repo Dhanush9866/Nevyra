@@ -1,5 +1,5 @@
 // API Base URL - Updated to deployed backend URL
-const API_BASE_URL = 'https://nevyra-9b9y.onrender.com/api';
+export const API_BASE_URL = 'http://localhost:8000/api';
 
 // Helper function to get auth token
 const getAuthToken = () => {
