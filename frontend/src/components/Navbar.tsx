@@ -217,7 +217,7 @@ export function Navbar() {
     <nav className={`bg-background border-b border-border sticky top-0 z-50 transition-all duration-300 ${
       isScrolled ? "shadow-lg bg-background/95 backdrop-blur-sm" : ""
     }`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full px-2 sm:px-4 lg:px-6">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 flex-shrink-0">

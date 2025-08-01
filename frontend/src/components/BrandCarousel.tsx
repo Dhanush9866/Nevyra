@@ -30,7 +30,7 @@ export const BrandCarousel = () => {
 
   return (
     <div className="py-12">
-      <div className="max-w-full mx-auto px-2 sm:px-4 lg:px-6">
+      <div className="w-full px-1 sm:px-2 lg:px-3">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-foreground mb-2">Featured Brands</h2>
           <p className="text-muted-foreground">Trusted by millions worldwide</p>

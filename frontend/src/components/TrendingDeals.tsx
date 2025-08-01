@@ -79,7 +79,7 @@ export const TrendingDeals = () => {
 
   return (
     <div className="py-8">
-      <div className="max-w-full mx-auto px-2 sm:px-4 lg:px-6">
+      <div className="w-full px-1 sm:px-2 lg:px-3">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
           <div className="flex items-center space-x-3 mb-4 sm:mb-0">

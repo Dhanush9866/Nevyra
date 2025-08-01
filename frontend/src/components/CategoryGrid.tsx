@@ -132,7 +132,7 @@ export const CategoryGrid = () => {
               >
                 {category.products.map((product: any) => (
                   <div key={product.id} className="flex-shrink-0 w-48 group">
-                    <Link to={`/products?category=${category.name}&product=${product.name}`} className="block">
+                    <Link to={`/products/${product.id}`} className="block">
                       {/* Product Image - Borderless */}
                       <div className="aspect-square mb-3">
                         <img

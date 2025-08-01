@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useState, useRef, useEffect } from "react";
@@ -10,6 +10,10 @@ export const CategoryNavBar = () => {
   const categoryRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const location = useLocation();
+  
+  // Check if we're on the home page
+  const isHomePage = location.pathname === "/";
 
   const categories = [
     {
@@ -241,7 +245,7 @@ export const CategoryNavBar = () => {
   return (
     <>
       <div className="bg-gradient-to-r from-white via-gray-50 to-white border-b border-gray-200 shadow-lg relative z-50">
-        <div className="max-w-full mx-auto px-2 sm:px-4 lg:px-6">
+        <div className="w-full px-1 sm:px-2 lg:px-3">
           <div className="flex items-center justify-between py-4 overflow-x-auto scrollbar-hide gap-2">
             {categories.map((category) => (
               <div
@@ -253,42 +257,57 @@ export const CategoryNavBar = () => {
               >
                 <Link
                   to={category.link}
-                  className={`flex flex-col items-center justify-center min-w-[100px] px-3 py-3 rounded-xl transition-all duration-300 hover:shadow-xl hover:scale-105 ${
+                  className={`flex ${isHomePage ? 'flex-col items-center justify-center min-w-[100px] px-3 py-3' : 'flex-row items-center justify-center min-w-[80px] px-4 py-2'} rounded-xl transition-all duration-300 hover:shadow-xl hover:scale-105 ${
                     hoveredCategory === category.id ? category.theme.bg : `hover:${category.theme.bg}`
                   }`}
                 >
-                  <div className="w-16 h-16 mb-3 flex items-center justify-center relative">
-                    <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <img 
-                      src={category.icon} 
-                      alt={category.name}
-                      className="h-16 w-16 object-cover rounded-xl transition-all duration-300 group-hover:scale-110 relative z-10 shadow-sm"
-                      onError={(e) => {
-                        // Fallback to a default icon if image fails to load
-                        e.currentTarget.style.display = 'none';
-                        e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                      }}
-                    />
-                    {/* Fallback icon - hidden by default */}
-                    <div className={`hidden w-16 h-16 text-3xl flex items-center justify-center ${category.theme.icon} group-hover:${category.theme.icon} relative z-10`}>
-                      {category.name === "Medical" && "❤️"}
-                      {category.name === "Groceries" && "🛒"}
-                      {category.name === "FashionBeauty" && "👕"}
-                      {category.name === "Devices" && "📱"}
-                      {category.name === "Electrical" && "⚡"}
-                      {category.name === "Automotive" && "🚗"}
-                      {category.name === "Sports" && "🏆"}
-                      {category.name === "HomeInterior" && "🏠"}
+                  {isHomePage ? (
+                    // Home page - Show images
+                    <>
+                      <div className="w-16 h-16 mb-3 flex items-center justify-center relative">
+                        <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <img 
+                          src={category.icon} 
+                          alt={category.name}
+                          className="h-16 w-16 object-cover rounded-xl transition-all duration-300 group-hover:scale-110 relative z-10 shadow-sm"
+                          onError={(e) => {
+                            // Fallback to a default icon if image fails to load
+                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                          }}
+                        />
+                        {/* Fallback icon - hidden by default */}
+                        <div className={`hidden w-16 h-16 text-3xl flex items-center justify-center ${category.theme.icon} group-hover:${category.theme.icon} relative z-10`}>
+                          {category.name === "Medical" && "❤️"}
+                          {category.name === "Groceries" && "🛒"}
+                          {category.name === "FashionBeauty" && "👕"}
+                          {category.name === "Devices" && "📱"}
+                          {category.name === "Electrical" && "⚡"}
+                          {category.name === "Automotive" && "🚗"}
+                          {category.name === "Sports" && "🏆"}
+                          {category.name === "HomeInterior" && "🏠"}
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <span className={`text-sm font-semibold text-gray-800 group-hover:${category.theme.icon} transition-colors duration-300 whitespace-nowrap`}>
+                          {category.name}
+                        </span>
+                        {category.hasDropdown && (
+                          <ChevronDown className={`h-4 w-4 text-gray-500 group-hover:${category.theme.icon} transition-all duration-300 group-hover:rotate-180`} />
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    // Other pages - Show only names (Flipkart style)
+                    <div className="flex items-center space-x-1">
+                      <span className={`text-sm font-medium text-gray-700 group-hover:${category.theme.icon} transition-colors duration-300 whitespace-nowrap`}>
+                        {category.name}
+                      </span>
+                      {category.hasDropdown && (
+                        <ChevronDown className={`h-3 w-3 text-gray-500 group-hover:${category.theme.icon} transition-all duration-300 group-hover:rotate-180`} />
+                      )}
                     </div>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <span className={`text-sm font-semibold text-gray-800 group-hover:${category.theme.icon} transition-colors duration-300 whitespace-nowrap`}>
-                      {category.name}
-                    </span>
-                    {category.hasDropdown && (
-                      <ChevronDown className={`h-4 w-4 text-gray-500 group-hover:${category.theme.icon} transition-all duration-300 group-hover:rotate-180`} />
-                    )}
-                  </div>
+                  )}
                 </Link>
               </div>
             ))}

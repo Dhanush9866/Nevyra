@@ -15,8 +15,8 @@ export default function Home() {
       <CategoryNavBar />
 
       {/* Hero Banner Carousel */}
-      <section className="px-2 sm:px-4 lg:px-6 py-8">
-        <div className="max-w-full mx-auto">
+      <section className="px-1 sm:px-2 lg:px-3 py-8">
+        <div className="w-full">
           <HeroCarousel />
         </div>
       </section>
