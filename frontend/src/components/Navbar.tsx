@@ -227,18 +227,32 @@ export function Navbar() {
 
           {/* Search Bar - Desktop */}
           <div className="hidden md:flex flex-1 max-w-lg mx-4 relative">
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <div className="relative w-full group">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:scale-110 transition-all duration-200 z-10" />
               <Input
                 ref={searchInputRefDesktop}
                 type="search"
                 placeholder="Search products, brands, categories..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-4 w-full"
+                className="pl-12 pr-12 w-full border-2 border-gray-200 hover:border-primary/70 focus:border-primary focus:ring-4 focus:ring-primary/30 transition-all duration-300 shadow-lg hover:shadow-xl focus:shadow-2xl bg-white/95 backdrop-blur-sm rounded-xl relative z-10"
                 onFocus={() => setSearchFocused(true)}
                 autoComplete="off"
               />
+              <button
+                onClick={() => {
+                  if (searchQuery.trim()) {
+                    navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+                    setSearchQuery("");
+                    setSearchFocused(false);
+                  }
+                }}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 bg-primary hover:bg-primary/90 text-white rounded-lg transition-all duration-200 hover:scale-110 z-20"
+                disabled={!searchQuery.trim()}
+              >
+                <Search className="h-4 w-4" />
+              </button>
               {/* Dropdown */}
               {searchFocused && searchQuery && (
                 <div className="absolute left-0 right-0 mt-2 bg-background border border-border rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
@@ -349,18 +363,32 @@ export function Navbar() {
 
         {/* Mobile Search */}
         <div className="md:hidden pb-3 relative">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <div className="relative group">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:scale-110 transition-all duration-200 z-10" />
             <Input
               ref={searchInputRefMobile}
               type="search"
               placeholder="Search products..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-4 w-full"
+              className="pl-12 pr-12 w-full border-2 border-gray-200 hover:border-primary/70 focus:border-primary focus:ring-4 focus:ring-primary/30 transition-all duration-300 shadow-lg hover:shadow-xl focus:shadow-2xl bg-white/95 backdrop-blur-sm rounded-xl relative z-10"
               onFocus={() => setSearchFocused(true)}
               autoComplete="off"
             />
+            <button
+              onClick={() => {
+                if (searchQuery.trim()) {
+                  navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+                  setSearchQuery("");
+                  setSearchFocused(false);
+                }
+              }}
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 bg-primary hover:bg-primary/90 text-white rounded-lg transition-all duration-200 hover:scale-110 z-20"
+              disabled={!searchQuery.trim()}
+            >
+              <Search className="h-4 w-4" />
+            </button>
             {/* Dropdown */}
             {searchFocused && searchQuery && (
               <div className="absolute left-0 right-0 mt-2 bg-background border border-border rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">

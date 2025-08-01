@@ -1,76 +1,104 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Heart, ShoppingCart, Shirt, Smartphone, Zap, Car, Trophy, Home as HomeIcon, ChevronRight } from "lucide-react";
+import { Heart, ShoppingCart, Shirt, Smartphone, Zap, Car, Trophy, Home as HomeIcon, ChevronRight, ChevronLeft } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { productAPI } from "@/lib/api";
 
 export const CategoryGrid = () => {
-  const categories = [
-    {
-      id: 1,
-      name: "Beauty, Food, Toys & more",
-      products: [
-        { id: "med1", name: "Top Selling Stationery", price: 49, image: "https://images.unsplash.com/photo-1583485088034-697b5bc36d3c?w=200&h=200&fit=crop&crop=center", discount: "From ₹49" },
-        { id: "med2", name: "Best of Action Toys", price: 299, image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=200&h=200&fit=crop&crop=center", discount: "Up to 70% Off" },
-        { id: "med3", name: "Geared Cycles", price: 1999, image: "https://images.unsplash.com/photo-1544191696-102dbdaeeaa5?w=200&h=200&fit=crop&crop=center", discount: "Up to 70% Off" },
-        { id: "med4", name: "Remote Control Toys", price: 599, image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=200&h=200&fit=crop&crop=center", discount: "Up to 80% Off" },
-        { id: "med5", name: "Puzzles & Cubes", price: 79, image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=200&h=200&fit=crop&crop=center", discount: "From ₹79" },
-        { id: "med6", name: "Soft Toys", price: 399, image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=200&h=200&fit=crop&crop=center", discount: "Upto 70% Off" },
-        { id: "med7", name: "Dry Fruits", price: 199, image: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=200&h=200&fit=crop&crop=center", discount: "Upto 75% Off" }
-      ]
-    },
-    {
-      id: 2,
-      name: "Sports, Healthcare & more",
-      products: [
-        { id: "gro1", name: "Coffee Powder", price: 299, image: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=200&h=200&fit=crop&crop=center", discount: "Upto 80% Off" },
-        { id: "gro2", name: "Breakfast Cereal", price: 199, image: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=200&h=200&fit=crop&crop=center", discount: "Upto 75% Off" },
-        { id: "gro3", name: "Musical Toys", price: 199, image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=200&h=200&fit=crop&crop=center", discount: "Under 199" },
-        { id: "gro4", name: "Honey", price: 399, image: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=200&h=200&fit=crop&crop=center", discount: "Upto 75% Off" },
-        { id: "gro5", name: "Tea Powder", price: 149, image: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=200&h=200&fit=crop&crop=center", discount: "Upto 75% Off" },
-        { id: "gro6", name: "Learning & Education", price: 599, image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=200&h=200&fit=crop&crop=center", discount: "Up to 80% Off" }
-      ]
-    },
-    {
-      id: 3,
-      name: "Fashion & Beauty",
-      products: [
-        { id: "fash1", name: "Denim Jacket", price: 2499, image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=200&h=200&fit=crop&crop=center", discount: "Up to 60% Off" },
-        { id: "fash2", name: "Running Shoes", price: 1899, image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=200&h=200&fit=crop&crop=center", discount: "Up to 50% Off" },
-        { id: "fash3", name: "Leather Bag", price: 3999, image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=200&h=200&fit=crop&crop=center", discount: "Up to 40% Off" },
-        { id: "fash4", name: "Sunglasses", price: 899, image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=200&h=200&fit=crop&crop=center", discount: "Up to 70% Off" },
-        { id: "fash5", name: "Wrist Watch", price: 1299, image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=200&h=200&fit=crop&crop=center", discount: "Up to 55% Off" },
-        { id: "fash6", name: "Perfume", price: 799, image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=200&h=200&fit=crop&crop=center", discount: "Up to 65% Off" }
-      ]
-    },
-    {
-      id: 4,
-      name: "Electronics & Gadgets",
-      products: [
-        { id: "dev1", name: "Smartphone", price: 15999, image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200&h=200&fit=crop&crop=center", discount: "Up to 30% Off" },
-        { id: "dev2", name: "Laptop", price: 45999, image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200&h=200&fit=crop&crop=center", discount: "Up to 25% Off" },
-        { id: "dev3", name: "Wireless Earbuds", price: 2999, image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200&h=200&fit=crop&crop=center", discount: "Up to 40% Off" },
-        { id: "dev4", name: "Smart Watch", price: 3999, image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200&h=200&fit=crop&crop=center", discount: "Up to 35% Off" },
-        { id: "dev5", name: "Power Bank", price: 999, image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200&h=200&fit=crop&crop=center", discount: "Up to 50% Off" },
-        { id: "dev6", name: "Bluetooth Speaker", price: 1499, image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200&h=200&fit=crop&crop=center", discount: "Up to 45% Off" }
-      ]
-    },
-    {
-      id: 5,
-      name: "Home & Living",
-      products: [
-        { id: "home1", name: "Wall Clock", price: 799, image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=200&h=200&fit=crop&crop=center", discount: "Up to 60% Off" },
-        { id: "home2", name: "Table Lamp", price: 1299, image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=200&h=200&fit=crop&crop=center", discount: "Up to 55% Off" },
-        { id: "home3", name: "Curtain Set", price: 899, image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=200&h=200&fit=crop&crop=center", discount: "Up to 70% Off" },
-        { id: "home4", name: "Bed Sheet", price: 599, image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=200&h=200&fit=crop&crop=center", discount: "Up to 65% Off" },
-        { id: "home5", name: "Cushion Cover", price: 299, image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=200&h=200&fit=crop&crop=center", discount: "Up to 75% Off" },
-        { id: "home6", name: "Wall Art", price: 499, image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=200&h=200&fit=crop&crop=center", discount: "Up to 50% Off" }
-      ]
+  const scrollRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
+  const [categories, setCategories] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const scrollToDirection = (categoryId: number, direction: 'left' | 'right') => {
+    const container = scrollRefs.current[categoryId];
+    if (container) {
+      const scrollAmount = 300; // Adjust scroll amount as needed
+      const newScrollLeft = direction === 'left' 
+        ? container.scrollLeft - scrollAmount 
+        : container.scrollLeft + scrollAmount;
+      
+      container.scrollTo({
+        left: newScrollLeft,
+        behavior: 'smooth'
+      });
     }
-  ];
+  };
+
+  // Fetch products from API and group by category
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await productAPI.getAllProducts();
+        
+        if (response.success && Array.isArray(response.data)) {
+          // Group products by category
+          const groupedProducts = response.data.reduce((acc: any, product: any) => {
+            const category = product.category || 'Other';
+            if (!acc[category]) {
+              acc[category] = [];
+            }
+            acc[category].push({
+              id: product._id || product.id,
+              name: product.title || product.name,
+              price: product.price,
+              image: product.images && product.images.length > 0 ? product.images[0] : "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=200&h=200&fit=crop&crop=center",
+              discount: product.discount || "Up to 50% Off",
+              rating: product.rating,
+              reviews: product.reviews,
+              inStock: product.inStock
+            });
+            return acc;
+          }, {});
+
+          // Convert to array format for rendering
+          const categoryArray = Object.keys(groupedProducts).map((categoryName, index) => ({
+            id: index + 1,
+            name: categoryName,
+            products: groupedProducts[categoryName]
+          }));
+
+          setCategories(categoryArray);
+        }
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="py-8 bg-background">
+        <div className="max-w-full mx-auto px-2 sm:px-4 lg:px-6">
+          <div className="animate-pulse">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="mb-12">
+                <div className="h-8 bg-gray-200 rounded mb-6 w-1/3"></div>
+                <div className="flex gap-4 overflow-hidden">
+                  {[1, 2, 3, 4, 5].map((j) => (
+                    <div key={j} className="flex-shrink-0 w-48">
+                      <div className="aspect-square bg-gray-200 rounded mb-3"></div>
+                      <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                      <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="py-8 bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-full mx-auto px-2 sm:px-4 lg:px-6">
         {categories.map((category, index) => (
           <div key={category.id} className={`mb-12 ${index > 0 ? 'border-t border-gray-200 pt-8' : ''}`}>
             {/* Category Heading */}
@@ -79,9 +107,30 @@ export const CategoryGrid = () => {
             </h2>
             
             {/* Horizontal Scrolling Products with Navigation Arrow */}
-            <div className="relative">
-              <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-4">
-                {category.products.map((product) => (
+            <div className="relative w-full group">
+              {/* Left Arrow */}
+              <button
+                onClick={() => scrollToDirection(category.id, 'left')}
+                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white shadow-lg rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                aria-label="Scroll left"
+              >
+                <ChevronLeft className="h-5 w-5 text-gray-600" />
+              </button>
+
+              {/* Right Arrow */}
+              <button
+                onClick={() => scrollToDirection(category.id, 'right')}
+                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white shadow-lg rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                aria-label="Scroll right"
+              >
+                <ChevronRight className="h-5 w-5 text-gray-600" />
+              </button>
+
+              <div 
+                ref={(el) => scrollRefs.current[category.id] = el}
+                className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 scroll-smooth whitespace-nowrap px-2"
+              >
+                {category.products.map((product: any) => (
                   <div key={product.id} className="flex-shrink-0 w-48 group">
                     <Link to={`/products?category=${category.name}&product=${product.name}`} className="block">
                       {/* Product Image - Borderless */}
