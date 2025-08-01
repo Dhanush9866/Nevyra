@@ -15,7 +15,8 @@ interface Product {
   originalPrice?: number;
   rating: number;
   reviews: number;
-  image: string;
+  image?: string;
+  images?: string[];
   category: string;
   subcategory: string;
   inStock: boolean;
@@ -96,16 +97,14 @@ export const ProductCard = ({ product, viewMode }: ProductCardProps) => {
                   to={`/products/${product.id}`}
                   className="block w-full h-full"
                 >
-                  {product.image ? (
+                  {(product.image || (product.images && product.images.length > 0)) ? (
                     <img
-                      src={product.image}
+                      src={product.image || product.images[0]}
                       alt={product.title}
                       className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
                     />
                   ) : (
-                    <span className="text-6xl">🖼️
-          
-                    </span>
+                    <span className="text-6xl">🖼️</span>
                   )}
                 </Link>
 
@@ -225,9 +224,9 @@ export const ProductCard = ({ product, viewMode }: ProductCardProps) => {
         <CardContent className="p-0 h-full">
           {/* Product Image */}
           <div className="relative aspect-square bg-gradient-to-br from-muted to-accent/20 flex items-center justify-center rounded-t-lg overflow-hidden">
-            {product.image ? (
+            {(product.image || (product.images && product.images.length > 0)) ? (
               <img
-                src={product.image}
+                src={product.image || product.images[0]}
                 alt={product.title}
                 className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-110"
               />
