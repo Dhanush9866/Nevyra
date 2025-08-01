@@ -253,7 +253,7 @@ export function Navbar() {
                         className="flex items-center gap-3 px-4 py-2 hover:bg-muted transition-colors border-b last:border-b-0"
                       >
                         <img
-                          src={product.image}
+                          src={product.image || (product.images && product.images[0]) || "/placeholder.svg"}
                           alt={product.title}
                           className="w-10 h-10 object-cover rounded cursor-pointer"
                           onClick={() => {
@@ -380,7 +380,7 @@ export function Navbar() {
                       }}
                     >
                       <img
-                        src={product.image}
+                        src={product.image || (product.images && product.images[0]) || "/placeholder.svg"}
                         alt={product.title}
                         className="w-10 h-10 object-cover rounded"
                       />

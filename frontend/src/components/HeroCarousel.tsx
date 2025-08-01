@@ -70,7 +70,7 @@ export const HeroCarousel = () => {
   };
 
   return (
-    <div className="relative w-full h-64 md:h-96 lg:h-[28rem] overflow-hidden rounded-lg">
+    <div className="relative w-full h-44 md:h-48 lg:h-56 overflow-hidden rounded-lg">
       {/* Banners */}
       <div 
         className="flex transition-transform duration-500 ease-in-out h-full"
@@ -82,14 +82,14 @@ export const HeroCarousel = () => {
             className={`w-full h-full flex-shrink-0 bg-gradient-to-r ${banner.bgColor} flex items-center justify-center relative`}
           >
             <div className="text-center text-white z-10 px-4">
-              <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4">
+              <h1 className="text-lg md:text-4xl lg:text-5xl font-bold mb-2 md:mb-4">
                 {banner.title}
               </h1>
-              <p className="text-lg md:text-xl mb-6 opacity-90">
+              <p className="text-xs md:text-xl mb-3 md:mb-6 opacity-90">
                 {banner.subtitle}
               </p>
               <Button 
-                className="bg-white text-gray-900 hover:bg-gray-100 px-8 py-3 text-lg font-semibold rounded-lg transition-colors"
+                className="bg-white text-gray-900 hover:bg-gray-100 px-4 py-2 md:px-8 md:py-3 text-xs md:text-lg font-semibold rounded-lg transition-colors"
                 asChild
               >
                 <a href={banner.ctaLink}>{banner.ctaText}</a>
@@ -105,26 +105,26 @@ export const HeroCarousel = () => {
       <Button
         variant="ghost"
         size="icon"
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white border-0"
+        className="absolute left-2 md:left-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white border-0"
         onClick={prevSlide}
       >
-        <ChevronLeft className="h-6 w-6" />
+        <ChevronLeft className="h-4 w-4 md:h-6 md:w-6" />
       </Button>
       <Button
         variant="ghost"
         size="icon"
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white border-0"
+        className="absolute right-2 md:right-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white border-0"
         onClick={nextSlide}
       >
-        <ChevronRight className="h-6 w-6" />
+        <ChevronRight className="h-4 w-4 md:h-6 md:w-6" />
       </Button>
 
       {/* Dot Indicators */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+      <div className="absolute bottom-2 md:bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-1 md:space-x-2">
         {banners.map((_, index) => (
           <button
             key={index}
-            className={`w-3 h-3 rounded-full transition-colors ${
+            className={`w-2 h-2 md:w-3 md:h-3 rounded-full transition-colors ${
               index === currentSlide ? 'bg-white' : 'bg-white/50'
             }`}
             onClick={() => goToSlide(index)}
