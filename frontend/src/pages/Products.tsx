@@ -8,6 +8,7 @@ import { Pagination } from "@/components/Pagination";
 import { Button } from "@/components/ui/button";
 import { Filter, Grid, List } from "lucide-react";
 import { productAPI } from "@/lib/api";
+import { CategoryNavBar } from "@/components/CategoryNavBar";
 
 // Removed mockProducts
 
@@ -121,8 +122,11 @@ export default function Products() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Category Navigation Bar - Shows only names on non-home pages */}
+      <CategoryNavBar />
+      
       {/* Header */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div className="w-full px-2 sm:px-4 lg:px-6 py-4">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold text-foreground">Browse Products</h1>
@@ -167,7 +171,7 @@ export default function Products() {
         />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="w-full px-2 sm:px-4 lg:px-6 py-6">
         <div className="flex gap-6">
           {/* Sidebar */}
           <ProductSidebar
