@@ -15,7 +15,7 @@ export const CategoryNavBar = () => {
     {
       id: 1,
       name: "Medical",
-      icon: "/images/categories/medical-realistic.png",
+      icon: "https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=120&h=120&fit=crop&crop=center",
       hasDropdown: true,
       link: "/products?category=Medical",
       theme: {
@@ -37,7 +37,7 @@ export const CategoryNavBar = () => {
     {
       id: 2,
       name: "Groceries",
-      icon: "/images/categories/groceries-realistic.png",
+      icon: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=120&h=120&fit=crop&crop=center",
       hasDropdown: true,
       link: "/products?category=Groceries",
       theme: {
@@ -59,7 +59,7 @@ export const CategoryNavBar = () => {
     {
       id: 3,
       name: "FashionBeauty",
-      icon: "/images/categories/fashion-realistic.png",
+      icon: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=120&h=120&fit=crop&crop=center",
       hasDropdown: true,
       link: "/products?category=FashionBeauty",
       theme: {
@@ -81,7 +81,7 @@ export const CategoryNavBar = () => {
     {
       id: 4,
       name: "Devices",
-      icon: "/images/categories/devices-realistic.png",
+      icon: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=120&h=120&fit=crop&crop=center",
       hasDropdown: true,
       link: "/products?category=Devices",
       theme: {
@@ -103,7 +103,7 @@ export const CategoryNavBar = () => {
     {
       id: 5,
       name: "Electrical",
-      icon: "/images/categories/electrical-realistic.png",
+      icon: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=120&h=120&fit=crop&crop=center",
       hasDropdown: true,
       link: "/products?category=Electrical",
       theme: {
@@ -125,7 +125,7 @@ export const CategoryNavBar = () => {
     {
       id: 6,
       name: "Automotive",
-      icon: "/images/categories/automotive-realistic.png",
+      icon: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=120&h=120&fit=crop&crop=center",
       hasDropdown: true,
       link: "/products?category=Automotive",
       theme: {
@@ -137,17 +137,17 @@ export const CategoryNavBar = () => {
         icon: "text-gray-600"
       },
       subcategories: [
-        { name: "Bike Parts & Accessories", link: "/products?category=Automotive&subcategory=BikePartsAccessories" },
-        { name: "Car Parts & Spares", link: "/products?category=Automotive&subcategory=CarPartsSpares" },
-        { name: "Maintenance & Service", link: "/products?category=Automotive&subcategory=MaintenanceService" },
-        { name: "Car Accessories", link: "/products?category=Automotive&subcategory=CarAccessories" },
-        { name: "Tools & Equipment", link: "/products?category=Automotive&subcategory=ToolsEquipment" }
+        { name: "Bike Parts", link: "/products?category=Automotive&subcategory=BikeParts" },
+        { name: "Car Parts", link: "/products?category=Automotive&subcategory=CarParts" },
+        { name: "Maintenance Products", link: "/products?category=Automotive&subcategory=MaintenanceProducts" },
+        { name: "Engine Oil", link: "/products?category=Automotive&subcategory=EngineOil" },
+        { name: "Tire Sets", link: "/products?category=Automotive&subcategory=TireSets" }
       ]
     },
     {
       id: 7,
       name: "Sports",
-      icon: "/images/categories/sports-realistic.png",
+      icon: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=120&h=120&fit=crop&crop=center",
       hasDropdown: true,
       link: "/products?category=Sports",
       theme: {
@@ -159,17 +159,17 @@ export const CategoryNavBar = () => {
         icon: "text-orange-600"
       },
       subcategories: [
-        { name: "Cricket Equipment", link: "/products?category=Sports&subcategory=CricketEquipment" },
-        { name: "Volleyball & Team Sports", link: "/products?category=Sports&subcategory=VolleyballTeamSports" },
-        { name: "Football & Soccer", link: "/products?category=Sports&subcategory=FootballSoccer" },
-        { name: "Fitness & Gym Equipment", link: "/products?category=Sports&subcategory=FitnessGymEquipment" },
-        { name: "Outdoor Sports & Adventure", link: "/products?category=Sports&subcategory=OutdoorSportsAdventure" }
+        { name: "Cricket", link: "/products?category=Sports&subcategory=Cricket" },
+        { name: "Volleyball", link: "/products?category=Sports&subcategory=Volleyball" },
+        { name: "Fitness Equipment", link: "/products?category=Sports&subcategory=FitnessEquipment" },
+        { name: "Outdoor Sports", link: "/products?category=Sports&subcategory=OutdoorSports" },
+        { name: "Football", link: "/products?category=Sports&subcategory=Football" }
       ]
     },
     {
       id: 8,
       name: "HomeInterior",
-      icon: "/images/categories/home-realistic.png",
+      icon: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=120&h=120&fit=crop&crop=center",
       hasDropdown: true,
       link: "/products?category=HomeInterior",
       theme: {
@@ -181,11 +181,11 @@ export const CategoryNavBar = () => {
         icon: "text-purple-600"
       },
       subcategories: [
-        { name: "Ceiling & Wall Decor", link: "/products?category=HomeInterior&subcategory=CeilingWallDecor" },
-        { name: "Doors & Windows", link: "/products?category=HomeInterior&subcategory=DoorsWindows" },
-        { name: "Paint & Wall Coverings", link: "/products?category=HomeInterior&subcategory=PaintWallCoverings" },
-        { name: "Curtains & Blinds", link: "/products?category=HomeInterior&subcategory=CurtainsBlinds" },
-        { name: "Tiles & Flooring", link: "/products?category=HomeInterior&subcategory=TilesFlooring" }
+        { name: "Ceiling", link: "/products?category=HomeInterior&subcategory=Ceiling" },
+        { name: "Doors", link: "/products?category=HomeInterior&subcategory=Doors" },
+        { name: "Paint", link: "/products?category=HomeInterior&subcategory=Paint" },
+        { name: "Curtains", link: "/products?category=HomeInterior&subcategory=Curtains" },
+        { name: "Tiles", link: "/products?category=HomeInterior&subcategory=Tiles" }
       ]
     }
   ];
@@ -240,28 +240,29 @@ export const CategoryNavBar = () => {
 
   return (
     <>
-      <div className="bg-white border-b border-gray-200 shadow-sm relative z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-3 overflow-x-auto scrollbar-hide">
+      <div className="bg-gradient-to-r from-white via-gray-50 to-white border-b border-gray-200 shadow-lg relative z-50">
+        <div className="max-w-full mx-auto px-2 sm:px-4 lg:px-6">
+          <div className="flex items-center justify-between py-4 overflow-x-auto scrollbar-hide gap-2">
             {categories.map((category) => (
               <div
                 key={category.id}
-                className="relative group"
+                className="relative group flex-shrink-0"
                 ref={(el) => (categoryRefs.current[category.id] = el)}
                 onMouseEnter={() => handleMouseEnter(category.id)}
                 onMouseLeave={handleMouseLeave}
               >
                 <Link
                   to={category.link}
-                  className={`flex flex-col items-center justify-center min-w-[80px] px-3 py-2 rounded-lg transition-colors duration-200 ${
+                  className={`flex flex-col items-center justify-center min-w-[100px] px-3 py-3 rounded-xl transition-all duration-300 hover:shadow-xl hover:scale-105 ${
                     hoveredCategory === category.id ? category.theme.bg : `hover:${category.theme.bg}`
                   }`}
                 >
-                  <div className="w-12 h-12 mb-2 flex items-center justify-center">
+                  <div className="w-16 h-16 mb-3 flex items-center justify-center relative">
+                    <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <img 
                       src={category.icon} 
                       alt={category.name}
-                      className="h-8 w-8 object-contain transition-transform duration-200 group-hover:scale-110"
+                      className="h-16 w-16 object-cover rounded-xl transition-all duration-300 group-hover:scale-110 relative z-10 shadow-sm"
                       onError={(e) => {
                         // Fallback to a default icon if image fails to load
                         e.currentTarget.style.display = 'none';
@@ -269,7 +270,7 @@ export const CategoryNavBar = () => {
                       }}
                     />
                     {/* Fallback icon - hidden by default */}
-                    <div className={`hidden w-8 h-8 text-2xl flex items-center justify-center ${category.theme.icon} group-hover:${category.theme.icon}`}>
+                    <div className={`hidden w-16 h-16 text-3xl flex items-center justify-center ${category.theme.icon} group-hover:${category.theme.icon} relative z-10`}>
                       {category.name === "Medical" && "❤️"}
                       {category.name === "Groceries" && "🛒"}
                       {category.name === "FashionBeauty" && "👕"}
@@ -281,11 +282,11 @@ export const CategoryNavBar = () => {
                     </div>
                   </div>
                   <div className="flex items-center space-x-1">
-                    <span className={`text-xs font-medium text-gray-700 group-hover:${category.theme.icon} transition-colors duration-200 whitespace-nowrap`}>
+                    <span className={`text-sm font-semibold text-gray-800 group-hover:${category.theme.icon} transition-colors duration-300 whitespace-nowrap`}>
                       {category.name}
                     </span>
                     {category.hasDropdown && (
-                      <ChevronDown className={`h-3 w-3 text-gray-500 group-hover:${category.theme.icon} transition-colors duration-200`} />
+                      <ChevronDown className={`h-4 w-4 text-gray-500 group-hover:${category.theme.icon} transition-all duration-300 group-hover:rotate-180`} />
                     )}
                   </div>
                 </Link>
@@ -299,7 +300,7 @@ export const CategoryNavBar = () => {
       {hoveredCategory && getCurrentCategory()?.hasDropdown && createPortal(
         <div 
           ref={dropdownRef}
-          className={`fixed z-[99999999] w-80 bg-white border ${getCurrentCategory()?.theme.border} rounded-lg shadow-xl py-4`}
+          className={`fixed z-[99999999] w-80 bg-white border ${getCurrentCategory()?.theme.border} rounded-xl shadow-2xl py-4 backdrop-blur-sm bg-white/95`}
           style={{
             top: dropdownPosition.top,
             left: dropdownPosition.left,
@@ -310,8 +311,8 @@ export const CategoryNavBar = () => {
           <div className="grid grid-cols-2 gap-6">
             {/* Left Column */}
             <div>
-              <div className={`px-4 py-2 border-b ${getCurrentCategory()?.theme.border} mb-3`}>
-                <span className={`text-sm font-semibold ${getCurrentCategory()?.theme.text}`}>
+              <div className={`px-4 py-3 border-b ${getCurrentCategory()?.theme.border} mb-3`}>
+                <span className={`text-sm font-bold ${getCurrentCategory()?.theme.text}`}>
                   {getCurrentCategory()?.name}
                 </span>
               </div>
@@ -320,7 +321,7 @@ export const CategoryNavBar = () => {
                   <Link
                     key={index}
                     to={subcategory.link}
-                    className={`block px-4 py-2 text-sm text-gray-700 ${getCurrentCategory()?.theme.hover} hover:${getCurrentCategory()?.theme.text} transition-colors duration-200`}
+                    className={`block px-4 py-2.5 text-sm text-gray-700 ${getCurrentCategory()?.theme.hover} hover:${getCurrentCategory()?.theme.text} transition-all duration-200 rounded-lg mx-2 hover:shadow-sm`}
                   >
                     {subcategory.name}
                   </Link>
@@ -330,8 +331,8 @@ export const CategoryNavBar = () => {
             
             {/* Right Column */}
             <div>
-              <div className={`px-4 py-2 border-b ${getCurrentCategory()?.theme.border} mb-3`}>
-                <span className={`text-sm font-semibold ${getCurrentCategory()?.theme.text}`}>
+              <div className={`px-4 py-3 border-b ${getCurrentCategory()?.theme.border} mb-3`}>
+                <span className={`text-sm font-bold ${getCurrentCategory()?.theme.text}`}>
                   More in {getCurrentCategory()?.name}
                 </span>
               </div>
@@ -340,7 +341,7 @@ export const CategoryNavBar = () => {
                   <Link
                     key={index + Math.ceil((getCurrentCategory()?.subcategories?.length || 0) / 2)}
                     to={subcategory.link}
-                    className={`block px-4 py-2 text-sm text-gray-700 ${getCurrentCategory()?.theme.hover} hover:${getCurrentCategory()?.theme.text} transition-colors duration-200`}
+                    className={`block px-4 py-2.5 text-sm text-gray-700 ${getCurrentCategory()?.theme.hover} hover:${getCurrentCategory()?.theme.text} transition-all duration-200 rounded-lg mx-2 hover:shadow-sm`}
                   >
                     {subcategory.name}
                   </Link>
