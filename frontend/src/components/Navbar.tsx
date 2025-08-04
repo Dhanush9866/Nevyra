@@ -178,25 +178,7 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* Right Side Actions */}
-          <div className="flex items-center space-x-2">
-            <Link to="/bestseller">
-              <Button
-                variant="ghost"
-                className="text-gray-800 hover:bg-cyan-200 flex items-center space-x-1"
-              >
-                <span className="text-sm hidden md:inline">Best Seller</span>
-              </Button>
-            </Link>
-            <Link to="/auth">
-              <Button
-                variant="ghost"
-                className="text-gray-800 hover:bg-cyan-200 hidden md:flex items-center space-x-1"
-              >
-                <User className="h-4 w-4" />
-                <span className="text-sm">Login</span>
-              </Button>
-            </Link>
+        
             <Link to="/profile">
               <Button
                 variant="ghost"
