@@ -204,28 +204,7 @@ const Profile = () => {
             {activeTab === "addresses" && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h1 className="text-xl font-bold text-foreground">Saved Addresses</h1>
-                  <Button size="sm" className="text-xs">Add New Address</Button>
-                </div>
 
-                <div className="space-y-3">
-                  {addresses.map((address) => (
-                    <Card key={address.id}>
-                      <CardContent className="p-4">
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <h3 className="font-semibold text-sm text-foreground">{address.name}</h3>
-                              {address.isDefault && (
-                                <Badge variant="secondary" className="text-xs">Default</Badge>
-                              )}
-                            </div>
-                            <p className="text-xs text-muted-foreground mb-1">{address.address}</p>
-                            <p className="text-xs text-muted-foreground">{address.phone}</p>
-                          </div>
-                          <div className="flex gap-2">
-                            <Button variant="outline" size="sm" className="text-xs px-2 py-1">Edit</Button>
-                            <Button variant="outline" size="sm" className="text-xs px-2 py-1 text-destructive">Delete</Button>
                           </div>
                         </div>
                       </CardContent>
