@@ -127,26 +127,26 @@ const Navbar = () => {
   return (
     <div className="bg-cyan-100 font-roboto">
       {/* Main Navbar */}
-      <div className="container mx-auto px-4 py-3">
+      <div className="container mx-auto px-2 py-3">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
             <Button
               variant="ghost"
               size="sm"
-              className="md:hidden text-gray-800 hover:bg-cyan-200"
+              className="md:hidden text-gray-800 hover:bg-cyan-200 p-1"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
-            <Link to="/" className="flex items-center space-x-2">
-              <img 
-                src="/logo.jpg" 
-                alt="Nevyra Logo" 
-                className="h-8 w-auto"
-              />
-              <span className="text-xl font-bold text-gray-800">NEVYRA</span>
-            </Link>
+                         <Link to="/" className="flex items-center space-x-2">
+               <img 
+                 src="/logo.jpg" 
+                 alt="Nevyra Logo" 
+                 className="h-8 w-auto mix-blend-multiply filter drop-shadow-sm"
+               />
+               <span className="text-xl font-bold text-gray-800">NEVYRA</span>
+             </Link>
           </div>
 
           {/* Search Bar */}
@@ -179,6 +179,7 @@ const Navbar = () => {
               </Button>
             </div>
           </div>
+
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-4">
@@ -233,6 +234,7 @@ const Navbar = () => {
               </Link>
             )}
             
+
             <Link to="/profile">
               <Button
                 variant="ghost"
@@ -245,7 +247,7 @@ const Navbar = () => {
             <Link to="/cart">
               <Button
                 variant="ghost"
-                className="text-gray-800 hover:bg-cyan-200 flex items-center space-x-1 relative"
+                className="text-gray-800 hover:bg-cyan-200 flex items-center space-x-1 relative p-1"
               >
                 <ShoppingCart className="h-4 w-4" />
                 <span className="text-sm hidden md:inline">Cart</span>
@@ -280,7 +282,7 @@ const Navbar = () => {
 
       {/* Category Navigation */}
       <div className="bg-background border-t border-border">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-2">
           {/* Desktop Categories */}
           <div className="hidden md:flex items-center space-x-8 py-2">
             {categories.map((category) => (

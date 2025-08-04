@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { ArrowLeft, ShoppingCart, Heart, Star, MoreVertical, Shield } from "lucide-react";
+import { Heart, Star, MoreVertical, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import phoneProduct from "@/assets/phone-product.jpg";
 import shoesProduct from "@/assets/shoes-product.jpg";
 import dressProduct from "@/assets/dress-product.jpg";
@@ -92,44 +94,9 @@ const Wishlist = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="sticky top-0 z-50 bg-primary border-b border-border">
-        <div className="flex items-center justify-between p-4">
-          <div className="flex items-center space-x-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate(-1)}
-              className="text-white hover:bg-primary/80"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <Link to="/" className="flex items-center space-x-2">
-              <img 
-                src="/logo.jpg" 
-                alt="Nevyra Logo" 
-                className="h-8 w-auto"
-              />
-              <span className="text-white font-semibold text-lg">NEVYRA</span>
-            </Link>
-          </div>
-          
-          <Link to="/cart">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-white hover:bg-primary/80 relative"
-            >
-              <ShoppingCart className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                3
-              </span>
-            </Button>
-          </Link>
-        </div>
-      </div>
-
+    <div className="min-h-screen bg-background font-roboto">
+      <Navbar />
+      
       {/* Page Title and Status */}
       <div className="p-4 border-b border-border">
         <h1 className="text-2xl font-bold text-foreground mb-2">My Wishlist</h1>
@@ -227,6 +194,8 @@ const Wishlist = () => {
           </div>
         )}
       </div>
+      
+      <Footer />
     </div>
   );
 };

@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ChevronRight, ChevronLeft, Star, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useIsMobile } from "@/hooks/use-mobile";
 import phoneProduct from "@/assets/phone-product.jpg";
 import shoesProduct from "@/assets/shoes-product.jpg";
 import laptopProduct from "@/assets/laptop-product.jpg";
@@ -437,6 +438,8 @@ const topPicksProducts = [
 ];
 
 const CategoryCards = () => {
+  const isMobile = useIsMobile();
+
   return (
     <section className="py-16 bg-background">
       <div className="w-full px-4 space-y-12">
@@ -449,10 +452,10 @@ const CategoryCards = () => {
               View More <ChevronRight className="h-4 w-4" /> 6+
             </Link>
           </div>
-          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                        {medicalProducts.map((product) => (
+          <div className={`${isMobile ? 'grid grid-cols-2 gap-3' : 'flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth'}`} style={!isMobile ? { scrollbarWidth: 'none', msOverflowStyle: 'none' } : {}}>
+            {(isMobile ? medicalProducts.slice(0, 4) : medicalProducts).map((product) => (
               <Link key={product.id} to={`/product/${product.id}`}>
-                <Card className="min-w-[200px] flex-shrink-0 bg-card border border-border hover:shadow-md transition-shadow cursor-pointer">
+                <Card className={`${isMobile ? 'w-full' : 'min-w-[200px] flex-shrink-0'} bg-card border border-border hover:shadow-md transition-shadow cursor-pointer`}>
                   <CardContent className="p-4">
                     <div className="relative mb-3">
                       <img
@@ -483,10 +486,10 @@ const CategoryCards = () => {
               View More <ChevronRight className="h-4 w-4" /> 5+
             </Link>
           </div>
-          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                        {groceryProducts.map((product) => (
+          <div className={`${isMobile ? 'grid grid-cols-2 gap-3' : 'flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth'}`} style={!isMobile ? { scrollbarWidth: 'none', msOverflowStyle: 'none' } : {}}>
+            {(isMobile ? groceryProducts.slice(0, 4) : groceryProducts).map((product) => (
               <Link key={product.id} to={`/product/${product.id}`}>
-                <Card className="min-w-[200px] flex-shrink-0 bg-card border border-border hover:shadow-md transition-shadow cursor-pointer">
+                <Card className={`${isMobile ? 'w-full' : 'min-w-[200px] flex-shrink-0'} bg-card border border-border hover:shadow-md transition-shadow cursor-pointer`}>
                   <CardContent className="p-4">
                     <div className="relative mb-3">
                       <img
@@ -517,10 +520,10 @@ const CategoryCards = () => {
               View More <ChevronRight className="h-4 w-4" /> 4+
             </Link>
           </div>
-          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                        {fashionProducts.map((product) => (
+          <div className={`${isMobile ? 'grid grid-cols-2 gap-3' : 'flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth'}`} style={!isMobile ? { scrollbarWidth: 'none', msOverflowStyle: 'none' } : {}}>
+            {(isMobile ? fashionProducts.slice(0, 4) : fashionProducts).map((product) => (
               <Link key={product.id} to={`/product/${product.id}`}>
-                <Card className="min-w-[200px] flex-shrink-0 bg-card border border-border hover:shadow-md transition-shadow cursor-pointer">
+                <Card className={`${isMobile ? 'w-full' : 'min-w-[200px] flex-shrink-0'} bg-card border border-border hover:shadow-md transition-shadow cursor-pointer`}>
                   <CardContent className="p-4">
                     <div className="relative mb-3">
                       <img
@@ -551,10 +554,10 @@ const CategoryCards = () => {
               View More <ChevronRight className="h-4 w-4" /> 3+
             </Link>
           </div>
-          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                        {deviceProducts.map((product) => (
+          <div className={`${isMobile ? 'grid grid-cols-2 gap-3' : 'flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth'}`} style={!isMobile ? { scrollbarWidth: 'none', msOverflowStyle: 'none' } : {}}>
+            {(isMobile ? deviceProducts.slice(0, 4) : deviceProducts).map((product) => (
               <Link key={product.id} to={`/product/${product.id}`}>
-                <Card className="min-w-[200px] flex-shrink-0 bg-card border border-border hover:shadow-md transition-shadow cursor-pointer">
+                <Card className={`${isMobile ? 'w-full' : 'min-w-[200px] flex-shrink-0'} bg-card border border-border hover:shadow-md transition-shadow cursor-pointer`}>
                   <CardContent className="p-4">
                     <div className="relative mb-3">
                       <img
@@ -585,10 +588,10 @@ const CategoryCards = () => {
               View More <ChevronRight className="h-4 w-4" /> 4+
             </Link>
           </div>
-          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                        {electricalProducts.map((product) => (
+          <div className={`${isMobile ? 'grid grid-cols-2 gap-3' : 'flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth'}`} style={!isMobile ? { scrollbarWidth: 'none', msOverflowStyle: 'none' } : {}}>
+            {(isMobile ? electricalProducts.slice(0, 4) : electricalProducts).map((product) => (
               <Link key={product.id} to={`/product/${product.id}`}>
-                <Card className="min-w-[200px] flex-shrink-0 bg-card border border-border hover:shadow-md transition-shadow cursor-pointer">
+                <Card className={`${isMobile ? 'w-full' : 'min-w-[200px] flex-shrink-0'} bg-card border border-border hover:shadow-md transition-shadow cursor-pointer`}>
                   <CardContent className="p-4">
                     <div className="relative mb-3">
                       <img
@@ -619,26 +622,28 @@ const CategoryCards = () => {
               View More <ChevronRight className="h-4 w-4" /> 4+
             </Link>
           </div>
-          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-            {automotiveProducts.map((product) => (
-              <Card key={product.id} className="min-w-[200px] flex-shrink-0 bg-card border border-border hover:shadow-md transition-shadow cursor-pointer">
-                <CardContent className="p-4">
-                  <div className="relative mb-3">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-32 object-cover rounded-lg"
-                    />
-                    <Badge className="absolute top-2 left-2 bg-discount text-white text-xs">
-                      {product.discount}% OFF
-                    </Badge>
-                  </div>
-                  <h3 className="font-medium text-sm text-card-foreground mb-1 line-clamp-2">
-                    {product.name}
-                  </h3>
-                  <p className="text-xs text-muted-foreground">Up to 50% Off</p>
-                </CardContent>
-              </Card>
+          <div className={`${isMobile ? 'grid grid-cols-2 gap-3' : 'flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth'}`} style={!isMobile ? { scrollbarWidth: 'none', msOverflowStyle: 'none' } : {}}>
+            {(isMobile ? automotiveProducts.slice(0, 4) : automotiveProducts).map((product) => (
+              <Link key={product.id} to={`/product/${product.id}`}>
+                <Card className={`${isMobile ? 'w-full' : 'min-w-[200px] flex-shrink-0'} bg-card border border-border hover:shadow-md transition-shadow cursor-pointer`}>
+                  <CardContent className="p-4">
+                    <div className="relative mb-3">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-32 object-cover rounded-lg"
+                      />
+                      <Badge className="absolute top-2 left-2 bg-discount text-white text-xs">
+                        {product.discount}% OFF
+                      </Badge>
+                    </div>
+                    <h3 className="font-medium text-sm text-card-foreground mb-1 line-clamp-2">
+                      {product.name}
+                    </h3>
+                    <p className="text-xs text-muted-foreground">Up to 50% Off</p>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
         </div>
@@ -651,118 +656,124 @@ const CategoryCards = () => {
               View More <ChevronRight className="h-4 w-4" /> 4+
             </Link>
           </div>
-          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-            {sportsProducts.map((product) => (
-              <Card key={product.id} className="min-w-[200px] flex-shrink-0 bg-card border border-border hover:shadow-md transition-shadow cursor-pointer">
-                <CardContent className="p-4">
-                  <div className="relative mb-3">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-32 object-cover rounded-lg"
-                    />
-                    <Badge className="absolute top-2 left-2 bg-discount text-white text-xs">
-                      {product.discount}% OFF
-                    </Badge>
-                  </div>
-                  <h3 className="font-medium text-sm text-card-foreground mb-1 line-clamp-2">
-                    {product.name}
-                  </h3>
-                  <p className="text-xs text-muted-foreground">Up to 50% Off</p>
-                </CardContent>
-              </Card>
+          <div className={`${isMobile ? 'grid grid-cols-2 gap-3' : 'flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth'}`} style={!isMobile ? { scrollbarWidth: 'none', msOverflowStyle: 'none' } : {}}>
+            {(isMobile ? sportsProducts.slice(0, 4) : sportsProducts).map((product) => (
+              <Link key={product.id} to={`/product/${product.id}`}>
+                <Card className={`${isMobile ? 'w-full' : 'min-w-[200px] flex-shrink-0'} bg-card border border-border hover:shadow-md transition-shadow cursor-pointer`}>
+                  <CardContent className="p-4">
+                    <div className="relative mb-3">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-32 object-cover rounded-lg"
+                      />
+                      <Badge className="absolute top-2 left-2 bg-discount text-white text-xs">
+                        {product.discount}% OFF
+                      </Badge>
+                    </div>
+                    <h3 className="font-medium text-sm text-card-foreground mb-1 line-clamp-2">
+                      {product.name}
+                    </h3>
+                    <p className="text-xs text-muted-foreground">Up to 50% Off</p>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
         </div>
 
-                                   {/* Home Interior Section */}
-          <div>
-            <div className="flex justify-between items-center mb-6">
-              <Link to="/category/home-interior" className="text-2xl font-bold text-foreground font-roboto hover:text-primary transition-colors cursor-pointer">Home Interior</Link>
-             <Link to="/category/home-interior" className="text-primary hover:text-primary-hover flex items-center gap-1">
-               View More <ChevronRight className="h-4 w-4" /> 4+
-             </Link>
-           </div>
-           <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-             {homeInteriorProducts.map((product) => (
-               <Card key={product.id} className="min-w-[200px] flex-shrink-0 bg-card border border-border hover:shadow-md transition-shadow cursor-pointer">
-                 <CardContent className="p-4">
-                   <div className="relative mb-3">
-                     <img
-                       src={product.image}
-                       alt={product.name}
-                       className="w-full h-32 object-cover rounded-lg"
-                     />
-                     <Badge className="absolute top-2 left-2 bg-discount text-white text-xs">
-                       {product.discount}% OFF
-                     </Badge>
-                   </div>
-                   <h3 className="font-medium text-sm text-card-foreground mb-1 line-clamp-2">
-                     {product.name}
-                   </h3>
-                   <p className="text-xs text-muted-foreground">Up to 50% Off</p>
-                 </CardContent>
-               </Card>
-             ))}
-           </div>
-         </div>
+        {/* Home Interior Section */}
+        <div>
+          <div className="flex justify-between items-center mb-6">
+            <Link to="/category/home-interior" className="text-2xl font-bold text-foreground font-roboto hover:text-primary transition-colors cursor-pointer">Home Interior</Link>
+            <Link to="/category/home-interior" className="text-primary hover:text-primary-hover flex items-center gap-1">
+              View More <ChevronRight className="h-4 w-4" /> 4+
+            </Link>
+          </div>
+          <div className={`${isMobile ? 'grid grid-cols-2 gap-3' : 'flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth'}`} style={!isMobile ? { scrollbarWidth: 'none', msOverflowStyle: 'none' } : {}}>
+            {(isMobile ? homeInteriorProducts.slice(0, 4) : homeInteriorProducts).map((product) => (
+              <Link key={product.id} to={`/product/${product.id}`}>
+                <Card className={`${isMobile ? 'w-full' : 'min-w-[200px] flex-shrink-0'} bg-card border border-border hover:shadow-md transition-shadow cursor-pointer`}>
+                  <CardContent className="p-4">
+                    <div className="relative mb-3">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-32 object-cover rounded-lg"
+                      />
+                      <Badge className="absolute top-2 left-2 bg-discount text-white text-xs">
+                        {product.discount}% OFF
+                      </Badge>
+                    </div>
+                    <h3 className="font-medium text-sm text-card-foreground mb-1 line-clamp-2">
+                      {product.name}
+                    </h3>
+                    <p className="text-xs text-muted-foreground">Up to 50% Off</p>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </div>
 
-         {/* Top Picks for You Section */}
-         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
-           <div className="flex justify-between items-center mb-6">
-             <div>
-               <h2 className="text-2xl font-bold text-blue-900 font-roboto mb-1">Top Picks for You</h2>
-               <p className="text-blue-600 text-xs">Handpicked products just for you</p>
-             </div>
-             <Link to="/category/top-picks" className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors text-sm">
-               View More <ChevronRight className="h-3 w-3" />
-             </Link>
-           </div>
-           <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-             {topPicksProducts.map((product) => (
-               <Card key={product.id} className="min-w-[200px] flex-shrink-0 bg-white border-2 border-blue-200 hover:border-blue-400 hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:-translate-y-1">
-                 <CardContent className="p-4">
-                   <div className="relative mb-3">
-                     <img
-                       src={product.image}
-                       alt={product.name}
-                       className="w-full h-32 object-cover rounded-lg"
-                     />
-                     <Badge className="absolute top-2 left-2 bg-red-500 text-white text-xs font-semibold px-2 py-0.5">
-                       {product.discount}% OFF
-                     </Badge>
-                     <div className="absolute top-2 right-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-1.5 py-0.5 rounded-full">
-                       ⭐ TOP
-                     </div>
-                   </div>
-                   <h3 className="font-medium text-sm text-gray-800 mb-1 line-clamp-2">
-                     {product.name}
-                   </h3>
-                   <div className="flex items-center gap-1 mb-2">
-                     <span className="text-sm font-bold text-blue-600">₹{product.price.toLocaleString()}</span>
-                     <span className="text-xs text-gray-500 line-through">₹{product.originalPrice.toLocaleString()}</span>
-                   </div>
-                   <div className="flex items-center gap-1 mb-2">
-                     <div className="flex">
-                       {[...Array(5)].map((_, i) => (
-                         <Star key={i} className={`h-3 w-3 ${i < 4 ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} />
-                       ))}
-                     </div>
-                     <span className="text-xs text-gray-600 ml-1">(4.5)</span>
-                   </div>
-                   <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs py-1.5">
-                     <ShoppingCart className="h-3 w-3 mr-1" />
-                     Add to Cart
-                   </Button>
-                 </CardContent>
-               </Card>
-             ))}
-           </div>
-         </div>
+        {/* Top Picks for You Section */}
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <h2 className="text-2xl font-bold text-blue-900 font-roboto mb-1">Top Picks for You</h2>
+              <p className="text-blue-600 text-xs">Handpicked products just for you</p>
+            </div>
+            <Link to="/category/top-picks" className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors text-sm">
+              View More <ChevronRight className="h-3 w-3" />
+            </Link>
+          </div>
+          <div className={`${isMobile ? 'grid grid-cols-2 gap-3' : 'flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth'}`} style={!isMobile ? { scrollbarWidth: 'none', msOverflowStyle: 'none' } : {}}>
+            {(isMobile ? topPicksProducts.slice(0, 4) : topPicksProducts).map((product) => (
+              <Link key={product.id} to={`/product/${product.id}`}>
+                <Card className={`${isMobile ? 'w-full' : 'min-w-[200px] flex-shrink-0'} bg-white border-2 border-blue-200 hover:border-blue-400 hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:-translate-y-1`}>
+                  <CardContent className="p-4">
+                    <div className="relative mb-3">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-32 object-cover rounded-lg"
+                      />
+                      <Badge className="absolute top-2 left-2 bg-red-500 text-white text-xs font-semibold px-2 py-0.5">
+                        {product.discount}% OFF
+                      </Badge>
+                      <div className="absolute top-2 right-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-1.5 py-0.5 rounded-full">
+                        ⭐ TOP
+                      </div>
+                    </div>
+                    <h3 className="font-medium text-sm text-gray-800 mb-1 line-clamp-2">
+                      {product.name}
+                    </h3>
+                    <div className="flex items-center gap-1 mb-2">
+                      <span className="text-sm font-bold text-blue-600">₹{product.price.toLocaleString()}</span>
+                      <span className="text-xs text-gray-500 line-through">₹{product.originalPrice.toLocaleString()}</span>
+                    </div>
+                    <div className="flex items-center gap-1 mb-2">
+                      <div className="flex">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className={`h-3 w-3 ${i < 4 ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} />
+                        ))}
+                      </div>
+                      <span className="text-xs text-gray-600 ml-1">(4.5)</span>
+                    </div>
+                    <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs py-1.5">
+                      <ShoppingCart className="h-3 w-3 mr-1" />
+                      Add to Cart
+                    </Button>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </div>
 
-       </div>
-     </section>
-   );
- };
+      </div>
+    </section>
+  );
+};
 
 export default CategoryCards; 
