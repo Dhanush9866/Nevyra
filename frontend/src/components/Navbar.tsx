@@ -1,4 +1,4 @@
-import { Search, User, ShoppingCart, Menu, ChevronDown, X } from "lucide-react";
+import { Search, User, ShoppingCart, Menu, ChevronDown, X, LogOut, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -16,6 +16,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useAuth } from "@/hooks/useAuth";
 
 const categories = [
   {
@@ -111,6 +112,7 @@ const Navbar = () => {
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { user, isAuthenticated, logout } = useAuth();
 
   const toggleCategory = (categoryName: string) => {
     setExpandedCategory(expandedCategory === categoryName ? null : categoryName);
@@ -178,7 +180,61 @@ const Navbar = () => {
             </div>
           </div>
 
-        
+
+          {/* Right Side Actions */}
+          <div className="flex items-center space-x-4">
+            {isAuthenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="text-gray-800 hover:bg-cyan-200 hidden md:flex items-center space-x-1"
+                  >
+                    <User className="h-4 w-4" />
+                    <span className="text-sm">
+                      {user?.firstName || 'User'}
+                    </span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile" className="flex items-center">
+                      <User className="h-4 w-4 mr-2" />
+                      Profile
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile" className="flex items-center">
+                      <Settings className="h-4 w-4 mr-2" />
+                      Settings
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    onClick={() => {
+                      logout();
+                      navigate('/');
+                    }}
+                    className="flex items-center text-red-600"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link to="/auth">
+                <Button
+                  variant="ghost"
+                  className="text-gray-800 hover:bg-cyan-200 hidden md:flex items-center space-x-1"
+                >
+                  <User className="h-4 w-4" />
+                  <span className="text-sm">Login</span>
+                </Button>
+              </Link>
+            )}
+            
+
             <Link to="/profile">
               <Button
                 variant="ghost"
@@ -285,26 +341,46 @@ const Navbar = () => {
           {/* Mobile Category Menu */}
           {isMobileMenuOpen && (
             <div className="md:hidden py-4 space-y-2 max-h-[70vh] overflow-y-auto">
-              {/* Mobile Login Link */}
+              {/* Mobile Login/User Links */}
               <div className="pb-4 border-b border-border">
-                <Link to="/auth">
-                  <Button
-                    variant="ghost"
-                    className="text-gray-800 hover:bg-cyan-200 w-full justify-start"
-                  >
-                    <User className="h-4 w-4 mr-2" />
-                    <span className="text-sm">Login</span>
-                  </Button>
-                </Link>
-                <Link to="/profile">
-                  <Button
-                    variant="ghost"
-                    className="text-gray-800 hover:bg-cyan-200 w-full justify-start mt-2"
-                  >
-                    <User className="h-4 w-4 mr-2" />
-                    <span className="text-sm">Profile</span>
-                  </Button>
-                </Link>
+                {isAuthenticated ? (
+                  <>
+                    <div className="px-4 py-2 text-sm text-muted-foreground">
+                      Welcome, {user?.firstName} {user?.lastName}
+                    </div>
+                    <Link to="/profile">
+                      <Button
+                        variant="ghost"
+                        className="text-gray-800 hover:bg-cyan-200 w-full justify-start"
+                      >
+                        <User className="h-4 w-4 mr-2" />
+                        <span className="text-sm">Profile</span>
+                      </Button>
+                    </Link>
+                    <Button
+                      variant="ghost"
+                      className="text-red-600 hover:bg-red-100 w-full justify-start"
+                      onClick={() => {
+                        logout();
+                        navigate('/');
+                        setIsMobileMenuOpen(false);
+                      }}
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      <span className="text-sm">Logout</span>
+                    </Button>
+                  </>
+                ) : (
+                  <Link to="/auth">
+                    <Button
+                      variant="ghost"
+                      className="text-gray-800 hover:bg-cyan-200 w-full justify-start"
+                    >
+                      <User className="h-4 w-4 mr-2" />
+                      <span className="text-sm">Login</span>
+                    </Button>
+                  </Link>
+                )}
               </div>
               
               {/* Categories */}

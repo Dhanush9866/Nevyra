@@ -1,4 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { apiService } from "@/lib/api";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Plus, CreditCard, Smartphone, Banknote, Shield, CheckCircle } from "lucide-react";
+import { MapPin, Plus, CreditCard, Smartphone, Banknote, Shield, CheckCircle, Save, X } from "lucide-react";
 import phoneProduct from "@/assets/phone-product.jpg";
 import shoesProduct from "@/assets/shoes-product.jpg";
 
@@ -33,28 +37,88 @@ const orderItems = [
   }
 ];
 
-const savedAddresses = [
-  {
-    id: 1,
-    name: "Rajesh Kumar",
-    address: "Flat 204, Sunrise Apartments, MG Road, Bengaluru - 560001",
-    phone: "+91 9876543210",
-    isDefault: true
-  },
-  {
-    id: 2,
-    name: "Rajesh Kumar (Office)",
-    address: "Tech Park, Sector 5, Electronic City, Bengaluru - 560100",
-    phone: "+91 9876543210",
-    isDefault: false
-  }
-];
-
 const Checkout = () => {
   const [currentStep, setCurrentStep] = useState(1);
-  const [selectedAddress, setSelectedAddress] = useState("1");
+  const [selectedAddress, setSelectedAddress] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("upi");
   const [showNewAddress, setShowNewAddress] = useState(false);
+  const [addresses, setAddresses] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [newAddress, setNewAddress] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    zipCode: ""
+  });
+
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchAddresses();
+  }, []);
+
+  const fetchAddresses = async () => {
+    try {
+      const response = await apiService.getAddresses();
+      if (response.success) {
+        setAddresses(response.data || []);
+        // Set first address as default if available
+        if (response.data && response.data.length > 0) {
+          setSelectedAddress("0");
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch addresses:", error);
+    }
+  };
+
+  const handleAddAddress = async () => {
+    if (!newAddress.firstName || !newAddress.lastName || !newAddress.email || 
+        !newAddress.phone || !newAddress.address || !newAddress.city || !newAddress.zipCode) {
+      toast({
+        title: "Error",
+        description: "Please fill in all address fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await apiService.addAddress(newAddress);
+      if (response.success) {
+        setAddresses(response.data);
+        setNewAddress({
+          firstName: "",
+          lastName: "",
+          email: "",
+          phone: "",
+          address: "",
+          city: "",
+          zipCode: ""
+        });
+        setShowNewAddress(false);
+        setSelectedAddress((response.data.length - 1).toString());
+        toast({
+          title: "Success",
+          description: "Address added successfully!",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to add address",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const subtotal = orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const shippingFee = 0; // Free shipping
@@ -62,9 +126,23 @@ const Checkout = () => {
   const total = subtotal + shippingFee + gst;
 
   const handlePlaceOrder = () => {
+    if (!selectedAddress) {
+      toast({
+        title: "Error",
+        description: "Please select a delivery address",
+        variant: "destructive",
+      });
+      return;
+    }
     // Order placement logic here
-    alert("Order placed successfully!");
+    toast({
+      title: "Success",
+      description: "Order placed successfully!",
+    });
+    navigate("/orders");
   };
+
+  const selectedAddressData = addresses[parseInt(selectedAddress)];
 
   return (
     <div className="min-h-screen bg-background font-roboto">
@@ -117,72 +195,138 @@ const Checkout = () => {
 
                   {currentStep === 1 ? (
                     <div className="space-y-4">
-                      <RadioGroup value={selectedAddress} onValueChange={setSelectedAddress}>
-                        {savedAddresses.map((address) => (
-                          <div key={address.id} className="flex items-start space-x-3 border border-border rounded-lg p-4">
-                            <RadioGroupItem value={address.id.toString()} id={address.id.toString()} className="mt-1" />
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-2">
-                                <Label htmlFor={address.id.toString()} className="font-medium">
-                                  {address.name}
-                                </Label>
-                                {address.isDefault && (
-                                  <Badge variant="secondary">Default</Badge>
-                                )}
+                      {addresses.length === 0 ? (
+                        <div className="text-center py-8">
+                          <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                          <h3 className="text-lg font-semibold mb-2">No addresses saved</h3>
+                          <p className="text-muted-foreground mb-4">Add your first address to continue</p>
+                          <Button onClick={() => setShowNewAddress(true)}>
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add Address
+                          </Button>
+                        </div>
+                      ) : (
+                        <>
+                          <RadioGroup value={selectedAddress} onValueChange={setSelectedAddress}>
+                            {addresses.map((address, index) => (
+                              <div key={index} className="flex items-start space-x-3 border border-border rounded-lg p-4">
+                                <RadioGroupItem value={index.toString()} id={index.toString()} className="mt-1" />
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <Label htmlFor={index.toString()} className="font-medium">
+                                      {address.firstName} {address.lastName}
+                                    </Label>
+                                    {index === 0 && (
+                                      <Badge variant="secondary">Default</Badge>
+                                    )}
+                                  </div>
+                                  <p className="text-muted-foreground text-sm mb-1">{address.address}</p>
+                                  <p className="text-muted-foreground text-sm mb-1">{address.city}, {address.zipCode}</p>
+                                  <p className="text-muted-foreground text-sm">{address.phone}</p>
+                                </div>
                               </div>
-                              <p className="text-muted-foreground text-sm mb-1">{address.address}</p>
-                              <p className="text-muted-foreground text-sm">{address.phone}</p>
-                            </div>
-                          </div>
-                        ))}
-                      </RadioGroup>
+                            ))}
+                          </RadioGroup>
 
-                      <Button
-                        variant="outline"
-                        onClick={() => setShowNewAddress(!showNewAddress)}
-                        className="w-full"
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add New Address
-                      </Button>
+                          <Button
+                            variant="outline"
+                            onClick={() => setShowNewAddress(!showNewAddress)}
+                            className="w-full"
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add New Address
+                          </Button>
+                        </>
+                      )}
 
                       {showNewAddress && (
                         <Card className="border-2 border-dashed border-border">
                           <CardContent className="p-4 space-y-4">
+                            <div className="flex items-center justify-between">
+                              <h3 className="text-lg font-semibold">Add New Address</h3>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setShowNewAddress(false)}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               <div>
-                                <Label htmlFor="name">Full Name</Label>
-                                <Input id="name" placeholder="Enter full name" />
+                                <Label htmlFor="addr-firstName">First Name</Label>
+                                <Input 
+                                  id="addr-firstName"
+                                  value={newAddress.firstName}
+                                  onChange={(e) => setNewAddress({...newAddress, firstName: e.target.value})}
+                                  placeholder="Enter first name"
+                                />
                               </div>
                               <div>
-                                <Label htmlFor="phone">Phone Number</Label>
-                                <Input id="phone" placeholder="Enter phone number" />
+                                <Label htmlFor="addr-lastName">Last Name</Label>
+                                <Input 
+                                  id="addr-lastName"
+                                  value={newAddress.lastName}
+                                  onChange={(e) => setNewAddress({...newAddress, lastName: e.target.value})}
+                                  placeholder="Enter last name"
+                                />
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <Label htmlFor="addr-email">Email</Label>
+                                <Input 
+                                  id="addr-email"
+                                  type="email"
+                                  value={newAddress.email}
+                                  onChange={(e) => setNewAddress({...newAddress, email: e.target.value})}
+                                  placeholder="Enter email"
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor="addr-phone">Phone</Label>
+                                <Input 
+                                  id="addr-phone"
+                                  type="tel"
+                                  value={newAddress.phone}
+                                  onChange={(e) => setNewAddress({...newAddress, phone: e.target.value})}
+                                  placeholder="Enter phone number"
+                                />
                               </div>
                             </div>
                             <div>
-                              <Label htmlFor="address">Address</Label>
-                              <Textarea id="address" placeholder="Enter complete address" />
+                              <Label htmlFor="addr-address">Address</Label>
+                              <Textarea 
+                                id="addr-address"
+                                value={newAddress.address}
+                                onChange={(e) => setNewAddress({...newAddress, address: e.target.value})}
+                                placeholder="Enter complete address"
+                              />
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               <div>
-                                <Label htmlFor="city">City</Label>
-                                <Input id="city" placeholder="City" />
+                                <Label htmlFor="addr-city">City</Label>
+                                <Input 
+                                  id="addr-city"
+                                  value={newAddress.city}
+                                  onChange={(e) => setNewAddress({...newAddress, city: e.target.value})}
+                                  placeholder="City"
+                                />
                               </div>
                               <div>
-                                <Label htmlFor="state">State</Label>
-                                <Input id="state" placeholder="State" />
+                                <Label htmlFor="addr-zipCode">Zip Code</Label>
+                                <Input 
+                                  id="addr-zipCode"
+                                  value={newAddress.zipCode}
+                                  onChange={(e) => setNewAddress({...newAddress, zipCode: e.target.value})}
+                                  placeholder="Zip code"
+                                />
                               </div>
-                              <div>
-                                <Label htmlFor="pincode">Pincode</Label>
-                                <Input id="pincode" placeholder="Pincode" />
-                              </div>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <Checkbox id="default-address" />
-                              <Label htmlFor="default-address">Make this my default address</Label>
                             </div>
                             <div className="flex gap-2">
-                              <Button>Save Address</Button>
+                              <Button onClick={handleAddAddress} disabled={isLoading}>
+                                {isLoading ? "Saving..." : "Save Address"}
+                              </Button>
                               <Button variant="outline" onClick={() => setShowNewAddress(false)}>
                                 Cancel
                               </Button>
@@ -191,16 +335,28 @@ const Checkout = () => {
                         </Card>
                       )}
 
-                      <Button 
-                        className="w-full bg-primary hover:bg-primary-hover text-primary-foreground"
-                        onClick={() => setCurrentStep(2)}
-                      >
-                        Continue to Payment
-                      </Button>
+                      {addresses.length > 0 && (
+                        <Button 
+                          className="w-full bg-primary hover:bg-primary-hover text-primary-foreground"
+                          onClick={() => setCurrentStep(2)}
+                          disabled={!selectedAddress}
+                        >
+                          Continue to Payment
+                        </Button>
+                      )}
                     </div>
                   ) : (
                     <div className="text-sm text-muted-foreground">
-                      {savedAddresses.find(a => a.id.toString() === selectedAddress)?.address}
+                      {selectedAddressData ? (
+                        <div>
+                          <p className="font-medium">{selectedAddressData.firstName} {selectedAddressData.lastName}</p>
+                          <p>{selectedAddressData.address}</p>
+                          <p>{selectedAddressData.city}, {selectedAddressData.zipCode}</p>
+                          <p>{selectedAddressData.phone}</p>
+                        </div>
+                      ) : (
+                        "No address selected"
+                      )}
                     </div>
                   )}
                 </CardContent>
