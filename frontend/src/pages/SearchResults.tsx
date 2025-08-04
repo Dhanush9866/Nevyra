@@ -1,115 +1,246 @@
 import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
-import { ProductCard } from "@/components/ProductCard";
-import { Pagination } from "@/components/Pagination";
+import { Search, ArrowLeft, Filter, Grid, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { productAPI } from "@/lib/api";
+import { Input } from "@/components/ui/input";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { Card, CardContent } from "@/components/ui/card";
 
-export default function SearchResults() {
+// Mock search results data
+const mockProducts = [
+  {
+    id: 1,
+    name: "Gaming Laptop",
+    price: 1299.99,
+    image: "/laptop-product.jpg",
+    rating: 4.5,
+    reviews: 128,
+    category: "Electronics"
+  },
+  {
+    id: 2,
+    name: "Wireless Headphones",
+    price: 89.99,
+    image: "/phone-product.jpg",
+    rating: 4.2,
+    reviews: 89,
+    category: "Electronics"
+  },
+  {
+    id: 3,
+    name: "Running Shoes",
+    price: 129.99,
+    image: "/shoes-product.jpg",
+    rating: 4.7,
+    reviews: 256,
+    category: "Sports"
+  },
+  {
+    id: 4,
+    name: "Summer Dress",
+    price: 59.99,
+    image: "/dress-product.jpg",
+    rating: 4.3,
+    reviews: 67,
+    category: "Fashion"
+  }
+];
+
+const SearchResults = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [results, setResults] = useState(mockProducts);
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [allProducts, setAllProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 12;
 
-  const query = searchParams.get("q") || "";
-  const category = searchParams.get("category");
-  const subcategory = searchParams.get("subcategory");
-
+  // Get search query from URL params
   useEffect(() => {
-    setLoading(true);
-    setError("");
-    
-    productAPI.getAllProducts()
-      .then((data) => {
-        if (data.success && Array.isArray(data.data)) {
-          setAllProducts(data.data);
-        } else {
-          setError("Invalid data format from server");
-        }
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message || "Error fetching products");
-        setLoading(false);
-      });
+    const query = searchParams.get("q");
+    if (query) {
+      setSearchQuery(query);
+      // Filter results based on query
+      const filtered = mockProducts.filter(product =>
+        product.name.toLowerCase().includes(query.toLowerCase()) ||
+        product.category.toLowerCase().includes(query.toLowerCase())
+      );
+      setResults(filtered);
+    }
   }, [searchParams]);
 
-  useEffect(() => {
-    let filtered = [...allProducts];
-    if (query) {
-      const q = query.toLowerCase();
-      filtered = filtered.filter(
-        (p) =>
-          p.title?.toLowerCase().includes(q) ||
-          p.category?.toLowerCase().includes(q) ||
-          p.subcategory?.toLowerCase().includes(q)
-      );
-    }
-    if (category && category !== "undefined") {
-      filtered = filtered.filter(
-        (p) => p.category?.toLowerCase() === category.toLowerCase()
-      );
-    }
-    if (subcategory && subcategory !== "undefined") {
-      filtered = filtered.filter(
-        (p) => p.subcategory?.toLowerCase() === subcategory.toLowerCase()
-      );
-    }
-    setFilteredProducts(filtered);
-    setCurrentPage(1);
-  }, [allProducts, query, category, subcategory]);
+  const handleSearch = (query: string) => {
+    navigate(`/search?q=${encodeURIComponent(query)}`);
+  };
 
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentProducts = filteredProducts.slice(startIndex, endIndex);
+  const handleBack = () => {
+    navigate(-1);
+  };
+
+  const handleProductClick = (productId: number) => {
+    navigate(`/product/${productId}`);
+  };
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <h1 className="text-3xl font-bold text-foreground mb-2">
-          Search Results for "{query}"
-        </h1>
-        <div className="text-muted-foreground mb-6">
-          {filteredProducts.length} product{filteredProducts.length !== 1 ? "s" : ""} found
+      {/* Header */}
+      <div className="sticky top-0 z-50 bg-background border-b border-border">
+        <div className="flex items-center p-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleBack}
+            className="mr-3"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          
+          <div className="flex-1 relative">
+            <Input
+              type="text"
+              placeholder="Search for products, brands and more"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2"
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  handleSearch(searchQuery);
+                }
+              }}
+            />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          </div>
+          
+          {/* Logo */}
+          <Link to="/" className="ml-3">
+            <img 
+              src="/logo.jpg" 
+              alt="Nevyra Logo" 
+              className="h-8 w-auto"
+            />
+          </Link>
         </div>
-        {loading && <div className="py-12 text-center">Loading products...</div>}
-        {error && <div className="py-12 text-center text-red-500">{error}</div>}
-        {!loading && !error && (
-          <>
-            {filteredProducts.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="text-6xl mb-4">🔍</div>
-                <h3 className="text-xl font-semibold mb-2">No products found</h3>
-                <p className="text-muted-foreground mb-4">
-                  Try a different search term or adjust your filters.
-                </p>
-                <Button onClick={() => window.history.back()}>Go Back</Button>
-              </div>
-            ) : (
-              <>
-                <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                  {currentProducts.map((product) => (
-                    <ProductCard key={product.id} product={product} viewMode="grid" />
-                  ))}
-                </div>
-                {filteredProducts.length > itemsPerPage && (
-                  <div className="mt-8">
-                    <Pagination
-                      currentPage={currentPage}
-                      totalPages={totalPages}
-                      onPageChange={setCurrentPage}
-                    />
+      </div>
+
+      {/* Results Header */}
+      <div className="p-4 border-b border-border">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-lg font-semibold">
+              Search Results for "{searchQuery}"
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              {results.length} results found
+            </p>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex items-center space-x-2"
+            >
+              <Filter className="h-4 w-4" />
+              <span>Filter</span>
+            </Button>
+            
+            <div className="flex border border-border rounded-md">
+              <Button
+                variant={viewMode === "grid" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setViewMode("grid")}
+                className="rounded-r-none"
+              >
+                <Grid className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={viewMode === "list" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setViewMode("list")}
+                className="rounded-l-none"
+              >
+                <List className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Results */}
+      <div className="p-4">
+        {results.length > 0 ? (
+          <div className={viewMode === "grid" ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" : "space-y-4"}>
+            {results.map((product) => (
+              <Card
+                key={product.id}
+                className="cursor-pointer hover:shadow-md transition-shadow"
+                onClick={() => handleProductClick(product.id)}
+              >
+                <CardContent className="p-4">
+                  <div className={viewMode === "grid" ? "space-y-3" : "flex space-x-4"}>
+                    <div className={viewMode === "grid" ? "aspect-square" : "w-24 h-24"}>
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-full object-cover rounded-md"
+                      />
+                    </div>
+                    
+                    <div className={viewMode === "grid" ? "space-y-2" : "flex-1 space-y-2"}>
+                      <h3 className="font-medium text-sm line-clamp-2">
+                        {product.name}
+                      </h3>
+                      
+                      <div className="flex items-center space-x-2">
+                        <div className="flex items-center">
+                          {[...Array(5)].map((_, i) => (
+                            <span
+                              key={i}
+                              className={`text-xs ${
+                                i < Math.floor(product.rating)
+                                  ? "text-yellow-400"
+                                  : "text-gray-300"
+                              }`}
+                            >
+                              ★
+                            </span>
+                          ))}
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          ({product.reviews})
+                        </span>
+                      </div>
+                      
+                      <p className="text-sm text-muted-foreground">
+                        {product.category}
+                      </p>
+                      
+                      <p className="font-semibold text-lg">
+                        ${product.price}
+                      </p>
+                    </div>
                   </div>
-                )}
-              </>
-            )}
-          </>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <Search className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+            <h2 className="text-xl font-semibold mb-2">No results found</h2>
+            <p className="text-muted-foreground mb-4">
+              We couldn't find any products matching "{searchQuery}"
+            </p>
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">Try:</p>
+              <ul className="text-sm text-muted-foreground space-y-1">
+                <li>• Using different keywords</li>
+                <li>• Checking your spelling</li>
+                <li>• Using more general terms</li>
+              </ul>
+            </div>
+          </div>
         )}
       </div>
     </div>
   );
-} 
+};
+
+export default SearchResults; 

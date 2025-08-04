@@ -1,168 +1,153 @@
-import { Link } from "react-router-dom";
-import { Heart, Facebook, Twitter, Instagram, Youtube, Smartphone, Monitor } from "lucide-react";
+import {
+  Facebook,
+  Twitter,
+  Instagram,
+  Youtube,
+  Phone,
+  MapPin,
+} from "lucide-react";
 
-export const Footer = () => {
+const Footer = () => {
   return (
-    <footer className="bg-neutral-900 text-neutral-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* Brand Section */}
-          <div>
+    <footer className="bg-gray-900 text-white">
+      <div className="w-full px-4 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+          {/* Brand Identity */}
+          <div className="lg:col-span-1">
             <div className="flex items-center space-x-2 mb-4">
-              <img src="/logo.jpg" alt="Nevyra Logo" className="w-8 h-8 rounded-lg object-contain" />
+              <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
+                <span className="text-white font-bold text-lg">N</span>
+              </div>
               <span className="text-xl font-bold">Nevyra</span>
             </div>
-            <p className="text-primary-foreground/80 mb-6 max-w-md">
-              Your premium shopping destination. Discover amazing products with exceptional quality 
-              and enjoy a seamless shopping experience with fast delivery worldwide.
+            <p className="text-gray-300 mb-4">
+              Your premium shopping destination. Discover amazing products with exceptional quality and enjoy a seamless shopping experience with fast delivery worldwide.
             </p>
-            
-            {/* App Store Badges */}
-            
           </div>
 
           {/* Customer Service */}
           <div>
-            <h3 className="font-semibold mb-4">Customer Service</h3>
-            <ul className="space-y-3 text-sm">
+            <h4 className="text-lg font-semibold mb-4">
+              Customer Service
+            </h4>
+            <ul className="space-y-2">
               <li>
-                <Link to="/contact" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
+                <a href="#" className="text-gray-300 hover:text-white transition-colors">
                   Contact Us
-                </Link>
+                </a>
               </li>
               <li>
-                <Link to="/faq" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
+                <a href="#" className="text-gray-300 hover:text-white transition-colors">
                   FAQ
-                </Link>
+                </a>
               </li>
               <li>
-                <Link to="/shipping" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
+                <a href="#" className="text-gray-300 hover:text-white transition-colors">
                   Shipping Info
-                </Link>
+                </a>
               </li>
               <li>
-                <Link to="/returns" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
+                <a href="#" className="text-gray-300 hover:text-white transition-colors">
                   Returns & Exchanges
-                </Link>
+                </a>
               </li>
               <li>
-                <Link to="/track" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
+                <a href="#" className="text-gray-300 hover:text-white transition-colors">
                   Track Your Order
-                </Link>
+                </a>
               </li>
             </ul>
           </div>
 
-          {/* Account */}
+          {/* My Account */}
           <div>
-            <h3 className="font-semibold mb-4">My Account</h3>
-            <ul className="space-y-3 text-sm">
+            <h4 className="text-lg font-semibold mb-4">
+              My Account
+            </h4>
+            <ul className="space-y-2">
               <li>
-                <Link to="/profile" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
+                <a href="#" className="text-gray-300 hover:text-white transition-colors">
                   Profile
-                </Link>
+                </a>
               </li>
               <li>
-                <Link to="/orders" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
+                <a href="#" className="text-gray-300 hover:text-white transition-colors">
                   Order History
-                </Link>
+                </a>
               </li>
               <li>
-                <Link to="/wishlist" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
+                <a href="#" className="text-gray-300 hover:text-white transition-colors">
                   Wishlist
-                </Link>
+                </a>
               </li>
               <li>
-                <Link to="/cart" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
+                <a href="#" className="text-gray-300 hover:text-white transition-colors">
                   Shopping Cart
-                </Link>
+                </a>
               </li>
               <li>
-                <Link to="/rewards" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
+                <a href="#" className="text-gray-300 hover:text-white transition-colors">
                   Rewards Program
-                </Link>
+                </a>
               </li>
             </ul>
           </div>
 
-          {/* Company & Contact+Social as a flex-row on large screens */}
-          <div className="flex flex-col lg:flex-row gap-8">
-            {/* Company */}
-            <div className="flex-1 min-w-[180px]">
-              <h3 className="font-semibold mb-4">Company</h3>
-              <ul className="space-y-3 text-sm">
-                <li>
-                  <Link to="/about" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
-                    About Us
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/careers" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
-                    Careers
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/press" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
-                    Press
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/privacy" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
-                    Privacy Policy
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/terms" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
-                    Terms of Service
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            {/* Contact & Social */}
-            <div className="flex-1 min-w-[220px]">
-              <h3 className="font-semibold mb-4">Contact & Social</h3>
-              <ul className="space-y-3 text-sm">
-                <li>
-                  <span className="block font-medium">📍 Address:</span>
-                  <span>Krosuru, Krosuru Mandal,<br />Palnadu District, Andhra Pradesh – 522410</span>
-                </li>
-                <li>
-                  <span className="block font-medium">📞 Phone Numbers:</span>
-                  <span>+91 97017 96195<br />+91 94400 94282</span>
-                </li>
-              </ul>
-            </div>
+          {/* Company */}
+          <div>
+            <h4 className="text-lg font-semibold mb-4">
+              Company
+            </h4>
+            <ul className="space-y-2">
+              <li>
+                <a href="#" className="text-gray-300 hover:text-white transition-colors">
+                  About Us
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-gray-300 hover:text-white transition-colors">
+                  Careers
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-gray-300 hover:text-white transition-colors">
+                  Press
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-gray-300 hover:text-white transition-colors">
+                  Privacy Policy
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-gray-300 hover:text-white transition-colors">
+                  Terms of Service
+                </a>
+              </li>
+            </ul>
           </div>
-        </div>
 
-        {/* Bottom Section */}
-        <div className="border-t border-primary-foreground/20 pt-8 mt-8">
-          <div className="flex flex-col lg:flex-row justify-between items-center space-y-4 lg:space-y-0">
-            <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-6">
-              <p className="text-sm text-primary-foreground/80">
-                © 2024 Nevyra. All rights reserved.
-              </p>
-              <p className="text-sm text-primary-foreground/80 flex items-center">
-                Made with <Heart className="h-4 w-4 mx-1 text-accent" fill="currentColor" /> for great shopping
-              </p>
-            </div>
-            
-            {/* Social Media Icons */}
-            <div className="flex items-center space-x-4">
-              <span className="text-sm font-medium">Follow us:</span>
-              <div className="flex space-x-3">
-                <a href="#" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
-                  <Facebook className="h-5 w-5" />
-                </a>
-                <a href="#" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
-                  <Twitter className="h-5 w-5" />
-                </a>
-                <a href="https://www.instagram.com/nevyra_india" target="_blank" rel="noopener noreferrer" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
-                  <Instagram className="h-5 w-5" />
-                </a>
-                <a href="#" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
-                  <Youtube className="h-5 w-5" />
-                </a>
+          {/* Contact & Social */}
+          <div>
+            <h4 className="text-lg font-semibold mb-4">
+              Contact & Social
+            </h4>
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2">
+                <MapPin className="h-4 w-4 text-pink-400" />
+                <span className="text-gray-300">
+                  <span className="font-medium">Address:</span> Krosuru, Krosuru Mandal, Palnadu District, Andhra Pradesh - 522410
+                </span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Phone className="h-4 w-4 text-pink-400" />
+                <span className="text-gray-300">
+                  <span className="font-medium">Phone Numbers:</span>
+                </span>
+              </div>
+              <div className="ml-6 space-y-1">
+                <p className="text-gray-300">+91 97017 96195</p>
+                <p className="text-gray-300">+91 94400 94282</p>
               </div>
             </div>
           </div>
@@ -171,3 +156,5 @@ export const Footer = () => {
     </footer>
   );
 };
+
+export default Footer;

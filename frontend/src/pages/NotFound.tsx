@@ -1,5 +1,9 @@
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
+import { Link } from "react-router-dom";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { Button } from "@/components/ui/button";
 
 const NotFound = () => {
   const location = useLocation();
@@ -12,27 +16,25 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 via-white to-blue-100 px-4">
-      <div className="bg-white shadow-2xl rounded-2xl p-10 max-w-md w-full text-center border border-blue-100">
-        <div className="flex flex-col items-center mb-6">
-          <span className="text-7xl font-extrabold text-blue-500 mb-2 drop-shadow-lg">
-            404
-          </span>
-          <span className="inline-block w-16 h-1 bg-blue-200 rounded mb-2"></span>
+    <div className="min-h-screen bg-background font-roboto">
+      <Navbar />
+      <div className="flex items-center justify-center flex-1 py-16">
+        <div className="text-center">
+          <h1 className="text-6xl font-bold text-foreground mb-4">404</h1>
+          <p className="text-xl text-muted-foreground mb-6">
+            Oops! Page not found
+          </p>
+          <p className="text-muted-foreground mb-8">
+            The page you're looking for doesn't exist or has been moved.
+          </p>
+          <Link to="/">
+            <Button className="bg-primary hover:bg-primary-hover text-primary-foreground">
+              Return to Home
+            </Button>
+          </Link>
         </div>
-        <h1 className="text-2xl font-semibold mb-2 text-gray-800">
-          Page Not Found
-        </h1>
-        <p className="text-gray-500 mb-6">
-          Sorry, the page you are looking for does not exist or has been moved.
-        </p>
-        <a
-          href="/"
-          className="inline-block px-6 py-3 bg-blue-500 text-white font-medium rounded-lg shadow hover:bg-blue-600 transition-colors duration-200"
-        >
-          Return to Home
-        </a>
       </div>
+      <Footer />
     </div>
   );
 };
