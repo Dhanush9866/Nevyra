@@ -99,8 +99,6 @@ const Profile = () => {
                   <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-3">
                     <User className="h-8 w-8 text-primary-foreground" />
                   </div>
-                  <h2 className="text-lg font-semibold text-foreground">Rajesh Kumar</h2>
-                  <p className="text-xs text-muted-foreground">rajesh.kumar@email.com</p>
                 </div>
 
                 <nav className="space-y-2">
