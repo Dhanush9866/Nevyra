@@ -1,5 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { apiService } from "@/lib/api";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,7 +22,10 @@ import {
   Eye, 
   Download,
   Star,
-  Truck
+  Truck,
+  Save,
+  Edit,
+  Trash2
 } from "lucide-react";
 import phoneProduct from "@/assets/phone-product.jpg";
 import shoesProduct from "@/assets/shoes-product.jpg";
@@ -92,26 +98,163 @@ const wishlistItems = [
   }
 ];
 
-const addresses = [
-  {
-    id: 1,
-    name: "Rajesh Kumar",
-    address: "Flat 204, Sunrise Apartments, MG Road, Bengaluru - 560001",
-    phone: "+91 9876543210",
-    isDefault: true
-  },
-  {
-    id: 2,
-    name: "Rajesh Kumar (Office)",
-    address: "Tech Park, Sector 5, Electronic City, Bengaluru - 560100",
-    phone: "+91 9876543210",
-    isDefault: false
-  }
-];
-
 const Profile = () => {
   const [activeTab, setActiveTab] = useState("orders");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [profileForm, setProfileForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    address: ""
+  });
+  const [addresses, setAddresses] = useState<any[]>([]);
+  const [newAddress, setNewAddress] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    zipCode: ""
+  });
+  const [showAddAddress, setShowAddAddress] = useState(false);
+
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchUserProfile();
+    fetchAddresses();
+  }, []);
+
+  const fetchUserProfile = async () => {
+    try {
+      const response = await apiService.getProfile();
+      if (response.success) {
+        setUserProfile(response.data);
+        setProfileForm({
+          firstName: response.data.firstName || "",
+          lastName: response.data.lastName || "",
+          email: response.data.email || "",
+          phone: response.data.phone || "",
+          address: response.data.address || ""
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to fetch profile",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const fetchAddresses = async () => {
+    try {
+      const response = await apiService.getAddresses();
+      if (response.success) {
+        setAddresses(response.data || []);
+      }
+    } catch (error) {
+      console.error("Failed to fetch addresses:", error);
+    }
+  };
+
+  const handleProfileUpdate = async () => {
+    setIsLoading(true);
+    try {
+      const response = await apiService.updateProfile(profileForm);
+      if (response.success) {
+        setUserProfile(response.data);
+        setIsEditing(false);
+        toast({
+          title: "Success",
+          description: "Profile updated successfully!",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: response.message,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update profile",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleAddAddress = async () => {
+    if (!newAddress.firstName || !newAddress.lastName || !newAddress.email || 
+        !newAddress.phone || !newAddress.address || !newAddress.city || !newAddress.zipCode) {
+      toast({
+        title: "Error",
+        description: "Please fill in all address fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const response = await apiService.addAddress(newAddress);
+      if (response.success) {
+        setAddresses(response.data);
+        setNewAddress({
+          firstName: "",
+          lastName: "",
+          email: "",
+          phone: "",
+          address: "",
+          city: "",
+          zipCode: ""
+        });
+        setShowAddAddress(false);
+        toast({
+          title: "Success",
+          description: "Address added successfully!",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to add address",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteAddress = async (index: number) => {
+    try {
+      const response = await apiService.deleteAddressByIndex(index);
+      if (response.success) {
+        setAddresses(response.data);
+        toast({
+          title: "Success",
+          description: "Address deleted successfully!",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete address",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -125,6 +268,21 @@ const Profile = () => {
         return "bg-muted text-muted-foreground";
     }
   };
+
+  if (!userProfile) {
+    return (
+      <div className="min-h-screen bg-background font-roboto">
+        <Navbar />
+        <div className="container mx-auto px-4 py-16">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <p className="mt-4 text-muted-foreground">Loading profile...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background font-roboto">
@@ -140,8 +298,13 @@ const Profile = () => {
                   <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center mx-auto mb-3">
                     <User className="h-10 w-10 text-primary-foreground" />
                   </div>
-                  <h2 className="text-xl font-semibold text-foreground">Rajesh Kumar</h2>
-                  <p className="text-muted-foreground">rajesh.kumar@email.com</p>
+                  <h2 className="text-xl font-semibold text-foreground">
+                    {userProfile.firstName} {userProfile.lastName}
+                  </h2>
+                  <p className="text-muted-foreground">{userProfile.email}</p>
+                  {userProfile.phone && (
+                    <p className="text-sm text-muted-foreground">{userProfile.phone}</p>
+                  )}
                 </div>
 
                 <nav className="space-y-2">
@@ -178,7 +341,11 @@ const Profile = () => {
                     Account Settings
                   </Button>
                   <Separator className="my-4" />
-                  <Button variant="ghost" className="w-full justify-start text-destructive">
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start text-destructive"
+                    onClick={handleLogout}
+                  >
                     <LogOut className="h-4 w-4 mr-2" />
                     Logout
                   </Button>
@@ -321,32 +488,123 @@ const Profile = () => {
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <h1 className="text-2xl font-bold text-foreground">Saved Addresses</h1>
-                  <Button>Add New Address</Button>
+                  <Button onClick={() => setShowAddAddress(true)}>Add New Address</Button>
                 </div>
 
-                <div className="space-y-4">
-                  {addresses.map((address) => (
-                    <Card key={address.id}>
-                      <CardContent className="p-6">
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <h3 className="font-semibold text-foreground">{address.name}</h3>
-                              {address.isDefault && (
-                                <Badge variant="secondary">Default</Badge>
-                              )}
-                            </div>
-                            <p className="text-muted-foreground mb-1">{address.address}</p>
-                            <p className="text-muted-foreground">{address.phone}</p>
-                          </div>
-                          <div className="flex gap-2">
-                            <Button variant="outline" size="sm">Edit</Button>
-                            <Button variant="outline" size="sm" className="text-destructive">Delete</Button>
-                          </div>
+                {showAddAddress && (
+                  <Card>
+                    <CardContent className="p-6">
+                      <h3 className="text-lg font-semibold mb-4">Add New Address</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="addr-firstName">First Name</Label>
+                          <Input 
+                            id="addr-firstName"
+                            value={newAddress.firstName}
+                            onChange={(e) => setNewAddress({...newAddress, firstName: e.target.value})}
+                          />
                         </div>
+                        <div>
+                          <Label htmlFor="addr-lastName">Last Name</Label>
+                          <Input 
+                            id="addr-lastName"
+                            value={newAddress.lastName}
+                            onChange={(e) => setNewAddress({...newAddress, lastName: e.target.value})}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="addr-email">Email</Label>
+                          <Input 
+                            id="addr-email"
+                            type="email"
+                            value={newAddress.email}
+                            onChange={(e) => setNewAddress({...newAddress, email: e.target.value})}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="addr-phone">Phone</Label>
+                          <Input 
+                            id="addr-phone"
+                            type="tel"
+                            value={newAddress.phone}
+                            onChange={(e) => setNewAddress({...newAddress, phone: e.target.value})}
+                          />
+                        </div>
+                        <div className="md:col-span-2">
+                          <Label htmlFor="addr-address">Address</Label>
+                          <Input 
+                            id="addr-address"
+                            value={newAddress.address}
+                            onChange={(e) => setNewAddress({...newAddress, address: e.target.value})}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="addr-city">City</Label>
+                          <Input 
+                            id="addr-city"
+                            value={newAddress.city}
+                            onChange={(e) => setNewAddress({...newAddress, city: e.target.value})}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="addr-zipCode">Zip Code</Label>
+                          <Input 
+                            id="addr-zipCode"
+                            value={newAddress.zipCode}
+                            onChange={(e) => setNewAddress({...newAddress, zipCode: e.target.value})}
+                          />
+                        </div>
+                      </div>
+                      <div className="flex gap-2 mt-4">
+                        <Button onClick={handleAddAddress}>Save Address</Button>
+                        <Button variant="outline" onClick={() => setShowAddAddress(false)}>Cancel</Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                <div className="space-y-4">
+                  {addresses.length === 0 ? (
+                    <Card>
+                      <CardContent className="p-6 text-center">
+                        <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                        <h3 className="text-lg font-semibold mb-2">No addresses saved</h3>
+                        <p className="text-muted-foreground mb-4">Add your first address to get started</p>
+                        <Button onClick={() => setShowAddAddress(true)}>Add Address</Button>
                       </CardContent>
                     </Card>
-                  ))}
+                  ) : (
+                    addresses.map((address, index) => (
+                      <Card key={index}>
+                        <CardContent className="p-6">
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-2">
+                                <h3 className="font-semibold text-foreground">
+                                  {address.firstName} {address.lastName}
+                                </h3>
+                                {index === 0 && (
+                                  <Badge variant="secondary">Default</Badge>
+                                )}
+                              </div>
+                              <p className="text-muted-foreground mb-1">{address.address}</p>
+                              <p className="text-muted-foreground mb-1">{address.city}, {address.zipCode}</p>
+                              <p className="text-muted-foreground">{address.phone}</p>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => handleDeleteAddress(index)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))
+                  )}
                 </div>
               </div>
             )}
@@ -354,7 +612,16 @@ const Profile = () => {
             {/* Profile Tab */}
             {activeTab === "profile" && (
               <div className="space-y-6">
-                <h1 className="text-2xl font-bold text-foreground">Account Settings</h1>
+                <div className="flex items-center justify-between">
+                  <h1 className="text-2xl font-bold text-foreground">Account Settings</h1>
+                  <Button 
+                    variant={isEditing ? "outline" : "default"}
+                    onClick={() => setIsEditing(!isEditing)}
+                  >
+                    {isEditing ? <Save className="h-4 w-4 mr-2" /> : <Edit className="h-4 w-4 mr-2" />}
+                    {isEditing ? "Save Changes" : "Edit Profile"}
+                  </Button>
+                </div>
 
                 <Card>
                   <CardContent className="p-6">
@@ -363,31 +630,63 @@ const Profile = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="first-name">First Name</Label>
-                        <Input id="first-name" defaultValue="Rajesh" />
+                        <Input 
+                          id="first-name" 
+                          value={profileForm.firstName}
+                          onChange={(e) => setProfileForm({...profileForm, firstName: e.target.value})}
+                          disabled={!isEditing}
+                        />
                       </div>
                       <div>
                         <Label htmlFor="last-name">Last Name</Label>
-                        <Input id="last-name" defaultValue="Kumar" />
+                        <Input 
+                          id="last-name" 
+                          value={profileForm.lastName}
+                          onChange={(e) => setProfileForm({...profileForm, lastName: e.target.value})}
+                          disabled={!isEditing}
+                        />
                       </div>
                       <div>
                         <Label htmlFor="email">Email</Label>
-                        <Input id="email" type="email" defaultValue="rajesh.kumar@email.com" />
+                        <Input 
+                          id="email" 
+                          type="email" 
+                          value={profileForm.email}
+                          onChange={(e) => setProfileForm({...profileForm, email: e.target.value})}
+                          disabled={!isEditing}
+                        />
                       </div>
                       <div>
                         <Label htmlFor="phone">Phone Number</Label>
-                        <Input id="phone" type="tel" defaultValue="+91 9876543210" />
+                        <Input 
+                          id="phone" 
+                          type="tel" 
+                          value={profileForm.phone}
+                          onChange={(e) => setProfileForm({...profileForm, phone: e.target.value})}
+                          disabled={!isEditing}
+                        />
                       </div>
-                      <div>
-                        <Label htmlFor="dob">Date of Birth</Label>
-                        <Input id="dob" type="date" defaultValue="1990-05-15" />
-                      </div>
-                      <div>
-                        <Label htmlFor="gender">Gender</Label>
-                        <Input id="gender" defaultValue="Male" />
+                      <div className="md:col-span-2">
+                        <Label htmlFor="address">Address</Label>
+                        <Input 
+                          id="address" 
+                          value={profileForm.address}
+                          onChange={(e) => setProfileForm({...profileForm, address: e.target.value})}
+                          disabled={!isEditing}
+                        />
                       </div>
                     </div>
 
-                    <Button className="mt-6">Save Changes</Button>
+                    {isEditing && (
+                      <div className="flex gap-2 mt-6">
+                        <Button onClick={handleProfileUpdate} disabled={isLoading}>
+                          {isLoading ? "Saving..." : "Save Changes"}
+                        </Button>
+                        <Button variant="outline" onClick={() => setIsEditing(false)}>
+                          Cancel
+                        </Button>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
 
