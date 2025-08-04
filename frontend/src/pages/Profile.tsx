@@ -224,32 +224,7 @@ const Profile = () => {
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div>
-                        <Label htmlFor="first-name" className="text-xs">First Name</Label>
-                        <Input id="first-name" defaultValue="Rajesh" className="text-sm" />
-                      </div>
-                      <div>
-                        <Label htmlFor="last-name" className="text-xs">Last Name</Label>
-                        <Input id="last-name" defaultValue="Kumar" className="text-sm" />
-                      </div>
-                      <div>
-                        <Label htmlFor="email" className="text-xs">Email</Label>
-                        <Input id="email" type="email" defaultValue="rajesh.kumar@email.com" className="text-sm" />
-                      </div>
-                      <div>
-                        <Label htmlFor="phone" className="text-xs">Phone Number</Label>
-                        <Input id="phone" type="tel" defaultValue="+91 9876543210" className="text-sm" />
-                      </div>
-                      <div>
-                        <Label htmlFor="dob" className="text-xs">Date of Birth</Label>
-                        <Input id="dob" type="date" defaultValue="1990-05-15" className="text-sm" />
-                      </div>
-                      <div>
-                        <Label htmlFor="gender" className="text-xs">Gender</Label>
-                        <Input id="gender" defaultValue="Male" className="text-sm" />
-                      </div>
-                    </div>
-
-                    <Button className="mt-4 text-sm">Save Changes</Button>
+                 
                   </CardContent>
                 </Card>
 
