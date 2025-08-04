@@ -134,8 +134,6 @@ const Profile = () => {
                     <Settings className="h-4 w-4 mr-2" />
                     Account Settings
                   </Button>
-                  <Separator className="my-3" />
-                  <Button variant="ghost" className="w-full justify-start text-destructive text-sm">
                     <LogOut className="h-4 w-4 mr-2" />
                     Logout
                   </Button>
