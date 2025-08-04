@@ -222,9 +222,7 @@ const Profile = () => {
                   <CardContent className="p-4">
                     <h2 className="text-lg font-semibold text-foreground mb-4">Personal Information</h2>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      <div>
-                 
+
                   </CardContent>
                 </Card>
 
