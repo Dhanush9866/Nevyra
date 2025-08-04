@@ -70,7 +70,7 @@ const addresses = [
 const Profile = () => {
   const [activeTab, setActiveTab] = useState("orders");
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
+  
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
