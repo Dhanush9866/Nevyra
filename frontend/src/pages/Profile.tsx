@@ -255,7 +255,7 @@ const Profile = () => {
     logout();
     navigate("/");
   };
-
+const isMobile = useIsMobile();
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case "delivered":
