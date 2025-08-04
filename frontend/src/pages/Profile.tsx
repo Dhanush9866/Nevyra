@@ -205,7 +205,7 @@ const Profile = () => {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
 
-                          </div>
+                        
                         </div>
                       </CardContent>
                     </Card>
@@ -216,8 +216,7 @@ const Profile = () => {
 
             {/* Profile Tab */}
             {activeTab === "profile" && (
-              <div className="space-y-4">
-                <h1 className="text-xl font-bold text-foreground">Account Settings</h1>
+
 
                 <Card>
                   <CardContent className="p-4">
