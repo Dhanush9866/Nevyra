@@ -101,11 +101,11 @@ const OrderDetails = () => {
       <Navbar />
       
       {/* Breadcrumbs */}
-      <div className="bg-white border-b border-gray-200 px-3 py-2">
-        <div className="text-xs text-gray-600">
-          Home > My Account > My Orders > {order.id}
+              <div className="bg-white border-b border-gray-200 px-3 py-2">
+          <div className="text-xs text-gray-600">
+            Home &gt; My Account &gt; My Orders &gt; {order.id}
+          </div>
         </div>
-      </div>
 
       {/* Main Content */}
       <div className="flex flex-col lg:flex-row bg-gray-50">
@@ -156,7 +156,7 @@ const OrderDetails = () => {
               ))}
             </div>
             <div className="mt-3">
-              <a href="#" className="text-sm text-blue-600">See All Updates ></a>
+              <a href="#" className="text-sm text-blue-600">See All Updates &gt;</a>
             </div>
             <p className="text-xs text-gray-600 mt-2">Return policy ended on Jul 21</p>
           </div>
