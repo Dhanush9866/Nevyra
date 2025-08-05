@@ -214,7 +214,7 @@ const Orders = () => {
       {/* Breadcrumbs */}
       <div className="bg-white border-b border-gray-200 px-3 py-2">
         <div className="text-xs text-gray-600">
-          Home > My Account > My Orders
+          Home &gt; My Account &gt; My Orders
         </div>
       </div>
 
@@ -405,15 +405,6 @@ const Orders = () => {
                   onClick={() => handleOrderClick(order.id)}
                 >
                   <CardContent className="p-4">
-                    {/* Shared Order Banner */}
-                    {order.sharedBy && (
-                      <div className="bg-orange-100 border border-orange-200 rounded p-2 mb-3">
-                        <p className="text-xs text-orange-800">
-                          {order.sharedBy} shared this order with you.
-                        </p>
-                      </div>
-                    )}
-
                     {/* Order Item */}
                     <div className="flex gap-4">
                       <img
