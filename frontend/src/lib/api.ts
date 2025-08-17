@@ -80,7 +80,12 @@ class ApiService {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Something went wrong');
+        // Handle specific HTTP status codes
+        if (response.status === 401) {
+          // Unauthorized - clear token
+          localStorage.removeItem('token');
+        }
+        throw new Error(data.message || `HTTP ${response.status}: ${response.statusText}`);
       }
 
       return data;
@@ -88,7 +93,7 @@ class ApiService {
       if (error instanceof Error) {
         throw error;
       }
-      throw new Error('Network error');
+      throw new Error('Network error occurred. Please check your connection.');
     }
   }
 
@@ -179,6 +184,46 @@ class ApiService {
       method: 'DELETE',
     });
   }
+
+  // Order functions
+  async createOrder(orderData: any): Promise<{ success: boolean; message: string; data: any }> {
+    return this.request<{ success: boolean; message: string; data: any }>('/orders', {
+      method: 'POST',
+      body: JSON.stringify(orderData),
+    });
+  }
+
+  async getUserOrders(): Promise<{ success: boolean; message: string; data: any[] }> {
+    return this.request<{ success: boolean; message: string; data: any[] }>('/orders/user', {
+      method: 'GET',
+    });
+  }
+
+  async getOrderById(orderId: string): Promise<{ success: boolean; message: string; data: any }> {
+    return this.request<{ success: boolean; message: string; data: any }>(`/orders/${orderId}`, {
+      method: 'GET',
+    });
+  }
+
+  async cancelOrder(orderId: string): Promise<{ success: boolean; message: string; data: any }> {
+    return this.request<{ success: boolean; message: string; data: any }>(`/orders/${orderId}/cancel`, {
+      method: 'PATCH',
+    });
+  }
+
+  // Health check method
+  async healthCheck(): Promise<{ success: boolean; message: string }> {
+    try {
+      const response = await fetch(`${this.baseURL}/health`);
+      if (response.ok) {
+        return { success: true, message: 'API is healthy' };
+      } else {
+        return { success: false, message: 'API is not responding properly' };
+      }
+    } catch (error) {
+      return { success: false, message: 'Cannot connect to API server' };
+    }
+  }
 }
 
 export const apiService = new ApiService(API_BASE_URL);
@@ -199,5 +244,11 @@ export const authUtils = {
 
   isAuthenticated: (): boolean => {
     return !!localStorage.getItem('token');
+  },
+
+  // Clear all auth data
+  clearAuth: () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
   },
 }; 

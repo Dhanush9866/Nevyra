@@ -4,13 +4,14 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import ForgotPassword from "@/components/ForgotPassword";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { Eye, EyeOff, Mail, Lock, User, Phone } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User, Phone, AlertCircle } from "lucide-react";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   
   // Form states
@@ -38,6 +40,10 @@ const Auth = () => {
     confirmPassword: "",
     address: "",
   });
+
+  // Form errors
+  const [loginErrors, setLoginErrors] = useState<{ [key: string]: string }>({});
+  const [registerErrors, setRegisterErrors] = useState<{ [key: string]: string }>({});
   
   // Redirect if already authenticated
   if (isAuthenticated) {
@@ -46,14 +52,71 @@ const Auth = () => {
     return null;
   }
 
+  // Validation functions
+  const validateLoginForm = () => {
+    const errors: { [key: string]: string } = {};
+    
+    if (!loginForm.email.trim()) {
+      errors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginForm.email)) {
+      errors.email = "Please enter a valid email address";
+    }
+    
+    if (!loginForm.password) {
+      errors.password = "Password is required";
+    }
+    
+    setLoginErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const validateRegisterForm = () => {
+    const errors: { [key: string]: string } = {};
+    
+    if (!registerForm.firstName.trim()) {
+      errors.firstName = "First name is required";
+    } else if (registerForm.firstName.trim().length < 2) {
+      errors.firstName = "First name must be at least 2 characters";
+    }
+    
+    if (!registerForm.lastName.trim()) {
+      errors.lastName = "Last name is required";
+    } else if (registerForm.lastName.trim().length < 2) {
+      errors.lastName = "Last name must be at least 2 characters";
+    }
+    
+    if (!registerForm.email.trim()) {
+      errors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(registerForm.email)) {
+      errors.email = "Please enter a valid email address";
+    }
+    
+    if (registerForm.phone && !/^[\+]?[1-9][\d]{0,15}$/.test(registerForm.phone.replace(/\s/g, ''))) {
+      errors.phone = "Please enter a valid phone number";
+    }
+    
+    if (!registerForm.password) {
+      errors.password = "Password is required";
+    } else if (registerForm.password.length < 8) {
+      errors.password = "Password must be at least 8 characters long";
+    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/.test(registerForm.password)) {
+      errors.password = "Password must contain uppercase, lowercase, number, and special character";
+    }
+    
+    if (!registerForm.confirmPassword) {
+      errors.confirmPassword = "Please confirm your password";
+    } else if (registerForm.password !== registerForm.confirmPassword) {
+      errors.confirmPassword = "Passwords do not match";
+    }
+    
+    setRegisterErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!loginForm.email || !loginForm.password) {
-      toast({
-        title: "Error",
-        description: "Please fill in all fields",
-        variant: "destructive",
-      });
+    
+    if (!validateLoginForm()) {
       return;
     }
 
@@ -63,10 +126,10 @@ const Auth = () => {
       if (result.success) {
         toast({
           title: "Success",
-          description: "Login successful!",
+          description: result.message,
         });
-        const from = location.state?.from?.pathname || "/";
-        navigate(from);
+        // Redirect to profile page after successful login
+        navigate("/profile");
       } else {
         toast({
           title: "Error",
@@ -88,52 +151,43 @@ const Auth = () => {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validation
-    if (!registerForm.firstName || !registerForm.lastName || !registerForm.email || !registerForm.password) {
-      toast({
-        title: "Error",
-        description: "Please fill in all required fields",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (registerForm.password !== registerForm.confirmPassword) {
-      toast({
-        title: "Error",
-        description: "Passwords do not match",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (registerForm.password.length < 6) {
-      toast({
-        title: "Error",
-        description: "Password must be at least 6 characters long",
-        variant: "destructive",
-      });
+    if (!validateRegisterForm()) {
       return;
     }
 
     setIsLoading(true);
     try {
       const result = await register({
-        firstName: registerForm.firstName,
-        lastName: registerForm.lastName,
-        email: registerForm.email,
-        phone: registerForm.phone || undefined,
+        firstName: registerForm.firstName.trim(),
+        lastName: registerForm.lastName.trim(),
+        email: registerForm.email.trim(),
+        phone: registerForm.phone.trim() || undefined,
         password: registerForm.password,
-        address: registerForm.address || undefined,
+        address: registerForm.address.trim() || undefined,
       });
       
       if (result.success) {
         toast({
           title: "Success",
-          description: "Registration successful!",
+          description: "Registration successful! Please login with your new account.",
         });
-        const from = location.state?.from?.pathname || "/";
-        navigate(from);
+        // Redirect to login tab after successful registration
+        setActiveTab("login");
+        // Clear the registration form
+        setRegisterForm({
+          firstName: "",
+          lastName: "",
+          email: "",
+          phone: "",
+          password: "",
+          confirmPassword: "",
+          address: "",
+        });
+        // Pre-fill email in login form
+        setLoginForm({
+          email: registerForm.email.trim(),
+          password: "",
+        });
       } else {
         toast({
           title: "Error",
@@ -152,6 +206,26 @@ const Auth = () => {
     }
   };
 
+  const clearErrors = (formType: 'login' | 'register') => {
+    if (formType === 'login') {
+      setLoginErrors({});
+    } else {
+      setRegisterErrors({});
+    }
+  };
+
+  if (showForgotPassword) {
+    return (
+      <div className="min-h-screen bg-background font-roboto">
+        <Navbar />
+        <div className="container mx-auto px-4 py-16">
+          <ForgotPassword onBack={() => setShowForgotPassword(false)} />
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background font-roboto">
       <Navbar />
@@ -165,7 +239,10 @@ const Auth = () => {
                 <p className="text-muted-foreground">Your trusted shopping destination</p>
               </div>
 
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <Tabs value={activeTab} onValueChange={(value) => {
+                setActiveTab(value);
+                clearErrors(value === 'login' ? 'login' : 'register');
+              }} className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="login">Login</TabsTrigger>
                   <TabsTrigger value="register">Register</TabsTrigger>
@@ -182,12 +259,21 @@ const Auth = () => {
                           id="login-email"
                           type="email"
                           placeholder="Enter your email"
-                          className="pl-10"
+                          className={`pl-10 ${loginErrors.email ? 'border-red-500' : ''}`}
                           value={loginForm.email}
-                          onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
+                          onChange={(e) => {
+                            setLoginForm({ ...loginForm, email: e.target.value });
+                            if (loginErrors.email) clearErrors('login');
+                          }}
                           required
                         />
                       </div>
+                      {loginErrors.email && (
+                        <div className="flex items-center gap-1 mt-1 text-sm text-red-500">
+                          <AlertCircle className="h-3 w-3" />
+                          {loginErrors.email}
+                        </div>
+                      )}
                     </div>
 
                     <div>
@@ -198,9 +284,12 @@ const Auth = () => {
                           id="login-password"
                           type={showPassword ? "text" : "password"}
                           placeholder="Enter password"
-                          className="pl-10 pr-10"
+                          className={`pl-10 pr-10 ${loginErrors.password ? 'border-red-500' : ''}`}
                           value={loginForm.password}
-                          onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
+                          onChange={(e) => {
+                            setLoginForm({ ...loginForm, password: e.target.value });
+                            if (loginErrors.password) clearErrors('login');
+                          }}
                           required
                         />
                         <Button
@@ -213,10 +302,21 @@ const Auth = () => {
                           {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </Button>
                       </div>
+                      {loginErrors.password && (
+                        <div className="flex items-center gap-1 mt-1 text-sm text-red-500">
+                          <AlertCircle className="h-3 w-3" />
+                          {loginErrors.password}
+                        </div>
+                      )}
                     </div>
 
                     <div className="text-right">
-                      <Button variant="link" className="p-0 h-auto text-primary">
+                      <Button 
+                        type="button"
+                        variant="link" 
+                        className="p-0 h-auto text-primary"
+                        onClick={() => setShowForgotPassword(true)}
+                      >
                         Forgot Password?
                       </Button>
                     </div>
@@ -248,11 +348,6 @@ const Auth = () => {
                     </svg>
                     Continue with Google
                   </Button>
-
-                  <Button variant="outline" className="w-full">
-                    <Phone className="h-4 w-4 mr-2" />
-                    Login with OTP
-                  </Button>
                 </TabsContent>
 
                 {/* Register Tab */}
@@ -267,12 +362,21 @@ const Auth = () => {
                             id="register-firstName"
                             type="text"
                             placeholder="First name"
-                            className="pl-10"
+                            className={`pl-10 ${registerErrors.firstName ? 'border-red-500' : ''}`}
                             value={registerForm.firstName}
-                            onChange={(e) => setRegisterForm({ ...registerForm, firstName: e.target.value })}
+                            onChange={(e) => {
+                              setRegisterForm({ ...registerForm, firstName: e.target.value });
+                              if (registerErrors.firstName) clearErrors('register');
+                            }}
                             required
                           />
                         </div>
+                        {registerErrors.firstName && (
+                          <div className="flex items-center gap-1 mt-1 text-sm text-red-500">
+                            <AlertCircle className="h-3 w-3" />
+                            {registerErrors.firstName}
+                          </div>
+                        )}
                       </div>
 
                       <div>
@@ -283,12 +387,21 @@ const Auth = () => {
                             id="register-lastName"
                             type="text"
                             placeholder="Last name"
-                            className="pl-10"
+                            className={`pl-10 ${registerErrors.lastName ? 'border-red-500' : ''}`}
                             value={registerForm.lastName}
-                            onChange={(e) => setRegisterForm({ ...registerForm, lastName: e.target.value })}
+                            onChange={(e) => {
+                              setRegisterForm({ ...registerForm, lastName: e.target.value });
+                              if (registerErrors.lastName) clearErrors('register');
+                            }}
                             required
                           />
                         </div>
+                        {registerErrors.lastName && (
+                          <div className="flex items-center gap-1 mt-1 text-sm text-red-500">
+                            <AlertCircle className="h-3 w-3" />
+                            {registerErrors.lastName}
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -300,12 +413,21 @@ const Auth = () => {
                           id="register-email"
                           type="email"
                           placeholder="Enter your email"
-                          className="pl-10"
+                          className={`pl-10 ${registerErrors.email ? 'border-red-500' : ''}`}
                           value={registerForm.email}
-                          onChange={(e) => setRegisterForm({ ...registerForm, email: e.target.value })}
+                          onChange={(e) => {
+                            setRegisterForm({ ...registerForm, email: e.target.value });
+                            if (registerErrors.email) clearErrors('register');
+                          }}
                           required
                         />
                       </div>
+                      {registerErrors.email && (
+                        <div className="flex items-center gap-1 mt-1 text-sm text-red-500">
+                          <AlertCircle className="h-3 w-3" />
+                          {registerErrors.email}
+                        </div>
+                      )}
                     </div>
 
                     <div>
@@ -316,11 +438,20 @@ const Auth = () => {
                           id="register-phone"
                           type="tel"
                           placeholder="Enter your phone number"
-                          className="pl-10"
+                          className={`pl-10 ${registerErrors.phone ? 'border-red-500' : ''}`}
                           value={registerForm.phone}
-                          onChange={(e) => setRegisterForm({ ...registerForm, phone: e.target.value })}
+                          onChange={(e) => {
+                            setRegisterForm({ ...registerForm, phone: e.target.value });
+                            if (registerErrors.phone) clearErrors('register');
+                          }}
                         />
                       </div>
+                      {registerErrors.phone && (
+                        <div className="flex items-center gap-1 mt-1 text-sm text-red-500">
+                          <AlertCircle className="h-3 w-3" />
+                          {registerErrors.phone}
+                        </div>
+                      )}
                     </div>
 
                     <div>
@@ -344,9 +475,12 @@ const Auth = () => {
                           id="register-password"
                           type={showPassword ? "text" : "password"}
                           placeholder="Create password"
-                          className="pl-10 pr-10"
+                          className={`pl-10 pr-10 ${registerErrors.password ? 'border-red-500' : ''}`}
                           value={registerForm.password}
-                          onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
+                          onChange={(e) => {
+                            setRegisterForm({ ...registerForm, password: e.target.value });
+                            if (registerErrors.password) clearErrors('register');
+                          }}
                           required
                         />
                         <Button
@@ -359,6 +493,15 @@ const Auth = () => {
                           {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </Button>
                       </div>
+                      {registerErrors.password && (
+                        <div className="flex items-center gap-1 mt-1 text-sm text-red-500">
+                          <AlertCircle className="h-3 w-3" />
+                          {registerErrors.password}
+                        </div>
+                      )}
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Must be at least 8 characters with uppercase, lowercase, number, and special character
+                      </p>
                     </div>
 
                     <div>
@@ -369,9 +512,12 @@ const Auth = () => {
                           id="confirm-password"
                           type={showConfirmPassword ? "text" : "password"}
                           placeholder="Confirm password"
-                          className="pl-10 pr-10"
+                          className={`pl-10 pr-10 ${registerErrors.confirmPassword ? 'border-red-500' : ''}`}
                           value={registerForm.confirmPassword}
-                          onChange={(e) => setRegisterForm({ ...registerForm, confirmPassword: e.target.value })}
+                          onChange={(e) => {
+                            setRegisterForm({ ...registerForm, confirmPassword: e.target.value });
+                            if (registerErrors.confirmPassword) clearErrors('register');
+                          }}
                           required
                         />
                         <Button
@@ -384,6 +530,12 @@ const Auth = () => {
                           {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </Button>
                       </div>
+                      {registerErrors.confirmPassword && (
+                        <div className="flex items-center gap-1 mt-1 text-sm text-red-500">
+                          <AlertCircle className="h-3 w-3" />
+                          {registerErrors.confirmPassword}
+                        </div>
+                      )}
                     </div>
 
                     <div className="text-sm text-muted-foreground">

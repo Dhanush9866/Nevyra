@@ -1,62 +1,99 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { User } = require("../models");
-const { isEmail, isStrongPassword } = require("../utils/validators");
+const { isEmail, isStrongPassword, isValidPhone, isValidName } = require("../utils/validators");
 const { sendOTPEmail } = require("../utils/emailService");
 
 exports.register = async (req, res, next) => {
   try {
     const { firstName, lastName, email, phone, password, address } = req.body;
+    
+    // Validation
     if (!firstName || !lastName || !email || !password) {
       return res
         .status(400)
-        .json({ success: false, message: "All fields required", data: null });
+        .json({ success: false, message: "All required fields must be provided", data: null });
     }
+    
+    if (!isValidName(firstName)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "First name must be 2-50 characters and contain only letters, spaces, hyphens, and apostrophes", data: null });
+    }
+    
+    if (!isValidName(lastName)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Last name must be 2-50 characters and contain only letters, spaces, hyphens, and apostrophes", data: null });
+    }
+    
     if (!isEmail(email)) {
       return res
         .status(400)
-        .json({ success: false, message: "Invalid email", data: null });
+        .json({ success: false, message: "Please provide a valid email address", data: null });
     }
+    
     if (!isStrongPassword(password)) {
       return res
         .status(400)
-        .json({ success: false, message: "Password too weak", data: null });
+        .json({ success: false, message: "Password must be at least 8 characters long and contain uppercase, lowercase, number, and special character", data: null });
     }
-    const existing = await User.findOne({ email });
-    if (existing) {
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
       return res
         .status(409)
         .json({
           success: false,
-          message: "Email already registered",
+          message: "An account with this email already exists",
           data: null,
         });
     }
+
+    // Check phone uniqueness if provided
     if (phone) {
+      if (!isValidPhone(phone)) {
+        return res
+          .status(400)
+          .json({
+            success: false,
+            message: "Please provide a valid phone number",
+            data: null,
+          });
+      }
+      
       const existingPhone = await User.findOne({ phone });
       if (existingPhone) {
         return res
           .status(409)
           .json({
             success: false,
-            message: "Phone number already exists",
+            message: "This phone number is already registered",
             data: null,
           });
       }
     }
-    const hashed = await bcrypt.hash(password, 10);
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 12);
+    
+    // Create user
     const user = new User({
       firstName,
       lastName,
       phone,
       email,
-      password: hashed,
+      password: hashedPassword,
       address,
     });
+    
     await user.save();
+
+    // Don't generate JWT token - user needs to login separately
     return res.status(201).json({
       success: true,
-      message: "User registered",
+      message: "Account created successfully! Please login with your new account.",
       data: {
         id: user._id,
         firstName: user.firstName,
@@ -66,6 +103,7 @@ exports.register = async (req, res, next) => {
       },
     });
   } catch (err) {
+    console.error("Registration error:", err);
     next(err);
   }
 };
@@ -73,38 +111,55 @@ exports.register = async (req, res, next) => {
 exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
+    
+    // Validation
     if (!email || !password) {
       return res
         .status(400)
         .json({
           success: false,
-          message: "Email and password required",
+          message: "Email and password are required",
           data: null,
         });
     }
+
+    // Find user by email
     const user = await User.findOne({ email });
     if (!user) {
       return res
         .status(401)
-        .json({ success: false, message: "Invalid credentials", data: null });
+        .json({ success: false, message: "Invalid email or password", data: null });
     }
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) {
+
+    // Verify password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
       return res
         .status(401)
-        .json({ success: false, message: "Invalid credentials", data: null });
+        .json({ success: false, message: "Invalid email or password", data: null });
     }
+
+    // Generate JWT token
     const token = jwt.sign(
       { id: user._id, email: user.email, isAdmin: user.isAdmin },
-      process.env.JWT_SECRET || "secretToken",
-      { expiresIn: "7d" }
+      process.env.JWT_SECRET || "your-super-secret-jwt-key-change-this-in-production",
+      { expiresIn: process.env.JWT_EXPIRES_IN || "7d" }
     );
+
     return res.json({
       success: true,
-      message: "Login successful",
-      data: { token },
+      message: "Login successful! Welcome back.",
+      data: { 
+        token,
+        id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        phone: user.phone,
+      },
     });
   } catch (err) {
+    console.error("Login error:", err);
     next(err);
   }
 };
@@ -117,8 +172,9 @@ exports.profile = async (req, res, next) => {
         .status(404)
         .json({ success: false, message: "User not found", data: null });
     }
-    return res.json({ success: true, message: "Profile fetched", data: user });
+    return res.json({ success: true, message: "Profile retrieved successfully", data: user });
   } catch (err) {
+    console.error("Profile fetch error:", err);
     next(err);
   }
 };
@@ -127,64 +183,103 @@ exports.updateProfile = async (req, res, next) => {
   try {
     const userId = req.user.id;
     const { firstName, lastName, phone, email } = req.body;
+    
     const user = await User.findById(userId);
     if (!user) {
       return res
         .status(404)
         .json({ success: false, message: "User not found", data: null });
     }
-    if (firstName !== undefined) user.firstName = firstName;
-    if (lastName !== undefined) user.lastName = lastName;
+
+    // Update fields if provided
+    if (firstName !== undefined) {
+      if (!isValidName(firstName)) {
+        return res
+          .status(400)
+          .json({
+            success: false,
+            message: "First name must be 2-50 characters and contain only letters, spaces, hyphens, and apostrophes",
+            data: null,
+          });
+      }
+      user.firstName = firstName;
+    }
+    
+    if (lastName !== undefined) {
+      if (!isValidName(lastName)) {
+        return res
+          .status(400)
+          .json({
+            success: false,
+            message: "Last name must be 2-50 characters and contain only letters, spaces, hyphens, and apostrophes",
+            data: null,
+          });
+      }
+      user.lastName = lastName;
+    }
+    
+    // Handle phone update with duplicate check
     if (phone !== undefined && phone !== user.phone) {
-      // Check for duplicate phone
+      if (!isValidPhone(phone)) {
+        return res
+          .status(400)
+          .json({
+            success: false,
+            message: "Please provide a valid phone number",
+            data: null,
+          });
+      }
+      
       const existingPhone = await User.findOne({ phone });
-      if (
-        existingPhone &&
-        existingPhone._id.toString() !== user._id.toString()
-      ) {
+      if (existingPhone && existingPhone._id.toString() !== user._id.toString()) {
         return res
           .status(409)
           .json({
             success: false,
-            message: "Phone number already exists",
+            message: "This phone number is already registered",
             data: null,
           });
       }
       user.phone = phone;
     }
+
+    // Handle email update with validation and duplicate check
     if (email !== undefined && email !== user.email) {
-      // Validate email format
       if (!isEmail(email)) {
         return res
           .status(400)
           .json({
             success: false,
-            message: "Invalid email format",
+            message: "Please provide a valid email address",
             data: null,
           });
       }
-      // Check for duplicate email
-      const existing = await User.findOne({ email });
-      if (existing && existing._id.toString() !== user._id.toString()) {
+      
+      const existingEmail = await User.findOne({ email });
+      if (existingEmail && existingEmail._id.toString() !== user._id.toString()) {
         return res
           .status(409)
           .json({
             success: false,
-            message: "Email already in use",
+            message: "This email is already registered",
             data: null,
           });
       }
       user.email = email;
     }
+
     await user.save();
+    
     const userData = user.toObject();
     delete userData.password;
+    
     return res.json({
       success: true,
-      message: "Profile updated",
+      message: "Profile updated successfully",
       data: userData,
     });
   } catch (err) {
+    console.error("Profile update error:", err);
     next(err);
   }
 };
@@ -192,50 +287,58 @@ exports.updateProfile = async (req, res, next) => {
 exports.forgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
+    
     if (!email) {
-      return res.status(400).json({ success: false, message: "Email is required" });
+      return res.status(400).json({ 
+        success: false, 
+        message: "Email address is required" 
+      });
     }
+
+    // Validate email format
+    if (!isEmail(email)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Please provide a valid email address" 
+      });
+    }
+
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ success: false, message: "Email not found" });
+      // Don't reveal if email exists or not for security
+      return res.json({ 
+        success: true, 
+        message: "If an account with this email exists, a password reset link has been sent" 
+      });
     }
+
     // Generate 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     user.resetPasswordOTP = otp;
-    user.resetPasswordOTPExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 min
-    await user.save();
-    await sendOTPEmail(email, otp);
-    return res.json({ success: true, message: "OTP sent to your email" });
-  } catch (err) {
-    next(err);
-  }
-};
+    user.resetPasswordOTPExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
-exports.resetPassword = async (req, res, next) => {
-  try {
-    const { email, otp, newPassword } = req.body;
-    if (!email || !otp || !newPassword) {
-      return res.status(400).json({ success: false, message: "All fields are required" });
-    }
-    const user = await User.findOne({ email });
-    if (!user || !user.resetPasswordOTP || !user.resetPasswordOTPExpires) {
-      return res.status(400).json({ success: false, message: "Invalid request" });
-    }
-    if (user.resetPasswordOTP !== otp) {
-      return res.status(400).json({ success: false, message: "Invalid OTP" });
-    }
-    if (user.resetPasswordOTPExpires < new Date()) {
-      return res.status(400).json({ success: false, message: "OTP expired" });
-    }
-    if (!isStrongPassword(newPassword)) {
-      return res.status(400).json({ success: false, message: "Password too weak" });
-    }
-    user.password = await bcrypt.hash(newPassword, 10);
-    user.resetPasswordOTP = undefined;
-    user.resetPasswordOTPExpires = undefined;
     await user.save();
-    return res.json({ success: true, message: "Password reset successful" });
+
+    try {
+      await sendOTPEmail(email, otp);
+      return res.json({ 
+        success: true, 
+        message: "Password reset OTP has been sent to your email" 
+      });
+    } catch (emailError) {
+      // Reset OTP if email fails
+      user.resetPasswordOTP = undefined;
+      user.resetPasswordOTPExpires = undefined;
+      await user.save();
+      
+      console.error("Email sending failed:", emailError);
+      return res.status(500).json({ 
+        success: false, 
+        message: "Failed to send reset email. Please try again later." 
+      });
+    }
   } catch (err) {
+    console.error("Forgot password error:", err);
     next(err);
   }
 };
@@ -243,21 +346,110 @@ exports.resetPassword = async (req, res, next) => {
 exports.verifyOTP = async (req, res, next) => {
   try {
     const { email, otp } = req.body;
+    
     if (!email || !otp) {
-      return res.status(400).json({ success: false, message: "Email and OTP are required" });
+      return res.status(400).json({ 
+        success: false, 
+        message: "Email and OTP are required" 
+      });
     }
+
     const user = await User.findOne({ email });
     if (!user || !user.resetPasswordOTP || !user.resetPasswordOTPExpires) {
-      return res.status(400).json({ success: false, message: "Invalid request" });
+      return res.status(400).json({ 
+        success: false, 
+        message: "Invalid reset request or OTP expired" 
+      });
     }
+
     if (user.resetPasswordOTP !== otp) {
-      return res.status(400).json({ success: false, message: "Invalid OTP" });
+      return res.status(400).json({ 
+        success: false, 
+        message: "Invalid OTP code" 
+      });
     }
+
     if (user.resetPasswordOTPExpires < new Date()) {
-      return res.status(400).json({ success: false, message: "OTP expired" });
+      // Clear expired OTP
+      user.resetPasswordOTP = undefined;
+      user.resetPasswordOTPExpires = undefined;
+      await user.save();
+      
+      return res.status(400).json({ 
+        success: false, 
+        message: "OTP has expired. Please request a new one." 
+      });
     }
-    return res.json({ success: true, message: "OTP verified" });
+
+    return res.json({ 
+      success: true, 
+      message: "OTP verified successfully. You can now reset your password." 
+    });
   } catch (err) {
+    console.error("OTP verification error:", err);
+    next(err);
+  }
+};
+
+exports.resetPassword = async (req, res, next) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+    
+    if (!email || !otp || !newPassword) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Email, OTP, and new password are required" 
+      });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user || !user.resetPasswordOTP || !user.resetPasswordOTPExpires) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Invalid reset request or OTP expired" 
+      });
+    }
+
+    if (user.resetPasswordOTP !== otp) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Invalid OTP code" 
+      });
+    }
+
+    if (user.resetPasswordOTPExpires < new Date()) {
+      // Clear expired OTP
+      user.resetPasswordOTP = undefined;
+      user.resetPasswordOTPExpires = undefined;
+      await user.save();
+      
+      return res.status(400).json({ 
+        success: false, 
+        message: "OTP has expired. Please request a new one." 
+      });
+    }
+
+    // Validate new password strength
+    if (!isStrongPassword(newPassword)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Password must be at least 8 characters long and contain uppercase, lowercase, number, and special character" 
+      });
+    }
+
+    // Hash new password and clear OTP
+    user.password = await bcrypt.hash(newPassword, 12);
+    user.resetPasswordOTP = undefined;
+    user.resetPasswordOTPExpires = undefined;
+    
+    await user.save();
+
+    return res.json({ 
+      success: true, 
+      message: "Password has been reset successfully. You can now login with your new password." 
+    });
+  } catch (err) {
+    console.error("Password reset error:", err);
     next(err);
   }
 };

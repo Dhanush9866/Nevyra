@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
@@ -67,12 +69,28 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [pincode, setPincode] = useState("");
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { toast } = useToast();
 
   const handleQuantityChange = (change: number) => {
     const newQuantity = quantity + change;
     if (newQuantity >= 1 && newQuantity <= 10) {
       setQuantity(newQuantity);
     }
+  };
+
+  const handleBuyNow = () => {
+    if (!user) {
+      toast({
+        title: "Login required",
+        description: "Please log in to buy now.",
+        variant: "destructive",
+      });
+      navigate("/login");
+      return;
+    }
+    navigate("/checkout", { state: { product } });
   };
 
   return (
@@ -205,7 +223,7 @@ const ProductDetail = () => {
                   <ShoppingCart className="h-5 w-5 mr-2" />
                   Add to Cart
                 </Button>
-                <Button className="flex-1 bg-primary hover:bg-primary-hover text-primary-foreground font-medium text-lg py-6">
+                <Button className="flex-1 bg-primary hover:bg-primary-hover text-primary-foreground font-medium text-lg py-6" onClick={handleBuyNow}>
                   Buy Now
                 </Button>
               </div>

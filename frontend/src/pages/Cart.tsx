@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
@@ -55,6 +57,9 @@ const initialCartItems: CartItem[] = [
 const Cart = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>(initialCartItems);
   const [promoCode, setPromoCode] = useState("");
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { toast } = useToast();
 
   const updateQuantity = (id: number, newQuantity: number) => {
     if (newQuantity <= 0) {
@@ -108,6 +113,38 @@ const Cart = () => {
       </div>
     );
   }
+
+  const handleCheckout = () => {
+    if (!user) {
+      toast({
+        title: "Login required",
+        description: "Please log in to proceed to checkout.",
+        variant: "destructive",
+      });
+      navigate("/login");
+      return;
+    }
+
+    // Prepare checkout data from cart items
+    const checkoutItems = cartItems.map(item => ({
+      productId: item.id.toString(),
+      productName: item.name,
+      productImage: item.image,
+      quantity: item.quantity,
+      price: item.price,
+      totalPrice: item.price * item.quantity,
+    }));
+
+    const checkoutData = {
+      items: checkoutItems,
+      subtotal: subtotal,
+      shippingCost: shippingFee,
+      tax: Math.round(subtotal * 0.18), // 18% GST
+      totalAmount: finalTotal + Math.round(subtotal * 0.18),
+    };
+
+    navigate("/checkout", { state: { checkoutData } });
+  };
 
   return (
     <div className="min-h-screen bg-background font-roboto">
@@ -254,11 +291,12 @@ const Cart = () => {
                   </div>
                 </div>
 
-                <Link to="/checkout">
-                  <Button className="w-full bg-primary hover:bg-primary-hover text-primary-foreground font-medium text-lg py-6 mb-4">
-                    Proceed to Checkout
-                  </Button>
-                </Link>
+                <Button
+                  className="w-full bg-primary hover:bg-primary-hover text-primary-foreground font-medium text-lg py-6 mb-4"
+                  onClick={handleCheckout}
+                >
+                  Proceed to Checkout
+                </Button>
 
                 {/* Delivery Info */}
                 <div className="space-y-3 text-sm">

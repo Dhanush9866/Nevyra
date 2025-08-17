@@ -15,6 +15,7 @@ interface AuthContextType {
   }) => Promise<{ success: boolean; message: string }>;
   logout: () => void;
   isAuthenticated: boolean;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -37,18 +38,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const isAuthenticated = !!user;
 
+  // Initialize authentication state
   useEffect(() => {
     const initializeAuth = async () => {
       const token = authUtils.getToken();
       if (token) {
         try {
-          const response = await apiService.getProfile();
-          if (response.success) {
-            setUser(response.data);
-          } else {
-            authUtils.removeToken();
-          }
+          await refreshUser();
         } catch (error) {
+          console.error('Failed to initialize auth:', error);
           authUtils.removeToken();
         }
       }
@@ -58,24 +56,50 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     initializeAuth();
   }, []);
 
+  // Refresh user profile
+  const refreshUser = async () => {
+    try {
+      const response = await apiService.getProfile();
+      if (response.success) {
+        setUser(response.data);
+      } else {
+        throw new Error(response.message);
+      }
+    } catch (error) {
+      console.error('Failed to refresh user:', error);
+      authUtils.removeToken();
+      setUser(null);
+      throw error;
+    }
+  };
+
   const login = async (email: string, password: string) => {
     try {
       const response = await apiService.login({ email, password });
       if (response.success && response.data?.token) {
+        // Store token
         authUtils.setToken(response.data.token);
-        // Fetch user profile after successful login
-        const profileResponse = await apiService.getProfile();
-        if (profileResponse.success) {
-          setUser(profileResponse.data);
+        
+        // Fetch user profile
+        try {
+          await refreshUser();
+          return { success: true, message: response.message };
+        } catch (profileError) {
+          // If profile fetch fails, remove token and return error
+          authUtils.removeToken();
+          return { 
+            success: false, 
+            message: 'Login successful but failed to load profile. Please try again.' 
+          };
         }
-        return { success: true, message: response.message };
       } else {
-        return { success: false, message: response.message };
+        return { success: false, message: response.message || 'Login failed' };
       }
     } catch (error) {
+      console.error('Login error:', error);
       return { 
         success: false, 
-        message: error instanceof Error ? error.message : 'Login failed' 
+        message: error instanceof Error ? error.message : 'Login failed. Please try again.' 
       };
     }
   };
@@ -90,21 +114,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }) => {
     try {
       const response = await apiService.register(userData);
-      if (response.success && response.data?.token) {
-        authUtils.setToken(response.data.token);
-        // Fetch user profile after successful registration
-        const profileResponse = await apiService.getProfile();
-        if (profileResponse.success) {
-          setUser(profileResponse.data);
-        }
+      if (response.success) {
+        // Registration successful - don't auto-login
+        // Just return success message
         return { success: true, message: response.message };
       } else {
-        return { success: false, message: response.message };
+        return { success: false, message: response.message || 'Registration failed' };
       }
     } catch (error) {
+      console.error('Registration error:', error);
       return { 
         success: false, 
-        message: error instanceof Error ? error.message : 'Registration failed' 
+        message: error instanceof Error ? error.message : 'Registration failed. Please try again.' 
       };
     }
   };
@@ -121,6 +142,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     register,
     logout,
     isAuthenticated,
+    refreshUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

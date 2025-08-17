@@ -1,5 +1,5 @@
 // API Base URL - Update to your deployed backend URL
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = 'http://localhost:8000/api';
 
 // Helper function to handle API responses
 const handleResponse = async (response) => {

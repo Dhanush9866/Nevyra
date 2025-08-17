@@ -82,13 +82,35 @@ const Profile = () => {
 
   const navigate = useNavigate();
 
-  const { user, logout } = useAuth();
+  const { user, logout, isAuthenticated } = useAuth();
   const { toast } = useToast();
 
+  // Redirect to login if not authenticated
   useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/auth");
+      return;
+    }
+    
     fetchUserProfile();
     fetchAddresses();
-  }, []);
+  }, [isAuthenticated, navigate]);
+
+  // Show loading while checking authentication
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-background font-roboto">
+        <Navbar />
+        <div className="container mx-auto px-4 py-16">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <p className="mt-4 text-muted-foreground">Checking authentication...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
 
   const fetchUserProfile = async () => {
@@ -103,13 +125,22 @@ const Profile = () => {
           phone: response.data.phone || "",
           address: response.data.address || ""
         });
+      } else {
+        toast({
+          title: "Error",
+          description: response.message || "Failed to fetch profile",
+          variant: "destructive",
+        });
       }
     } catch (error) {
+      console.error("Profile fetch error:", error);
       toast({
         title: "Error",
-        description: "Failed to fetch profile",
+        description: "Failed to fetch profile. Please try logging in again.",
         variant: "destructive",
       });
+      // If profile fetch fails, redirect to login
+      navigate("/auth");
     }
   };
 

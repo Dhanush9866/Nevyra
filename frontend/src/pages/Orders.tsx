@@ -1,469 +1,445 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { apiService } from "@/lib/api";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@/components/ui/separator";
 import { 
+  Package, 
   Eye, 
-  Download,
-  Star,
+  X, 
   Truck,
-  ArrowLeft,
-  Search,
-  Filter,
-  X
+  CheckCircle, 
+  Clock,
+  MapPin,
+  CreditCard,
+  Wallet,
+  Smartphone,
+  Building
 } from "lucide-react";
-import phoneProduct from "@/assets/phone-product.jpg";
-import shoesProduct from "@/assets/shoes-product.jpg";
-import laptopProduct from "@/assets/laptop-product.jpg";
 
-const orders = [
-  {
-    id: "NVR001234",
-    date: "2023-12-15",
-    status: "Delivered",
-    deliveryDate: "Jul 11",
-    total: 432,
-    items: [
-      {
-        name: "Richer Large 36 L Laptop Backpack Paradise",
-        image: laptopProduct,
-        quantity: 1,
-        price: 432,
-        color: "Black"
-      }
-    ]
-  },
-  {
-    id: "NVR001235",
-    date: "2023-12-10",
-    status: "Cancelled",
-    deliveryDate: "Jul 06",
-    total: 413,
-    items: [
-      {
-        name: "ENSURE Clinically Proven Nutritional Drink",
-        image: phoneProduct,
-        quantity: 1,
-        price: 413,
-        color: "Chocolate"
-      }
-    ]
-  },
-  {
-    id: "NVR001236",
-    date: "2023-12-05",
-    status: "Cancelled",
-    deliveryDate: "Jun 13",
-    total: 173,
-    items: [
-      {
-        name: "Print maker Back Cover for Realme 12 Pro",
-        image: shoesProduct,
-        quantity: 1,
-        price: 173,
-        color: "Multicolor"
-      }
-    ]
-  },
-  {
-    id: "NVR001237",
-    date: "2023-12-01",
-    status: "Delivered",
-    deliveryDate: "Jun 19",
-    total: 186,
-    items: [
-      {
-        name: "75 L Grey Laundry Basket",
-        image: phoneProduct,
-        quantity: 1,
-        price: 186,
-        color: "Grey"
-      }
-    ]
-  }
-];
+interface OrderItem {
+  productId: string;
+  productName: string;
+  productImage: string;
+  quantity: number;
+  price: number;
+  totalPrice: number;
+}
+
+interface Order {
+  _id: string;
+  orderNumber: string;
+  items: OrderItem[];
+  shippingAddress: {
+    firstName: string;
+    lastName: string;
+    address: string;
+    city: string;
+    zipCode: string;
+    phone: string;
+  };
+  paymentMethod: string;
+  paymentStatus: string;
+  orderStatus: string;
+  subtotal: number;
+  shippingCost: number;
+  tax: number;
+  totalAmount: number;
+  estimatedDelivery: string;
+  createdAt: string;
+  notes?: string;
+}
 
 const Orders = () => {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilters, setStatusFilters] = useState<string[]>([]);
-  const [timeFilters, setTimeFilters] = useState<string[]>([]);
-  const [filteredOrders, setFilteredOrders] = useState(orders);
+  const location = useLocation();
+  const { isAuthenticated } = useAuth();
+  const { toast } = useToast();
 
-  // Filter orders based on search query and filters
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+
+  // Redirect if not authenticated
   useEffect(() => {
-    let filtered = orders;
-
-    // Search functionality
-    if (searchQuery.trim()) {
-      filtered = filtered.filter(order => 
-        order.items[0].name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.items[0].color.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+    if (!isAuthenticated) {
+      navigate("/auth", { state: { from: location.pathname } });
+      return;
     }
 
-    // Status filtering
-    if (statusFilters.length > 0) {
-      filtered = filtered.filter(order => 
-        statusFilters.includes(order.status.toLowerCase())
-      );
-    }
+    fetchOrders();
 
-    // Time filtering
-    if (timeFilters.length > 0) {
-      filtered = filtered.filter(order => {
-        const orderDate = new Date(order.date);
-        const currentDate = new Date();
-        
-        return timeFilters.some(filter => {
-          switch (filter) {
-            case "last-30-days":
-              const thirtyDaysAgo = new Date();
-              thirtyDaysAgo.setDate(currentDate.getDate() - 30);
-              return orderDate >= thirtyDaysAgo;
-            case "2024":
-              return orderDate.getFullYear() === 2024;
-            case "2023":
-              return orderDate.getFullYear() === 2023;
-            case "2022":
-              return orderDate.getFullYear() === 2022;
-            case "2021":
-              return orderDate.getFullYear() === 2021;
-            case "older":
-              return orderDate.getFullYear() < 2021;
-            default:
-              return true;
-          }
-        });
+    // Show success message if redirected from checkout
+    if (location.state?.message) {
+      toast({
+        title: "Success",
+        description: location.state.message,
       });
     }
+  }, [isAuthenticated, navigate, location.state, toast]);
 
-    setFilteredOrders(filtered);
-  }, [searchQuery, statusFilters, timeFilters]);
+  const fetchOrders = async () => {
+    try {
+      const response = await apiService.getUserOrders();
+      if (response.success) {
+        setOrders(response.data);
+      } else {
+        toast({
+          title: "Error",
+          description: response.message || "Failed to fetch orders",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to fetch orders. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case "delivered":
-        return "bg-green-500";
-      case "cancelled":
-        return "bg-red-500";
+        return "bg-success text-success-foreground";
       case "shipped":
-        return "bg-blue-500";
+        return "bg-primary text-primary-foreground";
+      case "confirmed":
+        return "bg-blue-500 text-white";
       case "processing":
-        return "bg-yellow-500";
+        return "bg-warning text-warning-foreground";
+      case "cancelled":
+        return "bg-destructive text-destructive-foreground";
       default:
-        return "bg-gray-500";
+        return "bg-muted text-muted-foreground";
     }
   };
 
-  const getStatusText = (status: string) => {
+  const getStatusIcon = (status: string) => {
     switch (status.toLowerCase()) {
       case "delivered":
-        return "Delivered";
-      case "cancelled":
-        return "Cancelled";
+        return <CheckCircle className="h-4 w-4" />;
       case "shipped":
-        return "On the way";
+        return <Truck className="h-4 w-4" />;
+      case "confirmed":
+        return <CheckCircle className="h-4 w-4" />;
       case "processing":
-        return "Processing";
+        return <Clock className="h-4 w-4" />;
+      case "cancelled":
+        return <X className="h-4 w-4" />;
       default:
-        return status;
+        return <Clock className="h-4 w-4" />;
     }
   };
 
-  const handleOrderClick = (orderId: string) => {
-    navigate(`/order/${orderId}`);
-  };
-
-  const handleBack = () => {
-    navigate(-1);
-  };
-
-  const handleStatusFilterChange = (status: string, checked: boolean) => {
-    if (checked) {
-      setStatusFilters(prev => [...prev, status]);
-    } else {
-      setStatusFilters(prev => prev.filter(s => s !== status));
+  const getPaymentMethodIcon = (method: string) => {
+    switch (method) {
+      case "cod":
+        return <Wallet className="h-4 w-4" />;
+      case "card":
+        return <CreditCard className="h-4 w-4" />;
+      case "upi":
+        return <Smartphone className="h-4 w-4" />;
+      case "netbanking":
+        return <Building className="h-4 w-4" />;
+      default:
+        return <CreditCard className="h-4 w-4" />;
     }
   };
 
-  const handleTimeFilterChange = (timeFilter: string, checked: boolean) => {
-    if (checked) {
-      setTimeFilters(prev => [...prev, timeFilter]);
-    } else {
-      setTimeFilters(prev => prev.filter(t => t !== timeFilter));
-    }
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-IN", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
   };
 
-  const clearAllFilters = () => {
-    setSearchQuery("");
-    setStatusFilters([]);
-    setTimeFilters([]);
+  const handleViewOrder = (order: Order) => {
+    setSelectedOrder(order);
   };
+
+  const handleCloseOrderDetails = () => {
+    setSelectedOrder(null);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background font-roboto">
+        <Navbar />
+        <div className="container mx-auto px-4 py-16">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <p className="mt-4 text-muted-foreground">Loading orders...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background font-roboto">
       <Navbar />
       
-      {/* Breadcrumbs */}
-      <div className="bg-white border-b border-gray-200 px-3 py-2">
-        <div className="text-xs text-gray-600">
-          Home &gt; My Account &gt; My Orders
-        </div>
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-foreground">My Orders</h1>
+          <p className="text-muted-foreground">Track your order status and history</p>
       </div>
 
-      {/* Main Content */}
-      <div className="flex flex-col lg:flex-row">
-        {/* Filters Sidebar - Hidden on mobile, shown on desktop */}
-        <div className="hidden lg:block lg:w-64 bg-white border-r border-gray-200 p-4">
-          <h3 className="font-semibold text-sm mb-4">Filters</h3>
-          
-                     {/* Order Status */}
-           <div className="mb-6">
-             <h4 className="font-medium text-sm mb-3">ORDER STATUS</h4>
-             <div className="space-y-2">
-               <div className="flex items-center space-x-2">
-                 <Checkbox 
-                   id="on-the-way" 
-                   checked={statusFilters.includes("shipped")}
-                   onCheckedChange={(checked) => handleStatusFilterChange("shipped", checked as boolean)}
-                 />
-                 <label htmlFor="on-the-way" className="text-sm">On the way</label>
+        {orders.length === 0 ? (
+          <Card>
+            <CardContent className="p-12 text-center">
+              <Package className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-xl font-semibold mb-2">No orders yet</h3>
+              <p className="text-muted-foreground mb-6">
+                Start shopping to see your orders here
+              </p>
+              <Button onClick={() => navigate("/")}>
+                Start Shopping
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="space-y-6">
+            {orders.map((order) => (
+              <Card key={order._id} className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2">
+                        <Package className="h-5 w-5 text-primary" />
+                        <span className="font-semibold">#{order.orderNumber}</span>
                </div>
-               <div className="flex items-center space-x-2">
-                 <Checkbox 
-                   id="delivered" 
-                   checked={statusFilters.includes("delivered")}
-                   onCheckedChange={(checked) => handleStatusFilterChange("delivered", checked as boolean)}
-                 />
-                 <label htmlFor="delivered" className="text-sm">Delivered</label>
+                      <Badge className={getStatusColor(order.orderStatus)}>
+                        <div className="flex items-center gap-1">
+                          {getStatusIcon(order.orderStatus)}
+                          {order.orderStatus.charAt(0).toUpperCase() + order.orderStatus.slice(1)}
                </div>
-               <div className="flex items-center space-x-2">
-                 <Checkbox 
-                   id="cancelled" 
-                   checked={statusFilters.includes("cancelled")}
-                   onCheckedChange={(checked) => handleStatusFilterChange("cancelled", checked as boolean)}
-                 />
-                 <label htmlFor="cancelled" className="text-sm">Cancelled</label>
+                      </Badge>
                </div>
-               <div className="flex items-center space-x-2">
-                 <Checkbox 
-                   id="returned" 
-                   checked={statusFilters.includes("returned")}
-                   onCheckedChange={(checked) => handleStatusFilterChange("returned", checked as boolean)}
-                 />
-                 <label htmlFor="returned" className="text-sm">Returned</label>
+                    <div className="text-right">
+                      <p className="text-sm text-muted-foreground">
+                        {formatDate(order.createdAt)}
+                      </p>
+                      <p className="font-semibold text-lg">
+                        ₹{order.totalAmount.toLocaleString()}
+                      </p>
                </div>
+             </div>
+                </CardHeader>
+                
+                <CardContent>
+                  {/* Order Items Preview */}
+                  <div className="mb-4">
+                    <div className="flex items-center gap-4 mb-3">
+                      <div className="flex items-center gap-2">
+                        <CreditCard className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm text-muted-foreground">
+                          {getPaymentMethodIcon(order.paymentMethod)}
+                          {order.paymentMethod.toUpperCase()}
+                        </span>
+               </div>
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm text-muted-foreground">
+                          {order.shippingAddress.city}, {order.shippingAddress.zipCode}
+                        </span>
+               </div>
+               </div>
+                    
+                    <div className="flex items-center gap-4">
+                      {order.items.slice(0, 3).map((item, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                          <img
+                            src={item.productImage}
+                            alt={item.productName}
+                            className="w-12 h-12 object-cover rounded-lg"
+                          />
+                          <div className="text-sm">
+                            <p className="font-medium line-clamp-1">{item.productName}</p>
+                            <p className="text-muted-foreground">Qty: {item.quantity}</p>
+               </div>
+               </div>
+                      ))}
+                      {order.items.length > 3 && (
+                        <div className="text-sm text-muted-foreground">
+                          +{order.items.length - 3} more items
+               </div>
+                      )}
              </div>
            </div>
 
-           {/* Order Time */}
-           <div>
-             <h4 className="font-medium text-sm mb-3">ORDER TIME</h4>
-             <div className="space-y-2">
-               <div className="flex items-center space-x-2">
-                 <Checkbox 
-                   id="last-30-days" 
-                   checked={timeFilters.includes("last-30-days")}
-                   onCheckedChange={(checked) => handleTimeFilterChange("last-30-days", checked as boolean)}
-                 />
-                 <label htmlFor="last-30-days" className="text-sm">Last 30 days</label>
-               </div>
-               <div className="flex items-center space-x-2">
-                 <Checkbox 
-                   id="2024" 
-                   checked={timeFilters.includes("2024")}
-                   onCheckedChange={(checked) => handleTimeFilterChange("2024", checked as boolean)}
-                 />
-                 <label htmlFor="2024" className="text-sm">2024</label>
-               </div>
-               <div className="flex items-center space-x-2">
-                 <Checkbox 
-                   id="2023" 
-                   checked={timeFilters.includes("2023")}
-                   onCheckedChange={(checked) => handleTimeFilterChange("2023", checked as boolean)}
-                 />
-                 <label htmlFor="2023" className="text-sm">2023</label>
-               </div>
-               <div className="flex items-center space-x-2">
-                 <Checkbox 
-                   id="2022" 
-                   checked={timeFilters.includes("2022")}
-                   onCheckedChange={(checked) => handleTimeFilterChange("2022", checked as boolean)}
-                 />
-                 <label htmlFor="2022" className="text-sm">2022</label>
-               </div>
-               <div className="flex items-center space-x-2">
-                 <Checkbox 
-                   id="2021" 
-                   checked={timeFilters.includes("2021")}
-                   onCheckedChange={(checked) => handleTimeFilterChange("2021", checked as boolean)}
-                 />
-                 <label htmlFor="2021" className="text-sm">2021</label>
-               </div>
-               <div className="flex items-center space-x-2">
-                 <Checkbox 
-                   id="older" 
-                   checked={timeFilters.includes("older")}
-                   onCheckedChange={(checked) => handleTimeFilterChange("older", checked as boolean)}
-                 />
-                 <label htmlFor="older" className="text-sm">Older</label>
-               </div>
-             </div>
-           </div>
+                  <Separator className="my-4" />
 
-           {/* Clear Filters Button */}
-           {(statusFilters.length > 0 || timeFilters.length > 0) && (
-             <div className="mt-4">
+                  {/* Order Actions */}
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-muted-foreground">
+                      <p>Estimated delivery: {formatDate(order.estimatedDelivery)}</p>
+                      <p>{order.items.length} item{order.items.length !== 1 ? 's' : ''}</p>
+                    </div>
                <Button 
                  variant="outline" 
-                 size="sm" 
-                 onClick={clearAllFilters}
-                 className="w-full text-xs"
+                      onClick={() => handleViewOrder(order)}
                >
-                 <X className="h-3 w-3 mr-1" />
-                 Clear All Filters
+                      <Eye className="h-4 w-4 mr-2" />
+                      View Details
                </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
              </div>
            )}
         </div>
 
-        {/* Orders List */}
-        <div className="flex-1 bg-gray-50">
-                     {/* Search Bar */}
-           <div className="bg-white border-b border-gray-200 p-4">
-             <div className="flex gap-2">
-               <Input 
-                 placeholder="Search your orders here" 
-                 className="flex-1"
-                 value={searchQuery}
-                 onChange={(e) => setSearchQuery(e.target.value)}
-               />
-               {searchQuery && (
+      {/* Order Details Modal */}
+      {selectedOrder && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-background rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold">Order #{selectedOrder.orderNumber}</h2>
                  <Button 
                    variant="ghost" 
                    size="sm"
-                   onClick={() => setSearchQuery("")}
-                   className="text-gray-500 hover:text-gray-700"
+                  onClick={handleCloseOrderDetails}
                  >
                    <X className="h-4 w-4" />
                  </Button>
-               )}
+              </div>
+
+              {/* Order Status */}
+              <div className="mb-6">
+                <Badge className={`${getStatusColor(selectedOrder.orderStatus)} text-lg px-4 py-2`}>
+                  <div className="flex items-center gap-2">
+                    {getStatusIcon(selectedOrder.orderStatus)}
+                    {selectedOrder.orderStatus.charAt(0).toUpperCase() + selectedOrder.orderStatus.slice(1)}
              </div>
-             {/* Active Filters Display */}
-             {(statusFilters.length > 0 || timeFilters.length > 0) && (
-               <div className="flex flex-wrap gap-2 mt-2">
-                 {statusFilters.map(filter => (
-                   <Badge key={filter} variant="secondary" className="text-xs">
-                     {filter.charAt(0).toUpperCase() + filter.slice(1)}
                    </Badge>
-                 ))}
-                 {timeFilters.map(filter => (
-                   <Badge key={filter} variant="secondary" className="text-xs">
-                     {filter === "last-30-days" ? "Last 30 days" : filter}
-                   </Badge>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Order Items */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Order Items</h3>
+                  <div className="space-y-3">
+                    {selectedOrder.items.map((item, index) => (
+                      <div key={index} className="flex items-center gap-3 p-3 border rounded-lg">
+                        <img
+                          src={item.productImage}
+                          alt={item.productName}
+                          className="w-16 h-16 object-cover rounded-lg"
+                        />
+                        <div className="flex-1">
+                          <h4 className="font-medium">{item.productName}</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Quantity: {item.quantity} × ₹{item.price.toLocaleString()}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-semibold">₹{item.totalPrice.toLocaleString()}</p>
+                        </div>
+                      </div>
                  ))}
                </div>
-             )}
            </div>
 
-                                   {/* Orders */}
-             <div className="p-4 space-y-4">
-               {filteredOrders.length === 0 ? (
-                 <div className="text-center py-8">
-                   <p className="text-gray-500 text-sm">
-                     {searchQuery || statusFilters.length > 0 || timeFilters.length > 0 
-                       ? "No orders found matching your criteria." 
-                       : "No orders found."}
-                   </p>
-                   {(searchQuery || statusFilters.length > 0 || timeFilters.length > 0) && (
-                     <Button 
-                       variant="outline" 
-                       size="sm" 
-                       onClick={clearAllFilters}
-                       className="mt-2"
-                     >
-                       Clear Filters
-                     </Button>
-                   )}
+                {/* Order Details */}
+                <div className="space-y-6">
+                  {/* Shipping Address */}
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3">Shipping Address</h3>
+                    <div className="p-3 border rounded-lg">
+                      <p className="font-medium">
+                        {selectedOrder.shippingAddress.firstName} {selectedOrder.shippingAddress.lastName}
+                      </p>
+                      <p className="text-muted-foreground">{selectedOrder.shippingAddress.address}</p>
+                      <p className="text-muted-foreground">
+                        {selectedOrder.shippingAddress.city}, {selectedOrder.shippingAddress.zipCode}
+                      </p>
+                      <p className="text-muted-foreground">{selectedOrder.shippingAddress.phone}</p>
                  </div>
-               ) : (
-                 <>
-                   <div className="text-sm text-gray-600 mb-2">
-                     Showing {filteredOrders.length} of {orders.length} orders
                    </div>
-                   {filteredOrders.map((order) => (
-                <Card 
-                  key={order.id} 
-                  className="bg-white border border-gray-200 cursor-pointer hover:shadow-md transition-shadow"
-                  onClick={() => handleOrderClick(order.id)}
-                >
-                  <CardContent className="p-4">
-                    {/* Order Item */}
-                    <div className="flex gap-4">
-                      <img
-                        src={order.items[0].image}
-                        alt={order.items[0].name}
-                        className="w-20 h-20 object-cover rounded"
-                      />
-                      <div className="flex-1">
-                        <h3 className="font-medium text-sm text-gray-900 line-clamp-2">
-                          {order.items[0].name}
-                        </h3>
-                        <p className="text-xs text-gray-600 mt-1">Color: {order.items[0].color}</p>
-                        <p className="text-sm font-medium text-gray-900 mt-1">₹{order.total}</p>
-                        
-                        {/* Status */}
-                        <div className="flex items-center gap-2 mt-2">
-                          <div className={`w-2 h-2 rounded-full ${getStatusColor(order.status)}`}></div>
-                          <span className="text-xs text-gray-600">
-                            {getStatusText(order.status)} on {order.deliveryDate}
+
+                  {/* Payment & Order Info */}
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3">Order Information</h3>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Order Date:</span>
+                        <span>{formatDate(selectedOrder.createdAt)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Payment Method:</span>
+                        <span className="flex items-center gap-1">
+                          {getPaymentMethodIcon(selectedOrder.paymentMethod)}
+                          {selectedOrder.paymentMethod.toUpperCase()}
                           </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Payment Status:</span>
+                        <Badge variant={selectedOrder.paymentStatus === 'completed' ? 'default' : 'secondary'}>
+                          {selectedOrder.paymentStatus.charAt(0).toUpperCase() + selectedOrder.paymentStatus.slice(1)}
+                        </Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Estimated Delivery:</span>
+                        <span>{formatDate(selectedOrder.estimatedDelivery)}</span>
+                      </div>
+                    </div>
                         </div>
                         
-                        {/* Additional Info */}
-                        {order.status === "Delivered" && (
-                          <p className="text-xs text-gray-600 mt-1">Your item has been delivered</p>
-                        )}
-                        {order.status === "Cancelled" && order.id === "NVR001236" && (
-                          <p className="text-xs text-gray-600 mt-1">
-                            You requested a cancellation because you changed your mind about this product.
-                          </p>
+                  {/* Order Notes */}
+                  {selectedOrder.notes && (
+                    <div>
+                      <h3 className="text-lg font-semibold mb-3">Order Notes</h3>
+                      <p className="text-muted-foreground p-3 border rounded-lg">
+                        {selectedOrder.notes}
+                      </p>
+                    </div>
                         )}
                       </div>
                     </div>
 
-                    {/* Action Buttons */}
-                    {order.status === "Delivered" && (
-                      <div className="mt-3">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="text-xs bg-blue-600 text-white border-blue-600 hover:bg-blue-700"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            // Handle rate & review
-                          }}
-                        >
-                          <Star className="h-3 w-3 mr-1" />
-                          Rate & Review Product
-                        </Button>
+              {/* Order Summary */}
+              <div className="mt-6 p-4 bg-muted rounded-lg">
+                <h3 className="text-lg font-semibold mb-3">Order Summary</h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span>Subtotal:</span>
+                    <span>₹{selectedOrder.subtotal.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Shipping:</span>
+                    <span>₹{selectedOrder.shippingCost.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Tax:</span>
+                    <span>₹{selectedOrder.tax.toLocaleString()}</span>
+                  </div>
+                  <Separator />
+                  <div className="flex justify-between font-semibold text-lg">
+                    <span>Total:</span>
+                    <span>₹{selectedOrder.totalAmount.toLocaleString()}</span>
+                  </div>
+                </div>
                       </div>
-                                         )}
-                   </CardContent>
-                 </Card>
-               ))}
-                 </>
-               )}
              </div>
         </div>
       </div>
+      )}
 
       <Footer />
     </div>
