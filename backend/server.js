@@ -16,7 +16,7 @@ const corsOptions = {
     'https://nevyrafron.onrender.com',
     'https://nevyrafrontend.onrender.com',
     'https://nevyra.onrender.com',
-    'http://localhost:8000', 
+    'http://localhost:8080', 
     'http://localhost:8081',// Your frontend development server
     'http://localhost:3000',
     'http://localhost:5173',
