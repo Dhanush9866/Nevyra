@@ -1,6 +1,37 @@
 const { Product } = require("../models");
 const { validateAttributes } = require("../utils/validateAttributes");
 
+// Function to parse additional specifications
+function parseAdditionalSpecifications(specsString) {
+  if (!specsString || typeof specsString !== 'string') {
+    return {};
+  }
+  
+  const specifications = {};
+  
+  // Split by semicolon to get individual specifications
+  const specsArray = specsString.split(';').filter(spec => spec.trim());
+  
+  specsArray.forEach(spec => {
+    // Split by colon to separate key and value
+    const [key, value] = spec.split(':').map(s => s.trim());
+    
+    if (key && value) {
+      // Convert key to uppercase and clean it
+      const cleanKey = key.toUpperCase().replace(/[^A-Z0-9]/g, '');
+      
+      // Handle multiple values separated by commas
+      if (value.includes(',')) {
+        specifications[cleanKey] = value.split(',').map(v => v.trim()).filter(v => v);
+      } else {
+        specifications[cleanKey] = value;
+      }
+    }
+  });
+  
+  return specifications;
+}
+
 function mapProductId(product) {
   if (!product) return product;
   const obj = product.toObject ? product.toObject() : { ...product };
@@ -12,6 +43,14 @@ function mapProductId(product) {
       obj.attributes = Object.fromEntries(obj.attributes);
     } else if (obj.attributes.toObject) {
       obj.attributes = obj.attributes.toObject();
+    }
+  }
+  // Ensure additionalSpecifications is a plain object
+  if (obj.additionalSpecifications && typeof obj.additionalSpecifications === "object") {
+    if (obj.additionalSpecifications instanceof Map) {
+      obj.additionalSpecifications = Object.fromEntries(obj.additionalSpecifications);
+    } else if (obj.additionalSpecifications.toObject) {
+      obj.additionalSpecifications = obj.additionalSpecifications.toObject();
     }
   }
   return obj;
@@ -85,20 +124,28 @@ exports.create = async (req, res, next) => {
       stockQuantity,
       soldCount,
       attributes,
+      additionalSpecifications,
     } = req.body;
-    if (!title || !price || !category || !attributes || !images || !subCategory)
+    
+    if (!title || !price || !category || !images || !subCategory)
       return res.status(400).json({
         success: false,
         message: "Missing required fields",
         data: null,
       });
-    if (!validateAttributes(category, attributes)) {
+    
+    if (attributes && !validateAttributes(category, attributes)) {
       return res.status(400).json({
         success: false,
         message: "Invalid attributes for category",
         data: null,
       });
     }
+    
+    // Parse additional specifications if provided
+    const parsedSpecs = additionalSpecifications ? 
+      parseAdditionalSpecifications(additionalSpecifications) : {};
+    
     const product = new Product({
       title,
       price,
@@ -111,6 +158,7 @@ exports.create = async (req, res, next) => {
       stockQuantity,
       soldCount,
       attributes,
+      additionalSpecifications: parsedSpecs,
     });
     await product.save();
     res.status(201).json({
@@ -142,6 +190,7 @@ exports.update = async (req, res, next) => {
       stockQuantity,
       soldCount,
       attributes,
+      additionalSpecifications,
     } = req.body;
     if (category && attributes && !validateAttributes(category, attributes)) {
       return res.status(400).json({
@@ -161,6 +210,10 @@ exports.update = async (req, res, next) => {
     if (stockQuantity !== undefined) product.stockQuantity = stockQuantity;
     if (soldCount !== undefined) product.soldCount = soldCount;
     if (attributes !== undefined) product.attributes = attributes;
+    if (additionalSpecifications !== undefined) {
+      product.additionalSpecifications = additionalSpecifications ? 
+        parseAdditionalSpecifications(additionalSpecifications) : {};
+    }
     await product.save();
     res.json({
       success: true,

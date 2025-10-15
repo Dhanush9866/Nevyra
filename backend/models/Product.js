@@ -48,6 +48,10 @@ const productSchema = new mongoose.Schema(
       type: Map,
       of: mongoose.Schema.Types.Mixed,
     },
+    additionalSpecifications: {
+      type: Map,
+      of: mongoose.Schema.Types.Mixed,
+    },
   },
   {
     timestamps: true,

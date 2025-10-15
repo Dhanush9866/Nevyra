@@ -1,7 +1,6 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const bodyParser = require("body-parser");
 const routes = require("./routes");
 const errorHandler = require("./middlewares/errorHandler");
 const connectDB = require("./config/mongodb");
@@ -16,7 +15,7 @@ const corsOptions = {
     'https://nevyrafron.onrender.com',
     'https://nevyrafrontend.onrender.com',
     'https://nevyra.onrender.com',
-    'http://localhost:8000', 
+    'http://localhost:8080', 
     'http://localhost:8081',// Your frontend development server
     'http://localhost:3000',
     'http://localhost:5173',
@@ -33,12 +32,14 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
 // Logger middleware (optional)
 const logger = require("./middlewares/logger");
 app.use(logger);
+
+// Parse JSON and URL-encoded bodies BEFORE routes (needed for /products, etc.)
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Register API routes
 app.use("/api", routes);
