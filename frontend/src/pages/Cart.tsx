@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -6,70 +6,43 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Minus, Trash2, ShoppingBag, Truck, Shield } from "lucide-react";
-import phoneProduct from "@/assets/phone-product.jpg";
-import shoesProduct from "@/assets/shoes-product.jpg";
-import laptopProduct from "@/assets/laptop-product.jpg";
+import { apiService } from "@/lib/api";
 
-interface CartItem {
-  id: number;
-  name: string;
-  image: string;
-  price: number;
-  originalPrice: number;
-  quantity: number;
-  size?: string;
-  color?: string;
-}
-
-const initialCartItems: CartItem[] = [
-  {
-    id: 1,
-    name: "Latest Smartphone Pro Max",
-    image: phoneProduct,
-    price: 29999,
-    originalPrice: 35999,
-    quantity: 1,
-    color: "Space Black",
-  },
-  {
-    id: 2,
-    name: "Premium Running Shoes",
-    image: shoesProduct,
-    price: 2999,
-    originalPrice: 4999,
-    quantity: 2,
-    size: "UK 8",
-    color: "White",
-  },
-  {
-    id: 3,
-    name: "Gaming Laptop Ultra",
-    image: laptopProduct,
-    price: 69999,
-    originalPrice: 89999,
-    quantity: 1,
-    color: "Silver",
-  },
-];
+type CartItem = any;
 
 const Cart = () => {
-  const [cartItems, setCartItems] = useState<CartItem[]>(initialCartItems);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [promoCode, setPromoCode] = useState("");
 
-  const updateQuantity = (id: number, newQuantity: number) => {
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await apiService.getCart();
+        if (res.success) setCartItems(res.data);
+      } catch {}
+    })();
+  }, []);
+
+  const updateQuantity = async (id: string, newQuantity: number) => {
     if (newQuantity <= 0) {
-      removeItem(id);
+      await removeItem(id);
       return;
     }
-    setCartItems((items) =>
-      items.map((item) =>
-        item.id === id ? { ...item, quantity: newQuantity } : item
-      )
-    );
+    try {
+      await apiService.updateCartItem(id, newQuantity);
+      setCartItems((items) =>
+        items.map((item: any) =>
+          item._id === id ? { ...item, quantity: newQuantity } : item
+        )
+      );
+    } catch {}
   };
 
-  const removeItem = (id: number) => {
-    setCartItems((items) => items.filter((item) => item.id !== id));
+  const removeItem = async (id: string) => {
+    try {
+      await apiService.removeCartItem(id);
+      setCartItems((items) => items.filter((item: any) => item._id !== id));
+    } catch {}
   };
 
   const subtotal = cartItems.reduce(
@@ -121,19 +94,19 @@ const Cart = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-4">
-            {cartItems.map((item) => (
-              <Card key={item.id} className="p-4">
+            {cartItems.map((item: any) => (
+              <Card key={item._id} className="p-4">
                 <CardContent className="p-0">
                   <div className="flex flex-col md:flex-row gap-4">
                     <img
-                      src={item.image}
-                      alt={item.name}
+                      src={item.productId?.images?.[0] || '/placeholder.svg'}
+                      alt={item.productId?.title}
                       className="w-full md:w-32 h-32 object-cover rounded-lg"
                     />
 
                     <div className="flex-1 space-y-2">
                       <h3 className="font-semibold text-foreground text-lg">
-                        {item.name}
+                        {item.productId?.title}
                       </h3>
 
                       <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
@@ -143,10 +116,10 @@ const Cart = () => {
 
                       <div className="flex items-center gap-2">
                         <span className="text-xl font-bold text-price">
-                          ₹{item.price.toLocaleString()}
+                          ₹{(item.productId?.price || 0).toLocaleString()}
                         </span>
                         <span className="text-sm text-muted-foreground line-through">
-                          ₹{item.originalPrice.toLocaleString()}
+                          ₹{(item.productId?.mrp || item.productId?.price || 0).toLocaleString()}
                         </span>
                       </div>
 
@@ -156,7 +129,7 @@ const Cart = () => {
                             variant="ghost"
                             size="sm"
                             onClick={() =>
-                              updateQuantity(item.id, item.quantity - 1)
+                              updateQuantity(item._id, item.quantity - 1)
                             }
                           >
                             <Minus className="h-4 w-4" />
@@ -168,7 +141,7 @@ const Cart = () => {
                             variant="ghost"
                             size="sm"
                             onClick={() =>
-                              updateQuantity(item.id, item.quantity + 1)
+                              updateQuantity(item._id, item.quantity + 1)
                             }
                           >
                             <Plus className="h-4 w-4" />
@@ -178,7 +151,7 @@ const Cart = () => {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => removeItem(item.id)}
+                          onClick={() => removeItem(item._id)}
                           className="text-destructive hover:text-destructive"
                         >
                           <Trash2 className="h-4 w-4 mr-1" />
