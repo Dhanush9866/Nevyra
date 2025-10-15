@@ -53,6 +53,51 @@ class ApiService {
     this.baseURL = baseURL;
   }
 
+  // Products
+  async getProducts(params: Record<string, any> = {}): Promise<{ success: boolean; message: string; data: any[] }> {
+    const query = new URLSearchParams(params as any).toString();
+    return this.request(`/products${query ? `?${query}` : ''}`);
+  }
+
+  async getProductById(id: string): Promise<{ success: boolean; message: string; data: any }> {
+    return this.request(`/products/${id}`);
+  }
+
+  // Cart
+  async getCart(): Promise<{ success: boolean; message: string; data: any[] }> {
+    return this.request('/cart');
+  }
+
+  async addToCart(productId: string, quantity = 1): Promise<{ success: boolean; message: string; data: any }> {
+    return this.request('/cart', {
+      method: 'POST',
+      body: JSON.stringify({ productId, quantity }),
+    });
+  }
+
+  async updateCartItem(itemId: string, quantity: number): Promise<{ success: boolean; message: string; data: any }> {
+    return this.request(`/cart/${itemId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ quantity }),
+    });
+  }
+
+  async removeCartItem(itemId: string): Promise<{ success: boolean; message: string; data: any }> {
+    return this.request(`/cart/${itemId}`, { method: 'DELETE' });
+  }
+
+  // Orders
+  async createOrder(payload: any): Promise<{ success: boolean; message: string; data: any }> {
+    return this.request('/orders', { method: 'POST', body: JSON.stringify(payload) });
+  }
+
+  async getOrders(): Promise<{ success: boolean; message: string; data: any[] }> {
+    return this.request('/orders');
+  }
+
+  async getOrderById(id: string): Promise<{ success: boolean; message: string; data: any }> {
+    return this.request(`/orders/${id}`);
+  }
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}

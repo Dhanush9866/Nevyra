@@ -3,75 +3,46 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Star, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
-import phoneProduct from "@/assets/phone-product.jpg";
-import shoesProduct from "@/assets/shoes-product.jpg";
-import laptopProduct from "@/assets/laptop-product.jpg";
-import dressProduct from "@/assets/dress-product.jpg";
+import { useEffect, useState } from "react";
+import { apiService } from "@/lib/api";
 
-const products = [
-  {
-    id: 1,
-    name: "Latest Smartphone",
-    image: phoneProduct,
-    originalPrice: 25999,
-    salePrice: 19999,
-    discount: 23,
-    rating: 4.5,
-    reviews: 1250,
-  },
-  {
-    id: 2,
-    name: "Premium Running Shoes",
-    image: shoesProduct,
-    originalPrice: 4999,
-    salePrice: 2999,
-    discount: 40,
-    rating: 4.3,
-    reviews: 890,
-  },
-  {
-    id: 3,
-    name: "Gaming Laptop",
-    image: laptopProduct,
-    originalPrice: 89999,
-    salePrice: 69999,
-    discount: 22,
-    rating: 4.7,
-    reviews: 456,
-  },
-  {
-    id: 4,
-    name: "Designer Dress",
-    image: dressProduct,
-    originalPrice: 2999,
-    salePrice: 1499,
-    discount: 50,
-    rating: 4.2,
-    reviews: 324,
-  },
-  {
-    id: 5,
-    name: "Latest Smartphone Pro",
-    image: phoneProduct,
-    originalPrice: 35999,
-    salePrice: 29999,
-    discount: 17,
-    rating: 4.6,
-    reviews: 2100,
-  },
-  {
-    id: 6,
-    name: "Casual Sneakers",
-    image: shoesProduct,
-    originalPrice: 3499,
-    salePrice: 2199,
-    discount: 37,
-    rating: 4.4,
-    reviews: 567,
-  },
-];
+type DealProduct = {
+  _id: string;
+  title: string;
+  price: number;
+  mrp?: number;
+  images?: string[];
+  rating?: number;
+  reviewsCount?: number;
+  discount?: number;
+};
 
 const TopDeals = () => {
+  const [products, setProducts] = useState<DealProduct[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await apiService.getProducts({ limit: 12 });
+        if (res.success) {
+          const mapped = res.data.map((p: any) => ({
+            _id: p._id,
+            title: p.title,
+            price: p.price,
+            mrp: p.mrp || p.price,
+            images: p.images || [],
+            rating: p.rating || 4.5,
+            reviewsCount: p.reviewsCount || 0,
+            discount: p.mrp && p.mrp > p.price ? Math.round(((p.mrp - p.price) / p.mrp) * 100) : undefined,
+          }));
+          setProducts(mapped);
+        }
+      } catch (e) {
+        // ignore for homepage
+      }
+    })();
+  }, []);
+
   return (
     <section className="py-16 bg-muted">
       <div className="w-full px-4">
@@ -95,45 +66,49 @@ const TopDeals = () => {
         <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {products.slice(0, 8).map((product) => (
             <Card
-              key={product.id}
+              key={product._id}
               className="min-w-[200px] flex-shrink-0 group hover:shadow-xl hover:scale-105 transition-all duration-300 bg-card border border-border transform hover:-translate-y-1 cursor-pointer"
             >
               <CardContent className="p-3">
-                <Link to={`/product/${product.id}`}>
+                <Link to={`/product/${product._id}`}>
                   <div className="relative mb-2">
                     <img
-                      src={product.image}
-                      alt={product.name}
+                      src={product.images?.[0] || '/placeholder.svg'}
+                      alt={product.title}
                       className="w-full h-32 object-cover rounded-lg group-hover:scale-105 transition-transform duration-300"
                     />
-                    <Badge className="absolute top-1 left-1 bg-discount text-white text-xs px-1.5 py-0.5 group-hover:scale-110 transition-transform duration-300">
-                      {product.discount}% OFF
-                    </Badge>
+                    {product.discount && (
+                      <Badge className="absolute top-1 left-1 bg-discount text-white text-xs px-1.5 py-0.5 group-hover:scale-110 transition-transform duration-300">
+                        {product.discount}% OFF
+                      </Badge>
+                    )}
                   </div>
 
                   <h3 className="font-semibold text-card-foreground mb-1.5 font-roboto group-hover:text-primary transition-colors line-clamp-2 text-sm">
-                    {product.name}
+                    {product.title}
                   </h3>
 
                   <div className="flex items-center gap-1 mb-1.5">
                     <div className="flex items-center">
                       <Star className="h-3 w-3 fill-yellow-400 text-yellow-400 group-hover:scale-110 transition-transform duration-200" />
                       <span className="text-xs font-medium ml-1">
-                        {product.rating}
+                        {product.rating || 4.5}
                       </span>
                     </div>
                     <span className="text-xs text-muted-foreground">
-                      ({product.reviews})
+                      ({product.reviewsCount || 0})
                     </span>
                   </div>
 
                   <div className="flex items-center gap-1 mb-2">
                     <span className="text-sm font-bold text-price group-hover:text-primary transition-colors duration-200">
-                      ₹{product.salePrice.toLocaleString()}
+                      ₹{product.price.toLocaleString()}
                     </span>
-                    <span className="text-xs text-muted-foreground line-through">
-                      ₹{product.originalPrice.toLocaleString()}
-                    </span>
+                    {product.mrp && product.mrp > product.price && (
+                      <span className="text-xs text-muted-foreground line-through">
+                        ₹{product.mrp.toLocaleString()}
+                      </span>
+                    )}
                   </div>
                 </Link>
 

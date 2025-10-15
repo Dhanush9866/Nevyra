@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -15,75 +15,46 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Star, ShoppingCart, SlidersHorizontal } from "lucide-react";
-import phoneProduct from "@/assets/phone-product.jpg";
-import shoesProduct from "@/assets/shoes-product.jpg";
-import laptopProduct from "@/assets/laptop-product.jpg";
-import dressProduct from "@/assets/dress-product.jpg";
+import { apiService } from "@/lib/api";
 
-const products = [
-  {
-    id: 1,
-    name: "Latest Smartphone Pro Max",
-    image: phoneProduct,
-    originalPrice: 35999,
-    salePrice: 29999,
-    discount: 17,
-    rating: 4.5,
-    reviews: 1250,
-    brand: "TechCorp",
-  },
-  {
-    id: 2,
-    name: "Premium Running Shoes",
-    image: shoesProduct,
-    originalPrice: 4999,
-    salePrice: 2999,
-    discount: 40,
-    rating: 4.3,
-    reviews: 890,
-    brand: "SportBrand",
-  },
-  {
-    id: 3,
-    name: "Gaming Laptop Ultra",
-    image: laptopProduct,
-    originalPrice: 89999,
-    salePrice: 69999,
-    discount: 22,
-    rating: 4.7,
-    reviews: 456,
-    brand: "GameTech",
-  },
-  {
-    id: 4,
-    name: "Designer Dress Collection",
-    image: dressProduct,
-    originalPrice: 2999,
-    salePrice: 1499,
-    discount: 50,
-    rating: 4.2,
-    reviews: 324,
-    brand: "FashionHub",
-  },
-  // Duplicate products for demonstration
-  ...Array.from({ length: 8 }, (_, i) => ({
-    id: i + 5,
-    name: `Product ${i + 5}`,
-    image: [phoneProduct, shoesProduct, laptopProduct, dressProduct][i % 4],
-    originalPrice: Math.floor(Math.random() * 50000) + 5000,
-    salePrice: Math.floor(Math.random() * 40000) + 3000,
-    discount: Math.floor(Math.random() * 50) + 10,
-    rating: Number((Math.random() * 2 + 3).toFixed(1)),
-    reviews: Math.floor(Math.random() * 2000) + 100,
-    brand: ["TechCorp", "SportBrand", "GameTech", "FashionHub"][i % 4],
-  })),
-];
+type ProductItem = {
+  _id: string;
+  title: string;
+  price: number;
+  mrp?: number;
+  images?: string[];
+  rating?: number;
+  reviewsCount?: number;
+  brand?: string;
+};
 
 const brands = ["TechCorp", "SportBrand", "GameTech", "FashionHub"];
 
 const ProductListing = () => {
   const { categoryName } = useParams();
+  const [products, setProducts] = useState<ProductItem[]>([]);
   const [priceRange, setPriceRange] = useState([0, 100000]);
+  useEffect(() => {
+    (async () => {
+      const params: any = { limit: 40 };
+      if (categoryName) params.category = categoryName;
+      try {
+        const res = await apiService.getProducts(params);
+        if (res.success) {
+          setProducts(res.data.map((p: any) => ({
+            _id: p._id,
+            title: p.title,
+            price: p.price,
+            mrp: p.mrp || p.price,
+            images: p.images || [],
+            rating: p.rating || 4.5,
+            reviewsCount: p.reviewsCount || 0,
+            brand: p.brand || p.category,
+          })));
+        }
+      } catch {}
+    })();
+  }, [categoryName]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("popularity");
   const [showFilters, setShowFilters] = useState(false);
@@ -98,22 +69,22 @@ const ProductListing = () => {
 
   const filteredProducts = products.filter((product) => {
     const inPriceRange =
-      product.salePrice >= priceRange[0] && product.salePrice <= priceRange[1];
+      product.price >= priceRange[0] && product.price <= priceRange[1];
     const inSelectedBrands =
-      selectedBrands.length === 0 || selectedBrands.includes(product.brand);
+      selectedBrands.length === 0 || selectedBrands.includes(product.brand || "");
     return inPriceRange && inSelectedBrands;
   });
 
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     switch (sortBy) {
       case "price-low-high":
-        return a.salePrice - b.salePrice;
+        return a.price - b.price;
       case "price-high-low":
-        return b.salePrice - a.salePrice;
+        return b.price - a.price;
       case "rating":
-        return b.rating - a.rating;
+        return (b.rating || 0) - (a.rating || 0);
       case "newest":
-        return b.id - a.id;
+        return 0;
       default:
         return 0;
     }
@@ -270,44 +241,44 @@ const ProductListing = () => {
             <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4">
               {sortedProducts.map((product) => (
                 <Card
-                  key={product.id}
+                  key={product._id}
                   className="group hover:shadow-lg transition-shadow duration-300 bg-card border border-border"
                 >
                   <CardContent className="p-3 md:p-4">
-                    <Link to={`/product/${product.id}`}>
+                    <Link to={`/product/${product._id}`}>
                       <div className="relative mb-3 md:mb-4">
                         <img
-                          src={product.image}
-                          alt={product.name}
+                          src={product.images?.[0] || '/placeholder.svg'}
+                          alt={product.title}
                           className="w-full h-32 md:h-48 object-cover rounded-lg"
                         />
                         <Badge className="absolute top-1 md:top-2 left-1 md:left-2 bg-discount text-white text-xs md:text-sm">
-                          {product.discount}% OFF
+                          {product.mrp && product.mrp > product.price ? Math.round(((product.mrp - product.price)/product.mrp)*100) : 0}% OFF
                         </Badge>
                       </div>
 
                       <h3 className="font-semibold text-card-foreground mb-2 font-roboto group-hover:text-primary transition-colors line-clamp-2 text-sm md:text-base">
-                        {product.name}
+                        {product.title}
                       </h3>
 
                       <div className="flex items-center gap-1 md:gap-2 mb-2">
                         <div className="flex items-center">
                           <Star className="h-3 w-3 md:h-4 md:w-4 fill-yellow-400 text-yellow-400" />
                           <span className="text-xs md:text-sm font-medium ml-1">
-                            {product.rating}
+                            {product.rating || 4.5}
                           </span>
                         </div>
                         <span className="text-xs md:text-sm text-muted-foreground">
-                          ({product.reviews})
+                          ({product.reviewsCount || 0})
                         </span>
                       </div>
 
                       <div className="flex items-center gap-1 md:gap-2 mb-3 md:mb-4">
                         <span className="text-lg md:text-xl font-bold text-price">
-                          ₹{product.salePrice.toLocaleString()}
+                          ₹{product.price.toLocaleString()}
                         </span>
                         <span className="text-xs md:text-sm text-muted-foreground line-through">
-                          ₹{product.originalPrice.toLocaleString()}
+                          ₹{(product.mrp || product.price).toLocaleString()}
                         </span>
                       </div>
                     </Link>
