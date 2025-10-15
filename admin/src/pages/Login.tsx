@@ -51,7 +51,7 @@ const Login: React.FC = () => {
         return;
       }
       // Store token and redirect
-      localStorage.setItem("admin_token", token);
+      localStorage.setItem("adminToken", token);
       toast({ title: "Login successful", description: "Welcome, admin!", });
       navigate("/");
     } catch (err) {

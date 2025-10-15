@@ -2,7 +2,7 @@ import React from "react";
 import { Navigate } from "react-router-dom";
 
 function isAdminAuthenticated() {
-  const token = localStorage.getItem("admin_token");
+  const token = localStorage.getItem("adminToken");
   if (!token) return false;
   try {
     const payload = JSON.parse(atob(token.split(".")[1]));

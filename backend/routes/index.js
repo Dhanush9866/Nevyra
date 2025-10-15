@@ -9,5 +9,9 @@ router.use("/orders", require("./orders"));
 router.use("/users", require("./users"));
 router.use("/admins", require("./admins"));
 router.use("/payments", require("./payments"));
+console.log('Loading upload routes...');
+router.use("/upload", require("./upload"));
+console.log('Upload routes loaded');
+router.use("/dashboard", require("./dashboard"));
 
 module.exports = router;

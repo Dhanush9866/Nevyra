@@ -5,7 +5,13 @@
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "seed:admins": "node scripts/seedAdmins.js",
+    "seed:admins:clear": "node scripts/seedAdmins.js clear",
+    "seed:admins:list": "node scripts/seedAdmins.js list",
+    "seed:categories": "node scripts/seedCategories.js",
+    "seed:categories:clear": "node scripts/seedCategories.js clear",
+    "seed:categories:list": "node scripts/seedCategories.js list"
   },
   "keywords": [],
   "author": "",
@@ -14,11 +20,13 @@
   "dependencies": {
     "bcrypt": "^6.0.0",
     "body-parser": "^2.2.0",
+    "cloudinary": "^2.7.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.0.0",
+    "multer": "^2.0.2",
     "nodemailer": "^7.0.5",
     "pg": "^8.16.3",
     "pg-hstore": "^2.3.4",
