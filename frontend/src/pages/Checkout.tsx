@@ -14,31 +14,11 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Plus, CreditCard, Smartphone, Banknote, Shield, CheckCircle, Save, X } from "lucide-react";
-import phoneProduct from "@/assets/phone-product.jpg";
-import shoesProduct from "@/assets/shoes-product.jpg";
-
-const orderItems = [
-  {
-    id: 1,
-    name: "Latest Smartphone Pro Max",
-    image: phoneProduct,
-    price: 29999,
-    quantity: 1,
-    color: "Space Black"
-  },
-  {
-    id: 2,
-    name: "Premium Running Shoes",
-    image: shoesProduct,
-    price: 2999,
-    quantity: 2,
-    size: "UK 8",
-    color: "White"
-  }
-];
+// Items are sourced from the user's cart via API
 
 const Checkout = () => {
   const [currentStep, setCurrentStep] = useState(1);
+  const [cartItems, setCartItems] = useState<any[]>([]);
   const [selectedAddress, setSelectedAddress] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("upi");
   const [showNewAddress, setShowNewAddress] = useState(false);
@@ -60,7 +40,17 @@ const Checkout = () => {
 
   useEffect(() => {
     fetchAddresses();
+    fetchCart();
   }, []);
+
+  const fetchCart = async () => {
+    try {
+      const res = await apiService.getCart();
+      if (res.success) setCartItems(res.data || []);
+    } catch (e) {
+      console.error("Failed to fetch cart:", e);
+    }
+  };
 
   const fetchAddresses = async () => {
     try {
@@ -120,12 +110,12 @@ const Checkout = () => {
     }
   };
 
-  const subtotal = orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const subtotal = cartItems.reduce((sum, item) => sum + ((item.productId?.price || 0) * (item.quantity || 0)), 0);
   const shippingFee = 0; // Free shipping
   const gst = Math.round(subtotal * 0.18);
   const total = subtotal + shippingFee + gst;
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     if (!selectedAddress) {
       toast({
         title: "Error",
@@ -134,12 +124,19 @@ const Checkout = () => {
       });
       return;
     }
-    // Order placement logic here
-    toast({
-      title: "Success",
-      description: "Order placed successfully!",
-    });
-    navigate("/orders");
+    try {
+      const res = await apiService.createOrder({});
+      if (res.success) {
+        toast({ title: "Success", description: "Order placed successfully!" });
+        // notify cart badge
+        window.dispatchEvent(new Event('cart-updated'));
+        navigate("/orders");
+      } else {
+        throw new Error(res.message);
+      }
+    } catch (e) {
+      toast({ title: "Error", description: e instanceof Error ? e.message : 'Failed to place order', variant: 'destructive' });
+    }
   };
 
   const selectedAddressData = addresses[parseInt(selectedAddress)];
@@ -451,22 +448,23 @@ const Checkout = () => {
                   <h2 className="text-xl font-semibold text-foreground mb-4">Review Your Order</h2>
                   
                   <div className="space-y-4 mb-6">
-                    {orderItems.map((item) => (
+                    {cartItems.map((item: any) => (
                       <div key={item.id} className="flex gap-4 border-b border-border pb-4 last:border-b-0">
                         <img
-                          src={item.image}
-                          alt={item.name}
+                          src={item.productId?.images?.[0] || '/placeholder.svg'}
+                          alt={item.productId?.title}
                           className="w-16 h-16 object-cover rounded"
                         />
                         <div className="flex-1">
-                          <h4 className="font-medium text-foreground">{item.name}</h4>
+                          <h4 className="font-medium text-foreground">{item.productId?.title}</h4>
                           <div className="text-sm text-muted-foreground">
-                            {item.color && <span>Color: {item.color}</span>}
-                            {item.size && <span className="ml-2">Size: {item.size}</span>}
+                            {item.selectedFeatures && Object.entries(item.selectedFeatures).map(([k, v]) => (
+                              <span key={k} className="mr-2">{k}: {v as string}</span>
+                            ))}
                           </div>
                           <div className="flex justify-between items-center mt-1">
                             <span className="text-sm">Qty: {item.quantity}</span>
-                            <span className="font-medium">₹{(item.price * item.quantity).toLocaleString()}</span>
+                            <span className="font-medium">₹{((item.productId?.price || 0) * (item.quantity || 0)).toLocaleString()}</span>
                           </div>
                         </div>
                       </div>
@@ -492,7 +490,7 @@ const Checkout = () => {
                 
                 <div className="space-y-3 mb-4">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Subtotal ({orderItems.length} items)</span>
+                    <span className="text-muted-foreground">Subtotal ({cartItems.length} items)</span>
                     <span>₹{subtotal.toLocaleString()}</span>
                   </div>
                   

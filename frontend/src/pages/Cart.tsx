@@ -46,11 +46,15 @@ const Cart = () => {
   };
 
   const subtotal = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
+    (sum, item) => sum + ((item.productId?.price || 0) * (item.quantity || 0)),
     0
   );
   const originalTotal = cartItems.reduce(
-    (sum, item) => sum + item.originalPrice * item.quantity,
+    (sum, item) => {
+      const price = item.productId?.price || 0;
+      const mrp = item.productId?.mrp || price * 1.5; // fallback if mrp not present
+      return sum + (mrp * (item.quantity || 0));
+    },
     0
   );
   const totalSavings = originalTotal - subtotal;
@@ -113,6 +117,19 @@ const Cart = () => {
                         {item.color && <span>Color: {item.color}</span>}
                         {item.size && <span>Size: {item.size}</span>}
                       </div>
+
+                      {item.selectedFeatures && Object.keys(item.selectedFeatures).length > 0 && (
+                        <div className="mt-2">
+                          <p className="text-sm font-medium text-foreground mb-1">Selected Options:</p>
+                          <div className="flex flex-wrap gap-2">
+                            {Object.entries(item.selectedFeatures).map(([key, value]) => (
+                              <span key={key} className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
+                                {key}: {value}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
 
                       <div className="flex items-center gap-2">
                         <span className="text-xl font-bold text-price">

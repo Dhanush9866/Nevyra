@@ -181,9 +181,9 @@ export const adminAPI = {
   
   // ==================== ORDER APIs ====================
   orders: {
-    // Get all orders
+    // Get all orders (admin)
     getAll: async (token) => {
-      return apiRequest('/orders', {
+      return apiRequest('/orders/admin/all', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
     },
@@ -197,8 +197,8 @@ export const adminAPI = {
     
     // Update order status
     updateStatus: async (id, status, token) => {
-      return apiRequest(`/orders/${id}`, {
-        method: 'PUT',
+      return apiRequest(`/orders/${id}/status`, {
+        method: 'PATCH',
         headers: { 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ status }),
       });

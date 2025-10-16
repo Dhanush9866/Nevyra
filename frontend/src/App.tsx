@@ -69,6 +69,8 @@ const App = () => (
           <Route path="/search-suggestions" element={<SearchSuggestions />} />
           <Route path="/search" element={<SearchResults />} />
           <Route path="/wishlist" element={<RequireAuth><Wishlist /></RequireAuth>} />
+          <Route path="/orders" element={<RequireAuth><Orders /></RequireAuth>} />
+          <Route path="/order/:orderId" element={<RequireAuth><OrderDetails /></RequireAuth>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

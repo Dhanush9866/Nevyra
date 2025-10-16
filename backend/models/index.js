@@ -8,4 +8,5 @@ module.exports = {
   OrderItem: require(path.join(__dirname, "OrderItem.js")),
   CartItem: require(path.join(__dirname, "CartItem.js")),
   Category: require(path.join(__dirname, "Category.js")),
+  WishlistItem: require(path.join(__dirname, "WishlistItem.js")),
 };
