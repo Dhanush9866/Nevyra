@@ -59,6 +59,10 @@ class ApiService {
     return this.request(`/products${query ? `?${query}` : ''}`);
   }
 
+  async getProductsByCategory(category: string, limit: number = 10): Promise<{ success: boolean; message: string; data: any[] }> {
+    return this.request(`/products?category=${category}&limit=${limit}`);
+  }
+
   async getProductById(id: string): Promise<{ success: boolean; message: string; data: any }> {
     return this.request(`/products/${id}`);
   }
@@ -68,10 +72,10 @@ class ApiService {
     return this.request('/cart');
   }
 
-  async addToCart(productId: string, quantity = 1): Promise<{ success: boolean; message: string; data: any }> {
+  async addToCart(productId: string, quantity = 1, selectedFeatures?: Record<string, string>): Promise<{ success: boolean; message: string; data: any }> {
     return this.request('/cart', {
       method: 'POST',
-      body: JSON.stringify({ productId, quantity }),
+      body: JSON.stringify({ productId, quantity, selectedFeatures }),
     });
   }
 
@@ -97,6 +101,9 @@ class ApiService {
 
   async getOrderById(id: string): Promise<{ success: boolean; message: string; data: any }> {
     return this.request(`/orders/${id}`);
+  }
+  async updateOrderStatus(id: string, status: string): Promise<{ success: boolean; message: string; data: any }> {
+    return this.request(`/orders/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) });
   }
   private async request<T>(
     endpoint: string,

@@ -13,6 +13,11 @@ const cartItemSchema = new mongoose.Schema(
       required: true,
     },
     quantity: { type: Number, required: true, default: 1 },
+    selectedFeatures: {
+      type: Map,
+      of: String,
+      default: new Map()
+    },
   },
   { timestamps: true }
 );

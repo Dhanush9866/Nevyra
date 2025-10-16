@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   HoverCard,
@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/hover-card";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/hooks/useAuth";
+import { apiService } from "@/lib/api";
 
 const categories = [
   {
@@ -113,6 +114,23 @@ const Navbar = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { user, isAuthenticated, logout } = useAuth();
+  const [cartCount, setCartCount] = useState(0);
+
+  const refreshCartCount = async () => {
+    try {
+      const res = await apiService.getCart();
+      if (res.success) setCartCount(res.data?.length || 0);
+    } catch {
+      setCartCount(0);
+    }
+  };
+
+  useEffect(() => {
+    refreshCartCount();
+    const handler = () => refreshCartCount();
+    window.addEventListener("cart-updated", handler as EventListener);
+    return () => window.removeEventListener("cart-updated", handler as EventListener);
+  }, []);
 
   const toggleCategory = (categoryName: string) => {
     setExpandedCategory(expandedCategory === categoryName ? null : categoryName);
@@ -252,7 +270,7 @@ const Navbar = () => {
                 <ShoppingCart className="h-4 w-4" />
                 <span className="text-sm hidden md:inline">Cart</span>
                 <span className="absolute -top-1 -right-1 bg-warning text-warning-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  0
+                  {cartCount}
                 </span>
               </Button>
             </Link>

@@ -3,6 +3,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FloatingDock } from "@/components/FloatingDock";
 import { Loader2, Eye, Edit } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
 import { adminAPI } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 
@@ -44,6 +46,8 @@ const Orders: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState<string>('');
+  const [open, setOpen] = useState(false);
+  const [selected, setSelected] = useState<Order | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -66,7 +70,17 @@ const Orders: React.FC = () => {
       setLoading(true);
       const response = await adminAPI.orders.getAll(authToken);
       if (response.success) {
-        setOrders(response.data);
+        const normalized = (response.data || []).map((o: any) => ({
+          id: o.id || o._id,
+          orderNumber: o.orderNumber,
+          userId: o.userId,
+          totalAmount: o.totalAmount,
+          status: o.status,
+          createdAt: o.createdAt,
+          updatedAt: o.updatedAt,
+          items: o.items,
+        }));
+        setOrders(normalized);
       } else {
         throw new Error(response.message || 'Failed to load orders');
       }
@@ -151,25 +165,25 @@ const Orders: React.FC = () => {
                       orders.map((order) => (
                         <tr key={order.id} className="hover:bg-muted/50 transition-smooth">
                           <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-foreground">
-                            {order.orderNumber || order.id.slice(-8)}
+                            {order.orderNumber || (order.id ? order.id.slice(-8) : '')}
                           </td>
                           <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-foreground">
                             {getCustomerName(order)}
                           </td>
                           <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-muted-foreground">
-                            {formatDate(order.createdAt)}
+                            {order.createdAt ? formatDate(order.createdAt) : ''}
                           </td>
                           <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-foreground">
-                            {formatCurrency(order.totalAmount)}
+                            {formatCurrency(order.totalAmount || 0)}
                           </td>
                           <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm">
-                            <span className={`px-2 sm:px-3 py-1 rounded-full text-xs font-semibold ${statusColor(order.status)}`}>
-                              {order.status}
+                            <span className={`px-2 sm:px-3 py-1 rounded-full text-xs font-semibold ${statusColor(order.status || 'Pending')}`}>
+                              {order.status || 'Pending'}
                             </span>
                           </td>
                           <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm">
                             <div className="flex items-center gap-2">
-                              <Button variant="ghost" size="sm">
+                              <Button variant="ghost" size="sm" onClick={() => { setSelected(order); setOpen(true); }}>
                                 <Eye className="h-4 w-4" />
                               </Button>
                               <Button variant="ghost" size="sm">
@@ -187,6 +201,67 @@ const Orders: React.FC = () => {
           </Card>
         </div>
       </div>
+      {/* Order Details Dialog */}
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Order Details</DialogTitle>
+          </DialogHeader>
+          {!selected ? (
+            <div className="py-8 text-center text-muted-foreground">No order selected</div>
+          ) : (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-muted-foreground">Order ID</p>
+                  <p className="font-medium break-all">{selected.id}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Date</p>
+                  <p className="font-medium">{selected.createdAt ? new Date(selected.createdAt).toLocaleString() : ''}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Customer</p>
+                  <p className="font-medium">{getCustomerName(selected)}</p>
+                  {selected.userId && (
+                    <p className="text-xs text-muted-foreground">{selected.userId.email}</p>
+                  )}
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Total</p>
+                  <p className="font-medium">{formatCurrency(selected.totalAmount || 0)}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Status</p>
+                  <p className="font-medium">{selected.status || 'Pending'}</p>
+                </div>
+              </div>
+              <Separator />
+              <div>
+                <p className="font-semibold mb-2">Items</p>
+                <div className="space-y-2">
+                  {(selected.items || []).map((it, idx) => (
+                    <div key={idx} className="flex items-center justify-between text-sm">
+                      <div className="flex-1">
+                        <p className="font-medium">{(it as any).productId?.title || (it as any).productId}</p>
+                        {(it as any).selectedFeatures && (
+                          <div className="text-xs text-muted-foreground">
+                            {Object.entries((it as any).selectedFeatures).map(([k,v]) => (
+                              <span key={k} className="mr-2">{k}: {v as any}</span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <div className="w-28 text-right">Qty: {it.quantity}</div>
+                      <div className="w-28 text-right">{formatCurrency(it.price)}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

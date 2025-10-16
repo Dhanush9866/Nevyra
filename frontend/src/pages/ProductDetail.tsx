@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
@@ -7,66 +7,87 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Star, Heart, Share2, ShoppingCart, Truck, Shield, RotateCcw, Plus, Minus } from "lucide-react";
-import phoneProduct from "@/assets/phone-product.jpg";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Star, Heart, Share2, ShoppingCart, Truck, Shield, RotateCcw, Plus, Minus, Loader2 } from "lucide-react";
+import { apiService } from "@/lib/api";
+import { useToast } from "@/hooks/use-toast";
 
-const product = {
-  id: 1,
-  name: "Latest Smartphone Pro Max 256GB",
-  images: [phoneProduct, phoneProduct, phoneProduct, phoneProduct],
-  originalPrice: 35999,
-  salePrice: 29999,
-  discount: 17,
-  rating: 4.5,
-  totalReviews: 1250,
-  inStock: true,
-  seller: "TechCorp Official Store",
-  warranty: "1 Year Manufacturer Warranty",
-  specifications: {
-    "Display": "6.7-inch Super Retina XDR",
-    "Processor": "A17 Pro Chip",
-    "Storage": "256GB",
-    "Camera": "48MP Triple Camera System",
-    "Battery": "4323mAh",
-    "OS": "iOS 17",
-    "Color": "Space Black",
-    "Weight": "240g"
-  }
-};
+interface Product {
+  id: string;
+  title: string;
+  price: number;
+  category: string;
+  subCategory: string;
+  images: string[];
+  inStock: boolean;
+  rating: number;
+  reviews: number;
+  stockQuantity: number;
+  soldCount: number;
+  attributes?: Record<string, any>;
+  additionalSpecifications?: Record<string, any>;
+}
 
-const reviews = [
-  {
-    id: 1,
-    user: "Rajesh K.",
-    rating: 5,
-    date: "15 Dec 2023",
-    comment: "Excellent phone! Camera quality is outstanding and battery lasts all day.",
-    helpful: 12
-  },
-  {
-    id: 2,
-    user: "Priya S.",
-    rating: 4,
-    date: "12 Dec 2023",
-    comment: "Good performance but a bit expensive. Overall satisfied with the purchase.",
-    helpful: 8
-  },
-  {
-    id: 3,
-    user: "Amit M.",
-    rating: 5,
-    date: "10 Dec 2023",
-    comment: "Fast delivery and genuine product. Highly recommend this seller.",
-    helpful: 15
-  }
-];
+interface SelectedFeatures {
+  [key: string]: string;
+}
 
 const ProductDetail = () => {
   const { productId } = useParams();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [pincode, setPincode] = useState("");
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const [selectedFeatures, setSelectedFeatures] = useState<SelectedFeatures>({});
+  const [addingToCart, setAddingToCart] = useState(false);
+
+  useEffect(() => {
+    if (productId) {
+      fetchProduct();
+    }
+  }, [productId]);
+
+  const fetchProduct = async () => {
+    try {
+      setLoading(true);
+      const response = await apiService.getProductById(productId!);
+      if (response.success) {
+        setProduct(response.data);
+        // Initialize selected features with first available option for each feature
+        const initialFeatures: SelectedFeatures = {};
+        if (response.data.additionalSpecifications) {
+          Object.entries(response.data.additionalSpecifications).forEach(([key, value]) => {
+            if (Array.isArray(value) && value.length > 0) {
+              initialFeatures[key] = value[0];
+            }
+          });
+        }
+        setSelectedFeatures(initialFeatures);
+      } else {
+        toast({
+          title: "Error",
+          description: response.message || "Product not found",
+          variant: "destructive",
+        });
+        navigate("/");
+      }
+    } catch (error) {
+      console.error("Error fetching product:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch product details",
+        variant: "destructive",
+      });
+      navigate("/");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleQuantityChange = (change: number) => {
     const newQuantity = quantity + change;
@@ -75,6 +96,95 @@ const ProductDetail = () => {
     }
   };
 
+  const handleFeatureChange = (featureKey: string, value: string) => {
+    setSelectedFeatures(prev => ({
+      ...prev,
+      [featureKey]: value
+    }));
+  };
+
+  const handleAddToCart = async () => {
+    if (!product) return;
+    
+    try {
+      setAddingToCart(true);
+      const response = await apiService.addToCart(product.id, quantity, selectedFeatures);
+      
+      if (response.success) {
+        // notify navbar to refresh cart count
+        window.dispatchEvent(new Event("cart-updated"));
+        toast({
+          title: "Success",
+          description: "Product added to cart successfully!",
+        });
+      } else {
+        throw new Error(response.message || "Failed to add to cart");
+      }
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to add to cart",
+        variant: "destructive",
+      });
+    } finally {
+      setAddingToCart(false);
+    }
+  };
+
+  const handleBuyNow = () => {
+    // For now, just add to cart and navigate to checkout
+    handleAddToCart();
+    // TODO: Navigate to checkout page
+  };
+
+  const getProductImage = (images: string[]) => {
+    return images && images.length > 0 
+      ? images[0] 
+      : "https://via.placeholder.com/400x400?text=No+Image";
+  };
+
+  const calculateDiscount = (price: number) => {
+    // Simulate original price for discount calculation
+    const originalPrice = price * 1.5;
+    return Math.round(((originalPrice - price) / originalPrice) * 100);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background font-roboto">
+        <Navbar />
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex items-center justify-center h-96">
+            <div className="text-center">
+              <Loader2 className="h-12 w-12 animate-spin mx-auto mb-4" />
+              <p className="text-muted-foreground">Loading product details...</p>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-background font-roboto">
+        <Navbar />
+        <div className="container mx-auto px-4 py-6">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-foreground mb-4">Product not found</h1>
+            <Button onClick={() => navigate("/")}>Go back to home</Button>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  const discount = calculateDiscount(product.price);
+  const originalPrice = product.price * 1.5;
+
   return (
     <div className="min-h-screen bg-background font-roboto">
       <Navbar />
@@ -82,7 +192,7 @@ const ProductDetail = () => {
       <div className="container mx-auto px-4 py-6">
         {/* Breadcrumb */}
         <nav className="text-sm text-muted-foreground mb-6">
-          Home / Mobiles / Smartphones / {product.name}
+          Home / {product.category} / {product.subCategory} / {product.title}
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
@@ -90,34 +200,38 @@ const ProductDetail = () => {
           <div className="space-y-4">
             <div className="relative">
               <img 
-                src={product.images[selectedImage]} 
-                alt={product.name}
+                src={(product.images && product.images[selectedImage]) || getProductImage(product.images)} 
+                alt={product.title}
                 className="w-full h-96 object-cover rounded-lg border border-border"
               />
-              <Badge className="absolute top-4 left-4 bg-discount text-white text-lg px-3 py-1">
-                {product.discount}% OFF
-              </Badge>
+              {discount > 0 && (
+                <Badge className="absolute top-4 left-4 bg-discount text-white text-lg px-3 py-1">
+                  {discount}% OFF
+                </Badge>
+              )}
             </div>
-            <div className="flex gap-2 overflow-x-auto">
-              {product.images.map((image, index) => (
-                <img
-                  key={index}
-                  src={image}
-                  alt={`${product.name} ${index + 1}`}
-                  className={`w-20 h-20 object-cover rounded-lg border-2 cursor-pointer ${
-                    selectedImage === index ? 'border-primary' : 'border-border'
-                  }`}
-                  onClick={() => setSelectedImage(index)}
-                />
-              ))}
-            </div>
+            {product.images && product.images.length > 1 && (
+              <div className="flex gap-2 overflow-x-auto">
+                {product.images.map((image, index) => (
+                  <img
+                    key={index}
+                    src={image}
+                    alt={`${product.title} ${index + 1}`}
+                    className={`w-20 h-20 object-cover rounded-lg border-2 cursor-pointer ${
+                      selectedImage === index ? 'border-primary' : 'border-border'
+                    }`}
+                    onClick={() => setSelectedImage(index)}
+                  />
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Product Info */}
           <div className="space-y-6">
             <div>
               <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-                {product.name}
+                {product.title}
               </h1>
               <div className="flex items-center gap-4 mb-4">
                 <div className="flex items-center gap-2">
@@ -126,11 +240,11 @@ const ProductDetail = () => {
                     <Star className="h-3 w-3 fill-current ml-1" />
                   </div>
                   <span className="text-muted-foreground text-sm">
-                    {product.totalReviews.toLocaleString()} reviews
+                    {product.reviews.toLocaleString()} reviews
                   </span>
                 </div>
-                <Badge variant="outline" className="text-success border-success">
-                  In Stock
+                <Badge variant={product.inStock ? "default" : "destructive"} className={product.inStock ? "text-success border-success" : ""}>
+                  {product.inStock ? "In Stock" : "Out of Stock"}
                 </Badge>
               </div>
             </div>
@@ -138,12 +252,71 @@ const ProductDetail = () => {
             {/* Pricing */}
             <div className="space-y-2">
               <div className="flex items-center gap-3">
-                <span className="text-3xl font-bold text-price">₹{product.salePrice.toLocaleString()}</span>
-                <span className="text-xl text-muted-foreground line-through">₹{product.originalPrice.toLocaleString()}</span>
-                <Badge className="bg-discount text-white">{product.discount}% off</Badge>
+                <span className="text-3xl font-bold text-price">₹{product.price.toLocaleString()}</span>
+                {discount > 0 && (
+                  <>
+                    <span className="text-xl text-muted-foreground line-through">₹{originalPrice.toLocaleString()}</span>
+                    <Badge className="bg-discount text-white">{discount}% off</Badge>
+                  </>
+                )}
               </div>
               <p className="text-sm text-muted-foreground">Inclusive of all taxes</p>
             </div>
+
+            {/* Additional Features Selection */}
+            {product.additionalSpecifications && Object.keys(product.additionalSpecifications).length > 0 && (
+              <Card>
+                <CardContent className="p-4">
+                  <h3 className="font-semibold text-foreground mb-4">Select Options</h3>
+                  <div className="space-y-4">
+                    {Object.entries(product.additionalSpecifications).map(([key, value]) => {
+                      // If value is an array -> render selectable chips
+                      if (Array.isArray(value) && value.length > 0) {
+                        return (
+                          <div key={key} className="space-y-2">
+                            <label className="text-sm font-medium text-foreground capitalize">
+                              {key.replace(/([A-Z])/g, ' $1').trim()}
+                            </label>
+                            <div className="flex flex-wrap gap-2">
+                              {value.map((option: string) => {
+                                const isActive = (selectedFeatures[key] || value[0]) === option;
+                                return (
+                                  <button
+                                    type="button"
+                                    key={option}
+                                    onClick={() => handleFeatureChange(key, option)}
+                                    className={`px-3 py-1.5 rounded-md border text-sm transition-colors ${
+                                      isActive
+                                        ? 'border-primary bg-primary/10 text-primary'
+                                        : 'border-border hover:border-primary/50'
+                                    }`}
+                                  >
+                                    {option}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+                      }
+                      // Non-array -> show as a badge in a Special Features row
+                      return (
+                        <div key={key} className="space-y-2">
+                          <label className="text-sm font-medium text-foreground capitalize">
+                            {key.replace(/([A-Z])/g, ' $1').trim()}
+                          </label>
+                          <div className="flex flex-wrap gap-2">
+                            <Badge variant="secondary" className="capitalize">
+                              {String(value)}
+                            </Badge>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Delivery Check */}
             <Card>
@@ -201,11 +374,23 @@ const ProductDetail = () => {
               </div>
 
               <div className="flex gap-3">
-                <Button className="flex-1 bg-warning hover:bg-warning/90 text-warning-foreground font-medium text-lg py-6">
-                  <ShoppingCart className="h-5 w-5 mr-2" />
-                  Add to Cart
+                <Button 
+                  className="flex-1 bg-warning hover:bg-warning/90 text-warning-foreground font-medium text-lg py-6"
+                  onClick={handleAddToCart}
+                  disabled={!product.inStock || addingToCart}
+                >
+                  {addingToCart ? (
+                    <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                  ) : (
+                    <ShoppingCart className="h-5 w-5 mr-2" />
+                  )}
+                  {addingToCart ? "Adding..." : "Add to Cart"}
                 </Button>
-                <Button className="flex-1 bg-primary hover:bg-primary-hover text-primary-foreground font-medium text-lg py-6">
+                <Button 
+                  className="flex-1 bg-primary hover:bg-primary-hover text-primary-foreground font-medium text-lg py-6"
+                  onClick={handleBuyNow}
+                  disabled={!product.inStock}
+                >
                   Buy Now
                 </Button>
               </div>
@@ -225,8 +410,6 @@ const ProductDetail = () => {
                 </Button>
               </div>
             </div>
-
-
           </div>
         </div>
 
@@ -234,10 +417,8 @@ const ProductDetail = () => {
         <Tabs defaultValue="description" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="description">Description</TabsTrigger>
-            <TabsTrigger value="reviews">Reviews ({product.totalReviews})</TabsTrigger>
+            <TabsTrigger value="specifications">Specifications</TabsTrigger>
           </TabsList>
-          
-
           
           <TabsContent value="description" className="space-y-4">
             <Card>
@@ -245,48 +426,71 @@ const ProductDetail = () => {
                 <h3 className="font-semibold text-foreground mb-4">Product Description</h3>
                 <div className="prose prose-gray max-w-none">
                   <p className="text-muted-foreground">
-                    Experience the future of mobile technology with the Latest Smartphone Pro Max. 
-                    Featuring cutting-edge A17 Pro chip technology, this device delivers unprecedented 
-                    performance for gaming, photography, and productivity.
+                    {product.title} - A high-quality product from the {product.category} category. 
+                    This {product.subCategory} offers excellent value and performance.
                   </p>
                   <p className="text-muted-foreground">
-                    The 48MP camera system captures stunning photos and videos in any lighting condition, 
-                    while the 6.7-inch Super Retina XDR display provides vibrant colors and crystal-clear detail.
+                    With a rating of {product.rating} stars and {product.reviews} reviews, 
+                    this product has been well-received by customers.
                   </p>
                   <p className="text-muted-foreground">
-                    With 256GB of storage and all-day battery life, this smartphone is perfect for users 
-                    who demand the best in mobile technology.
+                    Currently in stock with {product.stockQuantity} units available. 
+                    {product.soldCount} units have been sold.
                   </p>
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
           
-          <TabsContent value="reviews" className="space-y-4">
+          <TabsContent value="specifications" className="space-y-4">
             <Card>
               <CardContent className="p-6">
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="font-semibold text-foreground">Customer Reviews</h3>
-                  <Button variant="outline">Write a Review</Button>
-                </div>
-                
-                <div className="space-y-6">
-                  {reviews.map((review) => (
-                    <div key={review.id} className="border-b border-border pb-4 last:border-b-0">
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="flex items-center bg-success text-success-foreground px-2 py-1 rounded text-sm">
-                          {review.rating}
-                          <Star className="h-3 w-3 fill-current ml-1" />
-                        </div>
-                        <span className="font-medium text-foreground">{review.user}</span>
-                        <span className="text-sm text-muted-foreground">{review.date}</span>
-                      </div>
-                      <p className="text-muted-foreground mb-2">{review.comment}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {review.helpful} people found this helpful
-                      </p>
+                <h3 className="font-semibold text-foreground mb-4">Product Specifications</h3>
+                <div className="space-y-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <span className="font-medium text-foreground">Category:</span>
+                      <span className="ml-2 text-muted-foreground">{product.category}</span>
                     </div>
-                  ))}
+                    <div>
+                      <span className="font-medium text-foreground">Sub Category:</span>
+                      <span className="ml-2 text-muted-foreground">{product.subCategory}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium text-foreground">Price:</span>
+                      <span className="ml-2 text-muted-foreground">₹{product.price.toLocaleString()}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium text-foreground">Rating:</span>
+                      <span className="ml-2 text-muted-foreground">{product.rating} stars</span>
+                    </div>
+                    <div>
+                      <span className="font-medium text-foreground">Reviews:</span>
+                      <span className="ml-2 text-muted-foreground">{product.reviews}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium text-foreground">Stock:</span>
+                      <span className="ml-2 text-muted-foreground">{product.stockQuantity} units</span>
+                    </div>
+                  </div>
+                  
+                  {product.attributes && Object.keys(product.attributes).length > 0 && (
+                    <div className="mt-6">
+                      <h4 className="font-medium text-foreground mb-3">Product Attributes</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {Object.entries(product.attributes).map(([key, value]) => (
+                          <div key={key}>
+                            <span className="font-medium text-foreground capitalize">
+                              {key.replace(/([A-Z])/g, ' $1').trim()}:
+                            </span>
+                            <span className="ml-2 text-muted-foreground">
+                              {Array.isArray(value) ? value.join(', ') : String(value)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

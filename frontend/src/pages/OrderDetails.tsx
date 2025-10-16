@@ -21,63 +21,25 @@ import {
   Truck as TruckIcon,
   User
 } from "lucide-react";
-import phoneProduct from "@/assets/phone-product.jpg";
-import shoesProduct from "@/assets/shoes-product.jpg";
-import laptopProduct from "@/assets/laptop-product.jpg";
+import { apiService } from "@/lib/api";
 
-// Mock order data
-const orderData = {
-  id: "OD334854323355442100",
-  date: "Jul 05",
-  status: "Delivered",
-  total: 432,
-  subtotal: 493,
-  shipping: 0,
-  tax: 13,
-  discount: 74,
-  listPrice: 2999,
-  sellingPrice: 750,
-  extraDiscount: 257,
-  specialPrice: 493,
-  paymentHandlingFee: 9,
-  platformFee: 4,
-  items: [
-    {
-      name: "Richer Large 36 L Laptop Backpack Paradise (Green) 36 L Laptop Backpack",
-      image: laptopProduct,
-      quantity: 1,
-      price: 432,
-      color: "Black",
-      seller: "RicherInternational"
-    }
-  ],
-  shippingAddress: {
-    name: "Bablu",
-    address: "1-213/1 Atreyapuram Subdistrict, Cbc church",
-    phone: "9502926069, 9704726252"
-  },
-  tracking: {
-    number: "9502926069",
-    status: "Delivered",
-    updates: [
-      {
-        date: "Jul 05",
-        status: "Order Confirmed",
-        description: "Your order has been confirmed"
-      },
-      {
-        date: "Jul 11",
-        status: "Delivered",
-        description: "Your order has been delivered"
-      }
-    ]
-  }
-};
+const emptyOrder: any = null;
 
 const OrderDetails = () => {
   const navigate = useNavigate();
   const { orderId } = useParams();
-  const [order, setOrder] = useState(orderData);
+  const [order, setOrder] = useState<any>(emptyOrder);
+  const [updating, setUpdating] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      if (!orderId) return;
+      try {
+        const res = await apiService.getOrderById(orderId);
+        if (res.success) setOrder(res.data);
+      } catch {}
+    })();
+  }, [orderId]);
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -103,7 +65,7 @@ const OrderDetails = () => {
       {/* Breadcrumbs */}
       <div className="bg-white border-b border-gray-200 px-3 py-2">
         <div className="text-xs text-gray-600">
-          Home > My Account > My Orders > {order.id}
+          Home &gt; My Account &gt; My Orders &gt; {order?._id}
         </div>
       </div>
 
@@ -113,7 +75,7 @@ const OrderDetails = () => {
         <div className="flex-1 p-4">
           {/* Order Tracking Info */}
           <div className="bg-white rounded-lg p-4 mb-4">
-            <p className="text-sm text-gray-600 mb-2">Order can be tracked by {order.tracking.number}.</p>
+            <p className="text-sm text-gray-600 mb-2">Order ID: {order?._id}</p>
             <p className="text-sm text-gray-600 mb-4">Tracking link is shared via SMS.</p>
             <div className="flex items-center justify-between text-sm text-blue-600">
               <span>Manage who can access</span>
@@ -125,17 +87,20 @@ const OrderDetails = () => {
           <div className="bg-white rounded-lg p-4 mb-4">
             <div className="flex gap-4">
               <img
-                src={order.items[0].image}
-                alt={order.items[0].name}
+                src={order?.items?.[0]?.productId?.images?.[0] || '/placeholder.svg'}
+                alt={order?.items?.[0]?.productId?.title || 'Product'}
                 className="w-16 h-16 object-cover rounded"
               />
               <div className="flex-1">
                 <h3 className="font-medium text-sm text-gray-900 line-clamp-2">
-                  {order.items[0].name}
+                  {order?.items?.[0]?.productId?.title}
                 </h3>
-                <p className="text-xs text-gray-600 mt-1">Color: {order.items[0].color}</p>
-                <p className="text-xs text-gray-600">Seller: {order.items[0].seller}</p>
-                <p className="text-sm font-medium text-gray-900 mt-1">₹{order.total}</p>
+                <div className="text-xs text-gray-600 mt-1">
+                  {order?.items?.[0]?.selectedFeatures && Object.entries(order.items[0].selectedFeatures).map(([k,v]) => (
+                    <span key={k} className="mr-2">{k}: {v as any}</span>
+                  ))}
+                </div>
+                <p className="text-sm font-medium text-gray-900 mt-1">₹{order?.totalAmount}</p>
                 <p className="text-xs text-gray-600">1 offer</p>
               </div>
             </div>
@@ -144,41 +109,26 @@ const OrderDetails = () => {
           {/* Order Status Timeline */}
           <div className="bg-white rounded-lg p-4 mb-4">
             <div className="space-y-3">
-              {order.tracking.updates.map((update, index) => (
-                <div key={index} className="flex items-center gap-3">
-                  <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                    <CheckCircle className="h-3 w-3 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">{update.status}, {update.date}</p>
-                  </div>
+              <div className="flex items-center gap-3">
+                <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                  <CheckCircle className="h-3 w-3 text-white" />
                 </div>
+                <div>
+                  <p className="text-sm font-medium">Status: {order?.status}</p>
+                </div>
+              </div>
+            </div>
+            <div className="mt-3 flex gap-2">
+              {['Pending','Shipped','Delivered','Cancelled'].map(s => (
+                <Button key={s} size="sm" variant={order?.status===s? 'default':'outline'} disabled={updating}
+                  onClick={async ()=>{ setUpdating(true); try{ const r=await apiService.updateOrderStatus(order._id,s); if(r.success){ setOrder({ ...order, status: s }); }} finally{ setUpdating(false);} }}>
+                  {s}
+                </Button>
               ))}
             </div>
-            <div className="mt-3">
-              <a href="#" className="text-sm text-blue-600">See All Updates ></a>
-            </div>
-            <p className="text-xs text-gray-600 mt-2">Return policy ended on Jul 21</p>
           </div>
 
-          {/* Product Rating */}
-          <div className="bg-white rounded-lg p-4 mb-4">
-            <div className="flex items-center gap-2">
-              <div className="flex">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star key={star} className="h-4 w-4 text-gray-300" />
-                ))}
-              </div>
-              <span className="text-sm text-gray-600">Rate this product</span>
-            </div>
-          </div>
-
-          {/* Support */}
-          <div className="bg-white rounded-lg p-4">
-            <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
-              Chat with us
-            </Button>
-          </div>
+          {/* Support - removed chat button as requested */}
         </div>
 
         {/* Right Section */}
@@ -197,14 +147,14 @@ const OrderDetails = () => {
               <div className="flex items-start gap-2">
                 <MapPin className="h-4 w-4 text-gray-500 mt-0.5" />
                 <div>
-                  <p className="text-sm text-gray-900">{order.shippingAddress.address}</p>
+                  <p className="text-sm text-gray-900">{order?.shippingAddress?.address || (order?.user && order?.user.address)}</p>
                 </div>
               </div>
               <div className="flex items-start gap-2">
                 <User className="h-4 w-4 text-gray-500 mt-0.5" />
                 <div>
-                  <p className="text-sm text-gray-900">{order.shippingAddress.name}</p>
-                  <p className="text-xs text-gray-600">{order.shippingAddress.phone}</p>
+                  <p className="text-sm text-gray-900">{order?.user?.firstName} {order?.user?.lastName}</p>
+                  <p className="text-xs text-gray-600">{order?.user?.phone}</p>
                 </div>
               </div>
             </div>
@@ -216,36 +166,36 @@ const OrderDetails = () => {
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-600">List price</span>
-                <span>₹{order.listPrice}</span>
+                <span>₹{order?.totalAmount}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Selling price</span>
-                <span>₹{order.sellingPrice}</span>
+                <span>₹{order?.totalAmount}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Extra Discount</span>
-                <span className="text-green-600">-₹{order.extraDiscount}</span>
+                <span className="text-green-600">-₹0</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Special Price</span>
-                <span>₹{order.specialPrice}</span>
+                <span>₹{order?.totalAmount}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Payment Handling Fee</span>
-                <span>₹{order.paymentHandlingFee}</span>
+                <span>₹0</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Platform fee</span>
-                <span>₹{order.platformFee}</span>
+                <span>₹0</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Get extra 15% off upto ₹75 on 50 item(s)</span>
-                <span className="text-green-600">-₹{order.discount}</span>
+                <span className="text-green-600">-₹0</span>
               </div>
               <Separator />
               <div className="flex justify-between font-semibold">
                 <span>Total Amount</span>
-                <span>₹{order.total}</span>
+                <span>₹{order?.totalAmount}</span>
               </div>
               <p className="text-xs text-gray-600">1 coupon:</p>
             </div>

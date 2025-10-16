@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Heart, Star, MoreVertical, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -6,91 +6,49 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import phoneProduct from "@/assets/phone-product.jpg";
-import shoesProduct from "@/assets/shoes-product.jpg";
-import dressProduct from "@/assets/dress-product.jpg";
-import laptopProduct from "@/assets/laptop-product.jpg";
+import { apiService } from "@/lib/api";
 
-const wishlistItems = [
-  {
-    id: 1,
-    name: "KAJARU Solid Men Polo Neck Sweater",
-    image: phoneProduct,
-    price: 259,
-    originalPrice: 999,
-    discount: 74,
-    rating: 4.5,
-    inStock: false,
-    assured: true
-  },
-  {
-    id: 2,
-    name: "TRIPR Self Design Men Polo Neck Sweater",
-    image: shoesProduct,
-    price: 360,
-    originalPrice: 999,
-    discount: 63,
-    rating: 3.0,
-    inStock: false,
-    assured: false
-  },
-  {
-    id: 3,
-    name: "Premium Running Shoes Collection",
-    image: dressProduct,
-    price: 1299,
-    originalPrice: 2499,
-    discount: 48,
-    rating: 4.2,
-    inStock: true,
-    assured: true
-  },
-  {
-    id: 4,
-    name: "Gaming Laptop Ultra Pro",
-    image: laptopProduct,
-    price: 45999,
-    originalPrice: 59999,
-    discount: 23,
-    rating: 4.7,
-    inStock: true,
-    assured: true
-  },
-  {
-    id: 5,
-    name: "Wireless Earbuds Pro",
-    image: phoneProduct,
-    price: 4999,
-    originalPrice: 7999,
-    discount: 38,
-    rating: 4.5,
-    inStock: true,
-    assured: true
-  },
-  {
-    id: 6,
-    name: "Smart Watch Series 8",
-    image: shoesProduct,
-    price: 15999,
-    originalPrice: 19999,
-    discount: 20,
-    rating: 4.3,
-    inStock: true,
-    assured: true
-  }
-];
+// We'll map server wishlist items to displayable data using product info
 
 const Wishlist = () => {
-  const [items, setItems] = useState(wishlistItems);
+  const [items, setItems] = useState<any[]>([]);
   const navigate = useNavigate();
 
-  const removeFromWishlist = (id: number) => {
-    setItems(items.filter(item => item.id !== id));
-  };
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await apiService.request<any>("/users/wishlist");
+        if ((res as any).success && Array.isArray((res as any).data)) {
+          // Each wishlist entry should include productId; fetch details already populated by backend if possible
+          const mapped = (res as any).data.map((entry: any) => {
+            const p = entry.product || entry.productId || {};
+            return {
+              id: entry._id || p.id,
+              name: p.title,
+              image: (p.images && p.images[0]) || "/placeholder.svg",
+              price: p.price,
+              originalPrice: Math.round(p.price * 1.5),
+              discount: Math.max(0, Math.round(((p.price * 1.5 - p.price) / (p.price * 1.5)) * 100)),
+              rating: p.rating || 0,
+              inStock: p.inStock !== false,
+              assured: true,
+            };
+          });
+          setItems(mapped);
+        }
+      } catch (e) {
+        // Fallback: no wishlist
+        setItems([]);
+      }
+    })();
+  }, []);
 
-  const addToCart = (id: number) => {
-    // In a real app, this would add to cart
-    console.log(`Added item ${id} to cart`);
+  const addToCart = async (id: string) => {
+    const item = items.find((i) => i.id === id);
+    if (!item) return;
+    try {
+      await apiService.addToCart(id, 1);
+    } catch {}
   };
 
   return (

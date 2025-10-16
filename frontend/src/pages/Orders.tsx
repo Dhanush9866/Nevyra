@@ -17,83 +17,31 @@ import {
   Filter,
   X
 } from "lucide-react";
-import phoneProduct from "@/assets/phone-product.jpg";
-import shoesProduct from "@/assets/shoes-product.jpg";
-import laptopProduct from "@/assets/laptop-product.jpg";
-
-const orders = [
-  {
-    id: "NVR001234",
-    date: "2023-12-15",
-    status: "Delivered",
-    deliveryDate: "Jul 11",
-    total: 432,
-    items: [
-      {
-        name: "Richer Large 36 L Laptop Backpack Paradise",
-        image: laptopProduct,
-        quantity: 1,
-        price: 432,
-        color: "Black"
-      }
-    ]
-  },
-  {
-    id: "NVR001235",
-    date: "2023-12-10",
-    status: "Cancelled",
-    deliveryDate: "Jul 06",
-    total: 413,
-    items: [
-      {
-        name: "ENSURE Clinically Proven Nutritional Drink",
-        image: phoneProduct,
-        quantity: 1,
-        price: 413,
-        color: "Chocolate"
-      }
-    ]
-  },
-  {
-    id: "NVR001236",
-    date: "2023-12-05",
-    status: "Cancelled",
-    deliveryDate: "Jun 13",
-    total: 173,
-    items: [
-      {
-        name: "Print maker Back Cover for Realme 12 Pro",
-        image: shoesProduct,
-        quantity: 1,
-        price: 173,
-        color: "Multicolor"
-      }
-    ]
-  },
-  {
-    id: "NVR001237",
-    date: "2023-12-01",
-    status: "Delivered",
-    deliveryDate: "Jun 19",
-    total: 186,
-    items: [
-      {
-        name: "75 L Grey Laundry Basket",
-        image: phoneProduct,
-        quantity: 1,
-        price: 186,
-        color: "Grey"
-      }
-    ]
-  }
-];
+import { apiService } from "@/lib/api";
 
 const Orders = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilters, setStatusFilters] = useState<string[]>([]);
   const [timeFilters, setTimeFilters] = useState<string[]>([]);
-  const [filteredOrders, setFilteredOrders] = useState(orders);
+  const [orders, setOrders] = useState<any[]>([]);
+  const [filteredOrders, setFilteredOrders] = useState<any[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await apiService.getOrders();
+        if (res.success) {
+          const list = (res.data || []).map((o: any) => ({
+            ...o,
+            createdAt: o.createdAt || o.date,
+          }));
+          setOrders(list);
+          setFilteredOrders(list);
+        }
+      } catch {}
+    })();
+  }, []);
 
   // Filter orders based on search query and filters
   useEffect(() => {
@@ -102,9 +50,8 @@ const Orders = () => {
     // Search functionality
     if (searchQuery.trim()) {
       filtered = filtered.filter(order => 
-        order.items[0].name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.items[0].color.toLowerCase().includes(searchQuery.toLowerCase())
+        (order.items?.[0]?.productId?.title || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (order._id || "").toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
@@ -118,7 +65,7 @@ const Orders = () => {
     // Time filtering
     if (timeFilters.length > 0) {
       filtered = filtered.filter(order => {
-        const orderDate = new Date(order.date);
+        const orderDate = new Date(order.createdAt || order.date || 0);
         const currentDate = new Date();
         
         return timeFilters.some(filter => {
@@ -398,32 +345,31 @@ const Orders = () => {
                    <div className="text-sm text-gray-600 mb-2">
                      Showing {filteredOrders.length} of {orders.length} orders
                    </div>
-                   {filteredOrders.map((order) => (
+                  {filteredOrders.map((order) => (
                 <Card 
-                  key={order.id} 
+                 key={order._id} 
                   className="bg-white border border-gray-200 cursor-pointer hover:shadow-md transition-shadow"
-                  onClick={() => handleOrderClick(order.id)}
+                 onClick={() => handleOrderClick(order._id)}
                 >
                   <CardContent className="p-4">
                     {/* Order Item */}
                     <div className="flex gap-4">
                       <img
-                        src={order.items[0].image}
-                        alt={order.items[0].name}
+                        src={order.items?.[0]?.productId?.images?.[0] || '/placeholder.svg'}
+                        alt={order.items?.[0]?.productId?.title || 'Product'}
                         className="w-20 h-20 object-cover rounded"
                       />
                       <div className="flex-1">
                         <h3 className="font-medium text-sm text-gray-900 line-clamp-2">
-                          {order.items[0].name}
+                          {order.items?.[0]?.productId?.title || 'Product'}
                         </h3>
-                        <p className="text-xs text-gray-600 mt-1">Color: {order.items[0].color}</p>
-                        <p className="text-sm font-medium text-gray-900 mt-1">₹{order.total}</p>
+                        <p className="text-sm font-medium text-gray-900 mt-1">₹{order.totalAmount}</p>
                         
                         {/* Status */}
                         <div className="flex items-center gap-2 mt-2">
                           <div className={`w-2 h-2 rounded-full ${getStatusColor(order.status)}`}></div>
                           <span className="text-xs text-gray-600">
-                            {getStatusText(order.status)} on {order.deliveryDate}
+                            {getStatusText(order.status || 'Pending')}
                           </span>
                         </div>
                         

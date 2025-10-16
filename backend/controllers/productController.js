@@ -1,4 +1,4 @@
-const { Product } = require("../models");
+const { Product, Category } = require("../models");
 const { validateAttributes } = require("../utils/validateAttributes");
 
 // Function to parse additional specifications
@@ -134,7 +134,37 @@ exports.create = async (req, res, next) => {
         data: null,
       });
     
-    if (attributes && !validateAttributes(category, attributes)) {
+    // Resolve category and subcategory names from IDs
+    let categoryName = category;
+    let subCategoryName = subCategory;
+    
+    // Check if category is an ObjectId (24 character hex string)
+    if (category.match(/^[0-9a-fA-F]{24}$/)) {
+      const categoryDoc = await Category.findById(category);
+      if (!categoryDoc) {
+        return res.status(400).json({
+          success: false,
+          message: "Category not found",
+          data: null,
+        });
+      }
+      categoryName = categoryDoc.name;
+    }
+    
+    // Check if subCategory is an ObjectId (24 character hex string)
+    if (subCategory.match(/^[0-9a-fA-F]{24}$/)) {
+      const subCategoryDoc = await Category.findById(subCategory);
+      if (!subCategoryDoc) {
+        return res.status(400).json({
+          success: false,
+          message: "Subcategory not found",
+          data: null,
+        });
+      }
+      subCategoryName = subCategoryDoc.name;
+    }
+    
+    if (attributes && !validateAttributes(categoryName, attributes)) {
       return res.status(400).json({
         success: false,
         message: "Invalid attributes for category",
@@ -149,8 +179,8 @@ exports.create = async (req, res, next) => {
     const product = new Product({
       title,
       price,
-      category,
-      subCategory,
+      category: categoryName,
+      subCategory: subCategoryName,
       images,
       inStock,
       rating,
@@ -192,7 +222,42 @@ exports.update = async (req, res, next) => {
       attributes,
       additionalSpecifications,
     } = req.body;
-    if (category && attributes && !validateAttributes(category, attributes)) {
+    
+    // Resolve category and subcategory names from IDs if provided
+    let categoryName = category;
+    let subCategoryName = subCategory;
+    
+    if (category !== undefined) {
+      // Check if category is an ObjectId (24 character hex string)
+      if (category.match(/^[0-9a-fA-F]{24}$/)) {
+        const categoryDoc = await Category.findById(category);
+        if (!categoryDoc) {
+          return res.status(400).json({
+            success: false,
+            message: "Category not found",
+            data: null,
+          });
+        }
+        categoryName = categoryDoc.name;
+      }
+    }
+    
+    if (subCategory !== undefined) {
+      // Check if subCategory is an ObjectId (24 character hex string)
+      if (subCategory.match(/^[0-9a-fA-F]{24}$/)) {
+        const subCategoryDoc = await Category.findById(subCategory);
+        if (!subCategoryDoc) {
+          return res.status(400).json({
+            success: false,
+            message: "Subcategory not found",
+            data: null,
+          });
+        }
+        subCategoryName = subCategoryDoc.name;
+      }
+    }
+    
+    if (categoryName && attributes && !validateAttributes(categoryName, attributes)) {
       return res.status(400).json({
         success: false,
         message: "Invalid attributes for category",
@@ -201,8 +266,8 @@ exports.update = async (req, res, next) => {
     }
     if (title !== undefined) product.title = title;
     if (price !== undefined) product.price = price;
-    if (category !== undefined) product.category = category;
-    if (subCategory !== undefined) product.subCategory = subCategory;
+    if (category !== undefined) product.category = categoryName;
+    if (subCategory !== undefined) product.subCategory = subCategoryName;
     if (images !== undefined) product.images = images;
     if (inStock !== undefined) product.inStock = inStock;
     if (rating !== undefined) product.rating = rating;

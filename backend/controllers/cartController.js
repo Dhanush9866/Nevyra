@@ -13,7 +13,7 @@ exports.list = async (req, res, next) => {
 
 exports.add = async (req, res, next) => {
   try {
-    const { productId, quantity } = req.body;
+    const { productId, quantity, selectedFeatures } = req.body;
     if (!productId || !quantity)
       return res
         .status(400)
@@ -22,12 +22,24 @@ exports.add = async (req, res, next) => {
           message: "Product and quantity required",
           data: null,
         });
-    let item = await CartItem.findOne({ userId: req.user.id, productId });
+    
+    // Check if item with same product and features already exists
+    let item = await CartItem.findOne({ 
+      userId: req.user.id, 
+      productId,
+      selectedFeatures: selectedFeatures || new Map()
+    });
+    
     if (item) {
       item.quantity += quantity;
       await item.save();
     } else {
-      item = new CartItem({ userId: req.user.id, productId, quantity });
+      item = new CartItem({ 
+        userId: req.user.id, 
+        productId, 
+        quantity,
+        selectedFeatures: selectedFeatures || new Map()
+      });
       await item.save();
     }
     res
