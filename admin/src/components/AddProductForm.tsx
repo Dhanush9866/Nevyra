@@ -32,11 +32,27 @@ interface ProductFormData {
 
 interface AddProductFormProps {
   onClose: () => void;
-  onProductAdded: () => void;
+  onProductAdded?: () => void;
+  onProductUpdated?: () => void;
   token: string;
+  mode?: 'add' | 'edit';
+  product?: {
+    id: string;
+    title: string;
+    price: number;
+    category: string;
+    subCategory: string;
+    stockQuantity: number;
+    inStock: boolean;
+    rating: number;
+    reviews: number;
+    soldCount: number;
+    images: string[];
+    additionalSpecifications?: any;
+  } | null;
 }
 
-const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded, token }) => {
+const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded, onProductUpdated, token, mode = 'add', product = null }) => {
   const [formData, setFormData] = useState<ProductFormData>({
     title: '',
     price: '',
@@ -63,6 +79,29 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
     loadCategories();
   }, []);
 
+  // Prefill when editing
+  useEffect(() => {
+    if (mode === 'edit' && product) {
+      setFormData(prev => ({
+        ...prev,
+        title: product.title || '',
+        price: product.price != null ? String(product.price) : '',
+        category: '', // will resolve to id after categories load
+        subCategory: '',
+        stockQuantity: product.stockQuantity != null ? String(product.stockQuantity) : '',
+        inStock: product.inStock ?? true,
+        rating: product.rating != null ? String(product.rating) : '0',
+        reviews: product.reviews != null ? String(product.reviews) : '0',
+        soldCount: product.soldCount != null ? String(product.soldCount) : '0',
+        additionalSpecifications: typeof product.additionalSpecifications === 'string' 
+          ? product.additionalSpecifications 
+          : JSON.stringify(product.additionalSpecifications || {})
+      }));
+      // show existing image previews
+      setImagePreview(product.images || []);
+    }
+  }, [mode, product]);
+
   // Update subcategories when category changes
   useEffect(() => {
     if (formData.category) {
@@ -85,6 +124,20 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
       const response = await adminAPI.categories.getAll();
       if (response.success) {
         setCategories(response.data);
+        // If editing, map existing category/subCategory names to IDs
+        if (mode === 'edit' && product) {
+          const parent = response.data.find((c: Category) => !c.parentId && c.name === product.category);
+          const sub = response.data.find((c: Category) => c.parentId && c.name === product.subCategory);
+          setFormData(prev => ({
+            ...prev,
+            category: parent?._id || '',
+            subCategory: sub?._id || ''
+          }));
+          if (parent) {
+            const subs = response.data.filter((cat: Category) => cat.parentId === parent._id);
+            setSubCategories(subs);
+          }
+        }
       } else {
         toast({
           title: "Error",
@@ -168,27 +221,34 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
         rating: parseFloat(formData.rating) || 0,
         reviews: parseInt(formData.reviews) || 0,
         soldCount: parseInt(formData.soldCount) || 0,
-        images: imageUrls,
+        // If editing and no new images uploaded, keep existing ones
+        images: imageUrls.length > 0 ? imageUrls : (mode === 'edit' && product ? product.images : []),
         additionalSpecifications: formData.additionalSpecifications
       };
 
-      // Create product
-      const response = await adminAPI.products.create(productData, token);
+      // Create or Update product
+      const response = mode === 'edit' && product
+        ? await adminAPI.products.update(product.id, productData, token)
+        : await adminAPI.products.create(productData, token);
       
       if (response.success) {
         toast({
           title: "Success",
-          description: "Product created successfully!",
+          description: mode === 'edit' ? 'Product updated successfully!' : 'Product created successfully!',
         });
-        onProductAdded();
+        if (mode === 'edit') {
+          onProductUpdated && onProductUpdated();
+        } else {
+          onProductAdded && onProductAdded();
+        }
         onClose();
       } else {
-        throw new Error(response.message || 'Failed to create product');
+        throw new Error(response.message || (mode === 'edit' ? 'Failed to update product' : 'Failed to create product'));
       }
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message || "Failed to create product",
+        description: error.message || (mode === 'edit' ? 'Failed to update product' : 'Failed to create product'),
         variant: "destructive",
       });
     } finally {
@@ -201,7 +261,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
       <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
-            Add New Product
+            {mode === 'edit' ? 'Edit Product' : 'Add New Product'}
             <Button variant="ghost" size="sm" onClick={onClose}>
               <X className="h-4 w-4" />
             </Button>
@@ -396,10 +456,10 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
                 {loading || uploadingImages ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    {uploadingImages ? 'Uploading Images...' : 'Creating Product...'}
+                    {uploadingImages ? 'Uploading Images...' : (mode === 'edit' ? 'Updating Product...' : 'Creating Product...')}
                   </>
                 ) : (
-                  'Create Product'
+                  mode === 'edit' ? 'Update Product' : 'Create Product'
                 )}
               </Button>
             </div>
