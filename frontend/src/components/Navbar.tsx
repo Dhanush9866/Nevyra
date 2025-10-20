@@ -40,14 +40,18 @@ const categories = [
   {
     name: "Fashion & Beauty",
     subcategories: [
-      "Menswear",
-      "Women's Wear",
-      "Kids Wear",
-      "Men's Shoes",
-      "Women's Shoes",
-      "Kids Shoes",
-      "Watches",
-      "Luggage",
+      {
+        name: "Clothing",
+        items: ["Menswear", "Women's Wear", "Kids Wear"]
+      },
+      {
+        name: "Shoes", 
+        items: ["Men's", "Women's", "Kids"]
+      },
+      {
+        name: "Accessories",
+        items: ["Watches", "Luggage"]
+      }
     ],
   },
   {
@@ -202,66 +206,26 @@ const Navbar = () => {
           {/* Right Side Actions */}
           <div className="flex items-center space-x-4">
             {isAuthenticated ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="text-gray-800 hover:bg-cyan-200 hidden md:flex items-center space-x-1"
-                  >
-                    <User className="h-4 w-4" />
-                    <span className="text-sm">
-                      {user?.firstName || 'User'}
-                    </span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem asChild>
-                    <Link to="/profile" className="flex items-center">
-                      <User className="h-4 w-4 mr-2" />
-                      Profile
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/profile" className="flex items-center">
-                      <Settings className="h-4 w-4 mr-2" />
-                      Settings
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem 
-                    onClick={() => {
-                      logout();
-                      navigate('/');
-                    }}
-                    className="flex items-center text-red-600"
-                  >
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Logout
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <Link to="/profile">
+                <Button
+                  variant="ghost"
+                  className="text-gray-800 hover:bg-cyan-200 flex items-center space-x-1"
+                >
+                  <User className="h-4 w-4" />
+                  <span className="text-sm hidden md:inline">{user?.firstName || 'Profile'}</span>
+                </Button>
+              </Link>
             ) : (
               <Link to="/auth">
                 <Button
                   variant="ghost"
-                  className="text-gray-800 hover:bg-cyan-200 hidden md:flex items-center space-x-1"
+                  className="text-gray-800 hover:bg-cyan-200 flex items-center space-x-1"
                 >
                   <User className="h-4 w-4" />
-                  <span className="text-sm">Login</span>
+                  <span className="text-sm hidden md:inline">Login</span>
                 </Button>
               </Link>
             )}
-            
-
-            <Link to="/profile">
-              <Button
-                variant="ghost"
-                className="text-gray-800 hover:bg-cyan-200 flex items-center space-x-1"
-              >
-                <User className="h-4 w-4" />
-                <span className="text-sm hidden md:inline">Profile</span>
-              </Button>
-            </Link>
             <Link to="/cart">
               <Button
                 variant="ghost"
@@ -318,21 +282,50 @@ const Navbar = () => {
                 </HoverCardTrigger>
                 <HoverCardContent className="w-64 bg-popover border border-border p-0">
                   <div className="py-2">
-                    {category.subcategories.map((subcategory, index) => (
-                      <div
-                        key={index}
-                        className="px-4 py-2 text-popover-foreground hover:bg-accent cursor-pointer"
-                      >
-                        <Link
-                          to={`/category/${category.name
-                            .toLowerCase()
-                            .replace(/\s+/g, "-")}`}
-                          className="w-full block"
-                        >
-                          {subcategory}
-                        </Link>
+                    {category.name === "Fashion & Beauty" ? (
+                      // Special layout for Fashion & Beauty
+                      <div className="px-4 py-2">
+                        {category.subcategories.map((section, sectionIndex) => (
+                          <div key={sectionIndex} className="mb-4">
+                            <div className="font-medium text-popover-foreground mb-2 text-sm">
+                              {section.name}
+                            </div>
+                            <div className="pl-4 space-y-1">
+                              {section.items.map((item, itemIndex) => (
+                                <div key={itemIndex} className="flex items-center">
+                                  <span className="w-2 h-2 bg-primary rounded-full mr-2"></span>
+                                  <Link
+                                    to={`/category/${category.name
+                                      .toLowerCase()
+                                      .replace(/\s+/g, "-")}`}
+                                    className="text-xs text-popover-foreground hover:text-primary cursor-pointer"
+                                  >
+                                    {item}
+                                  </Link>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    ) : (
+                      // Default layout for other categories
+                      category.subcategories.map((subcategory, index) => (
+                        <div
+                          key={index}
+                          className="px-4 py-2 text-popover-foreground hover:bg-accent cursor-pointer"
+                        >
+                          <Link
+                            to={`/category/${category.name
+                              .toLowerCase()
+                              .replace(/\s+/g, "-")}`}
+                            className="w-full block"
+                          >
+                            {subcategory}
+                          </Link>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </HoverCardContent>
               </HoverCard>
@@ -425,18 +418,45 @@ const Navbar = () => {
                   </div>
                   {expandedCategory === category.name && (
                     <div className="space-y-1 pl-4 bg-muted/30 rounded p-2">
-                      {category.subcategories.map((subcategory, index) => (
-                        <Link
-                          key={index}
-                          to={`/category/${category.name
-                            .toLowerCase()
-                            .replace(/\s+/g, "-")}`}
-                          className="block text-sm text-muted-foreground hover:text-foreground py-2 px-2 rounded hover:bg-muted"
-                          onClick={() => setIsMobileMenuOpen(false)}
-                        >
-                          {subcategory}
-                        </Link>
-                      ))}
+                      {category.name === "Fashion & Beauty" ? (
+                        // Special mobile layout for Fashion & Beauty
+                        category.subcategories.map((section, sectionIndex) => (
+                          <div key={sectionIndex} className="mb-3">
+                            <div className="font-medium text-foreground mb-2 text-sm">
+                              {section.name}
+                            </div>
+                            <div className="pl-4 space-y-1">
+                              {section.items.map((item, itemIndex) => (
+                                <Link
+                                  key={itemIndex}
+                                  to={`/category/${category.name
+                                    .toLowerCase()
+                                    .replace(/\s+/g, "-")}`}
+                                  className="block text-xs text-muted-foreground hover:text-foreground py-1 px-2 rounded hover:bg-muted flex items-center"
+                                  onClick={() => setIsMobileMenuOpen(false)}
+                                >
+                                  <span className="w-1.5 h-1.5 bg-primary rounded-full mr-2"></span>
+                                  {item}
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        // Default mobile layout for other categories
+                        category.subcategories.map((subcategory, index) => (
+                          <Link
+                            key={index}
+                            to={`/category/${category.name
+                              .toLowerCase()
+                              .replace(/\s+/g, "-")}`}
+                            className="block text-sm text-muted-foreground hover:text-foreground py-2 px-2 rounded hover:bg-muted"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                          >
+                            {subcategory}
+                          </Link>
+                        ))
+                      )}
                     </div>
                   )}
                 </div>

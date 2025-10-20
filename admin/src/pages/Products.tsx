@@ -53,6 +53,8 @@ const Products: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [token, setToken] = useState<string>('');
   const { toast } = useToast();
 
@@ -117,6 +119,17 @@ const Products: React.FC = () => {
         description: error.message || "Failed to delete product",
         variant: "destructive",
       });
+    }
+  };
+
+  const handleEditClick = (product: Product) => {
+    setSelectedProduct(product);
+    setShowEditForm(true);
+  };
+
+  const handleProductUpdated = () => {
+    if (token) {
+      loadProducts(token);
     }
   };
 
@@ -198,7 +211,7 @@ const Products: React.FC = () => {
                             </td>
                             <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm">
                               <div className="flex items-center gap-2">
-                                <Button variant="ghost" size="sm">
+                                <Button variant="ghost" size="sm" onClick={() => handleEditClick(product)}>
                                   <Edit className="h-4 w-4" />
                                 </Button>
                                 <Button 
@@ -227,6 +240,21 @@ const Products: React.FC = () => {
           onClose={() => setShowAddForm(false)}
           onProductAdded={handleProductAdded}
           token={token}
+        />
+      )}
+
+      {showEditForm && selectedProduct && (
+        <AddProductForm
+          onClose={() => setShowEditForm(false)}
+          onProductUpdated={handleProductUpdated}
+          token={token}
+          mode="edit"
+          product={{
+            ...selectedProduct,
+            additionalSpecifications: typeof selectedProduct.additionalSpecifications === 'string'
+              ? (selectedProduct.additionalSpecifications as unknown as string)
+              : JSON.stringify(selectedProduct.additionalSpecifications || {})
+          }}
         />
       )}
     </>

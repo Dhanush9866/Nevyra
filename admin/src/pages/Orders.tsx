@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { FloatingDock } from "@/components/FloatingDock";
 import { Loader2, Eye, Edit } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { adminAPI } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
@@ -48,6 +49,10 @@ const Orders: React.FC = () => {
   const [token, setToken] = useState<string>('');
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<Order | null>(null);
+  const [editOpen, setEditOpen] = useState(false);
+  const [editTarget, setEditTarget] = useState<Order | null>(null);
+  const [updating, setUpdating] = useState(false);
+  const [nextStatus, setNextStatus] = useState<string>("Processing");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -92,6 +97,31 @@ const Orders: React.FC = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const openEdit = (order: Order) => {
+    setEditTarget(order);
+    setNextStatus(order.status || "Processing");
+    setEditOpen(true);
+  };
+
+  const updateOrderStatus = async () => {
+    if (!editTarget) return;
+    try {
+      setUpdating(true);
+      const response = await adminAPI.orders.updateStatus(editTarget.id, nextStatus, token);
+      if (response.success) {
+        toast({ title: "Success", description: "Order status updated" });
+        setEditOpen(false);
+        loadOrders(token);
+      } else {
+        throw new Error(response.message || 'Failed to update status');
+      }
+    } catch (error: any) {
+      toast({ title: 'Error', description: error.message || 'Failed to update status', variant: 'destructive' });
+    } finally {
+      setUpdating(false);
     }
   };
 
@@ -186,7 +216,7 @@ const Orders: React.FC = () => {
                               <Button variant="ghost" size="sm" onClick={() => { setSelected(order); setOpen(true); }}>
                                 <Eye className="h-4 w-4" />
                               </Button>
-                              <Button variant="ghost" size="sm">
+                              <Button variant="ghost" size="sm" onClick={() => openEdit(order)}>
                                 <Edit className="h-4 w-4" />
                               </Button>
                             </div>
@@ -257,6 +287,53 @@ const Orders: React.FC = () => {
                     </div>
                   ))}
                 </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Order Status Dialog */}
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Order Status</DialogTitle>
+          </DialogHeader>
+          {!editTarget ? (
+            <div className="py-8 text-center text-muted-foreground">No order selected</div>
+          ) : (
+            <div className="space-y-4">
+              <div className="text-sm">
+                <div className="text-muted-foreground">Order</div>
+                <div className="font-medium">{editTarget.orderNumber || editTarget.id}</div>
+              </div>
+              <div className="space-y-2">
+                <div className="text-sm text-muted-foreground">Status</div>
+                <Select value={nextStatus} onValueChange={setNextStatus}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Pending">Pending</SelectItem>
+                    <SelectItem value="Processing">Processing</SelectItem>
+                    <SelectItem value="Shipped">Shipped</SelectItem>
+                    <SelectItem value="Delivered">Delivered</SelectItem>
+                    <SelectItem value="Cancelled">Cancelled</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setEditOpen(false)}>Cancel</Button>
+                <Button onClick={updateOrderStatus} disabled={updating}>
+                  {updating ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Updating...
+                    </>
+                  ) : (
+                    'Save'
+                  )}
+                </Button>
               </div>
             </div>
           )}
