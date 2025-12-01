@@ -60,7 +60,7 @@ exports.list = async (req, res, next) => {
   try {
     const { page = 1, limit = 10, category, search } = req.query;
     const filter = {};
-    if (category) filter.category = category;
+    if (category) filter.category = { $regex: new RegExp(`^${category}$`, "i") };
     if (search) filter.title = { $regex: search, $options: "i" };
     const skip = (parseInt(page) - 1) * parseInt(limit);
     const [products, count] = await Promise.all([

@@ -37,12 +37,27 @@ const ProductListing = () => {
   useEffect(() => {
     (async () => {
       const params: any = { limit: 40 };
-      if (categoryName) params.category = categoryName;
+      if (categoryName) {
+        // Map URL slug to actual category name
+        const categoryMap: Record<string, string> = {
+          'medical-and-pharmacy': 'Medical & Pharmacy',
+          'groceries': 'Groceries',
+          'fashion-and-beauty': 'Fashion & Beauty',
+          'devices': 'Devices',
+          'electrical': 'Electrical',
+          'automotive': 'Automotive',
+          'sports': 'Sports',
+          'home-interior': 'Home Interior',
+        };
+        params.category = categoryMap[categoryName] || categoryName;
+      }
       try {
+        console.log('Fetching products with params:', params);
         const res = await apiService.getProducts(params);
+        console.log('Product fetch response:', res);
         if (res.success) {
-          setProducts(res.data.map((p: any) => ({
-            _id: p._id,
+          const mappedProducts = res.data.map((p: any) => ({
+            _id: p.id || p._id,
             title: p.title,
             price: p.price,
             mrp: p.mrp || p.price,
@@ -50,9 +65,15 @@ const ProductListing = () => {
             rating: p.rating || 4.5,
             reviewsCount: p.reviewsCount || 0,
             brand: p.brand || p.category,
-          })));
+          }));
+          console.log('Mapped products:', mappedProducts);
+          setProducts(mappedProducts);
+        } else {
+          console.error('Failed to fetch products:', res.message);
         }
-      } catch {}
+      } catch (err) {
+        console.error('Error fetching products:', err);
+      }
     })();
   }, [categoryName]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
