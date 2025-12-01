@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = false ? 'http://localhost:8000/api' : "https://nevyra-backend.onrender.com/api";
 
 export interface LoginRequest {
   email: string;
