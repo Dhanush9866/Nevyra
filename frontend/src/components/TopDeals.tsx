@@ -23,10 +23,12 @@ const TopDeals = () => {
   useEffect(() => {
     (async () => {
       try {
+        console.log('TopDeals: Fetching products...');
         const res = await apiService.getProducts({ limit: 12 });
+        console.log('TopDeals: Product fetch response:', res);
         if (res.success) {
           const mapped = res.data.map((p: any) => ({
-            _id: p._id,
+            _id: p.id || p._id,
             title: p.title,
             price: p.price,
             mrp: p.mrp || p.price,
@@ -35,10 +37,13 @@ const TopDeals = () => {
             reviewsCount: p.reviewsCount || 0,
             discount: p.mrp && p.mrp > p.price ? Math.round(((p.mrp - p.price) / p.mrp) * 100) : undefined,
           }));
+          console.log('TopDeals: Mapped products:', mapped);
           setProducts(mapped);
+        } else {
+          console.error('TopDeals: Failed to fetch products:', res.message);
         }
       } catch (e) {
-        // ignore for homepage
+        console.error('TopDeals: Error fetching products:', e);
       }
     })();
   }, []);

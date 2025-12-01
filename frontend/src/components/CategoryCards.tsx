@@ -26,14 +26,14 @@ interface Product {
 
 // Category configuration
 const categories = [
-  { name: "Medical", slug: "medical", limit: 6 },
-  { name: "Groceries", slug: "groceries", limit: 5 },
-  { name: "FashionBeauty", slug: "fashion-beauty", limit: 4 },
-  { name: "Devices", slug: "devices", limit: 3 },
+  { name: "Medical & Pharmacy", slug: "medical-and-pharmacy", limit: 4 },
+  { name: "Groceries", slug: "groceries", limit: 4 },
+  { name: "Fashion & Beauty", slug: "fashion-and-beauty", limit: 4 },
+  { name: "Devices", slug: "devices", limit: 4 },
   { name: "Electrical", slug: "electrical", limit: 4 },
   { name: "Automotive", slug: "automotive", limit: 4 },
   { name: "Sports", slug: "sports", limit: 4 },
-  { name: "HomeInterior", slug: "home-interior", limit: 4 },
+  { name: "Home Interior", slug: "home-interior", limit: 4 },
 ];
 
 const CategoryCards = () => {
@@ -46,8 +46,12 @@ const CategoryCards = () => {
       try {
         const promises = categories.map(async (category) => {
           try {
+            console.log(`CategoryCards: Fetching products for ${category.name}`);
             const response = await apiService.getProductsByCategory(category.name, category.limit);
-            return { category: category.name, products: response.data || [] };
+            console.log(`CategoryCards: Response for ${category.name}:`, response);
+            const products = response.data || [];
+            console.log(`CategoryCards: Products for ${category.name}:`, products.length, 'items');
+            return { category: category.name, products };
           } catch (error) {
             console.error(`Error fetching ${category.name} products:`, error);
             return { category: category.name, products: [] };
@@ -58,7 +62,24 @@ const CategoryCards = () => {
         const productsMap: Record<string, Product[]> = {};
         
         results.forEach(({ category, products }) => {
-          productsMap[category] = products;
+          // Map products to ensure they have the correct id field
+          const mappedProducts = products.map((p: any) => ({
+            id: p.id || p._id,
+            title: p.title,
+            price: p.price,
+            category: p.category,
+            subCategory: p.subCategory,
+            images: p.images || [],
+            inStock: p.inStock !== undefined ? p.inStock : true,
+            rating: p.rating || 0,
+            reviews: p.reviews || 0,
+            stockQuantity: p.stockQuantity || 0,
+            soldCount: p.soldCount || 0,
+            attributes: p.attributes,
+            additionalSpecifications: p.additionalSpecifications,
+          }));
+          productsMap[category] = mappedProducts;
+          console.log(`CategoryCards: Mapped ${mappedProducts.length} products for ${category}`);
         });
 
         setProductsByCategory(productsMap);

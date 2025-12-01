@@ -112,6 +112,14 @@ const categories = [
   },
 ];
 
+// Helper function to convert category name to URL-safe slug
+const categoryToSlug = (categoryName: string): string => {
+  return categoryName
+    .toLowerCase()
+    .replace(/\s*&\s*/g, '-and-')  // Replace & with -and-
+    .replace(/\s+/g, '-');          // Replace spaces with hyphens
+};
+
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
@@ -270,7 +278,7 @@ const Navbar = () => {
             {categories.map((category) => (
               <HoverCard key={category.name} openDelay={0} closeDelay={0}>
                 <HoverCardTrigger asChild>
-                  <Link to={`/category/${category.name.toLowerCase().replace(/\s+/g, "-")}`}>
+                  <Link to={`/category/${categoryToSlug(category.name)}`}>
                     <Button
                       variant="ghost"
                       className="text-foreground hover:bg-muted flex items-center space-x-1"
@@ -295,9 +303,7 @@ const Navbar = () => {
                                 <div key={itemIndex} className="flex items-center">
                                   <span className="w-2 h-2 bg-primary rounded-full mr-2"></span>
                                   <Link
-                                    to={`/category/${category.name
-                                      .toLowerCase()
-                                      .replace(/\s+/g, "-")}`}
+                                    to={`/category/${categoryToSlug(category.name)}`}
                                     className="text-xs text-popover-foreground hover:text-primary cursor-pointer"
                                   >
                                     {item}
@@ -316,9 +322,7 @@ const Navbar = () => {
                           className="px-4 py-2 text-popover-foreground hover:bg-accent cursor-pointer"
                         >
                           <Link
-                            to={`/category/${category.name
-                              .toLowerCase()
-                              .replace(/\s+/g, "-")}`}
+                            to={`/category/${categoryToSlug(category.name)}`}
                             className="w-full block"
                           >
                             {subcategory}
@@ -338,9 +342,7 @@ const Navbar = () => {
               {categories.map((category) => (
                 <Link
                   key={category.name}
-                  to={`/category/${category.name
-                    .toLowerCase()
-                    .replace(/\s+/g, "-")}`}
+                  to={`/category/${categoryToSlug(category.name)}`}
                   className="whitespace-nowrap px-3 py-1 text-xs bg-muted hover:bg-muted/80 text-muted-foreground rounded-full transition-colors"
                 >
                   {category.name}
@@ -399,7 +401,7 @@ const Navbar = () => {
                 <div key={category.name} className="border-b border-border pb-2">
                   <div className="w-full flex items-center justify-between font-medium text-foreground mb-2 py-2 hover:bg-muted rounded px-2">
                     <Link 
-                      to={`/category/${category.name.toLowerCase().replace(/\s+/g, "-")}`}
+                      to={`/category/${categoryToSlug(category.name)}`}
                       className="flex-1"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
@@ -429,9 +431,7 @@ const Navbar = () => {
                               {section.items.map((item, itemIndex) => (
                                 <Link
                                   key={itemIndex}
-                                  to={`/category/${category.name
-                                    .toLowerCase()
-                                    .replace(/\s+/g, "-")}`}
+                                  to={`/category/${categoryToSlug(category.name)}`}
                                   className="block text-xs text-muted-foreground hover:text-foreground py-1 px-2 rounded hover:bg-muted flex items-center"
                                   onClick={() => setIsMobileMenuOpen(false)}
                                 >
@@ -447,9 +447,7 @@ const Navbar = () => {
                         category.subcategories.map((subcategory, index) => (
                           <Link
                             key={index}
-                            to={`/category/${category.name
-                              .toLowerCase()
-                              .replace(/\s+/g, "-")}`}
+                            to={`/category/${categoryToSlug(category.name)}`}
                             className="block text-sm text-muted-foreground hover:text-foreground py-2 px-2 rounded hover:bg-muted"
                             onClick={() => setIsMobileMenuOpen(false)}
                           >

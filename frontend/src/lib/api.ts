@@ -60,7 +60,7 @@ class ApiService {
   }
 
   async getProductsByCategory(category: string, limit: number = 10): Promise<{ success: boolean; message: string; data: any[] }> {
-    return this.request(`/products?category=${category}&limit=${limit}`);
+    return this.request(`/products?category=${encodeURIComponent(category)}&limit=${limit}`);
   }
 
   async getProductById(id: string): Promise<{ success: boolean; message: string; data: any }> {
@@ -126,17 +126,23 @@ class ApiService {
         Authorization: `Bearer ${token}`,
       };
     }
+    
+    const method = options.method || 'GET';
 
     try {
+      console.log(`API Request: ${method} ${url}`, config);
       const response = await fetch(url, config);
       const data = await response.json();
+      console.log(`API Response: ${method} ${url}`, data);
 
       if (!response.ok) {
+        console.error(`API Error: ${method} ${url}`, data);
         throw new Error(data.message || 'Something went wrong');
       }
 
       return data;
     } catch (error) {
+      console.error(`API Request Failed: ${method} ${url}`, error);
       if (error instanceof Error) {
         throw error;
       }
