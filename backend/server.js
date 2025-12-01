@@ -10,6 +10,7 @@ const app = express();
 // Configure CORS to allow requests from frontend
 const corsOptions = {
   origin: [
+    "https://nevyra-frontend.onrender.com",
     'https://nevyraadmin.onrender.com',
     'https://nevyrafron.onrender.com',
     'https://nevyrafron.onrender.com',
