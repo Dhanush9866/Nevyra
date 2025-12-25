@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { Star, ShoppingCart, SlidersHorizontal } from "lucide-react";
 import { apiService } from "@/lib/api";
+import { useToast } from "@/hooks/use-toast";
 
 type ProductItem = {
   _id: string;
@@ -34,6 +35,9 @@ const ProductListing = () => {
   const { categoryName } = useParams();
   const [products, setProducts] = useState<ProductItem[]>([]);
   const [priceRange, setPriceRange] = useState([0, 100000]);
+  const [addingId, setAddingId] = useState<string | null>(null);
+  const { toast } = useToast();
+
   useEffect(() => {
     (async () => {
       const params: any = { limit: 40 };
@@ -85,6 +89,33 @@ const ProductListing = () => {
       setSelectedBrands([...selectedBrands, brand]);
     } else {
       setSelectedBrands(selectedBrands.filter((b) => b !== brand));
+    }
+  };
+
+  const handleAddToCart = async (e: React.MouseEvent, productId: string) => {
+    e.preventDefault(); // Prevent Link navigation
+    e.stopPropagation();
+
+    try {
+      setAddingId(productId);
+      const res = await apiService.addToCart(productId, 1);
+      if (res.success) {
+        window.dispatchEvent(new Event("cart-updated"));
+        toast({
+          title: "Success",
+          description: "Added to cart successfully",
+        });
+      } else {
+        throw new Error(res.message || "Failed to add to cart");
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add to cart",
+        variant: "destructive",
+      });
+    } finally {
+      setAddingId(null);
     }
   };
 
@@ -274,7 +305,7 @@ const ProductListing = () => {
                           className="w-full h-32 md:h-48 object-cover rounded-lg"
                         />
                         <Badge className="absolute top-1 md:top-2 left-1 md:left-2 bg-discount text-white text-xs md:text-sm">
-                          {product.mrp && product.mrp > product.price ? Math.round(((product.mrp - product.price)/product.mrp)*100) : 0}% OFF
+                          {product.mrp && product.mrp > product.price ? Math.round(((product.mrp - product.price) / product.mrp) * 100) : 0}% OFF
                         </Badge>
                       </div>
 
@@ -304,9 +335,17 @@ const ProductListing = () => {
                       </div>
                     </Link>
 
-                    <Button className="w-full bg-primary hover:bg-primary-hover text-primary-foreground text-xs md:text-sm py-2 md:py-2">
-                      <ShoppingCart className="h-3 w-3 md:h-4 md:w-4 mr-1 md:mr-2" />
-                      Add to Cart
+                    <Button
+                      className="w-full bg-primary hover:bg-primary-hover text-primary-foreground text-xs md:text-sm py-2 md:py-2"
+                      onClick={(e) => handleAddToCart(e, product._id)}
+                      disabled={addingId === product._id}
+                    >
+                      {addingId === product._id ? (
+                        <span className="animate-spin mr-2">⟳</span>
+                      ) : (
+                        <ShoppingCart className="h-3 w-3 md:h-4 md:w-4 mr-1 md:mr-2" />
+                      )}
+                      {addingId === product._id ? "Adding..." : "Add to Cart"}
                     </Button>
                   </CardContent>
                 </Card>

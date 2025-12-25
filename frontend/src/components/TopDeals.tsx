@@ -1,10 +1,10 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Star, ShoppingCart } from "lucide-react";
+import { useRef } from "react";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { apiService } from "@/lib/api";
+import { useToast } from "@/hooks/use-toast";
+import { ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type DealProduct = {
   _id: string;
@@ -19,13 +19,13 @@ type DealProduct = {
 
 const TopDeals = () => {
   const [products, setProducts] = useState<DealProduct[]>([]);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     (async () => {
       try {
-        console.log('TopDeals: Fetching products...');
         const res = await apiService.getProducts({ limit: 12 });
-        console.log('TopDeals: Product fetch response:', res);
         if (res.success) {
           const mapped = res.data.map((p: any) => ({
             _id: p.id || p._id,
@@ -37,10 +37,7 @@ const TopDeals = () => {
             reviewsCount: p.reviewsCount || 0,
             discount: p.mrp && p.mrp > p.price ? Math.round(((p.mrp - p.price) / p.mrp) * 100) : undefined,
           }));
-          console.log('TopDeals: Mapped products:', mapped);
           setProducts(mapped);
-        } else {
-          console.error('TopDeals: Failed to fetch products:', res.message);
         }
       } catch (e) {
         console.error('TopDeals: Error fetching products:', e);
@@ -48,82 +45,64 @@ const TopDeals = () => {
     })();
   }, []);
 
-  return (
-    <section className="py-16 bg-muted">
-      <div className="w-full px-4">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-2 font-roboto">
-              Top Deals of the Day
-            </h2>
-            <p className="text-muted-foreground">
-              Limited time offers on bestselling products
-            </p>
-          </div>
-          <Button
-            variant="outline"
-            className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
-          >
-            View All Deals
-          </Button>
-        </div>
+  const scrollRight = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: 300, behavior: 'smooth' });
+    }
+  };
 
-        <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-          {products.slice(0, 8).map((product) => (
-            <Card
-              key={product._id}
-              className="min-w-[200px] flex-shrink-0 group hover:shadow-xl hover:scale-105 transition-all duration-300 bg-card border border-border transform hover:-translate-y-1 cursor-pointer"
+  return (
+    <section className="py-4 bg-gray-50">
+      <div className="w-full px-4">
+
+        {/* Top Deals Carousel */}
+        <div className="bg-white p-4 shadow-sm relative min-w-0">
+          <h2 className="text-xl font-bold text-foreground mb-4 font-roboto">
+            Top Deals
+          </h2>
+
+          <div className="relative">
+            <div
+              ref={scrollRef}
+              className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
-              <CardContent className="p-3">
-                <Link to={`/product/${product._id}`}>
-                  <div className="relative mb-2">
+              {products.map((product) => (
+                <Link
+                  key={product._id}
+                  to={`/product/${product._id}`}
+                  className="min-w-[160px] w-[160px] flex-shrink-0 group cursor-pointer border border-transparent hover:border-border rounded-lg p-2 transition-all duration-300"
+                >
+                  <div className="w-full h-36 mb-3 flex items-center justify-center p-2">
                     <img
                       src={product.images?.[0] || '/placeholder.svg'}
                       alt={product.title}
-                      className="w-full h-32 object-cover rounded-lg group-hover:scale-105 transition-transform duration-300"
+                      className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
                     />
-                    {product.discount && (
-                      <Badge className="absolute top-1 left-1 bg-discount text-white text-xs px-1.5 py-0.5 group-hover:scale-110 transition-transform duration-300">
-                        {product.discount}% OFF
-                      </Badge>
-                    )}
                   </div>
 
-                  <h3 className="font-semibold text-card-foreground mb-1.5 font-roboto group-hover:text-primary transition-colors line-clamp-2 text-sm">
-                    {product.title}
-                  </h3>
-
-                  <div className="flex items-center gap-1 mb-1.5">
-                    <div className="flex items-center">
-                      <Star className="h-3 w-3 fill-yellow-400 text-yellow-400 group-hover:scale-110 transition-transform duration-200" />
-                      <span className="text-xs font-medium ml-1">
-                        {product.rating || 4.5}
-                      </span>
-                    </div>
-                    <span className="text-xs text-muted-foreground">
-                      ({product.reviewsCount || 0})
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-1 mb-2">
-                    <span className="text-sm font-bold text-price group-hover:text-primary transition-colors duration-200">
-                      ₹{product.price.toLocaleString()}
-                    </span>
-                    {product.mrp && product.mrp > product.price && (
-                      <span className="text-xs text-muted-foreground line-through">
-                        ₹{product.mrp.toLocaleString()}
-                      </span>
-                    )}
+                  <div className="text-center">
+                    <h3 className="font-medium text-xs text-gray-600 mb-1 line-clamp-2" title={product.title}>
+                      {product.title}
+                    </h3>
+                    <p className="text-sm font-bold text-black">
+                      From ₹{product.price.toLocaleString()}
+                    </p>
                   </div>
                 </Link>
+              ))}
+            </div>
 
-                <Button className="w-full bg-primary hover:bg-primary-hover text-primary-foreground text-xs py-1.5 group-hover:scale-105 transition-all duration-200 hover:shadow-md">
-                  <ShoppingCart className="h-3 w-3 mr-1 group-hover:scale-110 transition-transform duration-200" />
-                  Add to Cart
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+            {/* Floating Scroll Button */}
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={scrollRight}
+              className="absolute top-1/2 -right-0 -mt-8 h-12 w-8 rounded-l-md rounded-r-none bg-white shadow-md border-l border-y border-r-0 z-10 hidden md:flex"
+            >
+              <ChevronRight className="h-6 w-6 text-gray-600" />
+            </Button>
+          </div>
         </div>
       </div>
     </section>

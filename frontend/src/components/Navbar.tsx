@@ -45,7 +45,7 @@ const categories = [
         items: ["Menswear", "Women's Wear", "Kids Wear"]
       },
       {
-        name: "Shoes", 
+        name: "Shoes",
         items: ["Men's", "Women's", "Kids"]
       },
       {
@@ -155,7 +155,7 @@ const Navbar = () => {
   };
 
   return (
-    <div className="bg-cyan-100 font-roboto">
+    <div className="bg-background border-b border-border/40 font-roboto sticky top-0 z-50">
       {/* Main Navbar */}
       <div className="container mx-auto px-2 py-3">
         <div className="flex items-center justify-between">
@@ -169,14 +169,14 @@ const Navbar = () => {
             >
               {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
-                         <Link to="/" className="flex items-center space-x-2">
-               <img 
-                 src="/logo.jpg" 
-                 alt="Nevyra Logo" 
-                 className="h-8 w-auto mix-blend-multiply filter drop-shadow-sm"
-               />
-               <span className="text-xl font-bold text-gray-800">NEVYRA</span>
-             </Link>
+            <Link to="/" className="flex items-center space-x-2">
+              <img
+                src="/zythova-logo.png"
+                alt="Zythova Logo"
+                className="h-10 w-auto object-contain"
+              />
+              <span className="text-2xl font-bold text-foreground tracking-tight">Zythova</span>
+            </Link>
           </div>
 
           {/* Search Bar */}
@@ -185,7 +185,7 @@ const Navbar = () => {
               <Input
                 type="text"
                 placeholder="Search for products, brands and more"
-                className="w-full pl-4 pr-12 py-2 bg-background text-foreground border-none rounded-sm"
+                className="w-full pl-4 pr-12 py-2 bg-background text-foreground border border-gray-300 rounded-md focus:border-primary"
                 onKeyPress={(e) => {
                   if (e.key === "Enter") {
                     const target = e.target as HTMLInputElement;
@@ -197,7 +197,7 @@ const Navbar = () => {
               />
               <Button
                 size="sm"
-                className="absolute right-0 top-0 h-full px-4 bg-warning hover:bg-warning/90 text-warning-foreground rounded-l-none rounded-r-sm"
+                className="absolute right-0 top-0 h-full px-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-l-none rounded-r-md"
                 onClick={() => {
                   const input = document.querySelector('input[placeholder="Search for products, brands and more"]') as HTMLInputElement;
                   if (input && input.value.trim()) {
@@ -236,14 +236,15 @@ const Navbar = () => {
             )}
             <Link to="/cart">
               <Button
-                variant="ghost"
-                className="text-gray-800 hover:bg-cyan-200 flex items-center space-x-1 relative p-1"
+                className="bg-warning hover:bg-warning/90 text-warning-foreground flex items-center space-x-1 relative px-6 rounded-full font-medium"
               >
-                <ShoppingCart className="h-4 w-4" />
+                <ShoppingCart className="h-4 w-4 mr-1" />
                 <span className="text-sm hidden md:inline">Cart</span>
-                <span className="absolute -top-1 -right-1 bg-warning text-warning-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {cartCount}
-                </span>
+                {cartCount > 0 && (
+                  <span className="ml-2 bg-white text-warning text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                    {cartCount}
+                  </span>
+                )}
               </Button>
             </Link>
           </div>
@@ -255,13 +256,13 @@ const Navbar = () => {
             <Input
               type="text"
               placeholder="Search for products, brands and more"
-              className="w-full pl-4 pr-12 py-2 bg-background text-foreground border-none rounded-sm"
+              className="w-full pl-4 pr-12 py-2 bg-background text-foreground border border-gray-300 rounded-md focus:border-primary"
               onFocus={handleSearchFocus}
               readOnly
             />
             <Button
               size="sm"
-              className="absolute right-0 top-0 h-full px-4 bg-warning hover:bg-warning/90 text-warning-foreground rounded-l-none rounded-r-sm"
+              className="absolute right-0 top-0 h-full px-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-l-none rounded-r-md"
               onClick={handleSearchFocus}
             >
               <Search className="h-4 w-4" />
@@ -395,12 +396,12 @@ const Navbar = () => {
                   </Link>
                 )}
               </div>
-              
+
               {/* Categories */}
               {categories.map((category) => (
                 <div key={category.name} className="border-b border-border pb-2">
                   <div className="w-full flex items-center justify-between font-medium text-foreground mb-2 py-2 hover:bg-muted rounded px-2">
-                    <Link 
+                    <Link
                       to={`/category/${categoryToSlug(category.name)}`}
                       className="flex-1"
                       onClick={() => setIsMobileMenuOpen(false)}
@@ -411,10 +412,9 @@ const Navbar = () => {
                       onClick={() => toggleCategory(category.name)}
                       className="p-1"
                     >
-                      <ChevronDown 
-                        className={`h-4 w-4 transition-transform ${
-                          expandedCategory === category.name ? 'rotate-180' : ''
-                        }`} 
+                      <ChevronDown
+                        className={`h-4 w-4 transition-transform ${expandedCategory === category.name ? 'rotate-180' : ''
+                          }`}
                       />
                     </button>
                   </div>

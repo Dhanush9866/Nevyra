@@ -2,6 +2,8 @@ const { Order, OrderItem, CartItem, Product } = require("../models");
 
 exports.create = async (req, res, next) => {
   try {
+    const { paymentMethod, paymentDetails } = req.body;
+
     const cartItems = await CartItem.find({ userId: req.user.id }).populate(
       "productId"
     );
@@ -17,6 +19,9 @@ exports.create = async (req, res, next) => {
       userId: req.user.id,
       totalAmount,
       status: "Pending",
+      paymentMethod: paymentMethod || "cod",
+      paymentStatus: (paymentMethod === "razorpay" && paymentDetails?.razorpayPaymentId) ? "Paid" : "Pending",
+      paymentDetails: paymentDetails || {},
     });
     await order.save();
     const orderItems = await Promise.all(
@@ -86,7 +91,12 @@ exports.details = async (req, res, next) => {
 exports.updateStatus = async (req, res, next) => {
   try {
     const { status } = req.body;
-    const order = await Order.findOne({ _id: req.params.id, userId: req.user.id });
+    let query = { _id: req.params.id };
+    // If not admin, restrict to own orders
+    if (!req.user.isAdmin) {
+      query.userId = req.user.id;
+    }
+    const order = await Order.findOne(query);
     if (!order) return res.status(404).json({ success: false, message: "Order not found", data: null });
     order.status = status || order.status;
     await order.save();

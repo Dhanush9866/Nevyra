@@ -1,7 +1,7 @@
 import Navbar from "@/components/Navbar";
 import HeroBanner from "@/components/HeroBanner";
 import TopDeals from "@/components/TopDeals";
-import CategoryCards from "@/components/CategoryCards";
+import ShopByCategory from "@/components/ShopByCategory";
 import WhyChooseUs from "@/components/WhyChooseUs";
 import Footer from "@/components/Footer";
 
@@ -10,8 +10,8 @@ const Index = () => {
     <div className="min-h-screen bg-background font-roboto">
       <Navbar />
       <HeroBanner />
-      <CategoryCards />
       <TopDeals />
+      <ShopByCategory />
       <WhyChooseUs />
       <Footer />
     </div>

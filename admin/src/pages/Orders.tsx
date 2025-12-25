@@ -90,6 +90,16 @@ const Orders: React.FC = () => {
         throw new Error(response.message || 'Failed to load orders');
       }
     } catch (error: any) {
+      if (error.message === "Invalid token" || error.message.includes("Unauthorized")) {
+        localStorage.removeItem('adminToken');
+        // We can't use useNavigate directly here if it's not available in scope?
+        // Ah, useNavigate is NOT imported or used in Orders.tsx?
+        // Let's check imports.
+        // It imports React... but NOT useNavigate from react-router-dom.
+        // I need to add that import and hook usage.
+        window.location.href = '/login'; // Fallback to window.location if hook not present or simple fix
+        return;
+      }
       toast({
         title: "Error",
         description: error.message || "Failed to load orders",
@@ -276,7 +286,7 @@ const Orders: React.FC = () => {
                         <p className="font-medium">{(it as any).productId?.title || (it as any).productId}</p>
                         {(it as any).selectedFeatures && (
                           <div className="text-xs text-muted-foreground">
-                            {Object.entries((it as any).selectedFeatures).map(([k,v]) => (
+                            {Object.entries((it as any).selectedFeatures).map(([k, v]) => (
                               <span key={k} className="mr-2">{k}: {v as any}</span>
                             ))}
                           </div>

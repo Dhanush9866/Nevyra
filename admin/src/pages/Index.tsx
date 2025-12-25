@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { 
-  Package, 
-  ShoppingBag, 
-  Users, 
-  BarChart3, 
-  Warehouse, 
+import {
+  Package,
+  ShoppingBag,
+  Users,
+  BarChart3,
+  Warehouse,
   Heart,
   Star,
   TrendingUp,
@@ -90,6 +90,16 @@ const Index = () => {
         throw new Error(response.message || 'Failed to load dashboard stats');
       }
     } catch (error: any) {
+      if (error.message === "Invalid token" || error.message.includes("Unauthorized")) {
+        localStorage.removeItem('adminToken');
+        navigate('/login');
+        toast({
+          title: "Session Expired",
+          description: "Please login again.",
+          variant: "destructive",
+        });
+        return;
+      }
       toast({
         title: "Error",
         description: error.message || "Failed to load dashboard data",

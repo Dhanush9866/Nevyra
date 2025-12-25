@@ -88,7 +88,7 @@ const SearchSuggestions = () => {
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          
+
           <div className="flex-1 relative">
             <Input
               type="text"
@@ -100,13 +100,13 @@ const SearchSuggestions = () => {
             />
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           </div>
-          
+
           {/* Logo */}
-          <Link to="/" className="ml-3">
-            <img 
-              src="/logo.jpg" 
-              alt="Nevyra Logo" 
-              className="h-8 w-auto"
+          <Link to="/" className="ml-3 flex items-center">
+            <img
+              src="/zythova-logo.png"
+              alt="Zythova Logo"
+              className="h-8 w-auto object-contain"
             />
           </Link>
         </div>

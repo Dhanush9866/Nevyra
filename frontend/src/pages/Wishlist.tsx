@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Heart, Star, MoreVertical, Shield } from "lucide-react";
+import { Heart, Star, Trash2, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,51 +10,79 @@ import { apiService } from "@/lib/api";
 
 // We'll map server wishlist items to displayable data using product info
 
+import { useToast } from "@/hooks/use-toast";
+
+// ... (imports remain similar)
+
 const Wishlist = () => {
   const [items, setItems] = useState<any[]>([]);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
-    (async () => {
-      try {
-        const res = await apiService.request<any>("/users/wishlist");
-        if ((res as any).success && Array.isArray((res as any).data)) {
-          // Each wishlist entry should include productId; fetch details already populated by backend if possible
-          const mapped = (res as any).data.map((entry: any) => {
-            const p = entry.product || entry.productId || {};
-            return {
-              id: entry._id || p.id,
-              name: p.title,
-              image: (p.images && p.images[0]) || "/placeholder.svg",
-              price: p.price,
-              originalPrice: Math.round(p.price * 1.5),
-              discount: Math.max(0, Math.round(((p.price * 1.5 - p.price) / (p.price * 1.5)) * 100)),
-              rating: p.rating || 0,
-              inStock: p.inStock !== false,
-              assured: true,
-            };
-          });
-          setItems(mapped);
-        }
-      } catch (e) {
-        // Fallback: no wishlist
-        setItems([]);
-      }
-    })();
+    fetchWishlist();
   }, []);
 
-  const addToCart = async (id: string) => {
-    const item = items.find((i) => i.id === id);
-    if (!item) return;
+  const fetchWishlist = async () => {
     try {
-      await apiService.addToCart(id, 1);
-    } catch {}
+      const res = await apiService.getWishlist();
+      if (res.success && Array.isArray(res.data)) {
+        const mapped = res.data.map((entry: any) => {
+          const p = entry.product || entry.productId || {};
+          // Handle case where product might be null/deleted
+          if (!p || !p._id) return null;
+
+          return {
+            id: p._id || p.id,
+            wishlistId: entry._id, // Keep track of wishlist entry ID if needed, but usually we remove by product ID
+            name: p.title,
+            image: (p.images && p.images[0]) || "/placeholder.svg",
+            price: p.price,
+            originalPrice: p.mrp || Math.round(p.price * 1.5),
+            discount: p.mrp ? Math.round(((p.mrp - p.price) / p.mrp) * 100) : 0,
+            rating: p.rating || 0,
+            inStock: p.inStock !== false,
+            assured: true,
+          };
+        }).filter(Boolean); // Remove nulls
+        setItems(mapped);
+      }
+    } catch (e) {
+      setItems([]);
+    }
   };
+
+  const addToCart = async (id: string) => {
+    try {
+      const res = await apiService.addToCart(id, 1);
+      if (res.success) {
+        window.dispatchEvent(new Event("cart-updated"));
+        toast({ title: "Success", description: "Added to cart" });
+      } else {
+        throw new Error(res.message);
+      }
+    } catch (e) {
+      toast({ title: "Error", description: "Failed to add to cart", variant: "destructive" });
+    }
+  };
+
+  const removeFromWishlist = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      // Optimistic update
+      setItems(prev => prev.filter(i => i.id !== id));
+      await apiService.removeFromWishlist(id);
+      toast({ title: "Removed from Wishlist" });
+    } catch (e) {
+      fetchWishlist(); // Revert
+      toast({ title: "Error", description: "Failed to remove", variant: "destructive" });
+    }
+  }
 
   return (
     <div className="min-h-screen bg-background font-roboto">
       <Navbar />
-      
+
       {/* Page Title and Status */}
       <div className="p-4 border-b border-border">
         <h1 className="text-2xl font-bold text-foreground mb-2">My Wishlist</h1>
@@ -78,19 +106,20 @@ const Wishlist = () => {
                     alt={item.name}
                     className="w-full h-40 object-cover rounded-lg"
                   />
-                  
+
                   {/* Discount Badge */}
                   <Badge className="absolute top-2 left-2 bg-green-500 text-white text-xs">
                     {item.discount}% ₹{item.originalPrice} ₹{item.price}
                   </Badge>
-                  
-                  {/* More Options */}
+
+                  {/* Remove Button */}
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="absolute top-2 right-2 text-gray-600 hover:text-gray-800 bg-white/80 hover:bg-white"
+                    className="absolute top-2 right-2 text-gray-600 hover:text-red-600 bg-white/80 hover:bg-white"
+                    onClick={(e) => removeFromWishlist(item.id, e)}
                   >
-                    <MoreVertical className="h-4 w-4" />
+                    <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
 
@@ -109,11 +138,10 @@ const Wishlist = () => {
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`h-3 w-3 ${
-                        i < Math.floor(item.rating)
-                          ? "fill-green-500 text-green-500"
-                          : "text-gray-300"
-                      }`}
+                      className={`h-3 w-3 ${i < Math.floor(item.rating)
+                        ? "fill-green-500 text-green-500"
+                        : "text-gray-300"
+                        }`}
                     />
                   ))}
                 </div>
@@ -127,7 +155,7 @@ const Wishlist = () => {
                 )}
 
                 {/* Add to Cart Button */}
-                <Button 
+                <Button
                   className="w-full border border-gray-300 bg-white text-black hover:bg-gray-50 text-sm"
                   onClick={() => addToCart(item.id)}
                 >
@@ -152,7 +180,7 @@ const Wishlist = () => {
           </div>
         )}
       </div>
-      
+
       <Footer />
     </div>
   );

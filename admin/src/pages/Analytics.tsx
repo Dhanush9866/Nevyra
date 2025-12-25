@@ -81,6 +81,11 @@ const Analytics: React.FC = () => {
         throw new Error(response.message || 'Failed to load analytics data');
       }
     } catch (error: any) {
+      if (error.message === "Invalid token" || error.message.includes("Unauthorized")) {
+        localStorage.removeItem('adminToken');
+        window.location.href = '/login';
+        return;
+      }
       toast({
         title: "Error",
         description: error.message || "Failed to load analytics data",
@@ -127,7 +132,7 @@ const Analytics: React.FC = () => {
 
   const generateCategoryData = () => {
     if (!stats) return pieData;
-    
+
     // In a real app, this would be calculated from actual product sales
     return [
       { label: "Electronics", value: 40, color: "#7c3aed" },
@@ -139,27 +144,27 @@ const Analytics: React.FC = () => {
 
   const getSummaryStats = () => {
     if (!stats) return summaryStats;
-    
+
     return [
-      { 
-        label: "Total Revenue", 
-        value: formatCurrency(stats.overview.monthlyRevenue), 
-        color: "text-purple-600" 
+      {
+        label: "Total Revenue",
+        value: formatCurrency(stats.overview.monthlyRevenue),
+        color: "text-purple-600"
       },
-      { 
-        label: "Total Orders", 
-        value: formatNumber(stats.overview.totalOrders), 
-        color: "text-pink-500" 
+      {
+        label: "Total Orders",
+        value: formatNumber(stats.overview.totalOrders),
+        color: "text-pink-500"
       },
-      { 
-        label: "Avg Order Value", 
-        value: formatCurrency(stats.overview.avgOrderValue), 
-        color: "text-green-500" 
+      {
+        label: "Avg Order Value",
+        value: formatCurrency(stats.overview.avgOrderValue),
+        color: "text-green-500"
       },
-      { 
-        label: "Growth Rate", 
-        value: `+${stats.overview.revenueGrowth}%`, 
-        color: "text-yellow-500" 
+      {
+        label: "Growth Rate",
+        value: `+${stats.overview.revenueGrowth}%`,
+        color: "text-yellow-500"
       },
     ];
   };

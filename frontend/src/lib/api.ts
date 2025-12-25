@@ -1,4 +1,4 @@
-const API_BASE_URL = false ? 'http://localhost:8000/api' : "https://nevyra-backend.onrender.com/api";
+const API_BASE_URL = 'http://localhost:8000/api';
 
 export interface LoginRequest {
   email: string;
@@ -99,6 +99,22 @@ class ApiService {
     return this.request('/orders');
   }
 
+  // Wishlist
+  async getWishlist(): Promise<{ success: boolean; message: string; data: any[] }> {
+    return this.request('/users/wishlist');
+  }
+
+  async addToWishlist(productId: string): Promise<{ success: boolean; message: string; data: any }> {
+    return this.request('/users/wishlist', {
+      method: 'POST',
+      body: JSON.stringify({ productId }),
+    });
+  }
+
+  async removeFromWishlist(productId: string): Promise<{ success: boolean; message: string; data: any }> {
+    return this.request(`/users/wishlist/${productId}`, { method: 'DELETE' });
+  }
+
   async getOrderById(id: string): Promise<{ success: boolean; message: string; data: any }> {
     return this.request(`/orders/${id}`);
   }
@@ -126,7 +142,7 @@ class ApiService {
         Authorization: `Bearer ${token}`,
       };
     }
-    
+
     const method = options.method || 'GET';
 
     try {
@@ -180,6 +196,21 @@ class ApiService {
     return this.request<{ success: boolean; message: string }>('/auth/forgot-password', {
       method: 'POST',
       body: JSON.stringify({ email }),
+    });
+  }
+
+  // Payment methods
+  async createPaymentOrder(amount: number, currency = 'INR'): Promise<{ success: boolean; message: string; data: any }> {
+    return this.request('/payments/create-order', {
+      method: 'POST',
+      body: JSON.stringify({ amount, currency }),
+    });
+  }
+
+  async verifyPayment(details: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }): Promise<{ success: boolean; message: string; data: any }> {
+    return this.request('/payments/verify', {
+      method: 'POST',
+      body: JSON.stringify(details),
     });
   }
 

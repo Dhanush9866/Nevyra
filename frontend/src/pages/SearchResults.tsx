@@ -98,7 +98,7 @@ const SearchResults = () => {
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          
+
           <div className="flex-1 relative">
             <Input
               type="text"
@@ -114,13 +114,13 @@ const SearchResults = () => {
             />
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           </div>
-          
+
           {/* Logo */}
-          <Link to="/" className="ml-2">
-            <img 
-              src="/logo.jpg" 
-              alt="Nevyra Logo" 
-              className="h-7 w-auto mix-blend-multiply filter drop-shadow-sm"
+          <Link to="/" className="ml-2 flex items-center">
+            <img
+              src="/zythova-logo.png"
+              alt="Zythova Logo"
+              className="h-8 w-auto object-contain"
             />
           </Link>
         </div>
@@ -137,7 +137,7 @@ const SearchResults = () => {
               {results.length} results found
             </p>
           </div>
-          
+
           <div className="flex items-center space-x-2">
             <Button
               variant="outline"
@@ -147,7 +147,7 @@ const SearchResults = () => {
               <Filter className="h-3 w-3" />
               <span className="hidden sm:inline">Filter</span>
             </Button>
-            
+
             <div className="flex border border-border rounded-md">
               <Button
                 variant={viewMode === "grid" ? "default" : "ghost"}
@@ -189,22 +189,21 @@ const SearchResults = () => {
                         className="w-full h-full object-cover rounded-md"
                       />
                     </div>
-                    
+
                     <div className={viewMode === "grid" ? "space-y-1" : "flex-1 space-y-1"}>
                       <h3 className="font-medium text-sm line-clamp-2 text-foreground leading-tight">
                         {product.name}
                       </h3>
-                      
+
                       <div className="flex items-center space-x-1">
                         <div className="flex items-center">
                           {[...Array(5)].map((_, i) => (
                             <Star
                               key={i}
-                              className={`h-3 w-3 ${
-                                i < Math.floor(product.rating)
-                                  ? "fill-yellow-400 text-yellow-400"
-                                  : "text-gray-300"
-                              }`}
+                              className={`h-3 w-3 ${i < Math.floor(product.rating)
+                                ? "fill-yellow-400 text-yellow-400"
+                                : "text-gray-300"
+                                }`}
                             />
                           ))}
                         </div>
@@ -212,11 +211,11 @@ const SearchResults = () => {
                           ({product.reviews})
                         </span>
                       </div>
-                      
+
                       <p className="text-xs text-muted-foreground">
                         {product.category}
                       </p>
-                      
+
                       <p className="font-semibold text-base text-foreground">
                         ${product.price}
                       </p>

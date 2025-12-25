@@ -19,7 +19,7 @@ const Auth = () => {
   const location = useLocation();
   const { login, register, isAuthenticated } = useAuth();
   const { toast } = useToast();
-  
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
@@ -34,13 +34,13 @@ const Auth = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [isResetPasswordLoading, setIsResetPasswordLoading] = useState(false);
-  
+
   // Form states
   const [loginForm, setLoginForm] = useState({
     email: "",
     password: "",
   });
-  
+
   const [registerForm, setRegisterForm] = useState({
     firstName: "",
     lastName: "",
@@ -50,7 +50,7 @@ const Auth = () => {
     confirmPassword: "",
     address: "",
   });
-  
+
   // Redirect if already authenticated
   if (isAuthenticated) {
     const from = location.state?.from?.pathname || "/";
@@ -61,7 +61,7 @@ const Auth = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("handleLogin called - this should only happen when login form is submitted");
-    
+
     if (!loginForm.email || !loginForm.password) {
       toast({
         title: "Error",
@@ -101,7 +101,7 @@ const Auth = () => {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validation
     if (!registerForm.firstName || !registerForm.lastName || !registerForm.email || !registerForm.password) {
       toast({
@@ -140,7 +140,7 @@ const Auth = () => {
         password: registerForm.password,
         address: registerForm.address || undefined,
       });
-      
+
       if (result.success) {
         toast({
           title: "Success",
@@ -169,7 +169,7 @@ const Auth = () => {
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("handleForgotPassword called");
-    
+
     if (!forgotPasswordEmail) {
       toast({
         title: "Error",
@@ -200,7 +200,7 @@ const Auth = () => {
     } catch (error: any) {
       // Handle specific error messages from the backend
       let errorMessage = "Failed to send reset instructions. Please try again.";
-      
+
       if (error.message) {
         // Map backend error messages to user-friendly messages
         switch (error.message) {
@@ -217,7 +217,7 @@ const Auth = () => {
             errorMessage = error.message;
         }
       }
-      
+
       toast({
         title: "Error",
         description: errorMessage,
@@ -231,9 +231,9 @@ const Auth = () => {
   const handleVerifyOTP = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("handleVerifyOTP called");
-    
+
     console.log("handleVerifyOTP called with:", { otp, forgotPasswordEmail });
-    
+
     if (!otp || otp.length !== 6) {
       toast({
         title: "Error",
@@ -274,7 +274,7 @@ const Auth = () => {
     } catch (error: any) {
       console.error("OTP verification error:", error);
       let errorMessage = "Failed to verify OTP. Please try again.";
-      
+
       if (error.message) {
         switch (error.message) {
           case "Email and OTP are required":
@@ -293,7 +293,7 @@ const Auth = () => {
             errorMessage = error.message;
         }
       }
-      
+
       toast({
         title: "Error",
         description: errorMessage,
@@ -307,14 +307,14 @@ const Auth = () => {
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("handleResetPassword called");
-    
-    console.log("handleResetPassword called with:", { 
-      newPassword: newPassword ? "***" : "empty", 
+
+    console.log("handleResetPassword called with:", {
+      newPassword: newPassword ? "***" : "empty",
       confirmNewPassword: confirmNewPassword ? "***" : "empty",
-      forgotPasswordEmail, 
-      otp 
+      forgotPasswordEmail,
+      otp
     });
-    
+
     if (!newPassword || !confirmNewPassword) {
       toast({
         title: "Error",
@@ -374,7 +374,7 @@ const Auth = () => {
       }
     } catch (error: any) {
       let errorMessage = "Failed to reset password. Please try again.";
-      
+
       if (error.message) {
         switch (error.message) {
           case "Invalid OTP":
@@ -390,7 +390,7 @@ const Auth = () => {
             errorMessage = error.message;
         }
       }
-      
+
       toast({
         title: "Error",
         description: errorMessage,
@@ -404,13 +404,13 @@ const Auth = () => {
   return (
     <div className="min-h-screen bg-background font-roboto">
       <Navbar />
-      
+
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-md mx-auto">
           <Card className="shadow-lg">
             <CardContent className="p-8">
               <div className="text-center mb-6">
-                <h1 className="text-2xl font-bold text-foreground mb-2">Welcome to Nevyra</h1>
+                <h1 className="text-2xl font-bold text-foreground mb-2">Welcome to Zythova</h1>
                 <p className="text-muted-foreground">Your trusted shopping destination</p>
               </div>
 
@@ -467,9 +467,9 @@ const Auth = () => {
                     <div className="text-right">
                       <Dialog open={isForgotPasswordOpen} onOpenChange={setIsForgotPasswordOpen}>
                         <DialogTrigger asChild>
-                          <Button 
+                          <Button
                             type="button"
-                            variant="link" 
+                            variant="link"
                             className="p-0 h-auto text-primary"
                           >
                             Forgot Password?
@@ -478,7 +478,7 @@ const Auth = () => {
                       </Dialog>
                     </div>
 
-                    <Button 
+                    <Button
                       type="submit"
                       className="w-full bg-primary hover:bg-primary-hover text-primary-foreground"
                       disabled={isLoading}
@@ -488,11 +488,11 @@ const Auth = () => {
                   </form>
 
                   <div className="relative">
-                
+
 
                   </div>
 
- 
+
                 </TabsContent>
 
                 {/* Register Tab */}
@@ -637,7 +637,7 @@ const Auth = () => {
                       </Button>
                     </div>
 
-                    <Button 
+                    <Button
                       type="submit"
                       className="w-full bg-primary hover:bg-primary-hover text-primary-foreground"
                       disabled={isLoading}
@@ -646,7 +646,7 @@ const Auth = () => {
                     </Button>
                   </form>
 
-                 
+
                 </TabsContent>
               </Tabs>
 
@@ -676,15 +676,15 @@ const Auth = () => {
                       We'll send you instructions to reset your password.
                     </div>
                     <div className="flex gap-2">
-                      <Button 
+                      <Button
                         type="button"
-                        variant="outline" 
+                        variant="outline"
                         className="flex-1"
                         onClick={() => setIsForgotPasswordOpen(false)}
                       >
                         Cancel
                       </Button>
-                      <Button 
+                      <Button
                         type="submit"
                         className="flex-1"
                         disabled={isForgotPasswordLoading}
@@ -721,9 +721,9 @@ const Auth = () => {
                         We've sent a 6-digit code to {forgotPasswordEmail}
                       </div>
                       <div className="text-center mt-2">
-                        <Button 
+                        <Button
                           type="button"
-                          variant="link" 
+                          variant="link"
                           className="p-0 h-auto text-primary text-sm"
                           onClick={async () => {
                             try {
@@ -748,9 +748,9 @@ const Auth = () => {
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <Button 
+                      <Button
                         type="button"
-                        variant="outline" 
+                        variant="outline"
                         className="flex-1"
                         onClick={() => {
                           setIsOTPDialogOpen(false);
@@ -759,7 +759,7 @@ const Auth = () => {
                       >
                         Back
                       </Button>
-                      <Button 
+                      <Button
                         type="submit"
                         className="flex-1"
                         disabled={isOTPLoading}
@@ -829,9 +829,9 @@ const Auth = () => {
                     </div>
 
                     <div className="flex gap-2">
-                      <Button 
+                      <Button
                         type="button"
-                        variant="outline" 
+                        variant="outline"
                         className="flex-1"
                         onClick={() => {
                           setIsResetPasswordDialogOpen(false);
@@ -840,7 +840,7 @@ const Auth = () => {
                       >
                         Back
                       </Button>
-                      <Button 
+                      <Button
                         type="submit"
                         className="flex-1"
                         disabled={isResetPasswordLoading}
@@ -856,8 +856,8 @@ const Auth = () => {
                 {activeTab === "login" ? (
                   <>
                     Don't have an account?{" "}
-                    <Button 
-                      variant="link" 
+                    <Button
+                      variant="link"
                       className="p-0 h-auto text-primary"
                       onClick={() => setActiveTab("register")}
                     >
@@ -867,8 +867,8 @@ const Auth = () => {
                 ) : (
                   <>
                     Already have an account?{" "}
-                    <Button 
-                      variant="link" 
+                    <Button
+                      variant="link"
                       className="p-0 h-auto text-primary"
                       onClick={() => setActiveTab("login")}
                     >
