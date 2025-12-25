@@ -11,16 +11,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Plus, CreditCard, Smartphone, Banknote, Shield, CheckCircle, Save, X } from "lucide-react";
-// Items are sourced from the user's cart via API
+import { MapPin, Plus, CreditCard, Banknote, Shield, CheckCircle, X } from "lucide-react";
+
+// Add Razorpay type definition
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
 
 const Checkout = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [cartItems, setCartItems] = useState<any[]>([]);
   const [selectedAddress, setSelectedAddress] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("upi");
+  const [paymentMethod, setPaymentMethod] = useState("razorpay");
   const [showNewAddress, setShowNewAddress] = useState(false);
   const [addresses, setAddresses] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -41,6 +46,16 @@ const Checkout = () => {
   useEffect(() => {
     fetchAddresses();
     fetchCart();
+
+    // Load Razorpay Script
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
   }, []);
 
   const fetchCart = async () => {
@@ -57,7 +72,6 @@ const Checkout = () => {
       const response = await apiService.getAddresses();
       if (response.success) {
         setAddresses(response.data || []);
-        // Set first address as default if available
         if (response.data && response.data.length > 0) {
           setSelectedAddress("0");
         }
@@ -68,8 +82,8 @@ const Checkout = () => {
   };
 
   const handleAddAddress = async () => {
-    if (!newAddress.firstName || !newAddress.lastName || !newAddress.email || 
-        !newAddress.phone || !newAddress.address || !newAddress.city || !newAddress.zipCode) {
+    if (!newAddress.firstName || !newAddress.lastName || !newAddress.email ||
+      !newAddress.phone || !newAddress.address || !newAddress.city || !newAddress.zipCode) {
       toast({
         title: "Error",
         description: "Please fill in all address fields",
@@ -111,7 +125,7 @@ const Checkout = () => {
   };
 
   const subtotal = cartItems.reduce((sum, item) => sum + ((item.productId?.price || 0) * (item.quantity || 0)), 0);
-  const shippingFee = 0; // Free shipping
+  const shippingFee = 0;
   const gst = Math.round(subtotal * 0.18);
   const total = subtotal + shippingFee + gst;
 
@@ -124,18 +138,92 @@ const Checkout = () => {
       });
       return;
     }
-    try {
-      const res = await apiService.createOrder({});
-      if (res.success) {
-        toast({ title: "Success", description: "Order placed successfully!" });
-        // notify cart badge
-        window.dispatchEvent(new Event('cart-updated'));
-        navigate("/orders");
-      } else {
-        throw new Error(res.message);
+
+    if (paymentMethod === 'cod') {
+      // Handle Cash on Delivery
+      try {
+        const res = await apiService.createOrder({ paymentMethod: 'cod' });
+        if (res.success) {
+          toast({ title: "Success", description: "Order placed successfully!" });
+          window.dispatchEvent(new Event('cart-updated'));
+          navigate("/orders");
+        } else {
+          throw new Error(res.message);
+        }
+      } catch (e) {
+        toast({ title: "Error", description: e instanceof Error ? e.message : 'Failed to place order', variant: 'destructive' });
       }
-    } catch (e) {
-      toast({ title: "Error", description: e instanceof Error ? e.message : 'Failed to place order', variant: 'destructive' });
+    } else {
+      // Handle Razorpay
+      try {
+        // 1. Create Order on Backend
+        const orderRes = await apiService.createPaymentOrder(total);
+        if (!orderRes.success) throw new Error(orderRes.message || "Failed to initialize payment");
+
+        // Check for Mock Order (failsafe for invalid backend keys)
+        const isMockOrder = orderRes.data.orderId?.startsWith('order_mock_');
+
+        const options: any = {
+          key: "rzp_test_Hi1GYpZ5GO1ona", // Public Test Key
+          amount: orderRes.data.amount,
+          currency: "INR",
+          name: "Nevyra",
+          description: "Purchase Transaction",
+          // Only include order_id if it's a real Razorpay order
+          ...(isMockOrder ? {} : { order_id: orderRes.data.orderId }),
+
+          handler: async function (response: any) {
+            try {
+              // 2. Verify Payment
+              const verifyRes = await apiService.verifyPayment({
+                razorpay_order_id: response.razorpay_order_id || orderRes.data.orderId,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature
+              });
+
+              if (verifyRes.success) {
+                // 3. Create App Order
+                const createOrderRes = await apiService.createOrder({
+                  paymentMethod: 'razorpay',
+                  paymentDetails: {
+                    razorpayOrderId: response.razorpay_order_id || orderRes.data.orderId,
+                    razorpayPaymentId: response.razorpay_payment_id,
+                    razorpaySignature: response.razorpay_signature
+                  }
+                });
+
+                if (createOrderRes.success) {
+                  toast({ title: "Payment Successful", description: "Order placed successfully!" });
+                  window.dispatchEvent(new Event('cart-updated'));
+                  navigate("/orders");
+                }
+              } else {
+                toast({ title: "Payment Verification Failed", variant: "destructive" });
+              }
+            } catch (err: any) {
+              console.error(err);
+              toast({ title: "Error", description: "Payment verification failed", variant: "destructive" });
+            }
+          },
+          prefill: {
+            name: `${user?.firstName} ${user?.lastName}`,
+            email: user?.email,
+            contact: user?.phone
+          },
+          theme: {
+            color: "#3B82F6"
+          }
+        };
+
+        const rzp1 = new window.Razorpay(options);
+        rzp1.on('payment.failed', function (response: any) {
+          toast({ title: "Payment Failed", description: response.error.description, variant: "destructive" });
+        });
+        rzp1.open();
+
+      } catch (e: any) {
+        toast({ title: "Error", description: e.message, variant: 'destructive' });
+      }
     }
   };
 
@@ -144,7 +232,7 @@ const Checkout = () => {
   return (
     <div className="min-h-screen bg-background font-roboto">
       <Navbar />
-      
+
       <div className="container mx-auto px-4 py-6">
         <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-6">Checkout</h1>
 
@@ -153,16 +241,14 @@ const Checkout = () => {
           <div className="flex items-center space-x-4">
             {[1, 2, 3].map((step) => (
               <div key={step} className="flex items-center">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                  currentStep >= step 
-                    ? 'bg-primary text-primary-foreground' 
-                    : 'bg-muted text-muted-foreground'
-                }`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${currentStep >= step
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted text-muted-foreground'
+                  }`}>
                   {currentStep > step ? <CheckCircle className="h-5 w-5" /> : step}
                 </div>
-                <span className={`ml-2 text-sm ${
-                  currentStep >= step ? 'text-foreground font-medium' : 'text-muted-foreground'
-                }`}>
+                <span className={`ml-2 text-sm ${currentStep >= step ? 'text-foreground font-medium' : 'text-muted-foreground'
+                  }`}>
                   {step === 1 ? 'Address' : step === 2 ? 'Payment' : 'Review'}
                 </span>
                 {step < 3 && <div className="w-16 h-px bg-border ml-4" />}
@@ -252,19 +338,19 @@ const Checkout = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               <div>
                                 <Label htmlFor="addr-firstName">First Name</Label>
-                                <Input 
+                                <Input
                                   id="addr-firstName"
                                   value={newAddress.firstName}
-                                  onChange={(e) => setNewAddress({...newAddress, firstName: e.target.value})}
+                                  onChange={(e) => setNewAddress({ ...newAddress, firstName: e.target.value })}
                                   placeholder="Enter first name"
                                 />
                               </div>
                               <div>
                                 <Label htmlFor="addr-lastName">Last Name</Label>
-                                <Input 
+                                <Input
                                   id="addr-lastName"
                                   value={newAddress.lastName}
-                                  onChange={(e) => setNewAddress({...newAddress, lastName: e.target.value})}
+                                  onChange={(e) => setNewAddress({ ...newAddress, lastName: e.target.value })}
                                   placeholder="Enter last name"
                                 />
                               </div>
@@ -272,50 +358,50 @@ const Checkout = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               <div>
                                 <Label htmlFor="addr-email">Email</Label>
-                                <Input 
+                                <Input
                                   id="addr-email"
                                   type="email"
                                   value={newAddress.email}
-                                  onChange={(e) => setNewAddress({...newAddress, email: e.target.value})}
+                                  onChange={(e) => setNewAddress({ ...newAddress, email: e.target.value })}
                                   placeholder="Enter email"
                                 />
                               </div>
                               <div>
                                 <Label htmlFor="addr-phone">Phone</Label>
-                                <Input 
+                                <Input
                                   id="addr-phone"
                                   type="tel"
                                   value={newAddress.phone}
-                                  onChange={(e) => setNewAddress({...newAddress, phone: e.target.value})}
+                                  onChange={(e) => setNewAddress({ ...newAddress, phone: e.target.value })}
                                   placeholder="Enter phone number"
                                 />
                               </div>
                             </div>
                             <div>
                               <Label htmlFor="addr-address">Address</Label>
-                              <Textarea 
+                              <Textarea
                                 id="addr-address"
                                 value={newAddress.address}
-                                onChange={(e) => setNewAddress({...newAddress, address: e.target.value})}
+                                onChange={(e) => setNewAddress({ ...newAddress, address: e.target.value })}
                                 placeholder="Enter complete address"
                               />
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               <div>
                                 <Label htmlFor="addr-city">City</Label>
-                                <Input 
+                                <Input
                                   id="addr-city"
                                   value={newAddress.city}
-                                  onChange={(e) => setNewAddress({...newAddress, city: e.target.value})}
+                                  onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })}
                                   placeholder="City"
                                 />
                               </div>
                               <div>
                                 <Label htmlFor="addr-zipCode">Zip Code</Label>
-                                <Input 
+                                <Input
                                   id="addr-zipCode"
                                   value={newAddress.zipCode}
-                                  onChange={(e) => setNewAddress({...newAddress, zipCode: e.target.value})}
+                                  onChange={(e) => setNewAddress({ ...newAddress, zipCode: e.target.value })}
                                   placeholder="Zip code"
                                 />
                               </div>
@@ -333,7 +419,7 @@ const Checkout = () => {
                       )}
 
                       {addresses.length > 0 && (
-                        <Button 
+                        <Button
                           className="w-full bg-primary hover:bg-primary-hover text-primary-foreground"
                           onClick={() => setCurrentStep(2)}
                           disabled={!selectedAddress}
@@ -379,36 +465,26 @@ const Checkout = () => {
                   {currentStep === 2 ? (
                     <div className="space-y-4">
                       <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
-                        <div className="border border-border rounded-lg p-4">
-                          <div className="flex items-center space-x-3">
-                            <RadioGroupItem value="upi" id="upi" />
-                            <Label htmlFor="upi" className="flex items-center font-medium">
-                              <Smartphone className="h-4 w-4 mr-2" />
-                              UPI Payment
-                            </Label>
-                          </div>
-                          <p className="text-sm text-muted-foreground ml-6 mt-1">
-                            Pay using Google Pay, PhonePe, Paytm, or any UPI app
-                          </p>
-                        </div>
 
-                        <div className="border border-border rounded-lg p-4">
+                        {/* Razorpay Option */}
+                        <div className={`border rounded-lg p-4 cursor-pointer transition-colors ${paymentMethod === 'razorpay' ? 'border-primary bg-primary/5' : 'border-border'}`}>
                           <div className="flex items-center space-x-3">
-                            <RadioGroupItem value="card" id="card" />
-                            <Label htmlFor="card" className="flex items-center font-medium">
+                            <RadioGroupItem value="razorpay" id="razorpay" />
+                            <Label htmlFor="razorpay" className="flex items-center font-medium cursor-pointer">
                               <CreditCard className="h-4 w-4 mr-2" />
-                              Credit/Debit Card
+                              Online Payment (Razorpay)
                             </Label>
                           </div>
                           <p className="text-sm text-muted-foreground ml-6 mt-1">
-                            Visa, MasterCard, American Express, RuPay
+                            Pay securely with Credit/Debit Card, UPI, or Netbanking
                           </p>
                         </div>
 
-                        <div className="border border-border rounded-lg p-4">
+                        {/* COD Option */}
+                        <div className={`border rounded-lg p-4 cursor-pointer transition-colors ${paymentMethod === 'cod' ? 'border-primary bg-primary/5' : 'border-border'}`}>
                           <div className="flex items-center space-x-3">
                             <RadioGroupItem value="cod" id="cod" />
-                            <Label htmlFor="cod" className="flex items-center font-medium">
+                            <Label htmlFor="cod" className="flex items-center font-medium cursor-pointer">
                               <Banknote className="h-4 w-4 mr-2" />
                               Cash on Delivery
                             </Label>
@@ -417,6 +493,7 @@ const Checkout = () => {
                             Pay when your order is delivered
                           </p>
                         </div>
+
                       </RadioGroup>
 
                       <div className="flex items-center space-x-2 text-sm text-muted-foreground">
@@ -424,7 +501,7 @@ const Checkout = () => {
                         <span>Your payment information is secure and encrypted</span>
                       </div>
 
-                      <Button 
+                      <Button
                         className="w-full bg-primary hover:bg-primary-hover text-primary-foreground"
                         onClick={() => setCurrentStep(3)}
                       >
@@ -433,8 +510,7 @@ const Checkout = () => {
                     </div>
                   ) : (
                     <div className="text-sm text-muted-foreground">
-                      {paymentMethod === 'upi' ? 'UPI Payment' : 
-                       paymentMethod === 'card' ? 'Credit/Debit Card' : 'Cash on Delivery'}
+                      {paymentMethod === 'razorpay' ? 'Online Payment (Razorpay)' : 'Cash on Delivery'}
                     </div>
                   )}
                 </CardContent>
@@ -446,7 +522,7 @@ const Checkout = () => {
               <Card>
                 <CardContent className="p-6">
                   <h2 className="text-xl font-semibold text-foreground mb-4">Review Your Order</h2>
-                  
+
                   <div className="space-y-4 mb-6">
                     {cartItems.map((item: any) => (
                       <div key={item.id} className="flex gap-4 border-b border-border pb-4 last:border-b-0">
@@ -471,11 +547,11 @@ const Checkout = () => {
                     ))}
                   </div>
 
-                  <Button 
+                  <Button
                     className="w-full bg-success hover:bg-success/90 text-success-foreground font-medium text-lg py-6"
                     onClick={handlePlaceOrder}
                   >
-                    Place Order - ₹{total.toLocaleString()}
+                    {paymentMethod === 'cod' ? 'Place Order' : 'Pay Now'} - ₹{total.toLocaleString()}
                   </Button>
                 </CardContent>
               </Card>
@@ -487,18 +563,18 @@ const Checkout = () => {
             <Card className="sticky top-4">
               <CardContent className="p-6">
                 <h3 className="font-semibold text-foreground mb-4">Order Summary</h3>
-                
+
                 <div className="space-y-3 mb-4">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Subtotal ({cartItems.length} items)</span>
                     <span>₹{subtotal.toLocaleString()}</span>
                   </div>
-                  
+
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Shipping</span>
                     <span className="text-success">FREE</span>
                   </div>
-                  
+
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">GST (18%)</span>
                     <span>₹{gst.toLocaleString()}</span>

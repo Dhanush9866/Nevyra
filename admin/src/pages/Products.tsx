@@ -83,6 +83,11 @@ const Products: React.FC = () => {
         throw new Error(response.message || 'Failed to load products');
       }
     } catch (error: any) {
+      if (error.message === "Invalid token" || error.message.includes("Unauthorized")) {
+        localStorage.removeItem('adminToken');
+        window.location.href = '/login';
+        return;
+      }
       toast({
         title: "Error",
         description: error.message || "Failed to load products",
@@ -101,7 +106,7 @@ const Products: React.FC = () => {
 
   const handleDeleteProduct = async (productId: string) => {
     if (!confirm('Are you sure you want to delete this product?')) return;
-    
+
     try {
       const response = await adminAPI.products.delete(productId, token);
       if (response.success) {
@@ -161,7 +166,7 @@ const Products: React.FC = () => {
               Add Product
             </Button>
           </div>
-          
+
           <Card className="glass border-0 shadow-xl">
             <CardContent className="p-0">
               <div className="overflow-x-auto">
@@ -214,8 +219,8 @@ const Products: React.FC = () => {
                                 <Button variant="ghost" size="sm" onClick={() => handleEditClick(product)}>
                                   <Edit className="h-4 w-4" />
                                 </Button>
-                                <Button 
-                                  variant="ghost" 
+                                <Button
+                                  variant="ghost"
                                   size="sm"
                                   onClick={() => handleDeleteProduct(product.id)}
                                 >
@@ -234,7 +239,7 @@ const Products: React.FC = () => {
           </Card>
         </div>
       </div>
-      
+
       {showAddForm && (
         <AddProductForm
           onClose={() => setShowAddForm(false)}

@@ -60,7 +60,7 @@ const CategoryCards = () => {
 
         const results = await Promise.all(promises);
         const productsMap: Record<string, Product[]> = {};
-        
+
         results.forEach(({ category, products }) => {
           // Map products to ensure they have the correct id field
           const mappedProducts = products.map((p: any) => ({
@@ -99,8 +99,8 @@ const CategoryCards = () => {
   };
 
   const getProductImage = (product: Product) => {
-    return product.images && product.images.length > 0 
-      ? product.images[0] 
+    return product.images && product.images.length > 0
+      ? product.images[0]
       : "https://via.placeholder.com/200x200?text=No+Image";
   };
 
@@ -111,11 +111,10 @@ const CategoryCards = () => {
 
     return (
       <Link key={product.id} to={`/product/${product.id}`}>
-        <Card className={`${isMobile ? 'w-full' : 'min-w-[200px] flex-shrink-0'} ${
-          isTopPicks 
-            ? 'bg-white border-2 border-blue-200 hover:border-blue-400 hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:-translate-y-1' 
+        <Card className={`${isMobile ? 'w-full' : 'min-w-[200px] flex-shrink-0'} ${isTopPicks
+            ? 'bg-white border-2 border-primary/20 hover:border-primary hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:-translate-y-1'
             : 'bg-card border border-border hover:shadow-md transition-shadow cursor-pointer'
-        }`}>
+          }`}>
           <CardContent className="p-4">
             <div className="relative mb-3">
               <img
@@ -124,9 +123,8 @@ const CategoryCards = () => {
                 className="w-full h-32 object-cover rounded-lg"
               />
               {discount > 0 && (
-                <Badge className={`absolute top-2 left-2 ${
-                  isTopPicks ? 'bg-red-500 text-white text-xs font-semibold px-2 py-0.5' : 'bg-discount text-white text-xs'
-                }`}>
+                <Badge className={`absolute top-2 left-2 ${isTopPicks ? 'bg-discount text-white text-xs font-semibold px-2 py-0.5' : 'bg-discount text-white text-xs'
+                  }`}>
                   {discount}% OFF
                 </Badge>
               )}
@@ -136,15 +134,14 @@ const CategoryCards = () => {
                 </div>
               )}
             </div>
-            <h3 className={`font-medium text-sm mb-1 line-clamp-2 ${
-              isTopPicks ? 'text-gray-800' : 'text-card-foreground'
-            }`}>
+            <h3 className={`font-medium text-sm mb-1 line-clamp-2 ${isTopPicks ? 'text-gray-800' : 'text-card-foreground'
+              }`}>
               {product.title}
             </h3>
             {isTopPicks ? (
               <>
                 <div className="flex items-center gap-1 mb-2">
-                  <span className="text-sm font-bold text-blue-600">₹{displayPrice.toLocaleString()}</span>
+                  <span className="text-sm font-bold text-primary">₹{displayPrice.toLocaleString()}</span>
                   {discount > 0 && (
                     <span className="text-xs text-gray-500 line-through">₹{originalPrice.toLocaleString()}</span>
                   )}
@@ -157,7 +154,7 @@ const CategoryCards = () => {
                   </div>
                   <span className="text-xs text-gray-600 ml-1">({product.rating})</span>
                 </div>
-                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs py-1.5">
+                <Button className="w-full bg-primary hover:bg-primary/90 text-white font-medium text-xs py-1.5">
                   <ShoppingCart className="h-3 w-3 mr-1" />
                   Add to Cart
                 </Button>
@@ -189,30 +186,30 @@ const CategoryCards = () => {
   return (
     <section className="py-16 bg-background">
       <div className="w-full px-4 space-y-12">
-        
+
         {/* Render each category */}
         {categories.map((category) => {
           const products = productsByCategory[category.name] || [];
-          
+
           return (
             <div key={category.name}>
               <div className="flex justify-between items-center mb-6">
-                <Link 
-                  to={`/category/${category.slug}`} 
+                <Link
+                  to={`/category/${category.slug}`}
                   className="text-2xl font-bold text-foreground font-roboto hover:text-primary transition-colors cursor-pointer"
                 >
                   {category.name}
                 </Link>
-                <Link 
-                  to={`/category/${category.slug}`} 
+                <Link
+                  to={`/category/${category.slug}`}
                   className="text-primary hover:text-primary-hover flex items-center gap-1"
                 >
                   View More <ChevronRight className="h-4 w-4" /> {products.length}+
                 </Link>
               </div>
-              <div className={`${isMobile ? 'grid grid-cols-2 gap-3' : 'flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth'}`} 
-                   style={!isMobile ? { scrollbarWidth: 'none', msOverflowStyle: 'none' } : {}}>
-                {(isMobile ? products.slice(0, 4) : products).map((product) => 
+              <div className={`${isMobile ? 'grid grid-cols-2 gap-3' : 'flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth'}`}
+                style={!isMobile ? { scrollbarWidth: 'none', msOverflowStyle: 'none' } : {}}>
+                {(isMobile ? products.slice(0, 4) : products).map((product) =>
                   renderProductCard(product)
                 )}
               </div>
@@ -221,18 +218,18 @@ const CategoryCards = () => {
         })}
 
         {/* Top Picks for You Section */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
+        <div className="bg-gradient-to-r from-purple-50 to-orange-50 rounded-xl p-6 border border-primary/10">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h2 className="text-2xl font-bold text-blue-900 font-roboto mb-1">Top Picks for You</h2>
-              <p className="text-blue-600 text-xs">Handpicked products just for you</p>
+              <h2 className="text-2xl font-bold text-foreground font-roboto mb-1">Top Picks for You</h2>
+              <p className="text-primary text-xs">Handpicked products just for you</p>
             </div>
-            <Link to="/category/top-picks" className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors text-sm">
+            <Link to="/category/top-picks" className="bg-primary hover:bg-primary/90 text-white px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors text-sm">
               View More <ChevronRight className="h-3 w-3" />
             </Link>
           </div>
-          <div className={`${isMobile ? 'grid grid-cols-2 gap-3' : 'flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth'}`} 
-               style={!isMobile ? { scrollbarWidth: 'none', msOverflowStyle: 'none' } : {}}>
+          <div className={`${isMobile ? 'grid grid-cols-2 gap-3' : 'flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth'}`}
+            style={!isMobile ? { scrollbarWidth: 'none', msOverflowStyle: 'none' } : {}}>
             {/* Get top rated products from all categories for top picks */}
             {Object.values(productsByCategory)
               .flat()

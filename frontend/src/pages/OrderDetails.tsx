@@ -6,8 +6,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { 
-  Eye, 
+import {
+  Eye,
   Download,
   Star,
   Truck,
@@ -37,7 +37,7 @@ const OrderDetails = () => {
       try {
         const res = await apiService.getOrderById(orderId);
         if (res.success) setOrder(res.data);
-      } catch {}
+      } catch { }
     })();
   }, [orderId]);
 
@@ -61,7 +61,7 @@ const OrderDetails = () => {
   return (
     <div className="min-h-screen bg-background font-roboto">
       <Navbar />
-      
+
       {/* Breadcrumbs */}
       <div className="bg-white border-b border-gray-200 px-3 py-2">
         <div className="text-xs text-gray-600">
@@ -96,7 +96,7 @@ const OrderDetails = () => {
                   {order?.items?.[0]?.productId?.title}
                 </h3>
                 <div className="text-xs text-gray-600 mt-1">
-                  {order?.items?.[0]?.selectedFeatures && Object.entries(order.items[0].selectedFeatures).map(([k,v]) => (
+                  {order?.items?.[0]?.selectedFeatures && Object.entries(order.items[0].selectedFeatures).map(([k, v]) => (
                     <span key={k} className="mr-2">{k}: {v as any}</span>
                   ))}
                 </div>
@@ -106,26 +106,53 @@ const OrderDetails = () => {
             </div>
           </div>
 
-          {/* Order Status Timeline */}
-          <div className="bg-white rounded-lg p-4 mb-4">
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                  <CheckCircle className="h-3 w-3 text-white" />
+          {/* Order Status Stepper */}
+          <div className="bg-white rounded-lg p-6 mb-4">
+            <h3 className="font-semibold text-lg mb-6">Order Status</h3>
+            {order?.status === 'Cancelled' ? (
+              <div className="flex items-center gap-3 text-red-600 bg-red-50 p-4 rounded-lg">
+                <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
+                  <span className="text-xl">✕</span>
                 </div>
                 <div>
-                  <p className="text-sm font-medium">Status: {order?.status}</p>
+                  <h4 className="font-semibold">Order Cancelled</h4>
+                  <p className="text-sm opacity-80">This order has been cancelled.</p>
                 </div>
               </div>
-            </div>
-            <div className="mt-3 flex gap-2">
-              {['Pending','Shipped','Delivered','Cancelled'].map(s => (
-                <Button key={s} size="sm" variant={order?.status===s? 'default':'outline'} disabled={updating}
-                  onClick={async ()=>{ setUpdating(true); try{ const r=await apiService.updateOrderStatus(order._id,s); if(r.success){ setOrder({ ...order, status: s }); }} finally{ setUpdating(false);} }}>
-                  {s}
-                </Button>
-              ))}
-            </div>
+            ) : (
+              <div className="relative">
+                {/* Vertical Line */}
+                <div className="absolute left-3.5 top-3 bottom-10 w-0.5 bg-gray-200" style={{ zIndex: 0 }}></div>
+
+                {['Pending', 'Processing', 'Shipped', 'Delivered'].map((step, index) => {
+                  const steps = ['Pending', 'Processing', 'Shipped', 'Delivered'];
+                  const currentStatusIndex = steps.indexOf(order?.status || 'Pending');
+                  const isCompleted = index <= currentStatusIndex;
+                  const isCurrent = index === currentStatusIndex;
+
+                  return (
+                    <div key={step} className="relative flex items-start gap-4 mb-8 last:mb-0 z-10">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 shrink-0 bg-white ${isCompleted ? 'border-primary bg-primary text-primary-foreground' : 'border-gray-300 text-gray-300'}`}>
+                        {isCompleted ? <CheckCircle className="w-5 h-5" /> : <div className="w-3 h-3 rounded-full bg-current" />}
+                      </div>
+                      <div className="pt-1">
+                        <h4 className={`font-semibold ${isCompleted ? 'text-gray-900' : 'text-gray-500'}`}>
+                          {step === 'Pending' ? 'Order Placed' : step}
+                        </h4>
+                        {isCurrent && (
+                          <p className="text-xs text-primary font-medium mt-0.5 animate-pulse">
+                            {step === 'Delivered' ? 'Package delivered' : 'In Progress'}
+                          </p>
+                        )}
+                        <p className="text-xs text-gray-400 mt-1">
+                          {isCompleted ? 'Completed' : 'Pending'}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* Support - removed chat button as requested */}

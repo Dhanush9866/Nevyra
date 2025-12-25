@@ -17,6 +17,16 @@ if (CLOUDINARY_URL) {
 
 // Upload single image
 const uploadImage = async (imagePath, folder = 'nevyra/products') => {
+  // Mock upload if no credentials
+  if (!cloudinary.config().cloud_name && !process.env.CLOUDINARY_URL) {
+    console.warn('Cloudinary credentials missing. Using mock URL.');
+    return {
+      success: true,
+      url: 'https://placehold.co/600x400?text=Mock+Image',
+      public_id: `mock_${Date.now()}`
+    };
+  }
+
   try {
     const result = await cloudinary.uploader.upload(imagePath, {
       folder,

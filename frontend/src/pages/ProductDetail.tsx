@@ -36,7 +36,7 @@ const ProductDetail = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  
+
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
@@ -49,8 +49,22 @@ const ProductDetail = () => {
   useEffect(() => {
     if (productId) {
       fetchProduct();
+      checkWishlistStatus();
     }
   }, [productId]);
+
+  const checkWishlistStatus = async () => {
+    try {
+      const res = await apiService.getWishlist();
+      if (res.success && Array.isArray(res.data)) {
+        // Check if current product is in wishlist
+        const exists = res.data.some((item: any) =>
+          (item.productId?._id === productId) || (item.productId === productId) || (item._id === productId)
+        );
+        setIsWishlisted(exists);
+      }
+    } catch { }
+  };
 
   const fetchProduct = async () => {
     try {
@@ -105,11 +119,11 @@ const ProductDetail = () => {
 
   const handleAddToCart = async () => {
     if (!product) return;
-    
+
     try {
       setAddingToCart(true);
       const response = await apiService.addToCart(product.id, quantity, selectedFeatures);
-      
+
       if (response.success) {
         // notify navbar to refresh cart count
         window.dispatchEvent(new Event("cart-updated"));
@@ -132,15 +146,57 @@ const ProductDetail = () => {
     }
   };
 
-  const handleBuyNow = () => {
-    // For now, just add to cart and navigate to checkout
-    handleAddToCart();
-    // TODO: Navigate to checkout page
+  const handleBuyNow = async () => {
+    if (!product) return;
+
+    try {
+      setAddingToCart(true); // Show loading state on Buy Now too if desired, or duplicate state
+      const response = await apiService.addToCart(product.id, quantity, selectedFeatures);
+
+      if (response.success) {
+        window.dispatchEvent(new Event("cart-updated"));
+        navigate("/checkout");
+      } else {
+        throw new Error(response.message || "Failed to process request");
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to proceed to checkout",
+        variant: "destructive",
+      });
+    } finally {
+      setAddingToCart(false);
+    }
+  };
+
+  const handleWishlistToggle = async () => {
+    if (!product) return;
+
+    const newState = !isWishlisted;
+    setIsWishlisted(newState); // Optimistic UI update
+
+    try {
+      if (newState) {
+        await apiService.addToWishlist(product.id);
+        toast({ title: "Added to Wishlist", description: "Product saved for later" });
+      } else {
+        await apiService.removeFromWishlist(product.id);
+        toast({ title: "Removed from Wishlist" });
+      }
+    } catch (error) {
+      setIsWishlisted(!newState); // Revert on failure
+      toast({
+        title: "Error",
+        description: "Failed to update wishlist",
+        variant: "destructive"
+      });
+    }
   };
 
   const getProductImage = (images: string[]) => {
-    return images && images.length > 0 
-      ? images[0] 
+    return images && images.length > 0
+      ? images[0]
       : "https://via.placeholder.com/400x400?text=No+Image";
   };
 
@@ -188,7 +244,7 @@ const ProductDetail = () => {
   return (
     <div className="min-h-screen bg-background font-roboto">
       <Navbar />
-      
+
       <div className="container mx-auto px-4 py-6">
         {/* Breadcrumb */}
         <nav className="text-sm text-muted-foreground mb-6">
@@ -199,8 +255,8 @@ const ProductDetail = () => {
           {/* Product Images */}
           <div className="space-y-4">
             <div className="relative">
-              <img 
-                src={(product.images && product.images[selectedImage]) || getProductImage(product.images)} 
+              <img
+                src={(product.images && product.images[selectedImage]) || getProductImage(product.images)}
                 alt={product.title}
                 className="w-full h-96 object-cover rounded-lg border border-border"
               />
@@ -217,9 +273,8 @@ const ProductDetail = () => {
                     key={index}
                     src={image}
                     alt={`${product.title} ${index + 1}`}
-                    className={`w-20 h-20 object-cover rounded-lg border-2 cursor-pointer ${
-                      selectedImage === index ? 'border-primary' : 'border-border'
-                    }`}
+                    className={`w-20 h-20 object-cover rounded-lg border-2 cursor-pointer ${selectedImage === index ? 'border-primary' : 'border-border'
+                      }`}
                     onClick={() => setSelectedImage(index)}
                   />
                 ))}
@@ -285,11 +340,10 @@ const ProductDetail = () => {
                                     type="button"
                                     key={option}
                                     onClick={() => handleFeatureChange(key, option)}
-                                    className={`px-3 py-1.5 rounded-md border text-sm transition-colors ${
-                                      isActive
-                                        ? 'border-primary bg-primary/10 text-primary'
-                                        : 'border-border hover:border-primary/50'
-                                    }`}
+                                    className={`px-3 py-1.5 rounded-md border text-sm transition-colors ${isActive
+                                      ? 'border-primary bg-primary/10 text-primary'
+                                      : 'border-border hover:border-primary/50'
+                                      }`}
                                   >
                                     {option}
                                   </button>
@@ -374,7 +428,7 @@ const ProductDetail = () => {
               </div>
 
               <div className="flex gap-3">
-                <Button 
+                <Button
                   className="flex-1 bg-warning hover:bg-warning/90 text-warning-foreground font-medium text-lg py-6"
                   onClick={handleAddToCart}
                   disabled={!product.inStock || addingToCart}
@@ -386,7 +440,7 @@ const ProductDetail = () => {
                   )}
                   {addingToCart ? "Adding..." : "Add to Cart"}
                 </Button>
-                <Button 
+                <Button
                   className="flex-1 bg-primary hover:bg-primary-hover text-primary-foreground font-medium text-lg py-6"
                   onClick={handleBuyNow}
                   disabled={!product.inStock}
@@ -399,7 +453,7 @@ const ProductDetail = () => {
                 <Button
                   variant="outline"
                   className="flex-1"
-                  onClick={() => setIsWishlisted(!isWishlisted)}
+                  onClick={handleWishlistToggle}
                 >
                   <Heart className={`h-4 w-4 mr-2 ${isWishlisted ? 'fill-red-500 text-red-500' : ''}`} />
                   Wishlist
@@ -419,29 +473,29 @@ const ProductDetail = () => {
             <TabsTrigger value="description">Description</TabsTrigger>
             <TabsTrigger value="specifications">Specifications</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="description" className="space-y-4">
             <Card>
               <CardContent className="p-6">
                 <h3 className="font-semibold text-foreground mb-4">Product Description</h3>
                 <div className="prose prose-gray max-w-none">
                   <p className="text-muted-foreground">
-                    {product.title} - A high-quality product from the {product.category} category. 
+                    {product.title} - A high-quality product from the {product.category} category.
                     This {product.subCategory} offers excellent value and performance.
                   </p>
                   <p className="text-muted-foreground">
-                    With a rating of {product.rating} stars and {product.reviews} reviews, 
+                    With a rating of {product.rating} stars and {product.reviews} reviews,
                     this product has been well-received by customers.
                   </p>
                   <p className="text-muted-foreground">
-                    Currently in stock with {product.stockQuantity} units available. 
+                    Currently in stock with {product.stockQuantity} units available.
                     {product.soldCount} units have been sold.
                   </p>
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
-          
+
           <TabsContent value="specifications" className="space-y-4">
             <Card>
               <CardContent className="p-6">
@@ -473,7 +527,7 @@ const ProductDetail = () => {
                       <span className="ml-2 text-muted-foreground">{product.stockQuantity} units</span>
                     </div>
                   </div>
-                  
+
                   {product.attributes && Object.keys(product.attributes).length > 0 && (
                     <div className="mt-6">
                       <h4 className="font-medium text-foreground mb-3">Product Attributes</h4>

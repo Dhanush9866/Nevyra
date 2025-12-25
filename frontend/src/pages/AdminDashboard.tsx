@@ -5,13 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  BarChart3, 
-  Package, 
-  Users, 
-  TrendingUp, 
-  Plus, 
-  Search, 
+import {
+  BarChart3,
+  Package,
+  Users,
+  TrendingUp,
+  Plus,
+  Search,
   Filter,
   Eye,
   Edit,
@@ -162,7 +162,7 @@ const AdminDashboard = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Nevyra Admin</h1>
+              <h1 className="text-2xl font-bold text-foreground">Zythova Admin</h1>
               <p className="text-muted-foreground">Manage your e-commerce platform</p>
             </div>
             <div className="flex items-center gap-4">
@@ -420,7 +420,7 @@ const AdminDashboard = () => {
                   <Users className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-foreground mb-2">Customer Management</h3>
                   <p className="text-muted-foreground">
-                    Customer management features will be available here. You can view customer details, 
+                    Customer management features will be available here. You can view customer details,
                     order history, and manage customer relationships.
                   </p>
                 </div>
