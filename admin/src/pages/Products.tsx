@@ -4,7 +4,15 @@ import { Table } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FloatingDock } from "@/components/FloatingDock";
-import { Plus, Loader2, Edit, Trash2 } from "lucide-react";
+import { Plus, Loader2, Edit, Trash2, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { adminAPI } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import AddProductForm from "@/components/AddProductForm";
@@ -56,6 +64,8 @@ const Products: React.FC = () => {
   const [showEditForm, setShowEditForm] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [token, setToken] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -138,6 +148,20 @@ const Products: React.FC = () => {
     }
   };
 
+  // Get unique categories for filter
+  const categories = ["all", ...new Set(products.map(p => p.category))];
+
+  // Filter products based on search and category
+  const filteredProducts = products.filter(product => {
+    const matchesSearch = 
+      product.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      product.id.includes(searchTerm);
+    
+    const matchesCategory = categoryFilter === "all" || product.category === categoryFilter;
+
+    return matchesSearch && matchesCategory;
+  });
+
   if (loading) {
     return (
       <>
@@ -167,6 +191,32 @@ const Products: React.FC = () => {
             </Button>
           </div>
 
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <div className="relative flex-1">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search products by name or ID..."
+                className="pl-8"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="w-full sm:w-[200px]">
+              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {category === "all" ? "All Categories" : category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
           <Card className="glass border-0 shadow-xl">
             <CardContent className="p-0">
               <div className="overflow-x-auto">
@@ -183,14 +233,14 @@ const Products: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody className="bg-card divide-y divide-border">
-                    {products.length === 0 ? (
+                    {filteredProducts.length === 0 ? (
                       <tr>
                         <td colSpan={7} className="px-6 py-12 text-center text-muted-foreground">
-                          No products found. Add your first product to get started.
+                          No products found matching your criteria.
                         </td>
                       </tr>
                     ) : (
-                      products.map((product) => {
+                      filteredProducts.map((product) => {
                         const status = getProductStatus(product);
                         return (
                           <tr key={product.id} className="hover:bg-muted/50 transition-smooth">
