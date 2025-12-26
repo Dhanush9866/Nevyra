@@ -11,7 +11,7 @@ const slides = [
     image: "/hero/hero-main-real.png",
     buttonText: "Shop Now",
     buttonColor: "bg-primary hover:bg-primary/90",
-    bgColor: "bg-[#f3e8ff]", // Light Purple
+    bgColor: "bg-white", // Changed to white as requested
     useBlend: true
   },
   {
@@ -22,7 +22,7 @@ const slides = [
     image: "/hero/hero-phones.png",
     buttonText: "Shop Phones",
     buttonColor: "bg-primary hover:bg-primary/90",
-    bgColor: "bg-[#eff6ff]", // Light Blue
+    bgColor: "bg-white", // Changed to white as requested
     useBlend: true
   },
   {
@@ -44,7 +44,7 @@ const slides = [
     image: "/hero/hero-electronics.png",
     buttonText: "Shop Electronics",
     buttonColor: "bg-primary hover:bg-primary/90",
-    bgColor: "bg-[#e0e7ff]", // Soft Indigo for premium look
+    bgColor: "bg-white", // Changed to white as requested
     useBlend: true
   },
   {
