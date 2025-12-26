@@ -34,13 +34,14 @@ const brands = ["TechCorp", "SportBrand", "GameTech", "FashionHub"];
 const ProductListing = () => {
   const { categoryName } = useParams();
   const [products, setProducts] = useState<ProductItem[]>([]);
-  const [priceRange, setPriceRange] = useState([0, 100000]);
+  const [priceRange, setPriceRange] = useState([0, 1000000]);
   const [addingId, setAddingId] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
     (async () => {
-      const params: any = { limit: 40 };
+      console.log('========== FRONTEND PRODUCT FETCH ==========');
+      const params: any = { limit: 100 };
       if (categoryName) {
         // Map URL slug to actual category name
         const categoryMap: Record<string, string> = {
@@ -54,11 +55,21 @@ const ProductListing = () => {
           'home-interior': 'Home Interior',
         };
         params.category = categoryMap[categoryName] || categoryName;
+        console.log('Category mapping:', { 
+          urlSlug: categoryName, 
+          mappedCategory: params.category 
+        });
       }
       try {
-        console.log('Fetching products with params:', params);
+        console.log('API request params:', params);
         const res = await apiService.getProducts(params);
-        console.log('Product fetch response:', res);
+        console.log('API response received:', {
+          success: res.success,
+          dataLength: res.data?.length,
+          pagination: res.pagination,
+          message: res.message
+        });
+        
         if (res.success) {
           const mappedProducts = res.data.map((p: any) => ({
             _id: p.id || p._id,
@@ -70,14 +81,20 @@ const ProductListing = () => {
             reviewsCount: p.reviewsCount || 0,
             brand: p.brand || p.category,
           }));
-          console.log('Mapped products:', mappedProducts);
+          console.log('Products mapped:', {
+            count: mappedProducts.length,
+            firstProduct: mappedProducts[0]?.title,
+            lastProduct: mappedProducts[mappedProducts.length - 1]?.title
+          });
           setProducts(mappedProducts);
+          console.log('State updated with products');
         } else {
-          console.error('Failed to fetch products:', res.message);
+          console.error('API returned success: false', res.message);
         }
       } catch (err) {
         console.error('Error fetching products:', err);
       }
+      console.log('==========================================');
     })();
   }, [categoryName]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
@@ -127,6 +144,14 @@ const ProductListing = () => {
     return inPriceRange && inSelectedBrands;
   });
 
+  console.log('Filtering results:', {
+    totalProducts: products.length,
+    afterPriceFilter: products.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1]).length,
+    afterBrandFilter: filteredProducts.length,
+    priceRange,
+    selectedBrands
+  });
+
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     switch (sortBy) {
       case "price-low-high":
@@ -141,6 +166,8 @@ const ProductListing = () => {
         return 0;
     }
   });
+
+  console.log('Final display count:', sortedProducts.length);
 
   return (
     <div className="min-h-screen bg-background font-roboto">
@@ -201,7 +228,7 @@ const ProductListing = () => {
                   <Slider
                     value={priceRange}
                     onValueChange={setPriceRange}
-                    max={100000}
+                    max={1000000}
                     min={0}
                     step={1000}
                     className="mb-2"

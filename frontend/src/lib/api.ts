@@ -54,7 +54,7 @@ class ApiService {
   }
 
   // Products
-  async getProducts(params: Record<string, any> = {}): Promise<{ success: boolean; message: string; data: any[] }> {
+  async getProducts(params: Record<string, any> = {}): Promise<{ success: boolean; message: string; data: any[]; pagination?: any }> {
     const query = new URLSearchParams(params as any).toString();
     return this.request(`/products${query ? `?${query}` : ''}`);
   }

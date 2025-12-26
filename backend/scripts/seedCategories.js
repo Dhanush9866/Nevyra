@@ -4,69 +4,103 @@ require("dotenv").config();
 
 const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://hosannaking2019:YWafeOL8X8dkaSYn@cluster0.rdtscmx.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
-// Default categories and subcategories
+// Default categories and subcategories - MUST MATCH FRONTEND NAVBAR.TSX EXACTLY
 const defaultCategories = [
   {
-    name: "Electronics",
+    name: "Medical & Pharmacy",
     parentId: null,
     subcategories: [
-      "Smartphones",
+      "Personal Care",
+      "Skin Care",
+      "Hair Care",
+      "Makeup",
+      "Foot, Hand & Nail Care",
+      "Salon Equipment",
+      "Shave & Hair Removal",
+      "Fragrance"
+    ]
+  },
+  {
+    name: "Groceries",
+    parentId: null,
+    subcategories: [
+      "General food items",
+      "Daily essentials"
+    ]
+  },
+  {
+    name: "Fashion & Beauty",
+    parentId: null,
+    subcategories: [
+      "Menswear",
+      "Women's Wear",
+      "Kids Wear",
+      "Men's Shoes",
+      "Women's Shoes",
+      "Kids Shoes",
+      "Watches",
+      "Luggage"
+    ]
+  },
+  {
+    name: "Devices",
+    parentId: null,
+    subcategories: [
+      "Cell Phones & Accessories",
       "Laptops",
-      "Tablets",
-      "Headphones",
-      "Cameras",
       "Televisions",
       "Refrigerators",
-      "Smart Watches",
-      "Cell Phones & Accessories"
+      "Smart Watches"
     ]
   },
   {
-    name: "Fashion",
+    name: "Electrical",
     parentId: null,
     subcategories: [
-      "Men's Clothing",
-      "Women's Clothing",
-      "Shoes",
-      "Accessories",
-      "Jewelry"
+      "Solar Panels",
+      "Solar Fencing Kit",
+      "Batteries",
+      "Transformers",
+      "Wiring Cables",
+      "LED Bulbs",
+      "Tube Lights",
+      "Ceiling Fan"
     ]
   },
   {
-    name: "Home & Garden",
+    name: "Automotive",
     parentId: null,
     subcategories: [
-      "Furniture",
-      "Kitchen & Dining",
-      "Home Decor",
-      "Garden Tools",
-      "Lighting",
-      "Sofas",
-      "Beds",
-      "Decor",
-      "Storage"
+      "Bike Accessories",
+      "Car Accessories",
+      "Engine Oil",
+      "Brake Fluid",
+      "Air Filter"
     ]
   },
   {
-    name: "Sports & Outdoors",
+    name: "Sports",
     parentId: null,
     subcategories: [
-      "Fitness Equipment",
-      "Outdoor Gear",
-      "Sports Apparel",
-      "Team Sports",
-      "Water Sports"
+      "Cricket Bats",
+      "Cricket Balls",
+      "Stumps",
+      "Cricket Kit",
+      "Volleyball",
+      "Volleyball Net"
     ]
   },
   {
-    name: "Books & Media",
+    name: "Home Interior",
     parentId: null,
     subcategories: [
-      "Books",
-      "Movies & TV",
-      "Music",
-      "Video Games",
-      "Educational Materials"
+      "Gypsum False Ceiling",
+      "Cove Lights",
+      "Main Door",
+      "Wall Paint",
+      "Wallpaper",
+      "Curtains",
+      "Wall Tiles"
     ]
   }
 ];
