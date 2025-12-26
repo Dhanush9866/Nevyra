@@ -1,111 +1,79 @@
-import { useRef } from "react";
-import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { apiService } from "@/lib/api";
-import { useToast } from "@/hooks/use-toast";
-import { ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
-type DealProduct = {
-  _id: string;
-  title: string;
-  price: number;
-  mrp?: number;
-  images?: string[];
-  rating?: number;
-  reviewsCount?: number;
-  discount?: number;
-};
+import React from "react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import { Button } from "@/components/ui/button";
+import { ChevronRight } from "lucide-react";
+
+const topDealsData = [
+  { id: "td1", title: "Wireless Earbuds", price: "$29.99", image: "https://images.unsplash.com/photo-1572569028738-411a56111005?auto=format&fit=crop&w=300&q=80" },
+  { id: "td2", title: "Smart Speaker", price: "$49.99", image: "https://images.unsplash.com/photo-1589492477829-5e65395b66cc?auto=format&fit=crop&w=300&q=80" },
+  { id: "td3", title: "Gaming Mouse", price: "$39.99", image: "https://images.unsplash.com/photo-1527814050087-3793815479db?auto=format&fit=crop&w=300&q=80" },
+  { id: "td4", title: "Mechanical Keyboard", price: "$89.99", image: "https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?auto=format&fit=crop&w=300&q=80" },
+  { id: "td5", title: "4K Monitor", price: "$299.99", image: "https://images.unsplash.com/photo-1586210579191-33b45e38fa2c?auto=format&fit=crop&w=300&q=80" },
+  { id: "td6", title: "External SSD", price: "$79.99", image: "https://images.unsplash.com/photo-1597872223015-a44784d4b8aa?auto=format&fit=crop&w=300&q=80" },
+  { id: "td7", title: "Graphics Tablet", price: "$59.99", image: "https://images.unsplash.com/photo-1563203369-26f2e4a5ccf7?auto=format&fit=crop&w=300&q=80" },
+  { id: "td8", title: "Webcam HD", price: "$45.00", image: "https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?auto=format&fit=crop&w=300&q=80" },
+  { id: "td9", title: "USB-C Hub", price: "$34.99", image: "https://images.unsplash.com/photo-1616410011236-7a421b19a586?auto=format&fit=crop&w=300&q=80" },
+  { id: "td10", title: "Laptop Stand", price: "$25.50", image: "https://images.unsplash.com/photo-1593642702749-b7d2a804fbcf?auto=format&fit=crop&w=300&q=80" },
+  { id: "td11", title: "Noise Cancelling Headphones", price: "$199.99", image: "https://images.unsplash.com/photo-1546435770-a3e2feadf72c?auto=format&fit=crop&w=300&q=80" },
+  { id: "td12", title: "Smart Watch Strap", price: "$15.99", image: "https://images.unsplash.com/photo-1551816230-ef5deaed4a26?auto=format&fit=crop&w=300&q=80" },
+];
 
 const TopDeals = () => {
-  const [products, setProducts] = useState<DealProduct[]>([]);
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const { toast } = useToast();
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const res = await apiService.getProducts({ limit: 12 });
-        if (res.success) {
-          const mapped = res.data.map((p: any) => ({
-            _id: p.id || p._id,
-            title: p.title,
-            price: p.price,
-            mrp: p.mrp || p.price,
-            images: p.images || [],
-            rating: p.rating || 4.5,
-            reviewsCount: p.reviewsCount || 0,
-            discount: p.mrp && p.mrp > p.price ? Math.round(((p.mrp - p.price) / p.mrp) * 100) : undefined,
-          }));
-          setProducts(mapped);
-        }
-      } catch (e) {
-        console.error('TopDeals: Error fetching products:', e);
-      }
-    })();
-  }, []);
-
-  const scrollRight = () => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: 300, behavior: 'smooth' });
-    }
-  };
-
   return (
-    <section className="py-4 bg-gray-50">
-      <div className="w-full px-4">
-
-        {/* Top Deals Carousel */}
-        <div className="bg-white p-4 shadow-sm relative min-w-0">
-          <h2 className="text-xl font-bold text-foreground mb-4 font-roboto">
-            Top Deals
-          </h2>
-
-          <div className="relative">
-            <div
-              ref={scrollRef}
-              className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-            >
-              {products.map((product) => (
-                <Link
-                  key={product._id}
-                  to={`/product/${product._id}`}
-                  className="min-w-[160px] w-[160px] flex-shrink-0 group cursor-pointer border border-transparent hover:border-border rounded-lg p-2 transition-all duration-300"
-                >
-                  <div className="w-full h-36 mb-3 flex items-center justify-center p-2">
-                    <img
-                      src={product.images?.[0] || '/placeholder.svg'}
-                      alt={product.title}
-                      className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-
-                  <div className="text-center">
-                    <h3 className="font-medium text-xs text-gray-600 mb-1 line-clamp-2" title={product.title}>
-                      {product.title}
-                    </h3>
-                    <p className="text-sm font-bold text-black">
-                      From ₹{product.price.toLocaleString()}
-                    </p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-
-            {/* Floating Scroll Button */}
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={scrollRight}
-              className="absolute top-1/2 -right-0 -mt-8 h-12 w-8 rounded-l-md rounded-r-none bg-white shadow-md border-l border-y border-r-0 z-10 hidden md:flex"
-            >
-              <ChevronRight className="h-6 w-6 text-gray-600" />
-            </Button>
-          </div>
-        </div>
+    <div className="container mx-auto px-4 py-8 bg-white my-4 shadow-sm rounded-none relative">
+      <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-4">
+        <h2 className="text-xl md:text-2xl font-bold text-gray-900">Top Deals</h2>
+        <Button variant="link" className="p-0 h-auto font-semibold text-primary hover:text-primary/90 hover:no-underline flex items-center gap-1 group/btn">
+            View All <ChevronRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
+        </Button>
       </div>
-    </section>
+
+      <Carousel
+        opts={{
+          align: "start",
+          loop: true,
+          slidesToScroll: 2,
+        }}
+        className="w-full relative group"
+      >
+        <CarouselPrevious className="absolute left-0 top-1/2 -translate-y-1/2 z-20 h-10 w-10 md:h-12 md:w-12 border-none shadow-lg bg-white/90 hover:bg-white text-gray-800 disabled:opacity-0 rounded-none" />
+        <CarouselNext className="absolute right-0 top-1/2 -translate-y-1/2 z-20 h-10 w-10 md:h-12 md:w-12 border-none shadow-lg bg-white/90 hover:bg-white text-gray-800 disabled:opacity-0 rounded-none" />
+
+        <CarouselContent className="-ml-2 md:-ml-4">
+          {topDealsData.map((product) => (
+            <CarouselItem key={product.id} className="basis-1/2 md:basis-1/4 lg:basis-1/5 pl-2 md:pl-4">
+              <div className="group cursor-pointer flex flex-col items-center p-2 rounded-none hover:shadow-md transition-shadow duration-300 border border-transparent hover:border-gray-100 h-full">
+                {/* Image Container: Fixed aspect ratio to match HomeProductCarousel */}
+                <div className="w-full aspect-square overflow-hidden rounded-none flex items-center justify-center mb-3 bg-gray-50">
+                  <img
+                    src={product.image}
+                    alt={product.title}
+                    className="max-h-full max-w-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-300 rounded-none"
+                  />
+                </div>
+                
+                {/* Text Content */}
+                <div className="text-center w-full space-y-1">
+                    <h3 className="font-medium text-gray-900 text-sm line-clamp-1" title={product.title}>
+                        {product.title}
+                    </h3>
+                    <div className="text-sm font-bold text-green-600">
+                        {product.price}
+                    </div>
+                </div>
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+      </Carousel>
+    </div>
   );
 };
 

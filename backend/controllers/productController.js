@@ -59,10 +59,19 @@ function mapProductId(product) {
 exports.list = async (req, res, next) => {
   try {
     const { page = 1, limit = 10, category, search } = req.query;
+    
+    console.log('========== PRODUCT LIST REQUEST ==========');
+    console.log('Query params:', { page, limit, category, search });
+    
     const filter = {};
     if (category) filter.category = { $regex: new RegExp(`^${category}$`, "i") };
     if (search) filter.title = { $regex: search, $options: "i" };
+    
+    console.log('MongoDB filter:', JSON.stringify(filter));
+    
     const skip = (parseInt(page) - 1) * parseInt(limit);
+    console.log('Pagination:', { skip, limit: parseInt(limit) });
+    
     const [products, count] = await Promise.all([
       Product.find(filter)
         .skip(skip)
@@ -72,8 +81,16 @@ exports.list = async (req, res, next) => {
         ),
       Product.countDocuments(filter),
     ]);
+    
+    console.log('Database results:', { 
+      productsFound: products.length, 
+      totalCount: count,
+      firstProduct: products[0] ? products[0].title : 'none'
+    });
+    
     const mappedProducts = products.map(mapProductId);
-    res.json({
+    
+    const response = {
       success: true,
       message: "Products fetched",
       data: mappedProducts,
@@ -83,8 +100,17 @@ exports.list = async (req, res, next) => {
         limit: parseInt(limit),
         totalPages: Math.ceil(count / limit),
       },
+    };
+    
+    console.log('Response summary:', {
+      dataLength: response.data.length,
+      pagination: response.pagination
     });
+    console.log('==========================================');
+    
+    res.json(response);
   } catch (err) {
+    console.error('Error in product list:', err);
     next(err);
   }
 };
