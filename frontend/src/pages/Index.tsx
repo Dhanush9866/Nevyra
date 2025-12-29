@@ -11,30 +11,30 @@ import HomeProductCarousel from "@/components/HomeProductCarousel";
 // Mock Data for Row 1 (Grid) - Using Valid Database Categories/Subcategories
 const row1GridGroups = [
   {
-    title: "Fashion & Beauty",
+    title: "Big Savings & Daily Essentials",
     items: [
-      { title: "Luggage", offer: "Travel Essentials", image: "https://images.unsplash.com/photo-1565026057447-bc90a3dceb87?auto=format&fit=crop&w=300&q=80", category: "Fashion & Beauty", subcategory: "Luggage" },
-      { title: "Watches", offer: "Timeless Style", image: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?auto=format&fit=crop&w=300&q=80", category: "Fashion & Beauty", subcategory: "Watches" },
-      { title: "Men's Shoes", offer: "Step in Style", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=300&q=80", category: "Fashion & Beauty", subcategory: "Men's Shoes" },
-      { title: "Women's Shoes", offer: "Elegant Footwear", image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=300&q=80", category: "Fashion & Beauty", subcategory: "Women's Shoes" },
+      { title: "Rice & Rice Products", offer: "Travel Essentials", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903338/nevyra/daily-essentials/WhatsApp%20Image%202025-12-26%20at%207.10.15%20PM.jpg", category: "Fashion & Beauty", subcategory: "Luggage" },
+      { title: "Fruits", offer: "Timeless Style", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903334/nevyra/daily-essentials/WhatsApp%20Image%202025-12-26%20at%207.10.15%20PM%20%281%29.jpg", category: "Fashion & Beauty", subcategory: "Watches" },
+      { title: "Milk", offer: "Step in Style", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903335/nevyra/daily-essentials/WhatsApp%20Image%202025-12-26%20at%207.10.15%20PM%20%282%29.jpg", category: "Fashion & Beauty", subcategory: "Men's Shoes" },
+      { title: "Instant Snacks", offer: "Elegant Footwear", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903337/nevyra/daily-essentials/WhatsApp%20Image%202025-12-26%20at%207.10.15%20PM%20%283%29.jpg", category: "Fashion & Beauty", subcategory: "Women's Shoes" },
     ]
   },
   {
-    title: "Devices",
+    title: "Trending Fashion Deals",
     items: [
-      { title: "Cell Phones & Accessories", offer: "Latest Tech", image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=300&q=80", category: "Devices", subcategory: "Cell Phones & Accessories" },
-      { title: "Laptops", offer: "Power & Performance", image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=300&q=80", category: "Devices", subcategory: "Laptops" },
-      { title: "Smart Watches", offer: "Tech Meets Style", image: "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?auto=format&fit=crop&w=300&q=80", category: "Devices", subcategory: "Smart Watches" },
-      { title: "Televisions", offer: "Home Entertainment", image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&w=300&q=80", category: "Devices", subcategory: "Televisions" },
+      { title: "Men's Wear", offer: "Latest Tech", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903395/nevyra/fashion-deals/WhatsApp%20Image%202025-12-26%20at%207.12.57%20PM.jpg", category: "Devices", subcategory: "Cell Phones & Accessories" },
+      { title: "Women's Wear", offer: "Power & Performance", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903393/nevyra/fashion-deals/WhatsApp%20Image%202025-12-26%20at%207.12.57%20PM%20%281%29.jpg", category: "Devices", subcategory: "Laptops" },
+      { title: "Baby Care & Kids", offer: "Tech Meets Style", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903394/nevyra/fashion-deals/WhatsApp%20Image%202025-12-26%20at%207.12.57%20PM%20%282%29.jpg", category: "Devices", subcategory: "Smart Watches" },
+      { title: "Small Accessories", offer: "Home Entertainment", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903397/nevyra/fashion-deals/WhatsApp%20Image%202025-12-26%20at%207.12.58%20PM.jpg", category: "Devices", subcategory: "Televisions" },
     ]
   },
   {
-    title: "Groceries",
+    title: "Health Essentials Deals",
     items: [
-      { title: "General food items", offer: "Pantry Staples", image: "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=300&q=80", category: "Groceries", subcategory: "General food items" },
-      { title: "Daily essentials", offer: "Everyday Needs", image: "https://images.unsplash.com/photo-1610348725531-843dff563e2c?auto=format&fit=crop&w=300&q=80", category: "Groceries", subcategory: "Daily essentials" },
-      { title: "Fresh Produce", offer: "Farm Fresh", image: "https://images.unsplash.com/photo-1610348725531-843dff563e2c?auto=format&fit=crop&w=300&q=80", category: "Groceries", subcategory: "General food items" },
-      { title: "Snacks", offer: "Tasty Treats", image: "https://images.unsplash.com/photo-1621939514649-28b12e81d196?auto=format&fit=crop&w=300&q=80", category: "Groceries", subcategory: "General food items" },
+      { title: "General food items", offer: "Pantry Staples", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903340/nevyra/health-essentials/WhatsApp%20Image%202025-12-26%20at%207.19.42%20PM.jpg", category: "Groceries", subcategory: "General food items" },
+      { title: "Daily essentials", offer: "Everyday Needs", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903344/nevyra/health-essentials/WhatsApp%20Image%202025-12-26%20at%207.19.43%20PM.jpg", category: "Groceries", subcategory: "Daily essentials" },
+      { title: "Fresh Produce", offer: "Farm Fresh", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903341/nevyra/health-essentials/WhatsApp%20Image%202025-12-26%20at%207.19.43%20PM%20%281%29.jpg", category: "Groceries", subcategory: "General food items" },
+      { title: "Snacks", offer: "Tasty Treats", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903342/nevyra/health-essentials/WhatsApp%20Image%202025-12-26%20at%207.19.43%20PM%20%282%29.jpg", category: "Groceries", subcategory: "General food items" },
     ]
   },
 
@@ -62,30 +62,30 @@ const row2Title = "Home Interior & Electrical Deals";
 // Mock Data for Row 3 (Grid) - Using Valid Database Categories/Subcategories
 const row3GridGroups = [
   {
-    title: "Automotive",
+    title: " Smart Deals",
     items: [
-      { title: "Car Accessories", offer: "Upgrade Your Ride", image: "https://images.unsplash.com/photo-1600273759367-1606d20367eb?auto=format&fit=crop&w=300&q=80", category: "Automotive", subcategory: "Car Accessories" },
-      { title: "Bike Accessories", offer: "Ride in Style", image: "https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=300&q=80", category: "Automotive", subcategory: "Bike Accessories" },
-      { title: "Engine Oil", offer: "Smooth Performance", image: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&w=300&q=80", category: "Automotive", subcategory: "Engine Oil" },
-      { title: "Brake Fluid", offer: "Safety First", image: "https://images.unsplash.com/photo-1517524285303-d6fc683dddf8?auto=format&fit=crop&w=300&q=80", category: "Automotive", subcategory: "Brake Fluid" },
+      { title: "Mobile Phones", offer: "Upgrade Your Ride", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903377/nevyra/smart-deals/WhatsApp%20Image%202025-12-26%20at%207.32.51%20PM.jpg", category: "Automotive", subcategory: "Car Accessories" },
+      { title: "Laptops", offer: "Ride in Style", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903375/nevyra/smart-deals/WhatsApp%20Image%202025-12-26%20at%207.32.51%20PM%20%281%29.jpg", category: "Automotive", subcategory: "Bike Accessories" },
+      { title: "Bluetooth Speakers", offer: "Smooth Performance", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903380/nevyra/smart-deals/WhatsApp%20Image%202025-12-26%20at%207.32.52%20PM.jpg", category: "Automotive", subcategory: "Engine Oil" },
+      { title: "Chargers & Cables", offer: "Safety First", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903378/nevyra/smart-deals/WhatsApp%20Image%202025-12-26%20at%207.32.52%20PM%20%281%29.jpg", category: "Automotive", subcategory: "Brake Fluid" },
     ]
   },
   {
-    title: "Sports",
+    title: "Sports Deals",
     items: [
-      { title: "Cricket Bats", offer: "Play Your Game", image: "https://images.unsplash.com/photo-1531415074968-036ba1b575da?auto=format&fit=crop&w=300&q=80", category: "Sports", subcategory: "Cricket Bats" },
-      { title: "Cricket Balls", offer: "Match Quality", image: "https://images.unsplash.com/photo-1624526267942-ab0ff8a3e972?auto=format&fit=crop&w=300&q=80", category: "Sports", subcategory: "Cricket Balls" },
-      { title: "Cricket Kit", offer: "Complete Set", image: "https://images.unsplash.com/photo-1593766787879-e8c78e09cec1?auto=format&fit=crop&w=300&q=80", category: "Sports", subcategory: "Cricket Kit" },
-      { title: "Volleyball", offer: "Team Sports", image: "https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?auto=format&fit=crop&w=300&q=80", category: "Sports", subcategory: "Volleyball" },
+      { title: "Sports Shoes", offer: "Play Your Game", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903385/nevyra/sports-deals/WhatsApp%20Image%202025-12-26%20at%207.43.37%20PM.jpg", category: "Sports", subcategory: "Cricket Bats" },
+      { title: "Cricket", offer: "Match Quality", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903381/nevyra/sports-deals/WhatsApp%20Image%202025-12-26%20at%207.43.37%20PM%20%281%29.jpg", category: "Sports", subcategory: "Cricket Balls" },
+      { title: "Football", offer: "Complete Set", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903383/nevyra/sports-deals/WhatsApp%20Image%202025-12-26%20at%207.43.37%20PM%20%282%29.jpg", category: "Sports", subcategory: "Cricket Kit" },
+      { title: "Fitness & Gym", offer: "Team Sports", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903384/nevyra/sports-deals/WhatsApp%20Image%202025-12-26%20at%207.43.37%20PM%20%283%29.jpg", category: "Sports", subcategory: "Volleyball" },
     ]
   },
   {
-    title: "Electrical",
+    title: "Security & Lighting Deals",
     items: [
-      { title: "LED Bulbs", offer: "Energy Efficient", image: "https://images.unsplash.com/photo-1550985616-10810253b84d?auto=format&fit=crop&w=300&q=80", category: "Electrical", subcategory: "LED Bulbs" },
-      { title: "Ceiling Fan", offer: "Cool Comfort", image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=300&q=80", category: "Electrical", subcategory: "Ceiling Fan" },
-      { title: "Batteries", offer: "Power Up", image: "https://images.unsplash.com/photo-1609525512049-5b8f7c9c4f6f?auto=format&fit=crop&w=300&q=80", category: "Electrical", subcategory: "Batteries" },
-      { title: "Wiring Cables", offer: "Safe Connections", image: "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=300&q=80", category: "Electrical", subcategory: "Wiring Cables" },
+      { title: "Cameras & Accessories", offer: "Energy Efficient", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903374/nevyra/security-lighting/WhatsApp%20Image%202025-12-26%20at%207.58.06%20PM.jpg", category: "Electrical", subcategory: "LED Bulbs" },
+      { title: "Smart Door Locks", offer: "Cool Comfort", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903369/nevyra/security-lighting/WhatsApp%20Image%202025-12-26%20at%207.58.06%20PM%20%281%29.jpg", category: "Electrical", subcategory: "Ceiling Fan" },
+      { title: "Lighting", offer: "Power Up", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903371/nevyra/security-lighting/WhatsApp%20Image%202025-12-26%20at%207.58.06%20PM%20%282%29.jpg", category: "Electrical", subcategory: "Batteries" },
+      { title: "CFL Bulbs", offer: "Safe Connections", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903372/nevyra/security-lighting/WhatsApp%20Image%202025-12-26%20at%207.58.06%20PM%20%283%29.jpg", category: "Electrical", subcategory: "Wiring Cables" },
     ]
   },
 
@@ -113,30 +113,30 @@ const row4Title = "Devices & Automotive Deals";
 // Mock Data for Row 5 (Grid) - Using Valid Database Categories/Subcategories
 const row5GridGroups = [
   {
-    title: "Home Interior",
+    title: "Office & Books Deals",
     items: [
-      { title: "Curtains", offer: "Window Dressing", image: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=300&q=80", category: "Home Interior", subcategory: "Curtains" },
-      { title: "Wall Paint", offer: "Fresh Colors", image: "https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=300&q=80", category: "Home Interior", subcategory: "Wall Paint" },
-      { title: "Wallpaper", offer: "Designer Walls", image: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=300&q=80", category: "Home Interior", subcategory: "Wallpaper" },
-      { title: "Cove Lights", offer: "Ambient Lighting", image: "https://images.unsplash.com/photo-1513506003011-3b03c80165bd?auto=format&fit=crop&w=300&q=80", category: "Home Interior", subcategory: "Cove Lights" },
+      { title: "Cabinets", offer: "Window Dressing", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903365/nevyra/office-books/WhatsApp%20Image%202025-12-26%20at%208.27.46%20PM.jpg", category: "Home Interior", subcategory: "Curtains" },
+      { title: "Printers & Scanners", offer: "Fresh Colors", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903363/nevyra/office-books/WhatsApp%20Image%202025-12-26%20at%208.27.46%20PM%20%281%29.jpg", category: "Home Interior", subcategory: "Wall Paint" },
+      { title: "Notebooks", offer: "Designer Walls", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903368/nevyra/office-books/WhatsApp%20Image%202025-12-26%20at%208.27.47%20PM.jpg", category: "Home Interior", subcategory: "Wallpaper" },
+      { title: "Pens", offer: "Ambient Lighting", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903367/nevyra/office-books/WhatsApp%20Image%202025-12-26%20at%208.27.47%20PM%20%281%29.jpg", category: "Home Interior", subcategory: "Cove Lights" },
     ]
   },
   {
-    title: "Medical & Pharmacy",
+    title: "Home & Skincare Deals",
     items: [
-      { title: "Personal Care", offer: "Daily Essentials", image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=300&q=80", category: "Medical & Pharmacy", subcategory: "Personal Care" },
-      { title: "Skin Care", offer: "Healthy Glow", image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=300&q=80", category: "Medical & Pharmacy", subcategory: "Skin Care" },
-      { title: "Hair Care", offer: "Salon Quality", image: "https://images.unsplash.com/photo-1522337660859-02fbefca4702?auto=format&fit=crop&w=300&q=80", category: "Medical & Pharmacy", subcategory: "Hair Care" },
-      { title: "Makeup", offer: "Glamorous Look", image: "https://images.unsplash.com/photo-1522335789203-abd652327ed8?auto=format&fit=crop&w=300&q=80", category: "Medical & Pharmacy", subcategory: "Makeup" },
+      { title: "Furniture", offer: "Daily Essentials", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903345/nevyra/home-skincare/WhatsApp%20Image%202025-12-26%20at%208.59.33%20PM.jpg", category: "Medical & Pharmacy", subcategory: "Personal Care" },
+      { title: "Home Appliances", offer: "Healthy Glow", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903350/nevyra/home-skincare/WhatsApp%20Image%202025-12-26%20at%208.59.34%20PM.jpg", category: "Medical & Pharmacy", subcategory: "Skin Care" },
+      { title: "Makeup", offer: "Salon Quality", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903347/nevyra/home-skincare/WhatsApp%20Image%202025-12-26%20at%208.59.34%20PM%20%281%29.jpg", category: "Medical & Pharmacy", subcategory: "Hair Care" },
+      { title: "Skincare", offer: "Glamorous Look", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903348/nevyra/home-skincare/WhatsApp%20Image%202025-12-26%20at%208.59.34%20PM%20%282%29.jpg", category: "Medical & Pharmacy", subcategory: "Makeup" },
     ]
   },
   {
-    title: "Fashion & Beauty",
+    title: "Music Instruments and Watches Deals",
     items: [
-      { title: "Menswear", offer: "Stylish Collection", image: "https://images.unsplash.com/photo-1490114538077-0a7f8cb49891?auto=format&fit=crop&w=300&q=80", category: "Fashion & Beauty", subcategory: "Menswear" },
-      { title: "Women's Wear", offer: "Trendy Outfits", image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=300&q=80", category: "Fashion & Beauty", subcategory: "Women's Wear" },
-      { title: "Kids Wear", offer: "Cute & Comfy", image: "https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?auto=format&fit=crop&w=300&q=80", category: "Fashion & Beauty", subcategory: "Kids Wear" },
-      { title: "Kids Shoes", offer: "Fun Footwear", image: "https://images.unsplash.com/photo-1514989940723-e8e51635b782?auto=format&fit=crop&w=300&q=80", category: "Fashion & Beauty", subcategory: "Kids Shoes" },
+      { title: "Televisions & Audio", offer: "Stylish Collection", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903362/nevyra/music-watches/WhatsApp%20Image%202025-12-26%20at%209.30.49%20PM.jpg", category: "Fashion & Beauty", subcategory: "Menswear" },
+      { title: "Televisions & Audio", offer: "Trendy Outfits", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903357/nevyra/music-watches/WhatsApp%20Image%202025-12-26%20at%209.30.49%20PM%20%281%29.jpg", category: "Fashion & Beauty", subcategory: "Women's Wear" },
+      { title: "Men's watches", offer: "Cute & Comfy", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903359/nevyra/music-watches/WhatsApp%20Image%202025-12-26%20at%209.30.49%20PM%20%282%29.jpg", category: "Fashion & Beauty", subcategory: "Kids Wear" },
+      { title: "Women's watches", offer: "Fun Footwear", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903360/nevyra/music-watches/WhatsApp%20Image%202025-12-26%20at%209.30.49%20PM%20%283%29.jpg", category: "Fashion & Beauty", subcategory: "Kids Shoes" },
     ]
   },
 ];
@@ -163,30 +163,30 @@ const row6Title = "Fashion, Beauty & Personal Care Deals";
 // Mock Data for Row 7 (Grid)
 const row7GridGroups = [
   {
-    title: "Automotive",
+    title: "Best Automative Deals",
     items: [
-      { title: "Car Care", offer: "Min. 20% Off", image: "https://images.unsplash.com/photo-1600273759367-1606d20367eb?auto=format&fit=crop&w=300&q=80" },
-      { title: "Tools", offer: "Best Sellers", image: "https://images.unsplash.com/photo-1517524285303-d6fc683dddf8?auto=format&fit=crop&w=300&q=80" },
-      { title: "Electronics", offer: "GPS & Audio", image: "https://images.unsplash.com/photo-1542456008-01d7842bd955?auto=format&fit=crop&w=300&q=80" },
-      { title: "Accessories", offer: "Up to 30% Off", image: "https://images.unsplash.com/photo-1588631388394-d99f2b8417c8?auto=format&fit=crop&w=300&q=80" },
+      { title: "Car Accessories", offer: "Min. 20% Off", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903331/nevyra/automotive-deals/WhatsApp%20Image%202025-12-26%20at%2010.26.26%20PM.jpg" },
+      { title: "ToolsBike Accessories", offer: "Best Sellers", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903328/nevyra/automotive-deals/WhatsApp%20Image%202025-12-26%20at%2010.26.26%20PM%20%281%29.jpg" },
+      { title: "Care & Cleaning", offer: "GPS & Audio", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903329/nevyra/automotive-deals/WhatsApp%20Image%202025-12-26%20at%2010.26.26%20PM%20%282%29.jpg" },
+      { title: "Tools & Safety", offer: "Up to 30% Off", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903332/nevyra/automotive-deals/WhatsApp%20Image%202025-12-26%20at%2010.26.27%20PM.jpg" },
     ]
   },
   {
-    title: "Tools & Hardware",
+    title: "Kids & Toys Deals",
     items: [
-      { title: "Power Tools", offer: "Top Brands", image: "https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=300&q=80" },
-      { title: "Hand Tools", offer: "Min. 40% Off", image: "https://images.unsplash.com/photo-1530124566582-a618bc2615dc?auto=format&fit=crop&w=300&q=80" },
-      { title: "Hardware", offer: "DIY Essentials", image: "https://images.unsplash.com/photo-1581235720704-06d3acfcb36f?auto=format&fit=crop&w=300&q=80" },
-      { title: "Safety", offer: "Gear & More", image: "https://images.unsplash.com/photo-1582650085445-3db523d44331?auto=format&fit=crop&w=300&q=80" },
+      { title: "Baby Clothes & Blankets", offer: "Top Brands", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903351/nevyra/kids-toys/WhatsApp%20Image%202025-12-26%20at%2010.44.27%20PM.jpg" },
+      { title: "School Bags", offer: "Min. 40% Off", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903356/nevyra/kids-toys/WhatsApp%20Image%202025-12-26%20at%2010.44.28%20PM.jpg" },
+      { title: "Building Blocks & LEGO-type Toys", offer: "DIY Essentials", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903353/nevyra/kids-toys/WhatsApp%20Image%202025-12-26%20at%2010.44.28%20PM%20%281%29.jpg" },
+      { title: "Outdoor Toys", offer: "Gear & More", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903354/nevyra/kids-toys/WhatsApp%20Image%202025-12-26%20at%2010.44.28%20PM%20%282%29.jpg" },
     ]
   },
   {
-    title: "Office Supplies",
+    title: "Tool & Energy Deals",
     items: [
-      { title: "Furniture", offer: "Work from Home", image: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=300&q=80" },
-      { title: "Stationery", offer: "Back to School", image: "https://images.unsplash.com/photo-1456735190827-d1262f71b8a3?auto=format&fit=crop&w=300&q=80" },
-      { title: "Organizers", offer: "Min. 25% Off", image: "https://images.unsplash.com/photo-1510444369796-0da1a011211e?auto=format&fit=crop&w=300&q=80" },
-      { title: "Tech", offer: "Office Gear", image: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=300&q=80" },
+      { title: "Power & Backup", offer: "Work from Home", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903387/nevyra/tools-energy/WhatsApp%20Image%202025-12-26%20at%2011.03.20%20PM.jpg" },
+      { title: "Power & Backup", offer: "Back to School", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903391/nevyra/tools-energy/WhatsApp%20Image%202025-12-26%20at%2011.03.21%20PM.jpg" },
+      { title: "Solar Inverters", offer: "Min. 25% Off", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903388/nevyra/tools-energy/WhatsApp%20Image%202025-12-26%20at%2011.03.21%20PM%20%281%29.jpg" },
+      { title: "Power & Backup", offer: "Office Gear", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903390/nevyra/tools-energy/WhatsApp%20Image%202025-12-26%20at%2011.03.21%20PM%20%282%29.jpg" },
     ]
   },
 ];
@@ -216,14 +216,14 @@ const Index = () => {
     <div className="min-h-screen bg-[#F1F3F6] font-roboto">
       <Navbar />
       <HeroBanner />
-       <TopDeals />
-      
+      <TopDeals />
+
       {/* Row 1: Grid */}
       <HomeCategoryGrid groups={row1GridGroups} />
-      
+
       {/* Row 2: Carousel - Home Interior & Electrical */}
       <HomeProductCarousel title={row2Title} products={row2Products} />
-      
+
       {/* Row 3: Grid */}
       <HomeCategoryGrid groups={row3GridGroups} />
 
@@ -242,7 +242,7 @@ const Index = () => {
       {/* Row 8: Carousel - Groceries & Sports */}
       <HomeProductCarousel title={row8Title} products={row8Products} />
 
-     
+
 
       <WhyChooseUs />
       <Footer />

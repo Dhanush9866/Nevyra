@@ -41,11 +41,11 @@ const HomeCategoryGrid: React.FC<HomeCategoryGridProps> = ({ groups }) => {
                 {group.items.slice(0, 4).map((item, itemIdx) => (
                   <div key={itemIdx} className="group cursor-pointer flex flex-col">
                     {/* Image Container - Aspect Square & Consistent Size & No Border Radius */}
-                    <div className="w-full aspect-square overflow-hidden mb-2 rounded-none">
-                       <img
+                    <div className="w-full h-32 md:h-40 overflow-hidden mb-2 rounded-none flex items-center justify-center p-1">
+                      <img
                         src={item.image}
                         alt={item.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 rounded-none"
+                        className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300 rounded-none"
                       />
                     </div>
                     {/* Text Below Image */}
@@ -56,7 +56,7 @@ const HomeCategoryGrid: React.FC<HomeCategoryGridProps> = ({ groups }) => {
                   </div>
                 ))}
               </div>
-              
+
               <div className="mt-4 pt-2">
                 {/* Replaced 'See all offers' link with 'Shop Now' button & No Border Radius */}
                 <Button className="w-full rounded-none bg-primary hover:bg-primary/90 text-primary-foreground font-semibold">
