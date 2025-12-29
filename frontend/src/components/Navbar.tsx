@@ -1,4 +1,4 @@
-import { Search, User, ShoppingCart, Menu, ChevronDown, X, LogOut, Settings } from "lucide-react";
+import { Search, User, ShoppingCart, Menu, ChevronDown, ChevronRight, X, LogOut, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -19,7 +19,19 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/hooks/useAuth";
 import { apiService } from "@/lib/api";
 
-const categories = [
+interface SubCategoryGroup {
+  name: string;
+  items: string[];
+}
+
+type SubCategory = string | SubCategoryGroup;
+
+interface Category {
+  name: string;
+  subcategories: SubCategory[];
+}
+
+const categories: Category[] = [
   {
     name: "Medical & Pharmacy",
     subcategories: [
@@ -35,79 +47,689 @@ const categories = [
   },
   {
     name: "Groceries",
-    subcategories: ["General food items", "Daily essentials"],
+    subcategories: [
+      {
+        name: "General food items",
+        items: [
+          "Rice & Rice Products",
+          "Atta, Flours & Sooji",
+          "Pulses & Dals",
+          "Cooking Oils & Ghee",
+          "Sugar, Jaggery & Salt",
+          "Snacks & Namkeen",
+          "Biscuits & Cookies",
+          "Breakfast Cereals",
+          "Noodles, Pasta & Vermicelli",
+          "Ready to Eat/ Ready to Cook",
+          "Whole Spices",
+          "Powdered Spices",
+          "Masala Mixes",
+          "Milk",
+          "Curd & Yogurt",
+          "Butter & Cheese",
+          "Eggs",
+          "Health Drinks",
+          "Soft Drinks & Juices",
+          "Chocolates",
+          "Candies & Toffees",
+          "Indian Sweets",
+          "Pickles",
+          "Sauces & Ketchup",
+          "Jams & Spreads",
+          "Dishwash & Cleaners",
+          "Laundry Detergents",
+          "Floor & Toilet Cleaners",
+          "Garbage Bags"
+        ]
+      },
+      {
+        name: "Daily essentials",
+        items: [
+          "Tissues & Paper Towels",
+          "Napkins",
+          "Foils & Cling Wraps",
+          "Organic Staples",
+          "Dry Fruits & Nuts",
+          "Seeds & Superfoods",
+          "Vegetables",
+          "Fruits",
+          "Leafy Vegetables",
+          "Herbs & Seasonings",
+          "Chips",
+          "Cookies",
+          "Popcorn",
+          "Instant Snacks",
+          "Bread & Bakery"
+        ]
+      }
+    ]
   },
   {
     name: "Fashion & Beauty",
     subcategories: [
       {
-        name: "Clothing",
-        items: ["Menswear", "Women's Wear", "Kids Wear"]
+        name: "Men's wear",
+        items: [
+          "T-shirts",
+          "Polo T-Shirts",
+          "Hoodies",
+          "Blazers",
+          "Casual Shirts",
+          "Formal Shirts",
+          "Jeans",
+          "Casual Trousers",
+          "Formal Trousers",
+          "Shorts",
+          "Cargos",
+          "Suits",
+          "Ties, Socks",
+          "Sweatshirts",
+          "Jackets",
+          "Sweater",
+          "Track pants",
+          "Joggers",
+          "Pathani Suits",
+          "Tracksuits",
+          "Sherwanis",
+          "Three Fourths",
+          "Kurta",
+          "Dhoti",
+          "Lungi",
+          "Vests",
+          "Boxers",
+          "Thermals",
+          "Night Suits",
+          "Briefs",
+          "Trunks",
+          "Gym wear",
+          "Winter wear",
+          "Rain wear",
+          "Waistcoats"
+        ]
       },
       {
-        name: "Shoes",
-        items: ["Men's", "Women's", "Kids"]
+        name: "Women's wear",
+        items: [
+          "Dresses",
+          "Topwear",
+          "Jeans",
+          "Jumpsuits",
+          "Shorts",
+          "T-shirts",
+          "Salwar Suits",
+          "Anarkali",
+          "Dupattas",
+          "Petticoats",
+          "Palazzos",
+          "Camisoles",
+          "Skirts",
+          "Jeggings & Tights",
+          "Trousers",
+          "Bras",
+          "Panties",
+          "Night Dresses & Nighties",
+          "Shapewear",
+          "Swim & Beachwear",
+          "Party Dresses",
+          "Sports Wear",
+          "Winter Wear",
+          "Sarees",
+          "Blouse",
+          "Kurtis",
+          "Kurtas",
+          "Dress Material",
+          "Lehenga",
+          "Leggings",
+          "Churidars",
+          "Dhoti Pants",
+          "Saree Shapewear"
+        ]
       },
       {
-        name: "Accessories",
-        items: ["Watches", "Luggage"]
+        name: "Baby Care & Kids",
+        items: [
+          "Outdoor Toys",
+          "Board Games",
+          "Musical Toys",
+          "Dolls",
+          "Doll Houses",
+          "Building Blocks & LEGO-type Toys",
+          "STEM Toys",
+          "Pretend Play",
+          "Action Figures",
+          "Art & Craft kits",
+          "Ride-on Toys",
+          "Puzzles",
+          "Toy Guns",
+          "Vehicles",
+          "Soft Toys",
+          "Remote Control Toys",
+          "Educational Toys",
+          "Helicopter",
+          "Drones",
+          "School Bags",
+          "Pencil Boxes",
+          "Stationery Sets",
+          "Tiffin Bags",
+          "Rain Covers for Bags",
+          "Lunch box",
+          "Bottle",
+          "School Combo Sets",
+          "Diapers",
+          "Wipes",
+          "Baby Rattles & Teethers",
+          "Baby Medical & Health Care",
+          "Baby Cleaners & Detergents",
+          "Baby Food & Formula",
+          "Baby Bibs",
+          "Pacifiers & Soothers",
+          "Baby Towels & Bedding",
+          "Baby Clothes & Blankets",
+          "Diper Bags",
+          "Baby Grooming",
+          "Baby Hair & Skin Care",
+          "Baby Bathing",
+          "Baby Feeding Bottle & Accessories",
+          "Baby Safety Accessories"
+        ]
+      },
+      {
+        name: "Watches",
+        items: [
+          "Titan",
+          "Fastrack",
+          "Sonata",
+          "Casio",
+          "Timex",
+          "boAt",
+          "Noise",
+          "Fire-Boltt",
+          "Amazfit",
+          "Fossil",
+          "Daniel Wellington",
+          "Armani Exchange",
+          "Tommy Hilfiger",
+          "Michael Kors"
+        ]
+      },
+      {
+        name: "Woman’s Bags",
+        items: [
+          "Handbags",
+          "Shoulder Bags",
+          "Sling Bags",
+          "Tote Bags",
+          "Clutches",
+          "Hobo bags"
+        ]
+      },
+      {
+        name: "Utility & Travel",
+        items: [
+          "Backpacks",
+          "Laptop Bags",
+          "Office Bags",
+          "Travel Bags",
+          "Duffel Bags"
+        ]
+      },
+      {
+        name: "Small Accessories",
+        items: [
+          "Wallets & Belts",
+          "Pouches",
+          "Coin purses",
+          "Sunglasses"
+        ]
+      },
+      {
+        name: "Jewellery",
+        items: [
+          "Earrings",
+          "Necklaces",
+          "Rings",
+          "Bangles & Bracelets",
+          "Anklets",
+          "Noise Pins",
+          "Bridal Jewelry",
+          "Men’s Jewelry",
+          "Kids Jewelry"
+        ]
+      },
+      {
+        name: "Luggage",
+        items: [
+          "Trolley Bags",
+          "Suitcases",
+          "Cabin Luggage",
+          "Check-in Luggage"
+        ]
+      },
+      {
+        name: "Travel Bags",
+        items: [
+          "Duffle Bags",
+          "Travel Backpacks",
+          "Weekender Bags"
+        ]
+      },
+      {
+        name: "Utility Travel",
+        items: [
+          "Laptop Trolleys",
+          "Office Travel Bags",
+          "Garment Bags"
+        ]
       }
     ],
   },
   {
     name: "Devices",
     subcategories: [
-      "Cell Phones & Accessories",
-      "Laptops",
-      "Televisions",
-      "Refrigerators",
-      "Smart Watches",
+      {
+        name: "Cell Phones & Accessories",
+        items: [
+          "Mobile Phones",
+          "Mobile Covers & Cases",
+          "Chargers & Cables",
+          "Power Banks",
+          "Screen Protectors",
+          "Earphones & Headphones",
+          "Bluetooth Speakers"
+        ]
+      },
+      {
+        name: "Laptops & Computers",
+        items: [
+          "Laptops",
+          "Desktops",
+          "Tablets",
+          "Keyboards & Mouse",
+          "Monitors",
+          "Printers & Scanners"
+        ]
+      },
+      {
+        name: "Televisions & Audio",
+        items: [
+          "Smart TVs",
+          "Streaming Devices",
+          "Soundbars",
+          "Home Theaters",
+          "Projectors"
+        ]
+      },
+      {
+        name: "Home Appliances",
+        items: [
+          "Refrigerators",
+          "Washing Machines",
+          "Air conditioners",
+          "Microwave Ovens",
+          "Dishwashers",
+          "Water Purifiers"
+        ]
+      },
+      {
+        name: "Smart Watches & Wearables",
+        items: [
+          "Smart Watches",
+          "Fitness Bands",
+          "VR Headsets",
+          "Smart Glasses"
+        ]
+      },
+      {
+        name: "Cameras & Accessories",
+        items: [
+          "Digital Cameras",
+          "DSLR Cameras",
+          "Action Cameras",
+          "Camera Lenses",
+          "Tripods",
+          "Memory Cards"
+        ]
+      },
+      {
+        name: "Gaming Devices",
+        items: [
+          "Gaming Consoles",
+          "Game Controllers",
+          "Gaming Headsets",
+          "Gaming Accessories"
+        ]
+      },
+      {
+        name: "Smart Devices",
+        items: [
+          "Smart Lights",
+          "Smart Plugs",
+          "Smart Door Locks",
+          "Security Cameras",
+          "WiFi- Routers",
+          "Smart Sensors"
+        ]
+      }
     ],
   },
   {
-    name: "Electrical",
+    name: "Electrical & Electronics",
     subcategories: [
-      "Solar Panels",
-      "Solar Fencing Kit",
-      "Batteries",
-      "Transformers",
-      "Wiring Cables",
-      "LED Bulbs",
-      "Tube Lights",
-      "Ceiling Fan",
+      {
+        name: "Power & Backup",
+        items: [
+          "Inverters & UPS",
+          "Batteries",
+          "Transformers",
+          "Stabilizers",
+          "UPS Systems",
+          "Solar Inverters",
+          "Battery Accessories"
+        ]
+      },
+      {
+        name: "Wiring & Protection",
+        items: [
+          "Wiring Cables & Wires",
+          "Switches & Sockets",
+          "MCBs, RCCBs & DB Boxes",
+          "Extension Boards",
+          "Plug Tops & Adaptors",
+          "Control Switches",
+          "Relays & Contractors"
+        ]
+      },
+      {
+        name: "Lighting",
+        items: [
+          "Ceiling Lights",
+          "CFL Bulbs",
+          "Wall Lights",
+          "Outdoor Lights",
+          "Street Lights",
+          "Emergency Lights"
+        ]
+      },
+      {
+        name: "Fans & Appliances",
+        items: [
+          "Table Fans",
+          "Pedestal Fans",
+          "Exhaust Fans",
+          "Ventilation Fans",
+          "Water Heaters",
+          "Room Heaters",
+          "Irons",
+          "Mixers & Grinders",
+          "Electric Kettles",
+          "Induction Cooktops"
+        ]
+      },
+      {
+        name: "Smart Home & Automation",
+        items: [
+          "Smart Switches",
+          "Smart Plugs",
+          "Smart Lights",
+          "Smart Doorbells",
+          "Home Automation Kits"
+        ]
+      },
+      {
+        name: "Tools & Industrial",
+        items: [
+          "Electrical Tools",
+          "Testing Devices",
+          "Tool kits",
+          "Safety Gloves & Gear",
+          "Industrial panels",
+          "Heavy Duty Cables"
+        ]
+      }
     ],
   },
   {
-    name: "Automotive",
+    name: "Automotive & Automobile",
     subcategories: [
-      "Bike Accessories",
-      "Car Accessories",
-      "Engine Oil",
-      "Brake Fluid",
-      "Air Filter",
+      {
+        name: "Bike Accessories",
+        items: [
+          "Helmets",
+          "Bike covers",
+          "Bike Lights",
+          "Bike Batteries",
+          "Bike Engine Oil",
+          "Bike Brake Oil",
+          "Bike Air Filters",
+          "Bike Cleaning & Care"
+        ]
+      },
+      {
+        name: "Car Accessories",
+        items: [
+          "Car Covers",
+          "Car Seat Covers",
+          "Car Mats",
+          "Car Chargers & Holders",
+          "Car Lights & Fog Lamps"
+        ]
+      },
+      {
+        name: "Lubricants & Fluids",
+        items: [
+          "Engine Oil",
+          "Brake Fluid",
+          "Coolant",
+          "Gear Oil",
+          "Power Steering Oil"
+        ]
+      },
+      {
+        name: "Spares & Parts",
+        items: [
+          "Air Filters",
+          "Oil Filters",
+          "Fuel Filters",
+          "Spark Plugs",
+          "Brake Pads",
+          "Clutch Parts",
+          "Horns",
+          "Wipers",
+          "Fuse & Relays"
+        ]
+      },
+      {
+        name: "Care & Cleaning",
+        items: [
+          "Car Wash & Shampoo",
+          "Polish & Wax",
+          "Interior Cleaners",
+          "Tyre Cleaners",
+          "Chain Lubes"
+        ]
+      },
+      {
+        name: "Tyres & Wheels",
+        items: [
+          "Car Tyres",
+          "Bike Tyres",
+          "Alloy Wheels",
+          "Tyre Inflators"
+        ]
+      },
+      {
+        name: "Tools & Safety",
+        items: [
+          "Tool Kits",
+          "Hydraulic Jacks",
+          "First Aid Kits",
+          "Warning Traingles"
+        ]
+      }
     ],
   },
   {
     name: "Sports",
     subcategories: [
-      "Cricket Bats",
-      "Cricket Balls",
-      "Stumps",
-      "Cricket Kit",
-      "Volleyball",
-      "Volleyball Net",
+      {
+        name: "Cricket",
+        items: [
+          "Batting Gloves",
+          "Batting Pads",
+          "Helmets",
+          "Wicket Keeping Gloves",
+          "Wicket Keeping Pads",
+          "Knee pads"
+        ]
+      },
+      {
+        name: "Football",
+        items: [
+          "Football",
+          "Football Shoes",
+          "Shin Guards",
+          "Goal Posts"
+        ]
+      },
+      {
+        name: "Racquet Sports",
+        items: [
+          "Badminton Rackets",
+          "Shuttlecocks",
+          "Badminton Nets",
+          "Grip Tapes",
+          "Tennis Rackets",
+          "Tennis Balls",
+          "Tennis Nets",
+          "Table Tennis Bats",
+          "Table Tennis Balls",
+          "TT Tables"
+        ]
+      },
+      {
+        name: "Basketball",
+        items: [
+          "Basketball",
+          "Basketball Ring",
+          "Basketball Net"
+        ]
+      },
+      {
+        name: "Indoor Games",
+        items: [
+          "Carrom Boards",
+          "Chess Boards"
+        ]
+      },
+      {
+        name: "Fitness & Gym",
+        items: [
+          "Dumbbells",
+          "Barbells",
+          "Weight Plates",
+          "Resistance Bands",
+          "Skipping Ropes",
+          "Yoga Mats",
+          "Exercise Balls"
+        ]
+      },
+      {
+        name: "Cycling & Skating",
+        items: [
+          "Cycles",
+          "Cycling Helmets",
+          "Skates",
+          "Skateboards"
+        ]
+      },
+      {
+        name: "Gear & Accessories",
+        items: [
+          "Sports Shoes",
+          "Sports Gloves",
+          "Sports Bags",
+          "Water Bottles"
+        ]
+      }
     ],
   },
   {
-    name: "Home Interior",
+    name: "Home Interior & Decor",
     subcategories: [
-      "Gypsum False Ceiling",
-      "Cove Lights",
-      "Main Door",
-      "Wall Paint",
-      "Wallpaper",
-      "Curtains",
-      "Wall Tiles",
+      {
+        name: "Ceiling & Lighting",
+        items: [
+          "POP Ceiling",
+          "LED Ceiling Lights",
+          "Chandeliers",
+          "Wall Lights",
+          "Spot Lights"
+        ]
+      },
+      {
+        name: "Doors & Windows",
+        items: [
+          "Main Door",
+          "Bedroom Doors",
+          "PVC / UPVC Doors",
+          "Door Frames",
+          "Door Handles & Locks",
+          "Windows & Grills"
+        ]
+      },
+      {
+        name: "Walls & Flooring",
+        items: [
+          "Texture Paint",
+          "Wallpaper",
+          "Wall Panels (PVC / WPC)",
+          "Wall Stickers & Decals",
+          "Floor Tiles",
+          "Wooden Flooring",
+          "Marble & Granite",
+          "Tile Adhesives & Grout",
+          "Paint Brushes & Rollers"
+        ]
+      },
+      {
+        name: "Curtains & Blinds",
+        items: [
+          "Curtains",
+          "Curtain Rods & Tracks",
+          "Blinds (Roller / Venetian)",
+          "Window Sheers"
+        ]
+      },
+      {
+        name: "Furniture",
+        items: [
+          "Sofa Sets",
+          "Beds",
+          "Wardrobes",
+          "TV Units",
+          "Dining Tables"
+        ]
+      },
+      {
+        name: "Decor & Plants",
+        items: [
+          "Wall Art & Frames",
+          "Mirrors",
+          "Clocks",
+          "Showpieces",
+          "Indoor Plants & Pots"
+        ]
+      },
+      {
+        name: "Storage & Hardware",
+        items: [
+          "Shelves & Racks",
+          "Shoe Racks",
+          "Cabinets",
+          "Storage Boxes",
+          "Hardware Fittings"
+        ]
+      }
     ],
   },
 ];
@@ -123,6 +745,7 @@ const categoryToSlug = (categoryName: string): string => {
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
+  const [activeSubCategory, setActiveSubCategory] = useState<string | null>(null);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { user, isAuthenticated, logout } = useAuth();
@@ -275,9 +898,19 @@ const Navbar = () => {
       <div className="bg-background border-t border-border">
         <div className="container mx-auto px-2">
           {/* Desktop Categories */}
-          <div className="hidden md:flex items-center space-x-8 py-2">
+          <div className="hidden md:flex items-center space-x-4 py-2 overflow-x-auto no-scrollbar whitespace-nowrap">
             {categories.map((category) => (
-              <HoverCard key={category.name} openDelay={0} closeDelay={0}>
+              <HoverCard
+                key={category.name}
+                openDelay={0}
+                closeDelay={100}
+                onOpenChange={(open) => {
+                  if (open) {
+                    // Reset to first item or keep null to let logic verify default
+                    setActiveSubCategory(null);
+                  }
+                }}
+              >
                 <HoverCardTrigger asChild>
                   <Link to={`/category/${categoryToSlug(category.name)}`}>
                     <Button
@@ -289,31 +922,64 @@ const Navbar = () => {
                     </Button>
                   </Link>
                 </HoverCardTrigger>
-                <HoverCardContent className="w-64 bg-popover border border-border p-0">
+                <HoverCardContent
+                  className={`bg-popover border border-border p-0 ${category.name === "Fashion & Beauty" || category.name === "Groceries" || category.name === "Devices" || category.name === "Electrical & Electronics" || category.name === "Automotive & Automobile" || category.name === "Sports" || category.name === "Home Interior & Decor"
+                    ? "w-auto min-w-[500px]"
+                    : "w-64"
+                    }`}
+                >
                   <div className="py-2">
-                    {category.name === "Fashion & Beauty" ? (
-                      // Special layout for Fashion & Beauty
-                      <div className="px-4 py-2">
-                        {category.subcategories.map((section, sectionIndex) => (
-                          <div key={sectionIndex} className="mb-4">
-                            <div className="font-medium text-popover-foreground mb-2 text-sm">
-                              {section.name}
+                    {category.name === "Fashion & Beauty" || category.name === "Groceries" || category.name === "Devices" || category.name === "Electrical & Electronics" || category.name === "Automotive & Automobile" || category.name === "Sports" || category.name === "Home Interior & Decor" ? (
+                      // Special layout for Mega Menus
+                      <div className="flex w-[800px] h-[400px]">
+                        {/* Left Side - Categories */}
+                        <div className="w-1/3 border-r bg-muted/30 py-2">
+                          {(category.subcategories as SubCategoryGroup[]).map((section, sectionIndex) => (
+                            <div
+                              key={sectionIndex}
+                              className={`px-4 py-3 cursor-pointer flex justify-between items-center transition-colors ${(activeSubCategory === section.name || (!activeSubCategory && sectionIndex === 0))
+                                ? "bg-white text-primary font-medium border-l-4 border-l-primary"
+                                : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                                }`}
+                              onMouseEnter={() => setActiveSubCategory(section.name)}
+                            >
+                              <span className="text-sm">{section.name}</span>
+                              <ChevronRight className="h-4 w-4" />
                             </div>
-                            <div className="pl-4 space-y-1">
-                              {section.items.map((item, itemIndex) => (
-                                <div key={itemIndex} className="flex items-center">
-                                  <span className="w-2 h-2 bg-primary rounded-full mr-2"></span>
-                                  <Link
-                                    to={`/category/${categoryToSlug(category.name)}`}
-                                    className="text-xs text-popover-foreground hover:text-primary cursor-pointer"
-                                  >
-                                    {item}
-                                  </Link>
-                                </div>
-                              ))}
-                            </div>
+                          ))}
+                        </div>
+
+                        {/* Right Side - Items */}
+                        <div className="w-2/3 p-6 bg-white overflow-y-auto">
+                          <h3 className="font-semibold text-gray-800 mb-4 text-lg">
+                            {(activeSubCategory || (category.subcategories[0] as SubCategoryGroup).name)}
+                          </h3>
+                          <div className="grid grid-cols-2 gap-x-8 gap-y-3">
+                            {(category.subcategories as SubCategoryGroup[])
+                              .find((s) => s.name === (activeSubCategory || (category.subcategories[0] as SubCategoryGroup).name))
+                              ?.items.map((item, itemIndex) => (
+                                <Link
+                                  key={itemIndex}
+                                  to={`/category/${categoryToSlug(category.name)}`}
+                                  className="text-sm text-gray-600 hover:text-primary hover:underline flex items-center"
+                                  title={item}
+                                >
+                                  {item}
+                                </Link>
+                              ))
+                            }
                           </div>
-                        ))}
+
+                          <div className="mt-8 pt-6 border-t">
+                            <Link
+                              to={`/category/${categoryToSlug(category.name)}`}
+                              className="inline-flex items-center text-primary font-medium hover:underline"
+                            >
+                              View all in {(activeSubCategory || (category.subcategories[0] as SubCategoryGroup).name)}
+                              <ChevronRight className="h-4 w-4 ml-1" />
+                            </Link>
+                          </div>
+                        </div>
                       </div>
                     ) : (
                       // Default layout for other categories
@@ -326,7 +992,7 @@ const Navbar = () => {
                             to={`/category/${categoryToSlug(category.name)}`}
                             className="w-full block"
                           >
-                            {subcategory}
+                            {subcategory as string}
                           </Link>
                         </div>
                       ))
@@ -420,9 +1086,9 @@ const Navbar = () => {
                   </div>
                   {expandedCategory === category.name && (
                     <div className="space-y-1 pl-4 bg-muted/30 rounded p-2">
-                      {category.name === "Fashion & Beauty" ? (
-                        // Special mobile layout for Fashion & Beauty
-                        category.subcategories.map((section, sectionIndex) => (
+                      {category.name === "Fashion & Beauty" || category.name === "Groceries" || category.name === "Devices" || category.name === "Electrical & Electronics" || category.name === "Automotive & Automobile" || category.name === "Sports" || category.name === "Home Interior & Decor" ? (
+                        // Special mobile layout for Grouped Categories
+                        (category.subcategories as SubCategoryGroup[]).map((section, sectionIndex) => (
                           <div key={sectionIndex} className="mb-3">
                             <div className="font-medium text-foreground mb-2 text-sm">
                               {section.name}
@@ -451,7 +1117,7 @@ const Navbar = () => {
                             className="block text-sm text-muted-foreground hover:text-foreground py-2 px-2 rounded hover:bg-muted"
                             onClick={() => setIsMobileMenuOpen(false)}
                           >
-                            {subcategory}
+                            {subcategory as string}
                           </Link>
                         ))
                       )}
