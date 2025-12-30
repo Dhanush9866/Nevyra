@@ -1,6 +1,6 @@
 // backend/categorySchemas.js
 module.exports.categorySchemas = {
-  Medical: ["brand", "expiryDate", "drugName", "dosage", "packSize"],
+  "Medical & Pharmacy": ["brand", "expiryDate", "drugName", "dosage", "packSize"],
   Groceries: ["brand", "weight", "type", "expiryDate"],
   FashionBeauty: ["size", "color", "material", "brand", "gender", "occasion"],
   Devices: ["brand", "model", "warranty", "batteryLife", "storage"],

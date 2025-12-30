@@ -35,14 +35,175 @@ const categories: Category[] = [
   {
     name: "Medical & Pharmacy",
     subcategories: [
-      "Personal Care",
-      "Skin Care",
-      "Hair Care",
-      "Makeup",
-      "Foot, Hand & Nail Care",
-      "Salon Equipment",
-      "Shave & Hair Removal",
-      "Fragrance",
+      {
+        name: "Personal Care",
+        items: [
+          "Oral Care",
+          "Body Care",
+          "Intimate Care",
+          "Hand Wash & Sanitizers"
+        ]
+      },
+      {
+        name: "Skin Care",
+        items: [
+          "Face Wash & Cleansers",
+          "Moisturizers & Creams",
+          "Sunscreen",
+          "Acne & Pimple Care",
+          "Anti-Aging",
+          "Serums & Toners"
+        ]
+      },
+      {
+        name: "Hair Care",
+        items: [
+          "Shampoo",
+          "Conditioner",
+          "Hair Oil",
+          "Hair Serum",
+          "Hair Fall Treatment",
+          "Dandruff Care"
+        ]
+      },
+      {
+        name: "Makeup",
+        items: [
+          "Face Makeup",
+          "Eye Makeup",
+          "Lip Makeup",
+          "Makeup Kits",
+          "Makeup Tools & Brushes"
+        ]
+      },
+      {
+        name: "Foot, Hand & Nail Care",
+        items: [
+          "Foot Creams",
+          "Hand Creams",
+          "Nail Care",
+          "Manicure & Pedicure Kits"
+        ]
+      },
+      {
+        name: "Salon Equipment",
+        items: [
+          "Hair Dryers",
+          "Hair Straighteners",
+          "Trimmers & Clippers",
+          "Facial Machines",
+          "Salon Chairs & Accessories"
+        ]
+      },
+      {
+        name: "Shave & Hair Removal",
+        items: [
+          "Razors",
+          "Shaving Cream & Foam",
+          "After Shave",
+          "Hair Removal Creams",
+          "Waxing Products",
+          "Bleach Crems",
+          "Epilator Devices",
+          "Threading Tools"
+        ]
+      },
+      {
+        name: "Fragrance",
+        items: [
+          "Perfumes",
+          "Deodorants",
+          "Body Mists",
+          "Roll-On"
+        ]
+      },
+      {
+        name: "Health & Wellness",
+        items: [
+          "Health Supplements",
+          "Vitamins & Minerals",
+          "Protein & Nutrition",
+          "Immunity Boosters",
+          "Herbal Supplements"
+        ]
+      },
+      {
+        name: "Medical Devices",
+        items: [
+          "Bp Monitors",
+          "Glucometers",
+          "Thermometers",
+          "Nebulizers",
+          "Pulse Oximeters",
+          "Weighing Scales"
+        ]
+      },
+      {
+        name: "Fitness & Rehab",
+        items: [
+          "Orthopedic Supports",
+          "Knee/Back/Wrist Supports",
+          "Hot & Cold Packs",
+          "Posture Correctors",
+          "Physiotherapy Equipment"
+        ]
+      },
+      {
+        name: "First Aid & Emergency",
+        items: [
+          "First Aid Kits",
+          "Bandages & Gauze",
+          "Antiseptic Liquids",
+          "Cotton & Medical Tapes",
+          "Burn Care"
+        ]
+      },
+      {
+        name: "Women's Health",
+        items: [
+          "Sanitary Napkins",
+          "Menstrual Cups",
+          "Intimate Wash",
+          "Maternity Care",
+          "Pregnancy Test Kits"
+        ]
+      },
+      {
+        name: "Men's Health",
+        items: [
+          "Men's Grooming",
+          "Hair Loss Solutions",
+          "Sexual Wellness"
+        ]
+      },
+      {
+        name: "Ayurvedic & Herbal",
+        items: [
+          "Ayurvedic Medicines",
+          "Herbal Oils",
+          "Herbal Powders",
+          "Traditional Remedies"
+        ]
+      },
+      {
+        name: "Elder Care",
+        items: [
+          "Adult Diapers",
+          "Walking Sticks",
+          "Hearing Aids",
+          "Wheelchairs",
+          "Pill Organizers"
+        ]
+      },
+      {
+        name: "Nutrition & Special Care",
+        items: [
+          "Diabetic Care",
+          "Sugar Free Products",
+          "Heart Care",
+          "Weight Management"
+        ]
+      }
     ],
   },
   {
@@ -923,17 +1084,17 @@ const Navbar = () => {
                   </Link>
                 </HoverCardTrigger>
                 <HoverCardContent
-                  className={`bg-popover border border-border p-0 ${category.name === "Fashion & Beauty" || category.name === "Groceries" || category.name === "Devices" || category.name === "Electrical & Electronics" || category.name === "Automotive & Automobile" || category.name === "Sports" || category.name === "Home Interior & Decor"
+                  className={`bg-popover border border-border p-0 ${category.name === "Fashion & Beauty" || category.name === "Groceries" || category.name === "Devices" || category.name === "Electrical & Electronics" || category.name === "Automotive & Automobile" || category.name === "Sports" || category.name === "Home Interior & Decor" || category.name === "Medical & Pharmacy"
                     ? "w-auto min-w-[500px]"
                     : "w-64"
                     }`}
                 >
                   <div className="py-2">
-                    {category.name === "Fashion & Beauty" || category.name === "Groceries" || category.name === "Devices" || category.name === "Electrical & Electronics" || category.name === "Automotive & Automobile" || category.name === "Sports" || category.name === "Home Interior & Decor" ? (
+                    {category.name === "Fashion & Beauty" || category.name === "Groceries" || category.name === "Devices" || category.name === "Electrical & Electronics" || category.name === "Automotive & Automobile" || category.name === "Sports" || category.name === "Home Interior & Decor" || category.name === "Medical & Pharmacy" ? (
                       // Special layout for Mega Menus
-                      <div className="flex w-[800px] h-[400px]">
+                      <div className="flex w-[800px] h-[500px]">
                         {/* Left Side - Categories */}
-                        <div className="w-1/3 border-r bg-muted/30 py-2">
+                        <div className="w-1/3 border-r bg-muted/30 py-2 overflow-y-auto custom-scrollbar">
                           {(category.subcategories as SubCategoryGroup[]).map((section, sectionIndex) => (
                             <div
                               key={sectionIndex}
@@ -950,7 +1111,7 @@ const Navbar = () => {
                         </div>
 
                         {/* Right Side - Items */}
-                        <div className="w-2/3 p-6 bg-white overflow-y-auto">
+                        <div className="w-2/3 p-6 bg-white overflow-y-auto custom-scrollbar">
                           <h3 className="font-semibold text-gray-800 mb-4 text-lg">
                             {(activeSubCategory || (category.subcategories[0] as SubCategoryGroup).name)}
                           </h3>
@@ -1086,7 +1247,7 @@ const Navbar = () => {
                   </div>
                   {expandedCategory === category.name && (
                     <div className="space-y-1 pl-4 bg-muted/30 rounded p-2">
-                      {category.name === "Fashion & Beauty" || category.name === "Groceries" || category.name === "Devices" || category.name === "Electrical & Electronics" || category.name === "Automotive & Automobile" || category.name === "Sports" || category.name === "Home Interior & Decor" ? (
+                      {category.name === "Fashion & Beauty" || category.name === "Groceries" || category.name === "Devices" || category.name === "Electrical & Electronics" || category.name === "Automotive & Automobile" || category.name === "Sports" || category.name === "Home Interior & Decor" || category.name === "Medical & Pharmacy" ? (
                         // Special mobile layout for Grouped Categories
                         (category.subcategories as SubCategoryGroup[]).map((section, sectionIndex) => (
                           <div key={sectionIndex} className="mb-3">
