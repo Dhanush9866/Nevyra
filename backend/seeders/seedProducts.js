@@ -6,14 +6,13 @@ async function seedProducts() {
   // Remove all existing products
   await Product.deleteMany({});
   const products = [
-    // Medical
+    // Medical & Pharmacy
     {
-      title: "Paracetamol Tablets",
+      title: "Waterproof Bandages",
       price: 5,
-      category: "Medical",
-      subCategory: "Pain Relief",
+      category: "Medical & Pharmacy",
+      subCategory: "Bandages & Gauze",
       images: [
-        "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=400",
         "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400",
       ],
       inStock: true,
@@ -24,9 +23,44 @@ async function seedProducts() {
       attributes: {
         brand: "MediCure",
         expiryDate: "2025-12-31",
-        drugName: "Paracetamol",
-        dosage: "500mg",
-        packSize: "20 tablets",
+        packSize: "20 strips",
+      },
+    },
+    {
+      title: "Herbal Face Wash",
+      price: 12,
+      category: "Medical & Pharmacy",
+      subCategory: "Face Wash & Cleansers",
+      images: [
+        "https://images.unsplash.com/photo-1556228578-8c89e6eb8f57?w=400",
+      ],
+      inStock: true,
+      rating: 4.6,
+      reviews: 85,
+      stockQuantity: 100,
+      soldCount: 150,
+      attributes: {
+        brand: "GlowNatural",
+        expiryDate: "2025-06-30",
+        packSize: "100ml",
+      },
+    },
+    {
+      title: "Digital Thermometer",
+      price: 25,
+      category: "Medical & Pharmacy",
+      subCategory: "Thermometers",
+      images: [
+        "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400"
+      ],
+      inStock: true,
+      rating: 4.8,
+      reviews: 200,
+      stockQuantity: 50,
+      soldCount: 300,
+      attributes: {
+        brand: "HealthSense",
+        warranty: "1 year",
       },
     },
     // Groceries
