@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://nevyra-backend.onrender.com/api';
+const API_BASE_URL = 'http://localhost:8000/api';
 
 export interface LoginRequest {
   email: string;
@@ -66,6 +66,12 @@ class ApiService {
   async getProductById(id: string): Promise<{ success: boolean; message: string; data: any }> {
     return this.request(`/products/${id}`);
   }
+
+  async getProductsByMultipleSubcategories(params: Record<string, any> = {}): Promise<{ success: boolean; message: string; data: any[]; pagination?: any }> {
+    const query = new URLSearchParams(params as any).toString();
+    return this.request(`/products/by-subcategories${query ? `?${query}` : ''}`);
+  }
+
 
   // Cart
   async getCart(): Promise<{ success: boolean; message: string; data: any[] }> {

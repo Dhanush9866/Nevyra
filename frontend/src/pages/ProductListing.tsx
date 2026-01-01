@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useSearchParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
@@ -33,6 +33,7 @@ const brands = ["TechCorp", "SportBrand", "GameTech", "FashionHub"];
 
 const ProductListing = () => {
   const { categoryName } = useParams();
+  const [searchParams] = useSearchParams();
   const [products, setProducts] = useState<ProductItem[]>([]);
   const [priceRange, setPriceRange] = useState([0, 1000000]);
   const [addingId, setAddingId] = useState<string | null>(null);
@@ -42,8 +43,9 @@ const ProductListing = () => {
     (async () => {
       console.log('========== FRONTEND PRODUCT FETCH ==========');
       const params: any = { limit: 100 };
-      if (categoryName) {
-        // Map URL slug to actual category name
+      
+      // Handle Category from URL param
+      if (categoryName && categoryName !== 'all') {
         const categoryMap: Record<string, string> = {
           'medical-and-pharmacy': 'Medical & Pharmacy',
           'groceries': 'Groceries',
@@ -55,14 +57,29 @@ const ProductListing = () => {
           'home-interior': 'Home Interior',
         };
         params.category = categoryMap[categoryName] || categoryName;
-        console.log('Category mapping:', { 
-          urlSlug: categoryName, 
-          mappedCategory: params.category 
-        });
       }
+
+      // Handle SubCategory from Query param
+      const subCategory = searchParams.get('subCategory');
+      if (subCategory) {
+        // Check if it contains comma-separated values
+        if (subCategory.includes(',')) {
+          // Use the new multi-subcategory endpoint
+          params.subCategories = subCategory;
+        } else {
+          // Use the regular single subcategory param
+          params.subCategory = subCategory;
+        }
+      }
+
       try {
         console.log('API request params:', params);
-        const res = await apiService.getProducts(params);
+        
+        // Use the appropriate endpoint based on whether we have multiple subcategories
+        const res = params.subCategories 
+          ? await apiService.getProductsByMultipleSubcategories(params)
+          : await apiService.getProducts(params);
+          
         console.log('API response received:', {
           success: res.success,
           dataLength: res.data?.length,
