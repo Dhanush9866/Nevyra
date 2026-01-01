@@ -1,5 +1,6 @@
 
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
@@ -20,6 +21,13 @@ interface HomeCategoryGridProps {
 }
 
 const HomeCategoryGrid: React.FC<HomeCategoryGridProps> = ({ groups }) => {
+  const navigate = useNavigate();
+
+  const handleItemClick = (item: GridItem) => {
+    // Navigate to product listing with subCategory filter matching the item title
+    navigate(`/category/all?subCategory=${encodeURIComponent(item.title)}`);
+  };
+
   return (
     <div className="container mx-auto px-4 py-8 bg-white my-4 shadow-sm rounded-none">
       {/* 
@@ -39,7 +47,11 @@ const HomeCategoryGrid: React.FC<HomeCategoryGridProps> = ({ groups }) => {
             <CardContent className="p-4 flex-grow flex flex-col">
               <div className="grid grid-cols-2 gap-4 flex-grow">
                 {group.items.slice(0, 4).map((item, itemIdx) => (
-                  <div key={itemIdx} className="group cursor-pointer flex flex-col">
+                  <div 
+                    key={itemIdx} 
+                    className="group cursor-pointer flex flex-col"
+                    onClick={() => handleItemClick(item)}
+                  >
                     {/* Image Container - Aspect Square & Consistent Size & No Border Radius */}
                     <div className="w-full h-32 md:h-40 overflow-hidden mb-2 rounded-none flex items-center justify-center p-1">
                       <img
@@ -49,9 +61,9 @@ const HomeCategoryGrid: React.FC<HomeCategoryGridProps> = ({ groups }) => {
                       />
                     </div>
                     {/* Text Below Image */}
-                    <div className="text-[13px] font-medium text-gray-800 leading-tight line-clamp-2">
+                    {/* <div className="text-[13px] font-medium text-gray-800 leading-tight line-clamp-2">
                       {item.title}
-                    </div>
+                    </div> */}
                     {/* Removed Green Offer Text */}
                   </div>
                 ))}
@@ -59,7 +71,10 @@ const HomeCategoryGrid: React.FC<HomeCategoryGridProps> = ({ groups }) => {
 
               <div className="mt-4 pt-2">
                 {/* Replaced 'See all offers' link with 'Shop Now' button & No Border Radius */}
-                <Button className="w-full rounded-none bg-primary hover:bg-primary/90 text-primary-foreground font-semibold">
+                <Button 
+                  className="w-full rounded-none bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
+                  onClick={() => navigate(`/category/all`)} // Fallback to all products
+                >
                   Shop Now
                 </Button>
               </div>

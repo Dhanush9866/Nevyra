@@ -6,6 +6,7 @@ const adminMiddleware = require("../middlewares/adminMiddleware");
 
 router.get("/", productController.list);
 router.get("/all", productController.getAll);
+router.get("/by-subcategories", productController.listByMultipleSubcategories);
 router.get("/:id", productController.details);
 
 router.post("/", authMiddleware, adminMiddleware, productController.create);
