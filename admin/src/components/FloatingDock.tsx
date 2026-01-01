@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
-import { 
-  LayoutDashboard, 
-  Package, 
-  ShoppingBag, 
-  Users, 
-  BarChart3, 
-  Warehouse, 
-  Megaphone, 
+import {
+  LayoutDashboard,
+  Package,
+  ShoppingBag,
+  Users,
+  BarChart3,
+  Warehouse,
+  Megaphone,
   Settings,
   Plus,
-  Zap
+  Zap,
+  ShieldCheck
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -20,6 +21,7 @@ const dockItems = [
   { id: "analytics", icon: BarChart3, label: "Analytics", color: "from-violet-500 to-purple-500" },
   { id: "orders", icon: ShoppingBag, label: "Orders", color: "from-green-500 to-emerald-500" },
   { id: "products", icon: Package, label: "Products", color: "from-blue-500 to-cyan-500" },
+  { id: "sellers", icon: ShieldCheck, label: "Verification", color: "from-yellow-500 to-orange-500" },
   { id: "customers", icon: Users, label: "Customers", color: "from-orange-500 to-red-500" },
   // { id: "inventory", icon: Warehouse, label: "Inventory", color: "from-cyan-500 to-blue-500" },
   // { id: "marketing", icon: Megaphone, label: "Marketing", color: "from-pink-500 to-rose-500" },
@@ -37,6 +39,7 @@ export function FloatingDock() {
     dashboard: "/",
     products: "/products",
     orders: "/orders",
+    sellers: "/sellers",
     customers: "/customers",
     analytics: "/analytics",
   };
@@ -59,24 +62,24 @@ export function FloatingDock() {
             const isHovered = hoveredItem === item.id;
             return (
               <div key={item.id} className="relative">
-                                                  <Button
-                   variant="ghost"
-                   size="icon"
-                   onClick={() => {
-                     setActiveItem(item.id);
-                     if (routeMap[item.id]) navigate(routeMap[item.id]);
-                   }}
-                   onMouseEnter={() => setHoveredItem(item.id)}
-                   onMouseLeave={() => setHoveredItem(null)}
-                   className={cn(
-                     "relative rounded-lg sm:rounded-xl transition-all duration-300 hover:scale-110",
-                     "h-10 w-10 sm:h-10 sm:w-10",
-                     isActive 
-                       ? `bg-gradient-to-r ${item.color} text-white shadow-lg scale-110` 
-                       : "hover:bg-muted"
-                   )}
-                 >
-                   <Icon className="h-5 w-5 sm:h-5 sm:w-5" />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => {
+                    setActiveItem(item.id);
+                    if (routeMap[item.id]) navigate(routeMap[item.id]);
+                  }}
+                  onMouseEnter={() => setHoveredItem(item.id)}
+                  onMouseLeave={() => setHoveredItem(null)}
+                  className={cn(
+                    "relative rounded-lg sm:rounded-xl transition-all duration-300 hover:scale-110",
+                    "h-10 w-10 sm:h-10 sm:w-10",
+                    isActive
+                      ? `bg-gradient-to-r ${item.color} text-white shadow-lg scale-110`
+                      : "hover:bg-muted"
+                  )}
+                >
+                  <Icon className="h-5 w-5 sm:h-5 sm:w-5" />
                   {/* Active indicator */}
                   {isActive && (
                     <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-white rounded-full" />

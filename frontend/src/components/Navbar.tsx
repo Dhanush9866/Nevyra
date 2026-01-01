@@ -1,4 +1,4 @@
-import { Search, User, ShoppingCart, Menu, ChevronDown, ChevronRight, X, LogOut, Settings } from "lucide-react";
+import { Search, User, ShoppingCart, Menu, ChevronDown, ChevronRight, X, LogOut, Settings, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -997,6 +997,15 @@ const Navbar = () => {
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-4">
+            <Link to="/seller">
+              <Button
+                variant="ghost"
+                className="text-gray-800 hover:bg-cyan-200 flex items-center space-x-1"
+              >
+                <Store className="h-4 w-4" />
+                <span className="text-sm hidden md:inline">Seller Hub</span>
+              </Button>
+            </Link>
             {isAuthenticated ? (
               <Link to="/profile">
                 <Button

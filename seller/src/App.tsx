@@ -22,6 +22,7 @@ import Analytics from "./pages/Analytics";
 import Settings from "./pages/Settings";
 import Support from "./pages/Support";
 import NotFound from "./pages/NotFound";
+import PendingVerification from "./pages/PendingVerification";
 
 const queryClient = new QueryClient();
 
@@ -36,7 +37,8 @@ const App = () => (
             {/* Public Routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-            
+            <Route path="/pending-verification" element={<PendingVerification />} />
+
             {/* Protected Seller Routes */}
             <Route
               path="/"
@@ -60,7 +62,7 @@ const App = () => (
               <Route path="settings" element={<Settings />} />
               <Route path="support" element={<Support />} />
             </Route>
-            
+
             {/* 404 */}
             <Route path="*" element={<NotFound />} />
           </Routes>

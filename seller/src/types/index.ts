@@ -4,14 +4,28 @@ export interface Seller {
   email: string;
   name: string;
   storeName: string;
+  sellerType: 'Individual' | 'Business';
   storeLogo?: string;
   storeDescription?: string;
   phone?: string;
   gstNumber?: string;
-  panNumber?: string;
-  bankAccountNumber?: string;
-  bankName?: string;
-  ifscCode?: string;
+  businessAddress?: {
+    address: string;
+    city: string;
+    pincode: string;
+  };
+  bankDetails?: {
+    accountHolderName: string;
+    accountNumber: string;
+    ifscCode: string;
+    cancelledCheque: string;
+  };
+  kycDetails?: {
+    panCard: string;
+    addressProof: string;
+    livePhoto: string;
+  };
+  verificationStatus: 'pending' | 'verified' | 'rejected';
   isVerified: boolean;
   createdAt: string;
   updatedAt: string;

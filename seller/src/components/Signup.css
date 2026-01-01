@@ -1,0 +1,26 @@
+
+/* Custom Styles for Seller Signup */
+
+.step-indicator {
+  @apply rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm;
+}
+
+.step-indicator.active {
+  @apply bg-[#2563EB] text-white;
+}
+
+.step-indicator.inactive {
+  @apply bg-gray-200 text-gray-500;
+}
+
+.input-field {
+  @apply w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent transition-all;
+}
+
+.btn-primary {
+  @apply bg-[#5846C4] hover:bg-[#4a39b0] text-white font-semibold py-3 px-6 rounded-lg transition-colors w-full shadow-lg;
+}
+
+.auth-card {
+  @apply bg-white/80 backdrop-blur-md rounded-2xl shadow-xl w-full max-w-lg p-8 md:p-10;
+}

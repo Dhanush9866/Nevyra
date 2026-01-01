@@ -6,5 +6,7 @@ const adminMiddleware = require("../middlewares/adminMiddleware");
 
 router.post("/login", adminController.login);
 router.put("/password", authMiddleware, adminMiddleware, adminController.updatePassword);
+router.patch("/verify-seller/:sellerId", authMiddleware, adminMiddleware, adminController.verifySeller);
+router.get("/pending-sellers", authMiddleware, adminMiddleware, adminController.getPendingSellers);
 
 module.exports = router; 

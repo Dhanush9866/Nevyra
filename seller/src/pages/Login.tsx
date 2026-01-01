@@ -21,10 +21,11 @@ const Login: React.FC = () => {
         description: 'You have successfully logged in.',
       });
       navigate('/dashboard');
-    } catch (error) {
+    } catch (error: any) {
+      const message = error.response?.data?.message || 'Please check your credentials and try again.';
       toast({
         title: 'Login failed',
-        description: 'Please check your credentials and try again.',
+        description: message,
         variant: 'destructive',
       });
     }
@@ -40,7 +41,7 @@ const Login: React.FC = () => {
           </div>
           <span className="text-xl font-bold text-sidebar-foreground">SellerHub</span>
         </div>
-        
+
         <div className="space-y-6">
           <h1 className="text-4xl font-bold text-sidebar-foreground leading-tight">
             Manage your store.<br />
@@ -50,7 +51,7 @@ const Login: React.FC = () => {
             Access powerful tools to manage products, track orders, analyze performance, and maximize your earnings.
           </p>
         </div>
-        
+
         <p className="text-sidebar-muted text-sm">
           © 2024 SellerHub. All rights reserved.
         </p>
