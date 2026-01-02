@@ -1,4 +1,4 @@
-require("dotenv").config();
+require("dotenv").config(); // Trigger restart
 const express = require("express");
 const cors = require("cors");
 const routes = require("./routes");
@@ -38,6 +38,12 @@ app.use(cors(corsOptions));
 // Logger middleware (optional)
 const logger = require("./middlewares/logger");
 app.use(logger);
+
+// Debug logging
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
 
 // Parse JSON and URL-encoded bodies BEFORE routes (needed for /products, etc.)
 app.use(express.json({ limit: '50mb' }));

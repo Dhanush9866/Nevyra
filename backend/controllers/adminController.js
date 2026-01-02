@@ -109,3 +109,55 @@ exports.getPendingSellers = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.getAllSellers = async (req, res, next) => {
+  try {
+    const { Seller } = require('../models');
+    const sellers = await Seller.find()
+      .populate('user', 'firstName lastName email mobile')
+      .sort({ createdAt: -1 });
+    res.json({ success: true, count: sellers.length, data: sellers });
+  } catch (err) { next(err); }
+};
+
+exports.getAllPayouts = async (req, res, next) => {
+  try {
+    const { Payout } = require('../models');
+    // Populate seller info deeply
+    const payouts = await Payout.find()
+      .populate({
+        path: 'sellerId',
+        select: 'storeName bankDetails walletBalance', // Select specific fields from seller
+        populate: { path: 'user', select: 'firstName lastName email mobile' } // User info
+      })
+      .sort({ createdAt: -1 });
+    
+    res.json({ success: true, count: payouts.length, data: payouts });
+  } catch (err) { next(err); }
+};
+
+exports.updatePayoutStatus = async (req, res, next) => {
+  try {
+    const { Payout, Seller } = require('../models');
+    const { id } = req.params;
+    const { status, transactionId, notes } = req.body; // Status: Paid, Failed, Processing
+
+    const payout = await Payout.findById(id);
+    if (!payout) return res.status(404).json({ success: false, message: "Payout request not found" });
+
+    // Handle Refund if failing a request
+    if ((status === 'Failed' || status === 'Rejected') && payout.status !== 'Failed' && payout.status !== 'Rejected') {
+        // Refund the amount to seller wallet
+        await Seller.findByIdAndUpdate(payout.sellerId, { $inc: { walletBalance: payout.amount } });
+    }
+
+    payout.status = status;
+    if (transactionId) payout.transactionId = transactionId;
+    if (notes) payout.notes = notes;
+    if (status === 'Paid' || status === 'Failed') payout.processedAt = new Date();
+    
+    await payout.save();
+
+    res.json({ success: true, message: `Payout marked as ${status}`, data: payout });
+  } catch (err) { next(err); }
+};

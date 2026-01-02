@@ -1,110 +1,145 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Search, 
   Filter, 
   MoreHorizontal, 
   Eye, 
-  Truck,
+  Clock,
   Package,
-  Download,
-  ShoppingCart
+  CheckCircle,
+  Truck,
+  XCircle,
+  AlertCircle
 } from 'lucide-react';
-import { StatusBadge } from '@/components/ui/StatusBadge';
+import { StatusBadge } from '@/components/ui/StatusBadge'; 
 import { EmptyState } from '@/components/ui/EmptyState';
-import { mockOrders } from '@/services/mockData';
-import { Order } from '@/types';
-import { format } from 'date-fns';
+import { sellerAPI } from '@/lib/api';
+import { toast } from 'sonner';
+import { Order, OrderItem } from '@/types'; // Using existing types
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 
 const Orders: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [orders] = useState<Order[]>(mockOrders);
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+      const response = await sellerAPI.orders.list();
+      if (response.data.success) {
+        // Map backend response to Frontend Order Type
+        const mappedOrders: Order[] = response.data.data.map((order: any) => {
+          // Calculate subtotal for THIS seller's items
+          const sellerItems = order.items || [];
+          const subtotal = sellerItems.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
+          
+          return {
+            id: order._id,
+            orderNumber: order._id.substring(0, 8).toUpperCase(), // Using ID as mock order number
+            customerId: order.userId?._id || 'guest',
+            customerName: order.userId ? `${order.userId.firstName} ${order.userId.lastName}` : 'Guest User',
+            customerEmail: order.userId?.email || '',
+            items: sellerItems.map((item: any) => ({
+              id: item._id,
+              productId: item.productId._id,
+              productName: item.productId.title,
+              productImage: item.productId.images?.[0] || 'https://placehold.co/100?text=No+Image',
+              quantity: item.quantity,
+              price: item.price,
+              total: item.price * item.quantity
+            })),
+            subtotal: subtotal,
+            shippingCharge: 0, // Not tracked per seller yet
+            discount: 0,
+            tax: 0,
+            total: subtotal, // Showing only seller's share
+            status: order.status || 'Pending',
+            shippingAddress: { // Default empty or map if backend provides
+              addressLine1: order.userId?.addresses?.[0]?.street || 'N/A', 
+              city: order.userId?.addresses?.[0]?.city || '', 
+              state: '', 
+              pincode: '', 
+              country: '',
+              name: '',
+              phone: ''
+            },
+            billingAddress: { addressLine1: '', city: '', state: '', pincode: '', country: '', name: '', phone: '' },
+            paymentMethod: order.paymentMethod,
+            paymentStatus: order.paymentStatus,
+            createdAt: order.createdAt,
+            updatedAt: order.createdAt
+          };
+        });
+        setOrders(mappedOrders);
+      }
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+      toast.error('Failed to load orders');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateStatus = async (orderId: string, newStatus: string) => {
+    try {
+      await sellerAPI.orders.updateStatus(orderId, newStatus);
+      toast.success(`Order status updated to ${newStatus}`);
+      fetchOrders(); // Refresh list
+    } catch (error) {
+      console.error('Error updating status:', error);
+      toast.error('Failed to update order status');
+    }
+  };
 
   const filteredOrders = orders.filter(order => {
-    const matchesSearch = order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    const matchesSearch = 
+      order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
       order.customerName.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
+    const matchesStatus = statusFilter === 'all' || order.status.toLowerCase() === statusFilter.toLowerCase();
     return matchesSearch && matchesStatus;
   });
 
+  const getStatusIcon = (status: string) => {
+    switch(status.toLowerCase()) {
+      case 'delivered': return <CheckCircle className="w-4 h-4 text-green-500" />;
+      case 'shipped': return <Truck className="w-4 h-4 text-blue-500" />;
+      case 'cancelled': return <XCircle className="w-4 h-4 text-red-500" />;
+      case 'pending': return <Clock className="w-4 h-4 text-orange-500" />;
+      default: return <AlertCircle className="w-4 h-4 text-gray-500" />;
+    }
+  };
+
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
     }).format(value);
   };
 
-  const getStatusColor = (status: string) => {
-    const colors: Record<string, string> = {
-      new: 'bg-info',
-      confirmed: 'bg-info',
-      packed: 'bg-warning',
-      shipped: 'bg-primary',
-      delivered: 'bg-success',
-      cancelled: 'bg-destructive',
-      returned: 'bg-destructive',
-    };
-    return colors[status] || 'bg-muted';
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-IN', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
   };
-
-  const orderStatuses = ['new', 'confirmed', 'packed', 'shipped', 'delivered'];
 
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="page-header mb-0">
-          <h1 className="page-title">Orders</h1>
-          <p className="page-description">
-            Track and manage customer orders
-          </p>
-        </div>
-        <button className="btn-secondary self-start">
-          <Download className="w-4 h-4" />
-          Export Orders
-        </button>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="bg-card rounded-xl border border-border p-4">
-          <p className="text-sm text-muted-foreground">New</p>
-          <p className="text-2xl font-bold text-foreground">
-            {orders.filter(o => o.status === 'new').length}
-          </p>
-        </div>
-        <div className="bg-card rounded-xl border border-border p-4">
-          <p className="text-sm text-muted-foreground">Packed</p>
-          <p className="text-2xl font-bold text-foreground">
-            {orders.filter(o => o.status === 'packed').length}
-          </p>
-        </div>
-        <div className="bg-card rounded-xl border border-border p-4">
-          <p className="text-sm text-muted-foreground">Shipped</p>
-          <p className="text-2xl font-bold text-foreground">
-            {orders.filter(o => o.status === 'shipped').length}
-          </p>
-        </div>
-        <div className="bg-card rounded-xl border border-border p-4">
-          <p className="text-sm text-muted-foreground">Delivered</p>
-          <p className="text-2xl font-bold text-foreground">
-            {orders.filter(o => o.status === 'delivered').length}
-          </p>
-        </div>
+      <div className="page-header mb-0">
+        <h1 className="page-title">Orders</h1>
+        <p className="page-description">Manage and track your customer orders</p>
       </div>
 
       {/* Filters */}
@@ -113,39 +148,34 @@ const Orders: React.FC = () => {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="text"
-            placeholder="Search by order number or customer..."
+            placeholder="Search by order ID or customer name..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="input-field pl-10"
           />
         </div>
-        <div className="flex items-center gap-3">
-          <select
+        <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             className="input-field w-auto"
           >
             <option value="all">All Status</option>
-            <option value="new">New</option>
-            <option value="packed">Packed</option>
-            <option value="shipped">Shipped</option>
-            <option value="delivered">Delivered</option>
-            <option value="cancelled">Cancelled</option>
-            <option value="returned">Returned</option>
-          </select>
-          <button className="btn-secondary">
-            <Filter className="w-4 h-4" />
-            <span className="hidden sm:inline">More Filters</span>
-          </button>
-        </div>
+            <option value="Pending">Pending</option>
+            <option value="Processing">Processing</option>
+            <option value="Shipped">Shipped</option>
+            <option value="Delivered">Delivered</option>
+            <option value="Cancelled">Cancelled</option>
+        </select>
       </div>
 
       {/* Orders Table */}
-      {filteredOrders.length === 0 ? (
+      {loading ? (
+        <div className="flex justify-center py-8">Loading orders...</div>
+      ) : filteredOrders.length === 0 ? (
         <EmptyState
-          icon={ShoppingCart}
+          icon={Package}
           title="No orders found"
-          description="Try adjusting your search or filters. Orders will appear here once customers place them."
+          description="When customers place orders, they will appear here."
         />
       ) : (
         <div className="bg-card rounded-xl border border-border overflow-hidden">
@@ -153,70 +183,67 @@ const Orders: React.FC = () => {
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>Order</th>
-                  <th>Customer</th>
-                  <th>Items</th>
-                  <th>Total</th>
-                  <th>Payment</th>
-                  <th>Status</th>
-                  <th>Date</th>
-                  <th className="w-12"></th>
+                   <th>Order ID</th>
+                   <th>Date</th>
+                   <th>Customer</th>
+                   <th>Items</th>
+                   <th>Total</th>
+                   <th>Status</th>
+                   <th className="w-12"></th>
                 </tr>
               </thead>
               <tbody>
                 {filteredOrders.map((order) => (
                   <tr key={order.id}>
-                    <td className="font-medium text-foreground">
-                      {order.orderNumber}
-                    </td>
+                    <td className="font-medium text-foreground">#{order.orderNumber}</td>
+                    <td className="text-muted-foreground">{formatDate(order.createdAt)}</td>
                     <td>
-                      <div>
-                        <p className="font-medium text-foreground">{order.customerName}</p>
-                        <p className="text-xs text-muted-foreground">{order.customerEmail}</p>
+                      <div className="flex flex-col">
+                        <span className="font-medium text-foreground">{order.customerName}</span>
+                        {/* <span className="text-xs text-muted-foreground">{order.customerEmail}</span> */}
                       </div>
                     </td>
-                    <td className="text-muted-foreground">
-                      {order.items.length} item{order.items.length > 1 ? 's' : ''}
+                    <td>
+                      <div className="flex flex-col gap-1">
+                        {order.items.map((item, idx) => (
+                          <div key={idx} className="flex items-center gap-2 text-sm">
+                             <img src={item.productImage} alt="" className="w-6 h-6 rounded object-cover" />
+                             <span className="text-foreground">{item.quantity}x {item.productName}</span>
+                          </div>
+                        ))}
+                        {order.items.length > 2 && (
+                          <span className="text-xs text-muted-foreground">+{order.items.length - 2} more</span>
+                        )}
+                      </div>
                     </td>
                     <td className="font-medium text-foreground">
-                      {formatCurrency(order.total)}
+                       {formatCurrency(order.total)}
                     </td>
                     <td>
-                      <StatusBadge status={order.paymentStatus} />
+                      <div className="flex items-center gap-2">
+                        {getStatusIcon(order.status)}
+                        <span className="capitalize">{order.status}</span>
+                      </div>
                     </td>
                     <td>
-                      <StatusBadge status={order.status} />
-                    </td>
-                    <td className="text-muted-foreground">
-                      {format(new Date(order.createdAt), 'MMM d, yyyy')}
-                    </td>
-                    <td>
-                      <DropdownMenu>
+                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <button className="p-2 rounded-lg hover:bg-muted transition-colors">
                             <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
                           </button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48">
-                          <DropdownMenuItem 
-                            className="gap-2"
-                            onClick={() => setSelectedOrder(order)}
-                          >
-                            <Eye className="w-4 h-4" />
-                            View Details
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem className="gap-2" onClick={() => handleUpdateStatus(order.id, 'Processing')}>
+                             Mark Processing
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="gap-2">
-                            <Package className="w-4 h-4" />
-                            Update Status
+                          <DropdownMenuItem className="gap-2" onClick={() => handleUpdateStatus(order.id, 'Shipped')}>
+                             Mark Shipped
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="gap-2">
-                            <Truck className="w-4 h-4" />
-                            Add Tracking
+                          <DropdownMenuItem className="gap-2" onClick={() => handleUpdateStatus(order.id, 'Delivered')}>
+                             Mark Delivered
                           </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem className="gap-2">
-                            <Download className="w-4 h-4" />
-                            Download Invoice
+                          <DropdownMenuItem className="gap-2 text-red-600" onClick={() => handleUpdateStatus(order.id, 'Cancelled')}>
+                             Cancel Order
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -226,132 +253,8 @@ const Orders: React.FC = () => {
               </tbody>
             </table>
           </div>
-          
-          {/* Pagination */}
-          <div className="flex items-center justify-between px-4 py-3 border-t border-border">
-            <p className="text-sm text-muted-foreground">
-              Showing <span className="font-medium text-foreground">1</span> to{' '}
-              <span className="font-medium text-foreground">{filteredOrders.length}</span> of{' '}
-              <span className="font-medium text-foreground">{filteredOrders.length}</span> orders
-            </p>
-            <div className="flex items-center gap-2">
-              <button className="btn-secondary" disabled>Previous</button>
-              <button className="btn-secondary" disabled>Next</button>
-            </div>
-          </div>
         </div>
       )}
-
-      {/* Order Details Modal */}
-      <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Order Details - {selectedOrder?.orderNumber}</DialogTitle>
-          </DialogHeader>
-          
-          {selectedOrder && (
-            <div className="space-y-6">
-              {/* Order Status Timeline */}
-              <div className="flex items-center justify-between overflow-x-auto pb-2">
-                {orderStatuses.map((status, index) => {
-                  const currentIndex = orderStatuses.indexOf(selectedOrder.status);
-                  const isCompleted = index <= currentIndex;
-                  const isCurrent = status === selectedOrder.status;
-                  
-                  return (
-                    <div key={status} className="flex items-center">
-                      <div className="flex flex-col items-center">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium ${
-                          isCompleted 
-                            ? 'bg-success text-success-foreground' 
-                            : 'bg-muted text-muted-foreground'
-                        } ${isCurrent ? 'ring-2 ring-success ring-offset-2' : ''}`}>
-                          {index + 1}
-                        </div>
-                        <span className="text-xs mt-1 capitalize">{status}</span>
-                      </div>
-                      {index < orderStatuses.length - 1 && (
-                        <div className={`w-12 h-0.5 mx-2 ${
-                          isCompleted ? 'bg-success' : 'bg-muted'
-                        }`} />
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Customer & Shipping */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 bg-muted/50 rounded-lg">
-                  <h4 className="font-medium text-foreground mb-2">Customer</h4>
-                  <p className="text-sm text-foreground">{selectedOrder.customerName}</p>
-                  <p className="text-sm text-muted-foreground">{selectedOrder.customerEmail}</p>
-                </div>
-                <div className="p-4 bg-muted/50 rounded-lg">
-                  <h4 className="font-medium text-foreground mb-2">Shipping Address</h4>
-                  <p className="text-sm text-foreground">{selectedOrder.shippingAddress.name}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedOrder.shippingAddress.addressLine1}
-                    {selectedOrder.shippingAddress.addressLine2 && `, ${selectedOrder.shippingAddress.addressLine2}`}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedOrder.shippingAddress.city}, {selectedOrder.shippingAddress.state} {selectedOrder.shippingAddress.pincode}
-                  </p>
-                </div>
-              </div>
-
-              {/* Items */}
-              <div>
-                <h4 className="font-medium text-foreground mb-3">Order Items</h4>
-                <div className="space-y-3">
-                  {selectedOrder.items.map((item) => (
-                    <div key={item.id} className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                      <img 
-                        src={item.productImage} 
-                        alt={item.productName}
-                        className="w-12 h-12 rounded-lg object-cover"
-                      />
-                      <div className="flex-1">
-                        <p className="font-medium text-foreground">{item.productName}</p>
-                        <p className="text-sm text-muted-foreground">
-                          Qty: {item.quantity} × {formatCurrency(item.price)}
-                        </p>
-                      </div>
-                      <p className="font-medium text-foreground">{formatCurrency(item.total)}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Summary */}
-              <div className="border-t border-border pt-4 space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Subtotal</span>
-                  <span className="text-foreground">{formatCurrency(selectedOrder.subtotal)}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Shipping</span>
-                  <span className="text-foreground">{formatCurrency(selectedOrder.shippingCharge)}</span>
-                </div>
-                {selectedOrder.discount > 0 && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Discount</span>
-                    <span className="text-success">-{formatCurrency(selectedOrder.discount)}</span>
-                  </div>
-                )}
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Tax</span>
-                  <span className="text-foreground">{formatCurrency(selectedOrder.tax)}</span>
-                </div>
-                <div className="flex justify-between text-lg font-bold pt-2 border-t border-border">
-                  <span className="text-foreground">Total</span>
-                  <span className="text-foreground">{formatCurrency(selectedOrder.total)}</span>
-                </div>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

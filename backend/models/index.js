@@ -10,4 +10,5 @@ module.exports = {
   Category: require(path.join(__dirname, "Category.js")),
   WishlistItem: require(path.join(__dirname, "WishlistItem.js")),
   Seller: require(path.join(__dirname, "Seller.js")),
+  Payout: require(path.join(__dirname, "Payout.js")),
 };

@@ -31,7 +31,8 @@ const sellerSchema = new mongoose.Schema(
             enum: ["pending", "verified", "rejected"],
             default: "pending"
         },
-        isVerified: { type: Boolean, default: false }
+        isVerified: { type: Boolean, default: false },
+        walletBalance: { type: Number, default: 0 }
     },
     { timestamps: true }
 );

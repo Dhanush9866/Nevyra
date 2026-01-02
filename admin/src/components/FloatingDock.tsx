@@ -10,7 +10,8 @@ import {
   Settings,
   Plus,
   Zap,
-  ShieldCheck
+  ShieldCheck,
+  Banknote
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -21,7 +22,8 @@ const dockItems = [
   { id: "analytics", icon: BarChart3, label: "Analytics", color: "from-violet-500 to-purple-500" },
   { id: "orders", icon: ShoppingBag, label: "Orders", color: "from-green-500 to-emerald-500" },
   { id: "products", icon: Package, label: "Products", color: "from-blue-500 to-cyan-500" },
-  { id: "sellers", icon: ShieldCheck, label: "Verification", color: "from-yellow-500 to-orange-500" },
+  { id: "sellers", icon: ShieldCheck, label: "Sellers", color: "from-yellow-500 to-orange-500" },
+  { id: "payouts", icon: Banknote, label: "Payouts", color: "from-green-600 to-emerald-600" },
   { id: "customers", icon: Users, label: "Customers", color: "from-orange-500 to-red-500" },
   // { id: "inventory", icon: Warehouse, label: "Inventory", color: "from-cyan-500 to-blue-500" },
   // { id: "marketing", icon: Megaphone, label: "Marketing", color: "from-pink-500 to-rose-500" },
@@ -40,6 +42,7 @@ export function FloatingDock() {
     products: "/products",
     orders: "/orders",
     sellers: "/sellers",
+    payouts: "/payouts",
     customers: "/customers",
     analytics: "/analytics",
   };

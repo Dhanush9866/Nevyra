@@ -5,14 +5,9 @@ import {
   Package, 
   ShoppingCart, 
   Warehouse, 
-  DollarSign, 
   CreditCard,
-  Users,
-  Star,
-  Tags,
   BarChart3,
   Settings,
-  HelpCircle,
   LogOut,
   ChevronLeft,
   ChevronRight,
@@ -31,17 +26,11 @@ const navItems = [
   { title: 'Products', href: '/products', icon: Package },
   { title: 'Orders', href: '/orders', icon: ShoppingCart },
   { title: 'Inventory', href: '/inventory', icon: Warehouse },
-  { title: 'Earnings', href: '/earnings', icon: DollarSign },
   { title: 'Payouts', href: '/payouts', icon: CreditCard },
-  { title: 'Customers', href: '/customers', icon: Users },
-  { title: 'Reviews', href: '/reviews', icon: Star },
-  { title: 'Offers', href: '/offers', icon: Tags },
-  { title: 'Analytics', href: '/analytics', icon: BarChart3 },
 ];
 
 const bottomNavItems = [
   { title: 'Settings', href: '/settings', icon: Settings },
-  { title: 'Help & Support', href: '/support', icon: HelpCircle },
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {

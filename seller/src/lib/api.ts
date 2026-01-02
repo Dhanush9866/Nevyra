@@ -34,6 +34,33 @@ export const sellerAPI = {
             });
         },
     },
+    products: {
+        list: () => api.get("/seller/products"),
+        create: (data: any) => api.post("/seller/products", data),
+        update: (id: string, data: any) => api.put(`/seller/products/${id}`, data),
+        delete: (id: string) => api.delete(`/seller/products/${id}`),
+        get: (id: string) => api.get(`/seller/products/${id}`),
+    },
+    categories: {
+        list: () => api.get("/categories"),
+        getSubcategories: (categoryId: string) => api.get(`/categories/${categoryId}/subcategories`),
+    },
+    orders: {
+        list: () => api.get("/seller/orders"),
+        updateStatus: (id: string, status: string) => api.put(`/seller/orders/${id}/status`, { status }),
+    },
+    payouts: {
+        getWallet: () => api.get("/seller/wallet"),
+        request: (amount: number) => api.post("/seller/request-payout", { amount }),
+        list: () => api.get("/seller/payouts"),
+        updateBank: (data: any) => api.put("/seller/bank-details", data)
+    },
+    inventory: {
+        stats: () => api.get("/seller/inventory/stats")
+    },
+    dashboard: {
+        stats: () => api.get("/seller/dashboard/stats")
+    }
     // Add other endpoints as needed
 };
 

@@ -46,24 +46,22 @@ export interface ProductVariant {
 
 export interface Product {
   id: string;
-  name: string;
-  description: string;
-  category: string;
-  subcategory?: string;
+  title: string;
   price: number;
-  compareAtPrice?: number;
-  stock: number;
-  sku: string;
+  category: string;
+  subCategory?: string;
+  description?: string;
   images: string[];
-  status: ProductStatus;
-  approvalStatus: 'pending' | 'approved' | 'rejected';
-  variants?: ProductVariant[];
-  seoTitle?: string;
-  seoDescription?: string;
-  seoKeywords?: string[];
-  sellerId: string;
-  createdAt: string;
-  updatedAt: string;
+  stockQuantity: number;
+  lowStockThreshold?: number;
+  inStock: boolean;
+  rating: number;
+  reviews: number;
+  soldCount: number;
+  attributes?: Record<string, any>;
+  additionalSpecifications?: Record<string, string> | string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 // Order Types
