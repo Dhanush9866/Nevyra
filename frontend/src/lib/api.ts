@@ -127,6 +127,23 @@ class ApiService {
   async updateOrderStatus(id: string, status: string): Promise<{ success: boolean; message: string; data: any }> {
     return this.request(`/orders/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) });
   }
+
+  // Reviews
+  async getReviews(productId: string): Promise<{ success: boolean; message: string; data: any[] }> {
+    return this.request(`/reviews/product/${productId}`);
+  }
+
+  async createReview(productId: string, reviewData: { rating: number; title?: string; comment: string; images?: string[] }): Promise<{ success: boolean; message: string; data: any }> {
+    return this.request(`/reviews/product/${productId}`, {
+      method: 'POST',
+      body: JSON.stringify(reviewData),
+    });
+  }
+
+  async deleteReview(reviewId: string): Promise<{ success: boolean; message: string }> {
+    return this.request(`/reviews/${reviewId}`, { method: 'DELETE' });
+  }
+
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}

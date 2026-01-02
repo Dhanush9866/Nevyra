@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link, useSearchParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Card, CardContent } from "@/components/ui/card";
+
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
@@ -29,7 +29,124 @@ type ProductItem = {
   brand?: string;
 };
 
-const brands = ["TechCorp", "SportBrand", "GameTech", "FashionHub"];
+// Category structure with subcategories (matching Navbar hover menu)
+const categories: Record<string, string[]> = {
+  "Medical & Pharmacy": [
+    "Oral Care", "Body Care", "Intimate Care", "Hand Wash & Sanitizers",
+    "Face Wash & Cleansers", "Moisturizers & Creams", "Sunscreen", "Acne & Pimple Care", "Anti-Aging", "Serums & Toners",
+    "Shampoo", "Conditioner", "Hair Oil", "Hair Serum", "Hair Fall Treatment", "Dandruff Care",
+    "Face Makeup", "Eye Makeup", "Lip Makeup", "Makeup Kits", "Makeup Tools & Brushes",
+    "Foot Creams", "Hand Creams", "Nail Care", "Manicure & Pedicure Kits",
+    "Hair Dryers", "Hair Straighteners", "Trimmers & Clippers", "Facial Machines", "Salon Chairs & Accessories",
+    "Razors", "Shaving Cream & Foam", "After Shave", "Hair Removal Creams", "Waxing Products", "Bleach Crems", "Epilator Devices", "Threading Tools",
+    "Perfumes", "Deodorants", "Body Mists", "Roll-On",
+    "Health Supplements", "Vitamins & Minerals", "Protein & Nutrition", "Immunity Boosters", "Herbal Supplements",
+    "Bp Monitors", "Glucometers", "Thermometers", "Nebulizers", "Pulse Oximeters", "Weighing Scales",
+    "Orthopedic Supports", "Knee/Back/Wrist Supports", "Hot & Cold Packs", "Posture Correctors", "Physiotherapy Equipment",
+    "First Aid Kits", "Bandages & Gauze", "Antiseptic Liquids", "Cotton & Medical Tapes", "Burn Care",
+    "Sanitary Napkins", "Menstrual Cups", "Intimate Wash", "Maternity Care", "Pregnancy Test Kits",
+    "Men's Grooming", "Hair Loss Solutions", "Sexual Wellness",
+    "Ayurvedic Medicines", "Herbal Oils", "Herbal Powders", "Traditional Remedies",
+    "Adult Diapers", "Walking Sticks", "Hearing Aids", "Wheelchairs", "Pill Organizers",
+    "Diabetic Care", "Sugar Free Products", "Heart Care", "Weight Management"
+  ],
+  "Groceries": [
+    "Rice & Rice Products", "Atta, Flours & Sooji", "Pulses & Dals", "Cooking Oils & Ghee", "Sugar, Jaggery & Salt",
+    "Snacks & Namkeen", "Biscuits & Cookies", "Breakfast Cereals", "Noodles, Pasta & Vermicelli", "Ready to Eat/ Ready to Cook",
+    "Whole Spices", "Powdered Spices", "Masala Mixes",
+    "Milk", "Curd & Yogurt", "Butter & Cheese", "Eggs",
+    "Health Drinks", "Soft Drinks & Juices",
+    "Chocolates", "Candies & Toffees", "Indian Sweets",
+    "Pickles", "Sauces & Ketchup", "Jams & Spreads",
+    "Dishwash & Cleaners", "Laundry Detergents", "Floor & Toilet Cleaners", "Garbage Bags",
+    "Tissues & Paper Towels", "Napkins", "Foils & Cling Wraps",
+    "Organic Staples", "Dry Fruits & Nuts", "Seeds & Superfoods",
+    "Vegetables", "Fruits", "Leafy Vegetables", "Herbs & Seasonings",
+    "Chips", "Cookies", "Popcorn", "Instant Snacks", "Bread & Bakery"
+  ],
+  "Fashion & Beauty": [
+    "T-shirts", "Polo T-Shirts", "Hoodies", "Blazers", "Casual Shirts", "Formal Shirts",
+    "Jeans", "Casual Trousers", "Formal Trousers", "Shorts", "Cargos", "Suits", "Ties, Socks",
+    "Sweatshirts", "Jackets", "Sweater", "Track pants", "Joggers", "Pathani Suits", "Tracksuits", "Sherwanis",
+    "Three Fourths", "Kurta", "Dhoti", "Lungi", "Vests", "Boxers", "Thermals", "Night Suits", "Briefs", "Trunks",
+    "Gym wear", "Winter wear", "Rain wear", "Waistcoats",
+    "Dresses", "Topwear", "Jumpsuits", "Salwar Suits", "Anarkali", "Dupattas", "Petticoats", "Palazzos",
+    "Camisoles", "Skirts", "Jeggings & Tights", "Trousers", "Bras", "Panties", "Night Dresses & Nighties",
+    "Shapewear", "Swim & Beachwear", "Party Dresses", "Sports Wear", "Sarees", "Blouse", "Kurtis", "Kurtas",
+    "Dress Material", "Lehenga", "Leggings", "Churidars", "Dhoti Pants", "Saree Shapewear",
+    "Outdoor Toys", "Board Games", "Musical Toys", "Dolls", "Doll Houses", "Building Blocks & LEGO-type Toys",
+    "STEM Toys", "Pretend Play", "Action Figures", "Art & Craft kits", "Ride-on Toys", "Puzzles", "Toy Guns",
+    "Vehicles", "Soft Toys", "Remote Control Toys", "Educational Toys", "Helicopter", "Drones",
+    "School Bags", "Pencil Boxes", "Stationery Sets", "Tiffin Bags", "Rain Covers for Bags", "Lunch box", "Bottle", "School Combo Sets",
+    "Diapers", "Wipes", "Baby Rattles & Teethers", "Baby Medical & Health Care", "Baby Cleaners & Detergents",
+    "Baby Food & Formula", "Baby Bibs", "Pacifiers & Soothers", "Baby Towels & Bedding", "Baby Clothes & Blankets",
+    "Diper Bags", "Baby Grooming", "Baby Hair & Skin Care", "Baby Bathing", "Baby Feeding Bottle & Accessories", "Baby Safety Accessories",
+    "Titan", "Fastrack", "Sonata", "Casio", "Timex", "boAt", "Noise", "Fire-Boltt", "Amazfit", "Fossil",
+    "Daniel Wellington", "Armani Exchange", "Tommy Hilfiger", "Michael Kors",
+    "Handbags", "Shoulder Bags", "Sling Bags", "Tote Bags", "Clutches", "Hobo bags",
+    "Backpacks", "Laptop Bags", "Office Bags", "Travel Bags", "Duffel Bags",
+    "Wallets & Belts", "Pouches", "Coin purses", "Sunglasses",
+    "Earrings", "Necklaces", "Rings", "Bangles & Bracelets", "Anklets", "Noise Pins", "Bridal Jewelry", "Men's Jewelry", "Kids Jewelry",
+    "Trolley Bags", "Suitcases", "Cabin Luggage", "Check-in Luggage",
+    "Duffle Bags", "Travel Backpacks", "Weekender Bags",
+    "Laptop Trolleys", "Office Travel Bags", "Garment Bags"
+  ],
+  "Devices": [
+    "Mobile Phones", "Mobile Covers & Cases", "Chargers & Cables", "Power Banks", "Screen Protectors", "Earphones & Headphones", "Bluetooth Speakers",
+    "Laptops", "Desktops", "Tablets", "Keyboards & Mouse", "Monitors", "Printers & Scanners",
+    "Smart TVs", "Streaming Devices", "Soundbars", "Home Theaters", "Projectors",
+    "Refrigerators", "Washing Machines", "Air conditioners", "Microwave Ovens", "Dishwashers", "Water Purifiers",
+    "Smart Watches", "Fitness Bands", "VR Headsets", "Smart Glasses",
+    "Digital Cameras", "DSLR Cameras", "Action Cameras", "Camera Lenses", "Tripods", "Memory Cards",
+    "Gaming Consoles", "Game Controllers", "Gaming Headsets", "Gaming Accessories",
+    "Smart Lights", "Smart Plugs", "Smart Door Locks", "Security Cameras", "WiFi- Routers", "Smart Sensors"
+  ],
+  "Electrical": [
+    "Inverters & UPS", "Batteries", "Transformers", "Stabilizers", "UPS Systems", "Solar Inverters", "Battery Accessories",
+    "Wiring Cables & Wires", "Switches & Sockets", "MCBs, RCCBs & DB Boxes", "Extension Boards", "Plug Tops & Adaptors", "Control Switches", "Relays & Contractors",
+    "Ceiling Lights", "CFL Bulbs", "Wall Lights", "Outdoor Lights", "Street Lights", "Emergency Lights",
+    "Table Fans", "Pedestal Fans", "Exhaust Fans", "Ventilation Fans", "Water Heaters", "Room Heaters", "Irons", "Mixers & Grinders", "Electric Kettles", "Induction Cooktops",
+    "Smart Switches", "Smart Plugs", "Smart Lights", "Smart Doorbells", "Home Automation Kits",
+    "Electrical Tools", "Testing Devices", "Tool kits", "Safety Gloves & Gear", "Industrial panels", "Heavy Duty Cables"
+  ],
+  "Automotive": [
+    "Helmets", "Bike covers", "Bike Lights", "Bike Batteries", "Bike Engine Oil", "Bike Brake Oil", "Bike Air Filters", "Bike Cleaning & Care",
+    "Car Covers", "Car Seat Covers", "Car Mats", "Car Chargers & Holders", "Car Lights & Fog Lamps",
+    "Engine Oil", "Brake Fluid", "Coolant", "Gear Oil", "Power Steering Oil",
+    "Air Filters", "Oil Filters", "Fuel Filters", "Spark Plugs", "Brake Pads", "Clutch Parts", "Horns", "Wipers", "Fuse & Relays",
+    "Car Wash & Shampoo", "Polish & Wax", "Interior Cleaners", "Tyre Cleaners", "Chain Lubes",
+    "Car Tyres", "Bike Tyres", "Alloy Wheels", "Tyre Inflators",
+    "Tool Kits", "Hydraulic Jacks", "First Aid Kits", "Warning Traingles"
+  ],
+  "Sports": [
+    "Batting Gloves", "Batting Pads", "Helmets", "Wicket Keeping Gloves", "Wicket Keeping Pads", "Knee pads",
+    "Football", "Football Shoes", "Shin Guards", "Goal Posts",
+    "Badminton Rackets", "Shuttlecocks", "Badminton Nets", "Grip Tapes", "Tennis Rackets", "Tennis Balls", "Tennis Nets", "Table Tennis Bats", "Table Tennis Balls", "TT Tables",
+    "Basketball", "Basketball Ring", "Basketball Net",
+    "Carrom Boards", "Chess Boards",
+    "Dumbbells", "Barbells", "Weight Plates", "Resistance Bands", "Skipping Ropes", "Yoga Mats", "Exercise Balls",
+    "Cycles", "Cycling Helmets", "Skates", "Skateboards",
+    "Sports Shoes", "Sports Gloves", "Sports Bags", "Water Bottles"
+  ],
+  "Home Interior": [
+    "POP Ceiling", "LED Ceiling Lights", "Chandeliers", "Wall Lights", "Spot Lights",
+    "Main Door", "Bedroom Doors", "PVC / UPVC Doors", "Door Frames", "Door Handles & Locks", "Windows & Grills",
+    "Texture Paint", "Wallpaper", "Wall Panels (PVC / WPC)", "Wall Stickers & Decals", "Floor Tiles", "Wooden Flooring", "Marble & Granite",
+    "Vinyl Flooring", "Carpet & Rugs",
+    "Modular Kitchen", "Kitchen Cabinets", "Kitchen Sinks", "Kitchen Faucets", "Chimney & Hobs", "Kitchen Storage",
+    "Bathroom Fittings", "Showers & Taps", "Bathroom Accessories", "Sanitary Ware", "Bathroom Mirrors",
+    "Sofa Sets", "Dining Tables", "Beds & Mattresses", "Wardrobes", "TV Units", "Study Tables", "Office Chairs",
+    "Curtains & Blinds", "Cushions & Covers", "Wall Art & Paintings", "Showpieces & Decor", "Artificial Plants", "Mirrors",
+    "Table Lamps", "Floor Lamps", "String Lights", "Night Lamps"
+  ],
+  "Electronics": [
+    "Mobile Phones", "Mobile Covers & Cases", "Chargers & Cables", "Power Banks", "Screen Protectors", "Earphones & Headphones", "Bluetooth Speakers",
+    "Laptops", "Desktops", "Tablets", "Keyboards & Mouse", "Monitors", "Printers & Scanners",
+    "Smart TVs", "Streaming Devices", "Soundbars", "Home Theaters", "Projectors",
+    "Smart Watches", "Fitness Bands", "VR Headsets", "Smart Glasses",
+    "Digital Cameras", "DSLR Cameras", "Action Cameras", "Camera Lenses", "Tripods", "Memory Cards"
+  ]
+};
 
 const ProductListing = () => {
   const { categoryName } = useParams();
@@ -37,7 +154,29 @@ const ProductListing = () => {
   const [products, setProducts] = useState<ProductItem[]>([]);
   const [priceRange, setPriceRange] = useState([0, 1000000]);
   const [addingId, setAddingId] = useState<string | null>(null);
+  const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
   const { toast } = useToast();
+
+  // Map URL category name to display category name
+  const categoryMap: Record<string, string> = {
+    'medical-and-pharmacy': 'Medical & Pharmacy',
+    'groceries': 'Groceries',
+    'fashion-and-beauty': 'Fashion & Beauty',
+    'devices': 'Devices',
+    'electrical': 'Electrical',
+    'automotive': 'Automotive',
+    'sports': 'Sports',
+    'home-interior': 'Home Interior',
+    'electronics': 'Electronics',
+  };
+
+  // Get the current category display name
+  const currentCategory = categoryName && categoryName !== 'all' 
+    ? categoryMap[categoryName] || categoryName 
+    : 'Electronics';
+
+  // Get subcategories for the current category
+  const currentSubcategories = categories[currentCategory as keyof typeof categories] || [];
 
   useEffect(() => {
     (async () => {
@@ -46,16 +185,6 @@ const ProductListing = () => {
       
       // Handle Category from URL param
       if (categoryName && categoryName !== 'all') {
-        const categoryMap: Record<string, string> = {
-          'medical-and-pharmacy': 'Medical & Pharmacy',
-          'groceries': 'Groceries',
-          'fashion-and-beauty': 'Fashion & Beauty',
-          'devices': 'Devices',
-          'electrical': 'Electrical',
-          'automotive': 'Automotive',
-          'sports': 'Sports',
-          'home-interior': 'Home Interior',
-        };
         params.category = categoryMap[categoryName] || categoryName;
       }
 
@@ -114,15 +243,17 @@ const ProductListing = () => {
       console.log('==========================================');
     })();
   }, [categoryName]);
-  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  
   const [sortBy, setSortBy] = useState("popularity");
   const [showFilters, setShowFilters] = useState(false);
 
-  const handleBrandChange = (brand: string, checked: boolean) => {
+
+
+  const handleSubcategoryChange = (subcategory: string, checked: boolean) => {
     if (checked) {
-      setSelectedBrands([...selectedBrands, brand]);
+      setSelectedSubcategories([...selectedSubcategories, subcategory]);
     } else {
-      setSelectedBrands(selectedBrands.filter((b) => b !== brand));
+      setSelectedSubcategories(selectedSubcategories.filter((s) => s !== subcategory));
     }
   };
 
@@ -156,17 +287,16 @@ const ProductListing = () => {
   const filteredProducts = products.filter((product) => {
     const inPriceRange =
       product.price >= priceRange[0] && product.price <= priceRange[1];
-    const inSelectedBrands =
-      selectedBrands.length === 0 || selectedBrands.includes(product.brand || "");
-    return inPriceRange && inSelectedBrands;
-  });
-
-  console.log('Filtering results:', {
-    totalProducts: products.length,
-    afterPriceFilter: products.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1]).length,
-    afterBrandFilter: filteredProducts.length,
-    priceRange,
-    selectedBrands
+    
+    // Filter by selected subcategories (if any are selected)
+    const inSelectedSubcategories =
+      selectedSubcategories.length === 0 || 
+      selectedSubcategories.some(subcat => 
+        product.title?.toLowerCase().includes(subcat.toLowerCase()) ||
+        product.brand?.toLowerCase().includes(subcat.toLowerCase())
+      );
+    
+    return inPriceRange && inSelectedSubcategories;
   });
 
   const sortedProducts = [...filteredProducts].sort((a, b) => {
@@ -184,15 +314,13 @@ const ProductListing = () => {
     }
   });
 
-  console.log('Final display count:', sortedProducts.length);
-
   return (
     <div className="min-h-screen bg-background font-roboto">
       <Navbar />
 
       <div className="w-full px-4 py-6">
         {/* Breadcrumb and Header */}
-        <div className="mb-6">
+        <div className="mb-4">
           <nav className="text-sm text-muted-foreground mb-2">
             Home / {categoryName || "Category"}
           </nav>
@@ -230,16 +358,53 @@ const ProductListing = () => {
           </div>
         </div>
 
-        <div className="flex gap-6">
-          {/* Sidebar Filters */}
-          <div className={`w-64 ${showFilters ? "block" : "hidden"} md:block`}>
-            <Card className="sticky top-4">
-              <CardContent className="p-6">
-                <h3 className="font-semibold text-foreground mb-4">Filters</h3>
+        <div className="flex gap-4">
+          {/* Sidebar Filters - Amazon Style */}
+          <div className={`w-60 ${showFilters ? "block" : "hidden"} md:block`}>
+            <div className="bg-card border-0 sticky top-4">
+              <div className="p-0">
+                {/* Clear Filters Button */}
+                {selectedSubcategories.length > 0 && (
+                  <div className="mb-3">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setSelectedSubcategories([])}
+                      className="w-full text-xs"
+                    >
+                      Clear Filters ({selectedSubcategories.length})
+                    </Button>
+                  </div>
+                )}
+                {/* Category Filter with Subcategories */}
+                <div className="mb-4 border-b pb-3">
+                  <h4 className="font-bold text-foreground mb-2 text-base">{currentCategory}</h4>
+                  {/* Scrollable subcategories container */}
+                  <div className="max-h-[400px] overflow-y-auto pr-2 space-y-1 filter-scroll">
+                    {currentSubcategories.map((subcategory) => (
+                      <div key={subcategory} className="flex items-center space-x-2 py-0.5">
+                        <Checkbox
+                          id={subcategory}
+                          checked={selectedSubcategories.includes(subcategory)}
+                          onCheckedChange={(checked) =>
+                            handleSubcategoryChange(subcategory, checked as boolean)
+                          }
+                          className="h-3 w-3 flex-shrink-0"
+                        />
+                        <label
+                          htmlFor={subcategory}
+                          className="text-xs text-foreground cursor-pointer hover:text-primary leading-tight"
+                        >
+                          {subcategory}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
                 {/* Price Range */}
-                <div className="mb-6">
-                  <h4 className="font-medium text-foreground mb-3">
+                <div className="mb-4 border-b pb-3">
+                  <h4 className="font-bold text-foreground mb-2 text-base">
                     Price Range
                   </h4>
                   <Slider
@@ -250,48 +415,24 @@ const ProductListing = () => {
                     step={1000}
                     className="mb-2"
                   />
-                  <div className="flex justify-between text-sm text-muted-foreground">
+                  <div className="flex justify-between text-xs text-muted-foreground">
                     <span>₹{priceRange[0].toLocaleString()}</span>
                     <span>₹{priceRange[1].toLocaleString()}</span>
                   </div>
                 </div>
 
-                {/* Brand Filter */}
-                <div className="mb-6">
-                  <h4 className="font-medium text-foreground mb-3">Brand</h4>
-                  <div className="space-y-2">
-                    {brands.map((brand) => (
-                      <div key={brand} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={brand}
-                          checked={selectedBrands.includes(brand)}
-                          onCheckedChange={(checked) =>
-                            handleBrandChange(brand, checked as boolean)
-                          }
-                        />
-                        <label
-                          htmlFor={brand}
-                          className="text-sm text-foreground cursor-pointer"
-                        >
-                          {brand}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
                 {/* Rating Filter */}
-                <div className="mb-6">
-                  <h4 className="font-medium text-foreground mb-3">
+                <div className="mb-4 border-b pb-3">
+                  <h4 className="font-bold text-foreground mb-2 text-base">
                     Customer Rating
                   </h4>
-                  <div className="space-y-2">
+                  <div className="space-y-1">
                     {[4, 3, 2, 1].map((rating) => (
-                      <div key={rating} className="flex items-center space-x-2">
-                        <Checkbox id={`rating-${rating}`} />
+                      <div key={rating} className="flex items-center space-x-2 py-0.5">
+                        <Checkbox id={`rating-${rating}`} className="h-3 w-3" />
                         <label
                           htmlFor={`rating-${rating}`}
-                          className="text-sm text-foreground cursor-pointer flex items-center"
+                          className="text-xs text-foreground cursor-pointer flex items-center hover:text-primary"
                         >
                           {rating}
                           <Star className="h-3 w-3 fill-yellow-400 text-yellow-400 ml-1" />
@@ -303,105 +444,105 @@ const ProductListing = () => {
                 </div>
 
                 {/* Availability */}
-                <div>
-                  <h4 className="font-medium text-foreground mb-3">
+                <div className="mb-4">
+                  <h4 className="font-bold text-foreground mb-2 text-base">
                     Availability
                   </h4>
-                  <div className="space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox id="in-stock" />
+                  <div className="space-y-1">
+                    <div className="flex items-center space-x-2 py-0.5">
+                      <Checkbox id="in-stock" className="h-3 w-3" />
                       <label
                         htmlFor="in-stock"
-                        className="text-sm text-foreground cursor-pointer"
+                        className="text-xs text-foreground cursor-pointer hover:text-primary"
                       >
                         In Stock
                       </label>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox id="fast-delivery" />
+                    <div className="flex items-center space-x-2 py-0.5">
+                      <Checkbox id="fast-delivery" className="h-3 w-3" />
                       <label
                         htmlFor="fast-delivery"
-                        className="text-sm text-foreground cursor-pointer"
+                        className="text-xs text-foreground cursor-pointer hover:text-primary"
                       >
                         Fast Delivery
                       </label>
                     </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
 
           {/* Product Grid */}
           <div className="flex-1">
-            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
               {sortedProducts.map((product) => (
-                <Card
+                <div
                   key={product._id}
                   className="group hover:shadow-lg transition-shadow duration-300 bg-card border border-border"
                 >
-                  <CardContent className="p-3 md:p-4">
+                  <div className="p-3">
                     <Link to={`/product/${product._id}`}>
-                      <div className="relative mb-3 md:mb-4">
+                      <div className="relative mb-2">
                         <img
                           src={product.images?.[0] || '/placeholder.svg'}
                           alt={product.title}
-                          className="w-full h-32 md:h-48 object-cover rounded-lg"
+                          className="w-full h-32 md:h-48 object-cover"
                         />
-                        <Badge className="absolute top-1 md:top-2 left-1 md:left-2 bg-discount text-white text-xs md:text-sm">
+                        <Badge className="absolute top-1 left-1 bg-discount text-white text-xs rounded-none">
                           {product.mrp && product.mrp > product.price ? Math.round(((product.mrp - product.price) / product.mrp) * 100) : 0}% OFF
                         </Badge>
                       </div>
 
-                      <h3 className="font-semibold text-card-foreground mb-2 font-roboto group-hover:text-primary transition-colors line-clamp-2 text-sm md:text-base">
+                      <h3 className="font-semibold text-card-foreground mb-1 font-roboto group-hover:text-primary transition-colors line-clamp-2 text-sm">
                         {product.title}
                       </h3>
 
-                      <div className="flex items-center gap-1 md:gap-2 mb-2">
+                      <div className="flex items-center gap-1 mb-1">
                         <div className="flex items-center">
-                          <Star className="h-3 w-3 md:h-4 md:w-4 fill-yellow-400 text-yellow-400" />
-                          <span className="text-xs md:text-sm font-medium ml-1">
+                          <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                          <span className="text-xs font-medium ml-1">
                             {product.rating || 4.5}
                           </span>
                         </div>
-                        <span className="text-xs md:text-sm text-muted-foreground">
+                        <span className="text-xs text-muted-foreground">
                           ({product.reviewsCount || 0})
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-1 md:gap-2 mb-3 md:mb-4">
-                        <span className="text-lg md:text-xl font-bold text-price">
+                      <div className="flex items-center gap-1 mb-2">
+                        <span className="text-lg font-bold text-price">
                           ₹{product.price.toLocaleString()}
                         </span>
-                        <span className="text-xs md:text-sm text-muted-foreground line-through">
+                        <span className="text-xs text-muted-foreground line-through">
                           ₹{(product.mrp || product.price).toLocaleString()}
                         </span>
                       </div>
                     </Link>
 
                     <Button
-                      className="w-full bg-primary hover:bg-primary-hover text-primary-foreground text-xs md:text-sm py-2 md:py-2"
+                      className="w-full bg-primary hover:bg-primary-hover text-primary-foreground text-xs py-2 rounded-none"
                       onClick={(e) => handleAddToCart(e, product._id)}
                       disabled={addingId === product._id}
                     >
                       {addingId === product._id ? (
                         <span className="animate-spin mr-2">⟳</span>
                       ) : (
-                        <ShoppingCart className="h-3 w-3 md:h-4 md:w-4 mr-1 md:mr-2" />
+                        <ShoppingCart className="h-3 w-3 mr-1" />
                       )}
                       {addingId === product._id ? "Adding..." : "Add to Cart"}
                     </Button>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               ))}
             </div>
 
             {/* Load More */}
-            <div className="text-center mt-8">
+            <div className="text-center mt-6">
               <Button
                 variant="outline"
                 size="lg"
-                className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                className="border-primary text-primary hover:bg-primary hover:text-primary-foreground rounded-none"
               >
                 Load More Products
               </Button>
