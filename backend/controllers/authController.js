@@ -297,7 +297,8 @@ exports.createSellerProfile = async (req, res, next) => {
       data: seller
     });
   } catch (err) {
-    next(err);
+    console.error("Create Seller Profile Error:", err);
+    return res.status(500).json({ success: false, message: err.message, stack: err.stack });
   }
 };
 
