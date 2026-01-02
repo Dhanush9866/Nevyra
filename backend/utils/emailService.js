@@ -16,6 +16,17 @@ async function sendOTPEmail(to, otp) {
     text: `Your OTP for password reset is: ${otp}. It is valid for 10 minutes.`,
   };
   return transporter.sendMail(mailOptions);
+  return transporter.sendMail(mailOptions);
 }
 
-module.exports = { sendOTPEmail }; 
+async function sendVerificationEmail(to, name) {
+  const mailOptions = {
+    from: process.env.EMAIL_USER || "laptoptest7788@gmail.com",
+    to,
+    subject: 'Your Seller Account is Approved!',
+    text: `Hello ${name},\n\nYour seller account has been successfully verified/approved by our admin team.\n\nYou can now log in to the Seller Hub and start selling.\n\nLogin here: http://localhost:8081/login\n\nBest Regards,\nNevyra Team`,
+  };
+  return transporter.sendMail(mailOptions);
+}
+
+module.exports = { sendOTPEmail, sendVerificationEmail }; 

@@ -26,6 +26,7 @@ const corsOptions = {
     'https://nevyraui.onrender.com', // Your latest deployed frontend URL
     'https://nevyra-frontend.vercel.app', // Alternative deployed frontend URL
     'https://nevyra.vercel.app', // Alternative deployed frontend URL
+    'http://localhost:8082', // Admin Panel
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],

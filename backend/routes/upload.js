@@ -18,7 +18,8 @@ const upload = multer({
 });
 
 // POST /api/upload/image - single image
-router.post('/image', authMiddleware, adminMiddleware, upload.single('image'), async (req, res, next) => {
+// POST /api/upload/image - single image - Allow authenticated users (Sellers need this)
+router.post('/image', authMiddleware, upload.single('image'), async (req, res, next) => {
   try {
     if (!req.file) {
       return res.status(400).json({ success: false, message: 'No image provided' });
@@ -40,7 +41,8 @@ router.post('/image', authMiddleware, adminMiddleware, upload.single('image'), a
 });
 
 // POST /api/upload/images - multiple images
-router.post('/images', authMiddleware, adminMiddleware, upload.array('images', 10), async (req, res, next) => {
+// POST /api/upload/images - multiple images
+router.post('/images', authMiddleware, upload.array('images', 10), async (req, res, next) => {
   try {
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ success: false, message: 'No images provided' });

@@ -20,13 +20,14 @@ import SearchSuggestions from "./pages/SearchSuggestions";
 import SearchResults from "./pages/SearchResults";
 import Wishlist from "./pages/Wishlist";
 import BestSeller from "./pages/BestSeller";
+import SellerLanding from "./pages/SellerLanding";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
 const AppContent = () => {
   useScrollToTop();
-  
+
   return (
     <Routes>
       <Route path="/" element={<Index />} />
@@ -43,6 +44,7 @@ const AppContent = () => {
       <Route path="/search" element={<SearchResults />} />
       <Route path="/wishlist" element={<Wishlist />} />
       <Route path="/bestseller" element={<BestSeller />} />
+      <Route path="/seller" element={<SellerLanding />} />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
       <Route path="*" element={<NotFound />} />
     </Routes>
@@ -57,23 +59,24 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-                  <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/category/:categoryName" element={<ProductListing />} />
-          <Route path="/product/:productId" element={<ProductDetail />} />
-          <Route path="/cart" element={<RequireAuth><Cart /></RequireAuth>} />
-          <Route path="/checkout" element={<RequireAuth><Checkout /></RequireAuth>} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
-          <Route path="/admin" element={<RequireAuth requireAdmin><AdminDashboard /></RequireAuth>} />
-          <Route path="/search-suggestions" element={<SearchSuggestions />} />
-          <Route path="/search" element={<SearchResults />} />
-          <Route path="/wishlist" element={<RequireAuth><Wishlist /></RequireAuth>} />
-          <Route path="/orders" element={<RequireAuth><Orders /></RequireAuth>} />
-          <Route path="/order/:orderId" element={<RequireAuth><OrderDetails /></RequireAuth>} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/category/:categoryName" element={<ProductListing />} />
+            <Route path="/product/:productId" element={<ProductDetail />} />
+            <Route path="/cart" element={<RequireAuth><Cart /></RequireAuth>} />
+            <Route path="/checkout" element={<RequireAuth><Checkout /></RequireAuth>} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
+            <Route path="/admin" element={<RequireAuth requireAdmin><AdminDashboard /></RequireAuth>} />
+            <Route path="/search-suggestions" element={<SearchSuggestions />} />
+            <Route path="/search" element={<SearchResults />} />
+            <Route path="/wishlist" element={<RequireAuth><Wishlist /></RequireAuth>} />
+            <Route path="/orders" element={<RequireAuth><Orders /></RequireAuth>} />
+            <Route path="/order/:orderId" element={<RequireAuth><OrderDetails /></RequireAuth>} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="/seller" element={<SellerLanding />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>

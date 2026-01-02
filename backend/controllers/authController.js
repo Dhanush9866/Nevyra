@@ -88,6 +88,28 @@ exports.login = async (req, res, next) => {
         .status(401)
         .json({ success: false, message: "Invalid credentials", data: null });
     }
+
+    // Check if user is a seller and verification status
+    // Note: This logic assumes that if a user is trying to login to the seller portal, 
+    // they might be hitting a specific endpoint or we check conditionally. 
+    // However, since User and Seller are linked, we can check if a Seller profile exists.
+    // Ideally, for the general 'login' endpoint, we might not want to block regular users.
+    // But if this is the ONLY login used by sellers, we should be careful.
+    // The prompt implies we should block if they are pending *and* trying to be a seller? 
+    // Or just block if they are a seller pending?
+    // Let's check if the user has a linked seller profile.
+    const { Seller } = require("../models");
+    const sellerProfile = await Seller.findOne({ user: user._id });
+
+    if (sellerProfile) {
+      if (sellerProfile.verificationStatus === 'pending') {
+        return res.status(403).json({ success: false, message: "Your account is currently under review. Please wait for admin approval." });
+      }
+      if (sellerProfile.verificationStatus === 'rejected') {
+        return res.status(403).json({ success: false, message: "Your account application has been rejected. Please contact support." });
+      }
+    }
+
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
       return res
@@ -240,6 +262,102 @@ exports.resetPassword = async (req, res, next) => {
   }
 };
 
+
+
+exports.createSellerProfile = async (req, res, next) => {
+  try {
+    const { storeName, sellerType, gstNumber, businessAddress } = req.body;
+    const userId = req.user.id;
+
+    if (!storeName) {
+      return res.status(400).json({ success: false, message: "Store name is required" });
+    }
+
+    const { Seller } = require("../models");
+
+    // Check if seller profile already exists
+    let seller = await Seller.findOne({ user: userId });
+    if (seller) {
+      return res.status(409).json({ success: false, message: "Seller profile already exists" });
+    }
+
+    seller = new Seller({
+      user: userId,
+      storeName,
+      sellerType,
+      gstNumber,
+      businessAddress
+    });
+
+    await seller.save();
+
+    return res.status(201).json({
+      success: true,
+      message: "Seller profile created",
+      data: seller
+    });
+  } catch (err) {
+    console.error("Create Seller Profile Error:", err);
+    return res.status(500).json({ success: false, message: err.message, stack: err.stack });
+  }
+};
+
+exports.updatePaymentDetails = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const { accountHolderName, accountNumber, ifscCode, cancelledCheque } = req.body;
+
+    const { Seller } = require("../models");
+    const seller = await Seller.findOne({ user: userId });
+
+    if (!seller) {
+      return res.status(404).json({ success: false, message: "Seller profile not found" });
+    }
+
+    seller.bankDetails = {
+      accountHolderName,
+      accountNumber,
+      ifscCode,
+      cancelledCheque
+    };
+
+    await seller.save();
+
+    return res.json({ success: true, message: "Payment details updated", data: seller });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.submitKYC = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const { panCard, addressProof, livePhoto } = req.body;
+
+    const { Seller } = require("../models");
+    const seller = await Seller.findOne({ user: userId });
+
+    if (!seller) {
+      return res.status(404).json({ success: false, message: "Seller profile not found" });
+    }
+
+    seller.kycDetails = {
+      panCard,
+      addressProof,
+      livePhoto
+    };
+
+    // After submitting KYC, status implies pending verification
+    seller.verificationStatus = "pending";
+
+    await seller.save();
+
+    return res.json({ success: true, message: "KYC submitted for verification", data: seller });
+  } catch (err) {
+    next(err);
+  }
+};
+
 exports.verifyOTP = async (req, res, next) => {
   try {
     const { email, otp } = req.body;
@@ -324,6 +442,23 @@ exports.deleteAddressByIndex = async (req, res, next) => {
     user.addresses.splice(idx, 1);
     await user.save();
     return res.json({ success: true, message: "Address deleted", data: user.addresses });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getSellerProfile = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const { Seller } = require("../models");
+    const seller = await Seller.findOne({ user: userId });
+
+    if (!seller) {
+      // It's possible a user is logged in but hasn't created a seller profile yet (Step 1 complete, Step 2 pending)
+      return res.json({ success: true, message: "No seller profile found", data: null });
+    }
+
+    return res.json({ success: true, message: "Seller profile fetched", data: seller });
   } catch (err) {
     next(err);
   }

@@ -11,7 +11,9 @@ import RequireAuth from "./components/RequireAuth";
 import Products from "./pages/Products";
 import Orders from "./pages/Orders";
 import Customers from "./pages/Customers";
+
 import Analytics from "./pages/Analytics";
+import Sellers from "./pages/Sellers";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +27,7 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/products" element={<RequireAuth><Products /></RequireAuth>} />
           <Route path="/orders" element={<RequireAuth><Orders /></RequireAuth>} />
+          <Route path="/sellers" element={<RequireAuth><Sellers /></RequireAuth>} />
           <Route path="/customers" element={<RequireAuth><Customers /></RequireAuth>} />
           <Route path="/analytics" element={<RequireAuth><Analytics /></RequireAuth>} />
           <Route path="/" element={<RequireAuth><Index /></RequireAuth>} />

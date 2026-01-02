@@ -1,5 +1,5 @@
 // API Base URL - Update to your deployed backend URL
-const API_BASE_URL = 'https://nevyra-backend.onrender.com/api';
+const API_BASE_URL = 'http://localhost:8000/api';
 
 // Helper function to handle API responses
 const handleResponse = async (response) => {
@@ -47,7 +47,7 @@ export const adminAPI = {
       body: JSON.stringify(credentials),
     });
   },
-  
+
   // ==================== PRODUCT APIs ====================
   products: {
     // Get all products
@@ -56,7 +56,7 @@ export const adminAPI = {
         headers: { 'Authorization': `Bearer ${token}` }
       });
     },
-    
+
     // Get products with pagination
     getList: async (params = {}, token) => {
       const queryParams = new URLSearchParams(params).toString();
@@ -64,14 +64,14 @@ export const adminAPI = {
         headers: { 'Authorization': `Bearer ${token}` }
       });
     },
-    
+
     // Get single product
     getById: async (id, token) => {
       return apiRequest(`/products/${id}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
     },
-    
+
     // Create product
     create: async (productData, token) => {
       return apiRequest('/products', {
@@ -80,7 +80,7 @@ export const adminAPI = {
         body: JSON.stringify(productData),
       });
     },
-    
+
     // Update product
     update: async (id, productData, token) => {
       return apiRequest(`/products/${id}`, {
@@ -89,7 +89,7 @@ export const adminAPI = {
         body: JSON.stringify(productData),
       });
     },
-    
+
     // Delete product
     delete: async (id, token) => {
       return apiRequest(`/products/${id}`, {
@@ -98,14 +98,14 @@ export const adminAPI = {
       });
     }
   },
-  
+
   // ==================== CATEGORY APIs ====================
   categories: {
     // Get all categories (no auth required)
     getAll: async () => {
       return apiRequest('/categories');
     },
-    
+
     // Create category
     create: async (categoryData, token) => {
       return apiRequest('/categories', {
@@ -114,7 +114,7 @@ export const adminAPI = {
         body: JSON.stringify(categoryData),
       });
     },
-    
+
     // Update category
     update: async (id, categoryData, token) => {
       return apiRequest(`/categories/${id}`, {
@@ -123,7 +123,7 @@ export const adminAPI = {
         body: JSON.stringify(categoryData),
       });
     },
-    
+
     // Delete category
     delete: async (id, token) => {
       return apiRequest(`/categories/${id}`, {
@@ -132,28 +132,28 @@ export const adminAPI = {
       });
     }
   },
-  
+
   // ==================== UPLOAD APIs ====================
   upload: {
     // Upload single image
     singleImage: async (imageFile, token) => {
       const formData = new FormData();
       formData.append('image', imageFile);
-      
+
       return fetch(`${API_BASE_URL}/upload/image`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
         body: formData,
       }).then(handleResponse);
     },
-    
+
     // Upload multiple images
     multipleImages: async (imageFiles, token) => {
       const formData = new FormData();
       imageFiles.forEach(file => {
         formData.append('images', file);
       });
-      
+
       return fetch(`${API_BASE_URL}/upload/images`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
@@ -161,7 +161,7 @@ export const adminAPI = {
       }).then(handleResponse);
     }
   },
-  
+
   // ==================== DASHBOARD APIs ====================
   dashboard: {
     // Get dashboard statistics
@@ -170,7 +170,7 @@ export const adminAPI = {
         headers: { 'Authorization': `Bearer ${token}` }
       });
     },
-    
+
     // Get quick stats for tiles
     getQuickStats: async (token) => {
       return apiRequest('/dashboard/quick-stats', {
@@ -178,7 +178,7 @@ export const adminAPI = {
       });
     }
   },
-  
+
   // ==================== ORDER APIs ====================
   orders: {
     // Get all orders (admin)
@@ -187,17 +187,37 @@ export const adminAPI = {
         headers: { 'Authorization': `Bearer ${token}` }
       });
     },
-    
+
     // Get single order
     getById: async (id, token) => {
       return apiRequest(`/orders/${id}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
     },
-    
+
+    // Update order status
     // Update order status
     updateStatus: async (id, status, token) => {
       return apiRequest(`/orders/${id}/status`, {
+        method: 'PATCH',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ status }),
+      });
+    }
+  },
+
+  // ==================== SELLER APIs ====================
+  sellers: {
+    // Get pending sellers
+    getPending: async (token) => {
+      return apiRequest('/admins/pending-sellers', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+    },
+
+    // Verify seller (approve/reject)
+    verify: async (sellerId, status, token) => {
+      return apiRequest(`/admins/verify-seller/${sellerId}`, {
         method: 'PATCH',
         headers: { 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ status }),
