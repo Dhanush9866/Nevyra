@@ -110,6 +110,8 @@ export interface Order {
   notes?: string;
   createdAt: string;
   updatedAt: string;
+  returnStatus?: 'None' | 'Pending' | 'Approved' | 'Rejected' | 'Success';
+  returnReason?: string;
 }
 
 // Inventory Types

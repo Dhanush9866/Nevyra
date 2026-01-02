@@ -48,6 +48,7 @@ export const sellerAPI = {
     orders: {
         list: () => api.get("/seller/orders"),
         updateStatus: (id: string, status: string) => api.put(`/seller/orders/${id}/status`, { status }),
+        updateReturnStatus: (id: string, status: string) => api.put(`/seller/orders/${id}/return-status`, { status }),
     },
     payouts: {
         getWallet: () => api.get("/seller/wallet"),

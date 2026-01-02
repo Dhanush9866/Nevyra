@@ -107,7 +107,7 @@ exports.updateStatus = async (req, res, next) => {
 // Admin: list all orders with user and items populated
 exports.adminList = async (req, res, next) => {
   try {
-    const orders = await Order.find().populate('userId', 'firstName lastName email phone addresses').lean();
+    const orders = await Order.find().sort({ createdAt: -1 }).populate('userId', 'firstName lastName email phone addresses').lean();
     const ordersWithItems = await Promise.all(
       orders.map(async (order) => {
         const items = await OrderItem.find({ orderId: order._id }).populate('productId');
@@ -116,4 +116,59 @@ exports.adminList = async (req, res, next) => {
     );
     res.json({ success: true, message: 'Orders fetched', data: ordersWithItems });
   } catch (err) { next(err); }
+};
+
+exports.requestReturn = async (req, res, next) => {
+  try {
+    const { reason } = req.body;
+    const order = await Order.findOne({
+      _id: req.params.id,
+      userId: req.user.id,
+    });
+
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Order not found" });
+    }
+
+    if (order.status !== "Delivered") {
+      return res.status(400).json({ success: false, message: "Only delivered orders can be returned" });
+    }
+
+    if (order.returnStatus && order.returnStatus !== "None") {
+      return res.status(400).json({ success: false, message: "Return request already exists" });
+    }
+
+    order.returnStatus = "Pending";
+    order.returnReason = reason;
+    await order.save();
+
+    res.json({ success: true, message: "Return request submitted", data: order });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.updateReturnStatus = async (req, res, next) => {
+  try {
+    const { status } = req.body;
+    const allowedStatuses = ["Approved", "Rejected", "Success"];
+
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({ success: false, message: "Invalid return status" });
+    }
+
+    // Since this is called by admin/seller, we don't restrict by userId
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Order not found" });
+    }
+
+    order.returnStatus = status;
+    await order.save();
+
+    res.json({ success: true, message: "Return status updated", data: order });
+  } catch (err) {
+    next(err);
+  }
 };
