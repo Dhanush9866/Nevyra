@@ -6,6 +6,7 @@ import {
   Phone,
   MapPin,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -33,11 +34,11 @@ const Footer = () => {
               Customer Service
             </h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><a href="#" className="hover:text-primary transition-colors">Contact Us</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">FAQ</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Shipping Info</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Returns & Exchanges</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Track Your Order</a></li>
+              <li><Link to="/contact" className="hover:text-primary transition-colors">Contact Us</Link></li>
+              <li><Link to="/faq" className="hover:text-primary transition-colors">FAQ</Link></li>
+              <li><Link to="/shipping-info" className="hover:text-primary transition-colors">Shipping Info</Link></li>
+              <li><Link to="/returns" className="hover:text-primary transition-colors">Returns & Exchanges</Link></li>
+              <li><Link to="/orders" className="hover:text-primary transition-colors">Track Your Order</Link></li>
             </ul>
           </div>
 
@@ -47,11 +48,11 @@ const Footer = () => {
               My Account
             </h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><a href="#" className="hover:text-primary transition-colors">Profile</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Order History</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Wishlist</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Shopping Cart</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Rewards Program</a></li>
+              <li><Link to="/profile" className="hover:text-primary transition-colors">Profile</Link></li>
+              <li><Link to="/orders" className="hover:text-primary transition-colors">Order History</Link></li>
+              <li><Link to="/wishlist" className="hover:text-primary transition-colors">Wishlist</Link></li>
+              <li><Link to="/cart" className="hover:text-primary transition-colors">Shopping Cart</Link></li>
+              <li><Link to="/rewards" className="hover:text-primary transition-colors">Rewards Program</Link></li>
             </ul>
           </div>
 
@@ -61,11 +62,11 @@ const Footer = () => {
               Company
             </h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><a href="#" className="hover:text-primary transition-colors">About Us</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Careers</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Press</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Terms of Service</a></li>
+              <li><Link to="/about" className="hover:text-primary transition-colors">About Us</Link></li>
+              <li><Link to="/careers" className="hover:text-primary transition-colors">Careers</Link></li>
+              <li><Link to="/press" className="hover:text-primary transition-colors">Press</Link></li>
+              <li><Link to="/privacy-policy" className="hover:text-primary transition-colors">Privacy Policy</Link></li>
+              <li><Link to="/terms" className="hover:text-primary transition-colors">Terms of Service</Link></li>
             </ul>
           </div>
 

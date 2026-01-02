@@ -29,4 +29,26 @@ async function sendVerificationEmail(to, name) {
   return transporter.sendMail(mailOptions);
 }
 
-module.exports = { sendOTPEmail, sendVerificationEmail }; 
+async function sendContactFormEmail(data) {
+  const { name, email, subject, message } = data;
+  const adminEmail = process.env.ADMIN_EMAIL || process.env.EMAIL_USER || "laptoptest7788@gmail.com";
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER || "laptoptest7788@gmail.com",
+    to: adminEmail,
+    replyTo: email,
+    subject: `New Contact Form Submission: ${subject}`,
+    text: `You have received a new message from the contact form.\n\nName: ${name}\nEmail: ${email}\nSubject: ${subject}\n\nMessage:\n${message}`,
+    html: `
+      <h3>New Contact Form Submission</h3>
+      <p><strong>Name:</strong> ${name}</p>
+      <p><strong>Email:</strong> ${email}</p>
+      <p><strong>Subject:</strong> ${subject}</p>
+      <p><strong>Message:</strong></p>
+      <p>${message.replace(/\n/g, '<br>')}</p>
+    `
+  };
+  return transporter.sendMail(mailOptions);
+}
+
+module.exports = { sendOTPEmail, sendVerificationEmail, sendContactFormEmail }; 
