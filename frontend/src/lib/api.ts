@@ -135,6 +135,13 @@ class ApiService {
     });
   }
 
+  async sendContactForm(data: { name: string; email: string; subject: string; message: string; }): Promise<{ success: boolean; message: string }> {
+    return this.request('/contact', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}

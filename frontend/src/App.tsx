@@ -22,6 +22,16 @@ import Wishlist from "./pages/Wishlist";
 import BestSeller from "./pages/BestSeller";
 import SellerLanding from "./pages/SellerLanding";
 import NotFound from "./pages/NotFound";
+import Contact from "./pages/Contact";
+import FAQ from "./pages/FAQ";
+import ShippingInfo from "./pages/ShippingInfo";
+import Returns from "./pages/Returns";
+import About from "./pages/About";
+import Careers from "./pages/Careers";
+import Press from "./pages/Press";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Terms from "./pages/Terms";
+import Rewards from "./pages/Rewards";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +55,16 @@ const AppContent = () => {
       <Route path="/wishlist" element={<Wishlist />} />
       <Route path="/bestseller" element={<BestSeller />} />
       <Route path="/seller" element={<SellerLanding />} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/faq" element={<FAQ />} />
+      <Route path="/shipping-info" element={<ShippingInfo />} />
+      <Route path="/returns" element={<Returns />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/careers" element={<Careers />} />
+      <Route path="/press" element={<Press />} />
+      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+      <Route path="/terms" element={<Terms />} />
+      <Route path="/rewards" element={<Rewards />} />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
       <Route path="*" element={<NotFound />} />
     </Routes>
@@ -75,6 +95,16 @@ const App = () => (
             <Route path="/order/:orderId" element={<RequireAuth><OrderDetails /></RequireAuth>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="/seller" element={<SellerLanding />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/shipping-info" element={<ShippingInfo />} />
+            <Route path="/returns" element={<Returns />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/careers" element={<Careers />} />
+            <Route path="/press" element={<Press />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/rewards" element={<Rewards />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

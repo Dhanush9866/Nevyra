@@ -13,7 +13,9 @@ router.use("/payments", require("./payments"));
 console.log('Loading upload routes...');
 router.use("/upload", require("./upload"));
 console.log('Upload routes loaded');
+console.log('Upload routes loaded');
 router.use("/dashboard", require("./dashboard"));
+router.use("/contact", require("./contact"));
 // router.use("/seller", require("./seller")); // Removed duplicate
 
 module.exports = router;
