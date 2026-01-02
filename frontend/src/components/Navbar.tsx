@@ -1131,7 +1131,7 @@ const Navbar = () => {
                                 <Link
                                   key={itemIndex}
                                   to={`/category/${categoryToSlug(category.name)}`}
-                                  className="text-sm text-gray-600 hover:text-primary hover:underline flex items-center"
+                                  className="text-sm text-gray-600 hover:text-primary flex items-center"
                                   title={item}
                                 >
                                   {item}
@@ -1143,7 +1143,7 @@ const Navbar = () => {
                           <div className="mt-8 pt-6 border-t">
                             <Link
                               to={`/category/${categoryToSlug(category.name)}`}
-                              className="inline-flex items-center text-primary font-medium hover:underline"
+                              className="inline-flex items-center text-primary font-medium"
                             >
                               View all in {(activeSubCategory || (category.subcategories[0] as SubCategoryGroup).name)}
                               <ChevronRight className="h-4 w-4 ml-1" />
