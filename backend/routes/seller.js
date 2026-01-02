@@ -30,6 +30,7 @@ router.delete("/products/:id", sellerController.deleteMyProduct);
 // Order Management
 router.get("/orders", sellerController.getMyOrders);
 router.put("/orders/:id/status", sellerController.updateOrderStatus);
+router.put("/orders/:id/return-status", sellerController.updateReturnStatus);
 
 // Payouts & Wallet
 router.get("/wallet", sellerController.getWallet);
