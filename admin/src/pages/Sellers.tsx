@@ -47,6 +47,8 @@ interface Seller {
         ifscCode: string;
         cancelledCheque: string;
     };
+    verificationStatus: 'pending' | 'verified' | 'rejected';
+    isVerified: boolean;
     createdAt: string;
 }
 
@@ -61,14 +63,14 @@ const Sellers = () => {
         try {
             const token = localStorage.getItem("adminToken");
             if (!token) return;
-            const response = await adminAPI.sellers.getPending(token);
+            const response = await adminAPI.sellers.getAll(token);
             if (response.success) {
                 setSellers(response.data);
             }
         } catch (error) {
             toast({
                 title: "Error fetching sellers",
-                description: "Failed to load pending sellers",
+                description: "Failed to load sellers",
                 variant: "destructive"
             });
         } finally {
@@ -96,7 +98,7 @@ const Sellers = () => {
 
             // Refresh list
             fetchSellers();
-            setSelectedSeller(null);
+            // We rely on user to close dialog or we can force close if we had open state controlled
         } catch (error) {
             toast({
                 title: "Operation failed",
@@ -125,20 +127,20 @@ const Sellers = () => {
         <>
             <FloatingDock />
             <div className="min-h-screen bg-background py-8 sm:py-12 px-4 sm:px-6 md:px-12 pb-20 sm:pb-12">
-                <div className="max-w-6xl mx-auto space-y-8">
+                <div className="max-w-7xl mx-auto space-y-8">
                     <div>
-                        <h2 className="text-3xl font-bold tracking-tight bg-gradient-primary bg-clip-text text-transparent">Pending Verifications</h2>
-                        <p className="text-muted-foreground">Review and approve new seller applications</p>
+                        <h2 className="text-3xl font-bold tracking-tight bg-gradient-primary bg-clip-text text-transparent">Seller Management</h2>
+                        <p className="text-muted-foreground">Manage and verify seller accounts</p>
                     </div>
 
                     <Card className="glass border-0 shadow-xl">
                         <CardHeader>
-                            <CardTitle>Pending Applications ({sellers.length})</CardTitle>
+                            <CardTitle>All Sellers ({sellers.length})</CardTitle>
                         </CardHeader>
                         <CardContent>
                             {sellers.length === 0 ? (
                                 <div className="text-center py-8 text-muted-foreground">
-                                    No pending applications found.
+                                    No sellers found.
                                 </div>
                             ) : (
                                 <Table>
@@ -148,6 +150,7 @@ const Sellers = () => {
                                             <TableHead>Seller Name</TableHead>
                                             <TableHead>Email</TableHead>
                                             <TableHead>Type</TableHead>
+                                            <TableHead>Status</TableHead>
                                             <TableHead>Date</TableHead>
                                             <TableHead>Action</TableHead>
                                         </TableRow>
@@ -159,17 +162,25 @@ const Sellers = () => {
                                                 <TableCell>{seller.user?.firstName} {seller.user?.lastName}</TableCell>
                                                 <TableCell>{seller.user?.email}</TableCell>
                                                 <TableCell><Badge variant="outline">{seller.sellerType}</Badge></TableCell>
+                                                <TableCell>
+                                                    <Badge variant={
+                                                        seller.verificationStatus === 'verified' ? 'default' : 
+                                                        seller.verificationStatus === 'rejected' ? 'destructive' : 'secondary'
+                                                    }>
+                                                        {seller.verificationStatus ? seller.verificationStatus.toUpperCase() : 'PENDING'}
+                                                    </Badge>
+                                                </TableCell>
                                                 <TableCell>{new Date(seller.createdAt).toLocaleDateString()}</TableCell>
                                                 <TableCell>
                                                     <Dialog>
                                                         <DialogTrigger asChild>
-                                                            <Button variant="default" size="sm" onClick={() => setSelectedSeller(seller)}>
-                                                                Review
+                                                            <Button variant="ghost" size="sm" onClick={() => setSelectedSeller(seller)}>
+                                                                View Details
                                                             </Button>
                                                         </DialogTrigger>
                                                         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
                                                             <DialogHeader>
-                                                                <DialogTitle>Verify Seller: {seller.storeName}</DialogTitle>
+                                                                <DialogTitle>Seller Details: {seller.storeName}</DialogTitle>
                                                                 <DialogDescription>Review KYC documents and bank details.</DialogDescription>
                                                             </DialogHeader>
 
@@ -184,6 +195,8 @@ const Sellers = () => {
                                                                         <span>{seller.gstNumber}</span>
                                                                         <span className="text-muted-foreground">Seller Type:</span>
                                                                         <span>{seller.sellerType}</span>
+                                                                        <span className="text-muted-foreground">Status:</span>
+                                                                        <span className="capitalize">{seller.verificationStatus}</span>
                                                                     </div>
                                                                 </div>
 

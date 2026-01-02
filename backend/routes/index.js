@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 router.use("/auth", require("./auth"));
+router.use("/seller", require("./seller")); // Moved up for priority
 router.use("/products", require("./products"));
 router.use("/categories", require("./categories"));
 router.use("/cart", require("./cart"));
@@ -13,5 +14,6 @@ console.log('Loading upload routes...');
 router.use("/upload", require("./upload"));
 console.log('Upload routes loaded');
 router.use("/dashboard", require("./dashboard"));
+// router.use("/seller", require("./seller")); // Removed duplicate
 
 module.exports = router;

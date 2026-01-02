@@ -14,6 +14,7 @@ import Customers from "./pages/Customers";
 
 import Analytics from "./pages/Analytics";
 import Sellers from "./pages/Sellers";
+import Payouts from "./pages/Payouts";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/products" element={<RequireAuth><Products /></RequireAuth>} />
           <Route path="/orders" element={<RequireAuth><Orders /></RequireAuth>} />
           <Route path="/sellers" element={<RequireAuth><Sellers /></RequireAuth>} />
+          <Route path="/payouts" element={<RequireAuth><Payouts /></RequireAuth>} />
           <Route path="/customers" element={<RequireAuth><Customers /></RequireAuth>} />
           <Route path="/analytics" element={<RequireAuth><Analytics /></RequireAuth>} />
           <Route path="/" element={<RequireAuth><Index /></RequireAuth>} />

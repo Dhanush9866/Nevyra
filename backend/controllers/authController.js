@@ -451,7 +451,7 @@ exports.getSellerProfile = async (req, res, next) => {
   try {
     const userId = req.user.id;
     const { Seller } = require("../models");
-    const seller = await Seller.findOne({ user: userId });
+    const seller = await Seller.findOne({ user: userId }).populate('user');
 
     if (!seller) {
       // It's possible a user is logged in but hasn't created a seller profile yet (Step 1 complete, Step 2 pending)

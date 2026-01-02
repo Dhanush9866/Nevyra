@@ -222,7 +222,30 @@ export const adminAPI = {
         headers: { 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ status }),
       });
+    },
+
+    // Get all sellers
+    getAll: async (token) => {
+      return apiRequest('/admins/sellers', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
     }
+  },
+
+  // ==================== PAYOUT APIs ====================
+  payouts: {
+      getAll: async (token) => {
+          return apiRequest('/admins/payouts', {
+              headers: { 'Authorization': `Bearer ${token}` }
+          });
+      },
+      updateStatus: async (id, data, token) => {
+          return apiRequest(`/admins/payouts/${id}`, {
+              method: 'PATCH',
+              headers: { 'Authorization': `Bearer ${token}` },
+              body: JSON.stringify(data) // status, transactionId, notes
+          });
+      }
   }
 };
 

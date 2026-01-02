@@ -32,15 +32,20 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [seller, setSeller] = useState<Seller | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // Initialize: Check for token
   React.useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      loadSellerProfile();
-    }
+    const checkAuth = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        await loadSellerProfile();
+      } else {
+        setIsLoading(false);
+      }
+    };
+    checkAuth();
   }, []);
 
   const loadSellerProfile = async () => {
@@ -49,22 +54,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Actually getSellerProfile returns null if no profile, or the profile
       const res = await sellerAPI.auth.getSellerProfile();
       if (res.data.success && res.data.data) {
-        // Map backend seller to frontend Seller type if needed
-        // Backend: _id, storeName, sellerType, verificationStatus
-        // Frontend Seller type: id, email, name, storeName
-        // We might need to fetch User details too for email/name
-        // But for now let's set what we have.
-        // Wait, fetching User profile for email/name
-        // Let's assume we can get it or just set seller data
-
-        // We should also fetch the User profile to get email/name if missing
-        // For simplicity let's rely on seller data.
         const sData = res.data.data;
         const mappedSeller: Seller = {
           id: sData._id,
-          email: sData.user?.email || '', // populate might have worked?
+          email: sData.user?.email || '', 
           name: sData.user ? `${sData.user.firstName} ${sData.user.lastName}` : '',
           storeName: sData.storeName,
+          sellerType: sData.sellerType,
+          isVerified: sData.isVerified,
           createdAt: sData.createdAt,
           updatedAt: sData.updatedAt,
           verificationStatus: sData.verificationStatus
@@ -74,11 +71,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       } else if (res.data.success && !res.data.data) {
         // Logged in as user but no seller profile
         setIsAuthenticated(true);
-        // potentially set user state if we had one
       }
     } catch (e) {
       console.error("Failed to load profile", e);
       localStorage.removeItem('token');
+      setIsAuthenticated(false);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -102,28 +101,37 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const signup = useCallback(async (email: string, password: string, phone: string) => {
     setIsLoading(true);
     try {
-      // Step 1: Register User
-      // Note: The UI asks for firstName/lastName too?
-      // The signup function signature here only has email, password, phone.
-      // We might need to adjust or send dummy names if UI doesn't provide them.
-      // Current UI Step 1 just has Email, Password, Phone?
-      // Let's check Signup.tsx.
-      // Assuming standard register
       const payload = {
         email, password, phone,
-        firstName: 'Seller', // Placeholder
+        firstName: 'Seller',
         lastName: 'User',
         address: 'N/A'
       };
-      const res = await sellerAPI.auth.signup(payload);
-      if (!res.data.success) {
-        throw new Error(res.data.message);
+      
+      try {
+        const res = await sellerAPI.auth.signup(payload);
+        if (!res.data.success) {
+          throw new Error(res.data.message);
+        }
+      } catch (error: any) {
+        // If user already exists (409), try to login
+        if (error.response && error.response.status === 409) {
+          console.log("User exists, attempting login...");
+          // Fall through to login
+        } else {
+          throw error;
+        }
       }
-      // Auto login? Or ask to login?
-      // Usually we auto-login.
+      
+      // Login (either new user or existing user)
       await login(email, password);
+      
+      // Check if they are already a seller?
+      // loadSellerProfile is called inside login.
+      
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Signup failed');
+      console.error("Signup/Login error:", error);
+      throw new Error(error.response?.data?.message || error.message || 'Signup failed');
     } finally {
       setIsLoading(false);
     }

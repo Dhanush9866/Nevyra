@@ -2,6 +2,11 @@ const mongoose = require("mongoose");
 
 const productSchema = new mongoose.Schema(
   {
+    seller: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Seller",
+      default: null,
+    },
     title: {
       type: String,
       required: true,
@@ -40,6 +45,7 @@ const productSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    lowStockThreshold: { type: Number, default: 5 },
     soldCount: {
       type: Number,
       default: 0,

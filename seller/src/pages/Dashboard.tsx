@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { 
   DollarSign, 
   ShoppingCart, 
@@ -10,11 +11,10 @@ import {
   TrendingUp,
   ArrowRight
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { KPICard } from '@/components/ui/KPICard';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { 
-  mockDashboardStats, 
   mockSalesData, 
   mockOrders, 
   mockInventory,
@@ -32,84 +32,121 @@ import {
   Bar
 } from 'recharts';
 import { format } from 'date-fns';
+import { sellerAPI } from '@/lib/api';
+import { toast } from 'sonner';
 
 const Dashboard: React.FC = () => {
-  const stats = mockDashboardStats;
+  const navigate = useNavigate();
+  const [stats, setStats] = useState({
+    totalSales: 0,
+    totalOrders: 0,
+    totalProducts: 0,
+    pendingOrders: 0,
+    walletBalance: 0
+  });
+  const [loading, setLoading] = useState(true);
+
+  // Mocks for charts/tables until real APIs exist
   const recentOrders = mockOrders.slice(0, 5);
   const lowStockItems = mockInventory.filter(item => item.stock <= item.lowStockThreshold);
   const topProducts = mockProductPerformance.slice(0, 5);
 
+  useEffect(() => {
+    fetchDashboardStats();
+  }, []);
+
+  const fetchDashboardStats = async () => {
+    try {
+        const res = await sellerAPI.dashboard.stats();
+        if (res.data.success) {
+            setStats(res.data.data);
+        }
+    } catch (error) {
+        console.error("Failed to fetch dashboard stats", error);
+        // toast.error("Failed to load dashboard stats"); // Optional, maybe silent fail
+    } finally {
+        setLoading(false);
+    }
+  };
+
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
     }).format(value);
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 animate-fade-in p-6">
       {/* Page Header */}
       <div className="page-header">
-        <h1 className="page-title">Dashboard</h1>
-        <p className="page-description">
+        <h1 className="page-title text-2xl font-bold">Dashboard</h1>
+        <p className="page-description text-muted-foreground">
           Welcome back! Here's an overview of your store performance.
         </p>
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        <KPICard
-          title="Total Sales"
-          value={formatCurrency(stats.totalSales)}
-          change={stats.salesGrowth}
-          changeLabel="vs last month"
-          icon={DollarSign}
-          variant="success"
-        />
-        <KPICard
-          title="Total Orders"
-          value={stats.totalOrders}
-          change={stats.ordersGrowth}
-          changeLabel="vs last month"
-          icon={ShoppingCart}
-          variant="primary"
-        />
-        <KPICard
-          title="Total Products"
-          value={stats.totalProducts}
-          icon={Package}
-          variant="default"
-        />
-        <KPICard
-          title="Pending Orders"
-          value={stats.pendingOrders}
-          icon={Clock}
-          variant="warning"
-        />
-        <KPICard
-          title="Returns"
-          value={stats.returnedOrders}
-          icon={RotateCcw}
-          variant="destructive"
-        />
-        <KPICard
-          title="Wallet Balance"
-          value={formatCurrency(stats.walletBalance)}
-          icon={Wallet}
-          variant="success"
-        />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+        <div onClick={() => navigate('/orders')} className="cursor-pointer hover:opacity-90 transition-opacity">
+            <KPICard
+            title="Total Sales"
+            value={formatCurrency(stats.totalSales)}
+            // change={12.5}
+            // changeLabel="vs last month"
+            icon={DollarSign}
+            variant="success"
+            />
+        </div>
+
+        <div onClick={() => navigate('/orders')} className="cursor-pointer hover:opacity-90 transition-opacity">
+            <KPICard
+            title="Total Orders"
+            value={stats.totalOrders}
+            // change={8.2}
+            // changeLabel="vs last month"
+            icon={ShoppingCart}
+            variant="primary"
+            />
+        </div>
+
+        <div onClick={() => navigate('/products')} className="cursor-pointer hover:opacity-90 transition-opacity">
+            <KPICard
+            title="Total Products"
+            value={stats.totalProducts}
+            icon={Package}
+            variant="default"
+            />
+        </div>
+
+        <div onClick={() => navigate('/orders')} className="cursor-pointer hover:opacity-90 transition-opacity">
+            <KPICard
+            title="Pending Orders"
+            value={stats.pendingOrders}
+            icon={Clock}
+            variant="warning"
+            />
+        </div>
+
+        <div onClick={() => navigate('/payouts')} className="cursor-pointer hover:opacity-90 transition-opacity">
+            <KPICard
+            title="Wallet Balance"
+            value={formatCurrency(stats.walletBalance)}
+            icon={Wallet}
+            variant="success"
+            />
+        </div>
       </div>
 
-      {/* Charts Row */}
+      {/* Charts Row - Using Mocks for Layout Consistency */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Sales Chart */}
-        <div className="bg-card rounded-xl border border-border p-6">
-          <div className="card-header">
-            <h3 className="card-title">Sales Overview</h3>
+        <div className="bg-card rounded-xl border border-border p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold text-lg">Sales Overview</h3>
             <select className="text-sm border border-input rounded-lg px-3 py-1.5 bg-background">
               <option>Last 7 days</option>
-              <option>Last 30 days</option>
-              <option>Last 90 days</option>
+              {/* <option>Last 30 days</option> */}
             </select>
           </div>
           <div className="h-72">
@@ -129,7 +166,7 @@ const Dashboard: React.FC = () => {
                   fontSize={12}
                 />
                 <YAxis 
-                  tickFormatter={(value) => `$${value}`}
+                  tickFormatter={(value) => `₹${value}`}
                   stroke="hsl(var(--muted-foreground))"
                   fontSize={12}
                 />
@@ -156,12 +193,11 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Orders Chart */}
-        <div className="bg-card rounded-xl border border-border p-6">
-          <div className="card-header">
-            <h3 className="card-title">Daily Orders</h3>
+        <div className="bg-card rounded-xl border border-border p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold text-lg">Daily Orders</h3>
             <select className="text-sm border border-input rounded-lg px-3 py-1.5 bg-background">
               <option>Last 7 days</option>
-              <option>Last 30 days</option>
             </select>
           </div>
           <div className="h-72">
@@ -200,9 +236,9 @@ const Dashboard: React.FC = () => {
       {/* Tables Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Orders */}
-        <div className="bg-card rounded-xl border border-border">
+        <div className="bg-card rounded-xl border border-border shadow-sm">
           <div className="p-6 border-b border-border flex items-center justify-between">
-            <h3 className="card-title">Recent Orders</h3>
+            <h3 className="font-semibold text-lg">Recent Orders</h3>
             <Link 
               to="/orders" 
               className="text-sm text-primary hover:underline flex items-center gap-1"
@@ -211,28 +247,28 @@ const Dashboard: React.FC = () => {
             </Link>
           </div>
           <div className="overflow-x-auto">
-            <table className="data-table">
-              <thead>
+            <table className="w-full text-sm text-left">
+              <thead className="bg-muted/50 border-b border-border text-muted-foreground font-medium">
                 <tr>
-                  <th>Order</th>
-                  <th>Customer</th>
-                  <th>Amount</th>
-                  <th>Status</th>
+                  <th className="px-4 py-3">Order</th>
+                  <th className="px-4 py-3">Customer</th>
+                  <th className="px-4 py-3">Amount</th>
+                  <th className="px-4 py-3">Status</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-border">
                 {recentOrders.map((order) => (
-                  <tr key={order.id}>
-                    <td className="font-medium text-foreground">
+                  <tr key={order.id} className="hover:bg-muted/30">
+                    <td className="px-4 py-3 font-medium text-foreground">
                       {order.orderNumber}
                     </td>
-                    <td className="text-muted-foreground">
+                    <td className="px-4 py-3 text-muted-foreground">
                       {order.customerName}
                     </td>
-                    <td className="font-medium text-foreground">
+                    <td className="px-4 py-3 font-medium text-foreground">
                       {formatCurrency(order.total)}
                     </td>
-                    <td>
+                    <td className="px-4 py-3">
                       <StatusBadge status={order.status} />
                     </td>
                   </tr>
@@ -243,11 +279,11 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Low Stock Alerts */}
-        <div className="bg-card rounded-xl border border-border">
+        <div className="bg-card rounded-xl border border-border shadow-sm">
           <div className="p-6 border-b border-border flex items-center justify-between">
             <div className="flex items-center gap-2">
               <AlertTriangle className="w-5 h-5 text-warning" />
-              <h3 className="card-title">Low Stock Alerts</h3>
+              <h3 className="font-semibold text-lg">Low Stock Alerts</h3>
             </div>
             <Link 
               to="/inventory" 
@@ -262,19 +298,19 @@ const Dashboard: React.FC = () => {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="data-table">
-                <thead>
+              <table className="w-full text-sm text-left">
+                <thead className="bg-muted/50 border-b border-border text-muted-foreground font-medium">
                   <tr>
-                    <th>Product</th>
-                    <th>SKU</th>
-                    <th>Stock</th>
-                    <th>Status</th>
+                    <th className="px-4 py-3">Product</th>
+                    <th className="px-4 py-3">SKU</th>
+                    <th className="px-4 py-3">Stock</th>
+                    <th className="px-4 py-3">Status</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-border">
                   {lowStockItems.map((item) => (
-                    <tr key={item.id}>
-                      <td>
+                    <tr key={item.id} className="hover:bg-muted/30">
+                      <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           <img 
                             src={item.productImage} 
@@ -286,9 +322,9 @@ const Dashboard: React.FC = () => {
                           </span>
                         </div>
                       </td>
-                      <td className="text-muted-foreground">{item.sku}</td>
-                      <td className="font-medium text-foreground">{item.stock}</td>
-                      <td>
+                      <td className="px-4 py-3 text-muted-foreground">{item.sku}</td>
+                      <td className="px-4 py-3 font-medium text-foreground">{item.stock}</td>
+                      <td className="px-4 py-3">
                         <StatusBadge 
                           status={item.stock === 0 ? 'Out of Stock' : 'Low Stock'} 
                           variant={item.stock === 0 ? 'destructive' : 'warning'}
@@ -303,64 +339,6 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Top Selling Products */}
-      <div className="bg-card rounded-xl border border-border">
-        <div className="p-6 border-b border-border flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-success" />
-            <h3 className="card-title">Top Selling Products</h3>
-          </div>
-          <Link 
-            to="/analytics" 
-            className="text-sm text-primary hover:underline flex items-center gap-1"
-          >
-            View analytics <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Product</th>
-                <th>Units Sold</th>
-                <th>Revenue</th>
-                <th>Views</th>
-                <th>Conversion</th>
-              </tr>
-            </thead>
-            <tbody>
-              {topProducts.map((product) => (
-                <tr key={product.id}>
-                  <td>
-                    <div className="flex items-center gap-3">
-                      <img 
-                        src={product.image} 
-                        alt={product.name}
-                        className="w-10 h-10 rounded-lg object-cover"
-                      />
-                      <span className="font-medium text-foreground">
-                        {product.name}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="font-medium text-foreground">{product.sold}</td>
-                  <td className="font-medium text-success">
-                    {formatCurrency(product.revenue)}
-                  </td>
-                  <td className="text-muted-foreground">
-                    {product.views.toLocaleString()}
-                  </td>
-                  <td>
-                    <span className="font-medium text-foreground">
-                      {product.conversionRate.toFixed(2)}%
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
     </div>
   );
 };
