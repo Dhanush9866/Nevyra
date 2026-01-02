@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { 
-  Eye, 
+import {
+  Eye,
   Download,
   Star,
   Truck,
@@ -26,6 +26,23 @@ const Orders = () => {
   const [timeFilters, setTimeFilters] = useState<string[]>([]);
   const [orders, setOrders] = useState<any[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<any[]>([]);
+  const [returnModal, setReturnModal] = useState({ isOpen: false, orderId: "", reason: "" });
+
+  const handleReturnRequest = async () => {
+    try {
+      if (!returnModal.orderId || !returnModal.reason.trim()) return;
+
+      const res = await apiService.requestReturn(returnModal.orderId, returnModal.reason);
+      if (res.success) {
+        setOrders(prev => prev.map(o => o._id === returnModal.orderId ? { ...o, returnStatus: "Pending", returnReason: returnModal.reason } : o));
+        setReturnModal({ isOpen: false, orderId: "", reason: "" });
+        // Optionally show success toast if you have a toast library or just UI update
+      }
+    } catch (e) {
+      console.error("Failed to request return", e);
+    }
+  };
+
 
   useEffect(() => {
     (async () => {
@@ -39,7 +56,7 @@ const Orders = () => {
           setOrders(list);
           setFilteredOrders(list);
         }
-      } catch {}
+      } catch { }
     })();
   }, []);
 
@@ -49,17 +66,21 @@ const Orders = () => {
 
     // Search functionality
     if (searchQuery.trim()) {
-      filtered = filtered.filter(order => 
+      filtered = filtered.filter(order =>
         (order.items?.[0]?.productId?.title || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
         (order._id || "").toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
     // Status filtering
+    // Status filtering
     if (statusFilters.length > 0) {
-      filtered = filtered.filter(order => 
-        statusFilters.includes(order.status.toLowerCase())
-      );
+      filtered = filtered.filter(order => {
+        if (statusFilters.includes("returned") && order.returnStatus && order.returnStatus !== "None") {
+          return true;
+        }
+        return statusFilters.includes(order.status.toLowerCase());
+      });
     }
 
     // Time filtering
@@ -67,7 +88,7 @@ const Orders = () => {
       filtered = filtered.filter(order => {
         const orderDate = new Date(order.createdAt || order.date || 0);
         const currentDate = new Date();
-        
+
         return timeFilters.some(filter => {
           switch (filter) {
             case "last-30-days":
@@ -157,7 +178,7 @@ const Orders = () => {
   return (
     <div className="min-h-screen bg-background font-roboto">
       <Navbar />
-      
+
       {/* Breadcrumbs */}
       <div className="bg-white border-b border-gray-200 px-3 py-2">
         <div className="text-xs text-gray-600">
@@ -170,246 +191,320 @@ const Orders = () => {
         {/* Filters Sidebar - Hidden on mobile, shown on desktop */}
         <div className="hidden lg:block lg:w-64 bg-white border-r border-gray-200 p-4">
           <h3 className="font-semibold text-sm mb-4">Filters</h3>
-          
-                     {/* Order Status */}
-           <div className="mb-6">
-             <h4 className="font-medium text-sm mb-3">ORDER STATUS</h4>
-             <div className="space-y-2">
-               <div className="flex items-center space-x-2">
-                 <Checkbox 
-                   id="on-the-way" 
-                   checked={statusFilters.includes("shipped")}
-                   onCheckedChange={(checked) => handleStatusFilterChange("shipped", checked as boolean)}
-                 />
-                 <label htmlFor="on-the-way" className="text-sm">On the way</label>
-               </div>
-               <div className="flex items-center space-x-2">
-                 <Checkbox 
-                   id="delivered" 
-                   checked={statusFilters.includes("delivered")}
-                   onCheckedChange={(checked) => handleStatusFilterChange("delivered", checked as boolean)}
-                 />
-                 <label htmlFor="delivered" className="text-sm">Delivered</label>
-               </div>
-               <div className="flex items-center space-x-2">
-                 <Checkbox 
-                   id="cancelled" 
-                   checked={statusFilters.includes("cancelled")}
-                   onCheckedChange={(checked) => handleStatusFilterChange("cancelled", checked as boolean)}
-                 />
-                 <label htmlFor="cancelled" className="text-sm">Cancelled</label>
-               </div>
-               <div className="flex items-center space-x-2">
-                 <Checkbox 
-                   id="returned" 
-                   checked={statusFilters.includes("returned")}
-                   onCheckedChange={(checked) => handleStatusFilterChange("returned", checked as boolean)}
-                 />
-                 <label htmlFor="returned" className="text-sm">Returned</label>
-               </div>
-             </div>
-           </div>
 
-           {/* Order Time */}
-           <div>
-             <h4 className="font-medium text-sm mb-3">ORDER TIME</h4>
-             <div className="space-y-2">
-               <div className="flex items-center space-x-2">
-                 <Checkbox 
-                   id="last-30-days" 
-                   checked={timeFilters.includes("last-30-days")}
-                   onCheckedChange={(checked) => handleTimeFilterChange("last-30-days", checked as boolean)}
-                 />
-                 <label htmlFor="last-30-days" className="text-sm">Last 30 days</label>
-               </div>
-               <div className="flex items-center space-x-2">
-                 <Checkbox 
-                   id="2024" 
-                   checked={timeFilters.includes("2024")}
-                   onCheckedChange={(checked) => handleTimeFilterChange("2024", checked as boolean)}
-                 />
-                 <label htmlFor="2024" className="text-sm">2024</label>
-               </div>
-               <div className="flex items-center space-x-2">
-                 <Checkbox 
-                   id="2023" 
-                   checked={timeFilters.includes("2023")}
-                   onCheckedChange={(checked) => handleTimeFilterChange("2023", checked as boolean)}
-                 />
-                 <label htmlFor="2023" className="text-sm">2023</label>
-               </div>
-               <div className="flex items-center space-x-2">
-                 <Checkbox 
-                   id="2022" 
-                   checked={timeFilters.includes("2022")}
-                   onCheckedChange={(checked) => handleTimeFilterChange("2022", checked as boolean)}
-                 />
-                 <label htmlFor="2022" className="text-sm">2022</label>
-               </div>
-               <div className="flex items-center space-x-2">
-                 <Checkbox 
-                   id="2021" 
-                   checked={timeFilters.includes("2021")}
-                   onCheckedChange={(checked) => handleTimeFilterChange("2021", checked as boolean)}
-                 />
-                 <label htmlFor="2021" className="text-sm">2021</label>
-               </div>
-               <div className="flex items-center space-x-2">
-                 <Checkbox 
-                   id="older" 
-                   checked={timeFilters.includes("older")}
-                   onCheckedChange={(checked) => handleTimeFilterChange("older", checked as boolean)}
-                 />
-                 <label htmlFor="older" className="text-sm">Older</label>
-               </div>
-             </div>
-           </div>
+          {/* Order Status */}
+          <div className="mb-6">
+            <h4 className="font-medium text-sm mb-3">ORDER STATUS</h4>
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="on-the-way"
+                  checked={statusFilters.includes("shipped")}
+                  onCheckedChange={(checked) => handleStatusFilterChange("shipped", checked as boolean)}
+                />
+                <label htmlFor="on-the-way" className="text-sm">On the way</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="delivered"
+                  checked={statusFilters.includes("delivered")}
+                  onCheckedChange={(checked) => handleStatusFilterChange("delivered", checked as boolean)}
+                />
+                <label htmlFor="delivered" className="text-sm">Delivered</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="cancelled"
+                  checked={statusFilters.includes("cancelled")}
+                  onCheckedChange={(checked) => handleStatusFilterChange("cancelled", checked as boolean)}
+                />
+                <label htmlFor="cancelled" className="text-sm">Cancelled</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="returned"
+                  checked={statusFilters.includes("returned")}
+                  onCheckedChange={(checked) => handleStatusFilterChange("returned", checked as boolean)}
+                />
+                <label htmlFor="returned" className="text-sm">Returned</label>
+              </div>
+            </div>
+          </div>
 
-           {/* Clear Filters Button */}
-           {(statusFilters.length > 0 || timeFilters.length > 0) && (
-             <div className="mt-4">
-               <Button 
-                 variant="outline" 
-                 size="sm" 
-                 onClick={clearAllFilters}
-                 className="w-full text-xs"
-               >
-                 <X className="h-3 w-3 mr-1" />
-                 Clear All Filters
-               </Button>
-             </div>
-           )}
+          {/* Order Time */}
+          <div>
+            <h4 className="font-medium text-sm mb-3">ORDER TIME</h4>
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="last-30-days"
+                  checked={timeFilters.includes("last-30-days")}
+                  onCheckedChange={(checked) => handleTimeFilterChange("last-30-days", checked as boolean)}
+                />
+                <label htmlFor="last-30-days" className="text-sm">Last 30 days</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="2024"
+                  checked={timeFilters.includes("2024")}
+                  onCheckedChange={(checked) => handleTimeFilterChange("2024", checked as boolean)}
+                />
+                <label htmlFor="2024" className="text-sm">2024</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="2023"
+                  checked={timeFilters.includes("2023")}
+                  onCheckedChange={(checked) => handleTimeFilterChange("2023", checked as boolean)}
+                />
+                <label htmlFor="2023" className="text-sm">2023</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="2022"
+                  checked={timeFilters.includes("2022")}
+                  onCheckedChange={(checked) => handleTimeFilterChange("2022", checked as boolean)}
+                />
+                <label htmlFor="2022" className="text-sm">2022</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="2021"
+                  checked={timeFilters.includes("2021")}
+                  onCheckedChange={(checked) => handleTimeFilterChange("2021", checked as boolean)}
+                />
+                <label htmlFor="2021" className="text-sm">2021</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="older"
+                  checked={timeFilters.includes("older")}
+                  onCheckedChange={(checked) => handleTimeFilterChange("older", checked as boolean)}
+                />
+                <label htmlFor="older" className="text-sm">Older</label>
+              </div>
+            </div>
+          </div>
+
+          {/* Clear Filters Button */}
+          {(statusFilters.length > 0 || timeFilters.length > 0) && (
+            <div className="mt-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={clearAllFilters}
+                className="w-full text-xs"
+              >
+                <X className="h-3 w-3 mr-1" />
+                Clear All Filters
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Orders List */}
         <div className="flex-1 bg-gray-50">
-                     {/* Search Bar */}
-           <div className="bg-white border-b border-gray-200 p-4">
-             <div className="flex gap-2">
-               <Input 
-                 placeholder="Search your orders here" 
-                 className="flex-1"
-                 value={searchQuery}
-                 onChange={(e) => setSearchQuery(e.target.value)}
-               />
-               {searchQuery && (
-                 <Button 
-                   variant="ghost" 
-                   size="sm"
-                   onClick={() => setSearchQuery("")}
-                   className="text-gray-500 hover:text-gray-700"
-                 >
-                   <X className="h-4 w-4" />
-                 </Button>
-               )}
-             </div>
-             {/* Active Filters Display */}
-             {(statusFilters.length > 0 || timeFilters.length > 0) && (
-               <div className="flex flex-wrap gap-2 mt-2">
-                 {statusFilters.map(filter => (
-                   <Badge key={filter} variant="secondary" className="text-xs">
-                     {filter.charAt(0).toUpperCase() + filter.slice(1)}
-                   </Badge>
-                 ))}
-                 {timeFilters.map(filter => (
-                   <Badge key={filter} variant="secondary" className="text-xs">
-                     {filter === "last-30-days" ? "Last 30 days" : filter}
-                   </Badge>
-                 ))}
-               </div>
-             )}
-           </div>
-
-                                   {/* Orders */}
-             <div className="p-4 space-y-4">
-               {filteredOrders.length === 0 ? (
-                 <div className="text-center py-8">
-                   <p className="text-gray-500 text-sm">
-                     {searchQuery || statusFilters.length > 0 || timeFilters.length > 0 
-                       ? "No orders found matching your criteria." 
-                       : "No orders found."}
-                   </p>
-                   {(searchQuery || statusFilters.length > 0 || timeFilters.length > 0) && (
-                     <Button 
-                       variant="outline" 
-                       size="sm" 
-                       onClick={clearAllFilters}
-                       className="mt-2"
-                     >
-                       Clear Filters
-                     </Button>
-                   )}
-                 </div>
-               ) : (
-                 <>
-                   <div className="text-sm text-gray-600 mb-2">
-                     Showing {filteredOrders.length} of {orders.length} orders
-                   </div>
-                  {filteredOrders.map((order) => (
-                <Card 
-                 key={order._id} 
-                  className="bg-white border border-gray-200 cursor-pointer hover:shadow-md transition-shadow"
-                 onClick={() => handleOrderClick(order._id)}
+          {/* Search Bar */}
+          <div className="bg-white border-b border-gray-200 p-4">
+            <div className="flex gap-2">
+              <Input
+                placeholder="Search your orders here"
+                className="flex-1"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              {searchQuery && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSearchQuery("")}
+                  className="text-gray-500 hover:text-gray-700"
                 >
-                  <CardContent className="p-4">
-                    {/* Order Item */}
-                    <div className="flex gap-4">
-                      <img
-                        src={order.items?.[0]?.productId?.images?.[0] || '/placeholder.svg'}
-                        alt={order.items?.[0]?.productId?.title || 'Product'}
-                        className="w-20 h-20 object-cover rounded"
-                      />
-                      <div className="flex-1">
-                        <h3 className="font-medium text-sm text-gray-900 line-clamp-2">
-                          {order.items?.[0]?.productId?.title || 'Product'}
-                        </h3>
-                        <p className="text-sm font-medium text-gray-900 mt-1">₹{order.totalAmount}</p>
-                        
-                        {/* Status */}
-                        <div className="flex items-center gap-2 mt-2">
-                          <div className={`w-2 h-2 rounded-full ${getStatusColor(order.status)}`}></div>
-                          <span className="text-xs text-gray-600">
-                            {getStatusText(order.status || 'Pending')}
-                          </span>
-                        </div>
-                        
-                        {/* Additional Info */}
-                        {order.status === "Delivered" && (
-                          <p className="text-xs text-gray-600 mt-1">Your item has been delivered</p>
-                        )}
-                        {order.status === "Cancelled" && order.id === "NVR001236" && (
-                          <p className="text-xs text-gray-600 mt-1">
-                            You requested a cancellation because you changed your mind about this product.
-                          </p>
-                        )}
-                      </div>
-                    </div>
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+            {/* Active Filters Display */}
+            {(statusFilters.length > 0 || timeFilters.length > 0) && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {statusFilters.map(filter => (
+                  <Badge key={filter} variant="secondary" className="text-xs">
+                    {filter.charAt(0).toUpperCase() + filter.slice(1)}
+                  </Badge>
+                ))}
+                {timeFilters.map(filter => (
+                  <Badge key={filter} variant="secondary" className="text-xs">
+                    {filter === "last-30-days" ? "Last 30 days" : filter}
+                  </Badge>
+                ))}
+              </div>
+            )}
+          </div>
 
-                    {/* Action Buttons */}
-                    {order.status === "Delivered" && (
-                      <div className="mt-3">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="text-xs bg-blue-600 text-white border-blue-600 hover:bg-blue-700"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            // Handle rate & review
-                          }}
-                        >
-                          <Star className="h-3 w-3 mr-1" />
-                          Rate & Review Product
-                        </Button>
+          {/* Orders */}
+          <div className="p-4 space-y-4">
+            {filteredOrders.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-gray-500 text-sm">
+                  {searchQuery || statusFilters.length > 0 || timeFilters.length > 0
+                    ? "No orders found matching your criteria."
+                    : "No orders found."}
+                </p>
+                {(searchQuery || statusFilters.length > 0 || timeFilters.length > 0) && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={clearAllFilters}
+                    className="mt-2"
+                  >
+                    Clear Filters
+                  </Button>
+                )}
+              </div>
+            ) : (
+              <>
+                <div className="text-sm text-gray-600 mb-2">
+                  Showing {filteredOrders.length} of {orders.length} orders
+                </div>
+                {filteredOrders.map((order) => (
+                  <Card
+                    key={order._id}
+                    className="bg-white border border-gray-200 cursor-pointer hover:shadow-md transition-shadow"
+                    onClick={() => handleOrderClick(order._id)}
+                  >
+                    <CardContent className="p-4">
+                      {/* Order Item */}
+                      <div className="flex gap-4">
+                        <img
+                          src={order.items?.[0]?.productId?.images?.[0] || '/placeholder.svg'}
+                          alt={order.items?.[0]?.productId?.title || 'Product'}
+                          className="w-20 h-20 object-cover rounded"
+                        />
+                        <div className="flex-1">
+                          <h3 className="font-medium text-sm text-gray-900 line-clamp-2">
+                            {order.items?.[0]?.productId?.title || 'Product'}
+                          </h3>
+                          <p className="text-sm font-medium text-gray-900 mt-1">₹{order.totalAmount}</p>
+
+                          {/* Status */}
+                          <div className="flex items-center gap-2 mt-2">
+                            <div className={`w-2 h-2 rounded-full ${getStatusColor(order.status)}`}></div>
+                            <span className="text-xs text-gray-600">
+                              {getStatusText(order.status || 'Pending')}
+                            </span>
+                          </div>
+
+                          {/* Return Status Badge */}
+                          {order.returnStatus && order.returnStatus !== "None" && (
+                            <div className="mt-2">
+                              <Badge
+                                variant={
+                                  order.returnStatus === "Pending" ? "secondary" :
+                                    order.returnStatus === "Approved" || order.returnStatus === "Success" ? "default" :
+                                      "destructive"
+                                }
+                                className={`text-xs ${order.returnStatus === "Pending" ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200" :
+                                  order.returnStatus === "Approved" ? "bg-blue-100 text-blue-800 hover:bg-blue-200" :
+                                    order.returnStatus === "Success" ? "bg-green-100 text-green-800 hover:bg-green-200" :
+                                      "bg-red-100 text-red-800 hover:bg-red-200"
+                                  }`}
+                              >
+                                {order.returnStatus === "Pending" ? "Return Pending" :
+                                  order.returnStatus === "Approved" ? "Return Approved" :
+                                    order.returnStatus === "Success" ? "Return Successful" :
+                                      "Return Rejected"}
+                              </Badge>
+                            </div>
+                          )}
+
+                          {/* Additional Info */}
+                          {order.status === "Delivered" && (
+                            <p className="text-xs text-gray-600 mt-1">Your item has been delivered</p>
+                          )}
+                          {order.status === "Cancelled" && order.id === "NVR001236" && (
+                            <p className="text-xs text-gray-600 mt-1">
+                              You requested a cancellation because you changed your mind about this product.
+                            </p>
+                          )}
+                        </div>
                       </div>
-                                         )}
-                   </CardContent>
-                 </Card>
-               ))}
-                 </>
-               )}
-             </div>
+
+                      {/* Action Buttons */}
+                      {order.status === "Delivered" && (
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-xs bg-blue-600 text-white border-blue-600 hover:bg-blue-700"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              // Handle rate & review
+                            }}
+                          >
+                            <Star className="h-3 w-3 mr-1" />
+                            Rate & Review Product
+                          </Button>
+
+                          {(!order.returnStatus || order.returnStatus === "None") && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-xs"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setReturnModal({ isOpen: true, orderId: order._id, reason: "" });
+                              }}
+                            >
+                              Return Product
+                            </Button>
+                          )}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </>
+            )}
+
+
+          </div>
         </div>
       </div>
+
+      {/* Return Request Modal */}
+      {returnModal.isOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl">
+            <h3 className="text-lg font-semibold mb-4">Request Return</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Please provide a reason for returning this item.
+            </p>
+            <textarea
+              className="w-full border border-gray-300 rounded-md p-2 text-sm min-h-[100px] focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+              placeholder="Enter reason here..."
+              value={returnModal.reason}
+              onChange={(e) => setReturnModal({ ...returnModal, reason: e.target.value })}
+            />
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setReturnModal({ isOpen: false, orderId: "", reason: "" })}
+              >
+                Cancel
+              </Button>
+              <Button
+                size="sm"
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+                disabled={!returnModal.reason.trim()}
+                onClick={handleReturnRequest}
+              >
+                Submit Request
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>

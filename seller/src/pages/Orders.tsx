@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Search, 
-  Filter, 
-  MoreHorizontal, 
-  Eye, 
+import {
+  Search,
+  Filter,
+  MoreHorizontal,
+  Eye,
   Clock,
   Package,
   CheckCircle,
@@ -11,7 +11,7 @@ import {
   XCircle,
   AlertCircle
 } from 'lucide-react';
-import { StatusBadge } from '@/components/ui/StatusBadge'; 
+import { StatusBadge } from '@/components/ui/StatusBadge';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { sellerAPI } from '@/lib/api';
 import { toast } from 'sonner';
@@ -43,7 +43,7 @@ const Orders: React.FC = () => {
           // Calculate subtotal for THIS seller's items
           const sellerItems = order.items || [];
           const subtotal = sellerItems.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
-          
+
           return {
             id: order._id,
             orderNumber: order._id.substring(0, 8).toUpperCase(), // Using ID as mock order number
@@ -66,10 +66,10 @@ const Orders: React.FC = () => {
             total: subtotal, // Showing only seller's share
             status: order.status || 'Pending',
             shippingAddress: { // Default empty or map if backend provides
-              addressLine1: order.userId?.addresses?.[0]?.street || 'N/A', 
-              city: order.userId?.addresses?.[0]?.city || '', 
-              state: '', 
-              pincode: '', 
+              addressLine1: order.userId?.addresses?.[0]?.street || 'N/A',
+              city: order.userId?.addresses?.[0]?.city || '',
+              state: '',
+              pincode: '',
               country: '',
               name: '',
               phone: ''
@@ -78,7 +78,9 @@ const Orders: React.FC = () => {
             paymentMethod: order.paymentMethod,
             paymentStatus: order.paymentStatus,
             createdAt: order.createdAt,
-            updatedAt: order.createdAt
+            updatedAt: order.createdAt,
+            returnStatus: order.returnStatus || 'None',
+            returnReason: order.returnReason || ''
           };
         });
         setOrders(mappedOrders);
@@ -102,16 +104,32 @@ const Orders: React.FC = () => {
     }
   };
 
+  const handleUpdateReturnStatus = async (orderId: string, newStatus: string) => {
+    try {
+      await sellerAPI.orders.updateReturnStatus(orderId, newStatus);
+      toast.success(`Return request ${newStatus}`);
+      fetchOrders();
+    } catch (error) {
+      console.error('Error updating return status:', error);
+      toast.error('Failed to update return status');
+    }
+  };
+
   const filteredOrders = orders.filter(order => {
-    const matchesSearch = 
+    const matchesSearch =
       order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
       order.customerName.toLowerCase().includes(searchQuery.toLowerCase());
+
+    if (statusFilter === 'Returned') {
+      return matchesSearch && order.returnStatus && order.returnStatus !== 'None';
+    }
+
     const matchesStatus = statusFilter === 'all' || order.status.toLowerCase() === statusFilter.toLowerCase();
     return matchesSearch && matchesStatus;
   });
 
   const getStatusIcon = (status: string) => {
-    switch(status.toLowerCase()) {
+    switch (status.toLowerCase()) {
       case 'delivered': return <CheckCircle className="w-4 h-4 text-green-500" />;
       case 'shipped': return <Truck className="w-4 h-4 text-blue-500" />;
       case 'cancelled': return <XCircle className="w-4 h-4 text-red-500" />;
@@ -155,16 +173,17 @@ const Orders: React.FC = () => {
           />
         </div>
         <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="input-field w-auto"
-          >
-            <option value="all">All Status</option>
-            <option value="Pending">Pending</option>
-            <option value="Processing">Processing</option>
-            <option value="Shipped">Shipped</option>
-            <option value="Delivered">Delivered</option>
-            <option value="Cancelled">Cancelled</option>
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="input-field w-auto"
+        >
+          <option value="all">All Status</option>
+          <option value="Pending">Pending</option>
+          <option value="Processing">Processing</option>
+          <option value="Shipped">Shipped</option>
+          <option value="Delivered">Delivered</option>
+          <option value="Cancelled">Cancelled</option>
+          <option value="Returned">Returned</option>
         </select>
       </div>
 
@@ -183,13 +202,13 @@ const Orders: React.FC = () => {
             <table className="data-table">
               <thead>
                 <tr>
-                   <th>Order ID</th>
-                   <th>Date</th>
-                   <th>Customer</th>
-                   <th>Items</th>
-                   <th>Total</th>
-                   <th>Status</th>
-                   <th className="w-12"></th>
+                  <th>Order ID</th>
+                  <th>Date</th>
+                  <th>Customer</th>
+                  <th>Items</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th className="w-12"></th>
                 </tr>
               </thead>
               <tbody>
@@ -207,8 +226,8 @@ const Orders: React.FC = () => {
                       <div className="flex flex-col gap-1">
                         {order.items.map((item, idx) => (
                           <div key={idx} className="flex items-center gap-2 text-sm">
-                             <img src={item.productImage} alt="" className="w-6 h-6 rounded object-cover" />
-                             <span className="text-foreground">{item.quantity}x {item.productName}</span>
+                            <img src={item.productImage} alt="" className="w-6 h-6 rounded object-cover" />
+                            <span className="text-foreground">{item.quantity}x {item.productName}</span>
                           </div>
                         ))}
                         {order.items.length > 2 && (
@@ -217,16 +236,27 @@ const Orders: React.FC = () => {
                       </div>
                     </td>
                     <td className="font-medium text-foreground">
-                       {formatCurrency(order.total)}
+                      {formatCurrency(order.total)}
                     </td>
                     <td>
-                      <div className="flex items-center gap-2">
-                        {getStatusIcon(order.status)}
-                        <span className="capitalize">{order.status}</span>
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-2">
+                          {getStatusIcon(order.status)}
+                          <span className="capitalize">{order.status}</span>
+                        </div>
+                        {order.returnStatus && order.returnStatus !== 'None' && (
+                          <span className={`text-xs px-2 py-0.5 rounded-full inline-block w-fit ${order.returnStatus === 'Pending' ? 'bg-orange-100 text-orange-700' :
+                            order.returnStatus === 'Approved' ? 'bg-blue-100 text-blue-700' :
+                              order.returnStatus === 'Success' ? 'bg-green-100 text-green-700' :
+                                'bg-red-100 text-red-700'
+                            }`}>
+                            Return: {order.returnStatus}
+                          </span>
+                        )}
                       </div>
                     </td>
                     <td>
-                       <DropdownMenu>
+                      <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <button className="p-2 rounded-lg hover:bg-muted transition-colors">
                             <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
@@ -234,17 +264,32 @@ const Orders: React.FC = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem className="gap-2" onClick={() => handleUpdateStatus(order.id, 'Processing')}>
-                             Mark Processing
+                            Mark Processing
                           </DropdownMenuItem>
                           <DropdownMenuItem className="gap-2" onClick={() => handleUpdateStatus(order.id, 'Shipped')}>
-                             Mark Shipped
+                            Mark Shipped
                           </DropdownMenuItem>
                           <DropdownMenuItem className="gap-2" onClick={() => handleUpdateStatus(order.id, 'Delivered')}>
-                             Mark Delivered
+                            Mark Delivered
                           </DropdownMenuItem>
                           <DropdownMenuItem className="gap-2 text-red-600" onClick={() => handleUpdateStatus(order.id, 'Cancelled')}>
-                             Cancel Order
+                            Cancel Order
                           </DropdownMenuItem>
+                          {order.returnStatus === 'Pending' && (
+                            <>
+                              <DropdownMenuItem className="gap-2 text-blue-600 border-t" onClick={() => handleUpdateReturnStatus(order.id, 'Approved')}>
+                                Approve Return
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="gap-2 text-red-600" onClick={() => handleUpdateReturnStatus(order.id, 'Rejected')}>
+                                Reject Return
+                              </DropdownMenuItem>
+                            </>
+                          )}
+                          {order.returnStatus === 'Approved' && (
+                            <DropdownMenuItem className="gap-2 text-green-600 border-t" onClick={() => handleUpdateReturnStatus(order.id, 'Success')}>
+                              Process Refund (Success)
+                            </DropdownMenuItem>
+                          )}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </td>
@@ -255,8 +300,13 @@ const Orders: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Return Request Management Dialog */}
+      {/* (Can add a dialog here if we want to show reason details separately, but inline status update is requested mostly) */}
+
     </div>
   );
 };
+
 
 export default Orders;

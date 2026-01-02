@@ -127,6 +127,14 @@ class ApiService {
   async updateOrderStatus(id: string, status: string): Promise<{ success: boolean; message: string; data: any }> {
     return this.request(`/orders/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) });
   }
+
+  async requestReturn(id: string, reason: string): Promise<{ success: boolean; message: string; data: any }> {
+    return this.request(`/orders/${id}/return`, {
+      method: "POST",
+      body: JSON.stringify({ reason }),
+    });
+  }
+
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}

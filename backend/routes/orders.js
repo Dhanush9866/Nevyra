@@ -9,6 +9,8 @@ router.post("/", authMiddleware, orderController.create);
 router.get("/", authMiddleware, orderController.list);
 router.get("/:id", authMiddleware, orderController.details);
 router.patch("/:id/status", authMiddleware, orderController.updateStatus);
+router.post("/:id/return", authMiddleware, orderController.requestReturn);
+router.patch("/:id/return-status", authMiddleware, adminMiddleware, orderController.updateReturnStatus); // Using adminMiddleware as minimal protection for now, assuming seller has similar access or this is shared
 
 // Admin routes
 router.get("/admin/all", authMiddleware, adminMiddleware, orderController.adminList);

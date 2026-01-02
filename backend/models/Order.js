@@ -28,6 +28,15 @@ const orderSchema = new mongoose.Schema(
       razorpayPaymentId: String,
       razorpaySignature: String,
     },
+    returnStatus: {
+      type: String,
+      enum: ["None", "Pending", "Approved", "Rejected", "Success"],
+      default: "None",
+    },
+    returnReason: {
+      type: String,
+      default: "",
+    },
     createdAt: { type: Date, default: Date.now },
   },
   { timestamps: false }

@@ -3,109 +3,109 @@ const { validateAttributes } = require("../utils/validateAttributes");
 
 // Helper: Parse additional specs
 function parseAdditionalSpecifications(specsString) {
-  if (!specsString || typeof specsString !== 'string') {
-    return {};
-  }
-  
-  const specifications = {};
-  const specsArray = specsString.split(';').filter(spec => spec.trim());
-  
-  specsArray.forEach(spec => {
-    const [key, value] = spec.split(':').map(s => s.trim());
-    if (key && value) {
-      const cleanKey = key.toUpperCase().replace(/[^A-Z0-9]/g, '');
-      if (value.includes(',')) {
-        specifications[cleanKey] = value.split(',').map(v => v.trim()).filter(v => v);
-      } else {
-        specifications[cleanKey] = value;
-      }
+    if (!specsString || typeof specsString !== 'string') {
+        return {};
     }
-  });
-  
-  return specifications;
+
+    const specifications = {};
+    const specsArray = specsString.split(';').filter(spec => spec.trim());
+
+    specsArray.forEach(spec => {
+        const [key, value] = spec.split(':').map(s => s.trim());
+        if (key && value) {
+            const cleanKey = key.toUpperCase().replace(/[^A-Z0-9]/g, '');
+            if (value.includes(',')) {
+                specifications[cleanKey] = value.split(',').map(v => v.trim()).filter(v => v);
+            } else {
+                specifications[cleanKey] = value;
+            }
+        }
+    });
+
+    return specifications;
 }
 
 // Helper: Map Product ID
 function mapProductId(product) {
-  if (!product) return product;
-  const obj = product.toObject ? product.toObject() : { ...product };
-  obj.id = obj._id;
-  delete obj._id;
-  
-  if (obj.attributes && typeof obj.attributes === "object") {
-    if (obj.attributes instanceof Map) {
-      obj.attributes = Object.fromEntries(obj.attributes);
-    } else if (obj.attributes.toObject) {
-      obj.attributes = obj.attributes.toObject();
+    if (!product) return product;
+    const obj = product.toObject ? product.toObject() : { ...product };
+    obj.id = obj._id;
+    delete obj._id;
+
+    if (obj.attributes && typeof obj.attributes === "object") {
+        if (obj.attributes instanceof Map) {
+            obj.attributes = Object.fromEntries(obj.attributes);
+        } else if (obj.attributes.toObject) {
+            obj.attributes = obj.attributes.toObject();
+        }
     }
-  }
-  
-  if (obj.additionalSpecifications && typeof obj.additionalSpecifications === "object") {
-    if (obj.additionalSpecifications instanceof Map) {
-      obj.additionalSpecifications = Object.fromEntries(obj.additionalSpecifications);
-    } else if (obj.additionalSpecifications.toObject) {
-      obj.additionalSpecifications = obj.additionalSpecifications.toObject();
+
+    if (obj.additionalSpecifications && typeof obj.additionalSpecifications === "object") {
+        if (obj.additionalSpecifications instanceof Map) {
+            obj.additionalSpecifications = Object.fromEntries(obj.additionalSpecifications);
+        } else if (obj.additionalSpecifications.toObject) {
+            obj.additionalSpecifications = obj.additionalSpecifications.toObject();
+        }
     }
-  }
-  return obj;
+    return obj;
 }
 
 // --- Product Management ---
 
 exports.createProduct = async (req, res, next) => {
-  try {
-    const {
-      title, price, category, subCategory, images, inStock,
-      rating, reviews, stockQuantity, soldCount, attributes, additionalSpecifications, lowStockThreshold
-    } = req.body;
-    
-    // ... seller check ...
-    const seller = await Seller.findOne({ user: req.user.id });
-    if (!seller) {
-        return res.status(404).json({ success: false, message: "Seller profile not found. Please create a seller profile first." });
-    }
+    try {
+        const {
+            title, price, category, subCategory, images, inStock,
+            rating, reviews, stockQuantity, soldCount, attributes, additionalSpecifications, lowStockThreshold
+        } = req.body;
 
-    if (!title || !price || !category || !images || !subCategory)
-      return res.status(400).json({ success: false, message: "Missing required fields" });
-    
-    // ... category resolution ...
-    let categoryName = category;
-    let subCategoryName = subCategory;
-    
-    // ... (omitted regex checks for brevity in tool call if context matches, but here I must be careful)
-    // Actually, I can just replace the definition and instantiation
-    
-    if (category.match(/^[0-9a-fA-F]{24}$/)) {
-      const categoryDoc = await Category.findById(category);
-      if (!categoryDoc) return res.status(400).json({ success: false, message: "Category not found" });
-      categoryName = categoryDoc.name;
-    }
-    
-    if (subCategory.match(/^[0-9a-fA-F]{24}$/)) {
-      const subCategoryDoc = await Category.findById(subCategory);
-      if (!subCategoryDoc) return res.status(400).json({ success: false, message: "Subcategory not found" });
-      subCategoryName = subCategoryDoc.name;
-    }
-    
-    if (attributes && !validateAttributes(categoryName, attributes)) {
-      return res.status(400).json({ success: false, message: "Invalid attributes for category" });
-    }
-    
-    const parsedSpecs = additionalSpecifications ? parseAdditionalSpecifications(additionalSpecifications) : {};
-    
-    const product = new Product({
-      title, price, category: categoryName, subCategory: subCategoryName, images,
-      inStock, rating: rating || 0, reviews: reviews || 0,
-      stockQuantity: stockQuantity || 0, soldCount: soldCount || 0,
-      attributes, additionalSpecifications: parsedSpecs,
-      seller: seller._id,
-      lowStockThreshold: lowStockThreshold || 5
-    });
+        // ... seller check ...
+        const seller = await Seller.findOne({ user: req.user.id });
+        if (!seller) {
+            return res.status(404).json({ success: false, message: "Seller profile not found. Please create a seller profile first." });
+        }
 
-    await product.save();
+        if (!title || !price || !category || !images || !subCategory)
+            return res.status(400).json({ success: false, message: "Missing required fields" });
 
-    res.status(201).json({ success: true, message: "Product created successfully", data: mapProductId(product) });
-  } catch (err) { next(err); }
+        // ... category resolution ...
+        let categoryName = category;
+        let subCategoryName = subCategory;
+
+        // ... (omitted regex checks for brevity in tool call if context matches, but here I must be careful)
+        // Actually, I can just replace the definition and instantiation
+
+        if (category.match(/^[0-9a-fA-F]{24}$/)) {
+            const categoryDoc = await Category.findById(category);
+            if (!categoryDoc) return res.status(400).json({ success: false, message: "Category not found" });
+            categoryName = categoryDoc.name;
+        }
+
+        if (subCategory.match(/^[0-9a-fA-F]{24}$/)) {
+            const subCategoryDoc = await Category.findById(subCategory);
+            if (!subCategoryDoc) return res.status(400).json({ success: false, message: "Subcategory not found" });
+            subCategoryName = subCategoryDoc.name;
+        }
+
+        if (attributes && !validateAttributes(categoryName, attributes)) {
+            return res.status(400).json({ success: false, message: "Invalid attributes for category" });
+        }
+
+        const parsedSpecs = additionalSpecifications ? parseAdditionalSpecifications(additionalSpecifications) : {};
+
+        const product = new Product({
+            title, price, category: categoryName, subCategory: subCategoryName, images,
+            inStock, rating: rating || 0, reviews: reviews || 0,
+            stockQuantity: stockQuantity || 0, soldCount: soldCount || 0,
+            attributes, additionalSpecifications: parsedSpecs,
+            seller: seller._id,
+            lowStockThreshold: lowStockThreshold || 5
+        });
+
+        await product.save();
+
+        res.status(201).json({ success: true, message: "Product created successfully", data: mapProductId(product) });
+    } catch (err) { next(err); }
 };
 
 exports.getMyProducts = async (req, res, next) => {
@@ -115,7 +115,7 @@ exports.getMyProducts = async (req, res, next) => {
 
         const products = await Product.find({ seller: seller._id });
         const mappedProducts = products.map(mapProductId);
-        
+
         res.json({ success: true, message: "Seller products fetched", data: mappedProducts });
     } catch (err) { next(err); }
 };
@@ -159,7 +159,7 @@ exports.updateMyProduct = async (req, res, next) => {
         if (lowStockThreshold !== undefined) product.lowStockThreshold = lowStockThreshold;
         if (attributes !== undefined) product.attributes = attributes;
         if (additionalSpecifications !== undefined) {
-          product.additionalSpecifications = additionalSpecifications ? parseAdditionalSpecifications(additionalSpecifications) : {};
+            product.additionalSpecifications = additionalSpecifications ? parseAdditionalSpecifications(additionalSpecifications) : {};
         }
 
         await product.save();
@@ -203,13 +203,13 @@ exports.getMyOrders = async (req, res, next) => {
 
         const orderMap = new Map();
         for (const item of orderItems) {
-            const order = item.orderId; 
-            if (!order) continue; 
+            const order = item.orderId;
+            if (!order) continue;
 
             if (!orderMap.has(order._id.toString())) {
                 orderMap.set(order._id.toString(), {
                     ...order.toObject(),
-                    items: [] 
+                    items: []
                 });
             }
             orderMap.get(order._id.toString()).items.push(item);
@@ -233,10 +233,10 @@ exports.updateOrderStatus = async (req, res, next) => {
         // Verify this order actually contains a product from this seller
         const products = await Product.find({ seller: currentSeller._id }).select('_id');
         const productIds = products.map(p => p._id);
-        
-        const orderItemToCheck = await OrderItem.findOne({ 
-            orderId: orderId, 
-            productId: { $in: productIds } 
+
+        const orderItemToCheck = await OrderItem.findOne({
+            orderId: orderId,
+            productId: { $in: productIds }
         });
 
         if (!orderItemToCheck) return res.status(403).json({ success: false, message: "You are not authorized" });
@@ -250,7 +250,7 @@ exports.updateOrderStatus = async (req, res, next) => {
         // Process Payouts if Delivered
         if (status === 'Delivered') {
             const allItems = await OrderItem.find({ orderId: orderId, isPayoutProcessed: false }).populate('productId');
-            
+
             const sellerUpdates = new Map();
 
             for (const item of allItems) {
@@ -259,9 +259,9 @@ exports.updateOrderStatus = async (req, res, next) => {
 
                 const sId = product.seller.toString();
                 const earning = item.price * item.quantity;
-                
+
                 sellerUpdates.set(sId, (sellerUpdates.get(sId) || 0) + earning);
-                
+
                 item.isPayoutProcessed = true;
                 await item.save();
             }
@@ -275,6 +275,44 @@ exports.updateOrderStatus = async (req, res, next) => {
     } catch (err) { next(err); }
 };
 
+exports.updateReturnStatus = async (req, res, next) => {
+    try {
+        const { status } = req.body;
+        const orderId = req.params.id;
+        const allowedStatuses = ["Approved", "Rejected", "Success"];
+
+        if (!allowedStatuses.includes(status)) {
+            return res.status(400).json({ success: false, message: "Invalid return status" });
+        }
+
+        const currentSeller = await Seller.findOne({ user: req.user.id });
+        if (!currentSeller) return res.status(404).json({ success: false, message: "Seller not found" });
+
+        // Verify this order actually contains a product from this seller
+        const products = await Product.find({ seller: currentSeller._id }).select('_id');
+        const productIds = products.map(p => p._id);
+
+        const orderItemToCheck = await OrderItem.findOne({
+            orderId: orderId,
+            productId: { $in: productIds }
+        });
+
+        if (!orderItemToCheck) return res.status(403).json({ success: false, message: "You are not authorized" });
+
+        const order = await Order.findById(orderId);
+        if (!order) return res.status(404).json({ success: false, message: "Order not found" });
+
+        order.returnStatus = status;
+        await order.save();
+
+        // Use different processing specific to returns if needed? 
+        // For now just update status. 
+        // If status is "Success", maybe trigger refund logic? (Not converting that part yet as per instruction just status)
+
+        res.json({ success: true, message: "Return status updated", data: { id: order._id, returnStatus: order.returnStatus } });
+    } catch (err) { next(err); }
+};
+
 // --- Wallet & Payouts ---
 
 exports.getWallet = async (req, res, next) => {
@@ -283,21 +321,21 @@ exports.getWallet = async (req, res, next) => {
         if (!seller) return res.status(404).json({ success: false, message: "Seller not found" });
 
         const recentPayouts = await Payout.find({ sellerId: seller._id }).sort({ createdAt: -1 }).limit(10);
-        
+
         const allPaid = await Payout.find({ sellerId: seller._id, status: 'Paid' });
         const totalPaid = allPaid.reduce((sum, p) => sum + p.amount, 0);
 
         const allPending = await Payout.find({ sellerId: seller._id, status: { $in: ['Pending', 'Processing'] } });
         const pendingAmount = allPending.reduce((sum, p) => sum + p.amount, 0);
 
-        res.json({ 
-            success: true, 
+        res.json({
+            success: true,
             data: {
                 balance: seller.walletBalance || 0,
-                pendingPayouts: pendingAmount, 
-                totalPaid: totalPaid, 
+                pendingPayouts: pendingAmount,
+                totalPaid: totalPaid,
                 recentPayouts,
-                bankDetails: seller.bankDetails 
+                bankDetails: seller.bankDetails
             }
         });
     } catch (err) { next(err); }
@@ -315,7 +353,7 @@ exports.updateBankDetails = async (req, res, next) => {
 
         // Preserve existing cancelledCheque if not provided (though typically handled by upload separate flow)
         const currentCheque = seller.bankDetails ? seller.bankDetails.cancelledCheque : "";
-        
+
         seller.bankDetails = {
             accountHolderName,
             accountNumber,
@@ -366,7 +404,7 @@ exports.getInventoryStats = async (req, res, next) => {
         if (!seller) return res.status(404).json({ success: false, message: "Seller not found" });
 
         const products = await Product.find({ seller: seller._id });
-        
+
         const totalProducts = products.length;
         const inStock = products.filter(p => p.stockQuantity > 0).length;
         const outOfStock = products.filter(p => p.stockQuantity === 0).length;
@@ -387,7 +425,7 @@ exports.getDashboardStats = async (req, res, next) => {
 
         // Fetch all order items for these products and populate the parent order
         const orderItems = await OrderItem.find({ productId: { $in: productIds } }).populate('orderId');
-        
+
         let totalSales = 0;
         const uniqueOrderIds = new Set();
         const uniquePendingOrderIds = new Set();
