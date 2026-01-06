@@ -82,16 +82,8 @@ const Footer = () => {
                   <span className="font-medium text-foreground">Address:</span> Krosuru, Krosuru Mandal, Palnadu District, Andhra Pradesh - 522410
                 </span>
               </div>
-              <div className="flex items-center space-x-2">
-                <Phone className="h-4 w-4 text-warning" />
-                <span className="text-muted-foreground">
-                  <span className="font-medium text-foreground">Phone Numbers:</span>
-                </span>
-              </div>
-              <div className="ml-6 space-y-1">
-                <p className="text-muted-foreground">+91 97017 96195</p>
-                <p className="text-muted-foreground">+91 94400 94282</p>
-              </div>
+
+
             </div>
           </div>
         </div>
@@ -100,7 +92,11 @@ const Footer = () => {
       {/* Bottom Bar */}
       <div className="w-full bg-primary text-primary-foreground py-4">
         <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-sm">
-          <p>© 2024 Zythova. All rights reserved.</p>
+          <div className="flex flex-col md:flex-row items-center gap-2">
+            <p>© 2024 Zythova. All rights reserved.</p>
+            <span className="hidden md:block mx-2">|</span>
+            <p className="font-medium">Zythova is operated by SOLNEX Pvt Ltd</p>
+          </div>
           <div className="flex space-x-4 mt-2 md:mt-0">
             <Facebook className="h-4 w-4 cursor-pointer hover:text-white/80" />
             <Twitter className="h-4 w-4 cursor-pointer hover:text-white/80" />
