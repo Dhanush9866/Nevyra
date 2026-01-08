@@ -20,8 +20,6 @@ interface ProductCardProps {
 export default function ProductCard({
   product,
   onPress,
-  onWishlistPress,
-  isWishlisted = false,
 }: ProductCardProps) {
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.9} style={styles.card}>
@@ -31,28 +29,7 @@ export default function ProductCard({
           style={styles.image}
           contentFit="cover"
         />
-        {product.discount && product.discount > 0 && (
-          <View style={styles.discountBadge}>
-            <Badge
-              text={`${product.discount}% OFF`}
-              variant="error"
-              size="sm"
-            />
-          </View>
-        )}
-        {onWishlistPress && (
-          <TouchableOpacity
-            onPress={onWishlistPress}
-            style={styles.wishlistButton}
-            activeOpacity={0.7}
-          >
-            <Heart
-              size={20}
-              color={isWishlisted ? Colors.error : Colors.white}
-              fill={isWishlisted ? Colors.error : 'transparent'}
-            />
-          </TouchableOpacity>
-        )}
+       
         {!product.inStock && (
           <View style={styles.outOfStock}>
             <AppText variant="caption" color={Colors.white} weight="semibold">
@@ -72,20 +49,15 @@ export default function ProductCard({
         <AppText
           variant="body"
           weight="medium"
-          numberOfLines={2}
+          numberOfLines={1}
           style={styles.name}
         >
           {product.name}
         </AppText>
-        <RatingStars
-          rating={product.rating}
-          reviewCount={product.reviewCount}
-          size={14}
-        />
+        
         <PriceTag
           price={product.price}
           originalPrice={product.originalPrice}
-          discount={product.discount}
           size="sm"
         />
       </View>
@@ -134,10 +106,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   content: {
-    padding: Spacing.md,
-    gap: Spacing.xs,
+    padding: Spacing.sm,
+    gap: 2,
   },
   name: {
-    minHeight: 40,
+    minHeight: 20,
   },
 });
