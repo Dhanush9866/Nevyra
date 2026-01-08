@@ -15,11 +15,15 @@ interface ProductCardProps {
   onPress: () => void;
   onWishlistPress?: () => void;
   isWishlisted?: boolean;
+  showAddToCart?: boolean;
+  onAddToCart?: () => void;
 }
 
 export default function ProductCard({
   product,
   onPress,
+  showAddToCart,
+  onAddToCart,
 }: ProductCardProps) {
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.9} style={styles.card}>
@@ -29,7 +33,7 @@ export default function ProductCard({
           style={styles.image}
           contentFit="cover"
         />
-       
+
         {!product.inStock && (
           <View style={styles.outOfStock}>
             <AppText variant="caption" color={Colors.white} weight="semibold">
@@ -54,12 +58,23 @@ export default function ProductCard({
         >
           {product.name}
         </AppText>
-        
+
         <PriceTag
           price={product.price}
           originalPrice={product.originalPrice}
           size="sm"
         />
+
+        {showAddToCart && (
+          <TouchableOpacity
+            style={styles.addToCartDetailButton}
+            onPress={onAddToCart}
+          >
+            <AppText variant="caption" weight="bold" color={Colors.white}>
+              Add to Cart
+            </AppText>
+          </TouchableOpacity>
+        )}
       </View>
     </TouchableOpacity>
   );
@@ -111,5 +126,12 @@ const styles = StyleSheet.create({
   },
   name: {
     minHeight: 20,
+  },
+  addToCartDetailButton: {
+    backgroundColor: Colors.primary,
+    paddingVertical: 6,
+    borderRadius: 16,
+    alignItems: 'center',
+    marginTop: Spacing.xs,
   },
 });
