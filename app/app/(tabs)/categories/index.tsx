@@ -193,7 +193,7 @@ export default function CategoriesScreen() {
         <ScrollView style={styles.mainContent} showsVerticalScrollIndicator={false}>
           {/* Main Category Title */}
           <View style={styles.mainHeader}>
-            <AppText variant="h6" weight="bold">{selectedCategory.name}</AppText>
+            <AppText variant="h4" weight="bold">{selectedCategory.name}</AppText>
           </View>
 
           {/* Subcategories Grid */}

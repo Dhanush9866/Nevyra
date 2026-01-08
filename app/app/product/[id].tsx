@@ -1,8 +1,8 @@
-import React from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity, StatusBar } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
-import { Heart, Star, Share2 } from 'lucide-react-native';
+import { Heart, Star, Share2, Search, ArrowLeft, ShoppingCart, ChevronRight } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import AppText from '@/components/atoms/AppText';
 import Button from '@/components/atoms/Button';
@@ -10,6 +10,7 @@ import IconButton from '@/components/atoms/IconButton';
 import Badge from '@/components/atoms/Badge';
 import PriceTag from '@/components/molecules/PriceTag';
 import RatingStars from '@/components/molecules/RatingStars';
+import ProductCard from '@/components/molecules/ProductCard';
 import Colors from '@/constants/colors';
 import Spacing from '@/constants/spacing';
 import { mockProducts } from '@/services/mockData';
@@ -19,6 +20,7 @@ import { useWishlist } from '@/store/WishlistContext';
 export default function ProductDetailScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { addToCart } = useCart();
   const { toggleWishlist, isWishlisted } = useWishlist();
 
@@ -26,46 +28,96 @@ export default function ProductDetailScreen() {
 
   return (
     <>
-      <Stack.Screen
-        options={{
-          title: '',
-          headerTransparent: true,
-          headerRight: () => (
-            <View style={styles.headerActions}>
-              <IconButton
-                icon={Share2}
-                onPress={() => {}}
-                color={Colors.white}
-                backgroundColor="rgba(0,0,0,0.3)"
-              />
-              <IconButton
-                icon={Heart}
-                onPress={() => toggleWishlist(product)}
-                color={isWishlisted(product.id) ? Colors.error : Colors.white}
-                backgroundColor="rgba(0,0,0,0.3)"
-              />
-            </View>
-          ),
-        }}
-      />
-      <View style={styles.container}>
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={styles.imageContainer}>
-            <Image
-              source={{ uri: product.images[0] }}
-              style={styles.image}
-              contentFit="cover"
-            />
-            <LinearGradient
-              colors={['transparent', Colors.background]}
-              style={styles.imageGradient}
-            />
-            {product.discount && product.discount > 0 && (
-              <View style={styles.discountBadge}>
-                <Badge text={`${product.discount}% OFF`} variant="error" />
-              </View>
-            )}
+      <StatusBar barStyle="light-content" />
+      <Stack.Screen options={{ headerShown: false }} />
+
+      {/* CUSTOM FIXED HEADER WITH SEARCH */}
+      <View style={[
+        styles.fixedHeader, 
+        { 
+          paddingTop: insets.top,
+          paddingBottom: Spacing.sm,
+        }
+      ]}>
+        <LinearGradient
+          colors={[Colors.primary, '#8e44ad']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={StyleSheet.absoluteFill}
+        />
+        
+        <View style={styles.headerTopRow}>
+          <TouchableOpacity 
+            onPress={() => router.back()}
+            style={styles.backButton}
+          >
+            <ArrowLeft size={24} color={Colors.white} />
+          </TouchableOpacity>
+
+          <View style={styles.searchContainer}>
+            <TouchableOpacity
+              onPress={() => router.push('/search' as any)}
+              activeOpacity={0.9}
+              style={styles.searchBar}
+            >
+              <Search size={18} color={Colors.textSecondary} />
+              <AppText variant="body" color={Colors.textLight} style={{ fontSize: 13 }}>
+                Search for products...
+              </AppText>
+            </TouchableOpacity>
           </View>
+
+          <View style={styles.headerActions}>
+            <IconButton
+              icon={ShoppingCart}
+              onPress={() => router.push('/(tabs)/cart')}
+              color={Colors.white}
+              size={20}
+            />
+          </View>
+        </View>
+      </View>
+
+      <View style={styles.container}>
+        <ScrollView 
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingTop: insets.top + 60 }}
+        >
+            <View style={styles.imageContainer}>
+              <Image
+                source={{ uri: product.images[0] }}
+                style={styles.image}
+                contentFit="cover"
+              />
+              
+              {/* Image Actions Overlay */}
+              <View style={styles.imageActions}>
+                <IconButton
+                  icon={Share2}
+                  onPress={() => {}}
+                  color={Colors.white}
+                  backgroundColor="rgba(0,0,0,0.4)"
+                  size={20}
+                />
+                <IconButton
+                  icon={Heart}
+                  onPress={() => toggleWishlist(product)}
+                  color={isWishlisted(product.id) ? Colors.error : Colors.white}
+                  backgroundColor="rgba(0,0,0,0.4)"
+                  size={20}
+                />
+              </View>
+
+              <LinearGradient
+                colors={['transparent', Colors.background]}
+                style={styles.imageGradient}
+              />
+              {product.discount && product.discount > 0 && (
+                <View style={styles.discountBadge}>
+                  <Badge text={`${product.discount}% OFF`} variant="error" />
+                </View>
+              )}
+            </View>
 
           <View style={styles.content}>
             <AppText variant="caption" color={Colors.textSecondary}>
@@ -80,17 +132,6 @@ export default function ProductDetailScreen() {
                 rating={product.rating}
                 reviewCount={product.reviewCount}
               />
-              <TouchableOpacity
-                onPress={() => router.push('/product/reviews' as any)}
-              >
-                <AppText
-                  variant="caption"
-                  color={Colors.primary}
-                  weight="semibold"
-                >
-                  See Reviews
-                </AppText>
-              </TouchableOpacity>
             </View>
 
             <PriceTag
@@ -128,18 +169,114 @@ export default function ProductDetailScreen() {
                 ))}
               </View>
             )}
+
+            {/* SPECIFICATIONS SECTION */}
+            <View style={styles.section}>
+              <AppText variant="h4" weight="bold">
+                Specifications
+              </AppText>
+              <View style={styles.specificationsGrid}>
+                <View style={styles.specItem}>
+                  <AppText variant="caption" color={Colors.textSecondary}>Brand</AppText>
+                  <AppText variant="body" weight="medium">{product.brand}</AppText>
+                </View>
+                <View style={styles.specItem}>
+                  <AppText variant="caption" color={Colors.textSecondary}>Model</AppText>
+                  <AppText variant="body" weight="medium">Premium-X1</AppText>
+                </View>
+                <View style={styles.specItem}>
+                  <AppText variant="caption" color={Colors.textSecondary}>Warranty</AppText>
+                  <AppText variant="body" weight="medium">1 Year</AppText>
+                </View>
+                <View style={styles.specItem}>
+                  <AppText variant="caption" color={Colors.textSecondary}>Material</AppText>
+                  <AppText variant="body" weight="medium">Premium Poly</AppText>
+                </View>
+              </View>
+            </View>
+
+            {/* SIMILAR PRODUCTS SECTION */}
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <AppText variant="h4" weight="bold">Similar Products</AppText>
+                <TouchableOpacity onPress={() => router.push('/(tabs)/categories')}>
+                  <AppText variant="caption" color={Colors.primary} weight="bold">View All</AppText>
+                </TouchableOpacity>
+              </View>
+              <ScrollView 
+                horizontal 
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.similarProductsContainer}
+              >
+                {mockProducts.filter(p => p.id !== product.id).slice(0, 5).map((item) => (
+                  <View key={item.id} style={styles.similarProductItem}>
+                    <ProductCard 
+                      product={item} 
+                      onPress={() => router.push(`/product/${item.id}` as any)} 
+                    />
+                  </View>
+                ))}
+              </ScrollView>
+            </View>
+
+            {/* RATINGS & REVIEWS SECTION */}
+            <View style={[styles.section, styles.reviewsSection]}>
+              <View style={styles.sectionHeader}>
+                <AppText variant="h4" weight="bold">
+                  Ratings & Reviews
+                </AppText>
+                <TouchableOpacity
+                  onPress={() => router.push('/product/reviews' as any)}
+                  style={styles.viewAllReviews}
+                >
+                  <AppText variant="caption" color={Colors.primary} weight="bold">
+                    View All
+                  </AppText>
+                  <ChevronRight size={14} color={Colors.primary} />
+                </TouchableOpacity>
+              </View>
+              
+              <View style={styles.ratingOverview}>
+                 <View style={styles.ratingBigCount}>
+                    <AppText variant="h1" weight="bold">{product.rating}</AppText>
+                    <RatingStars rating={product.rating} />
+                    <AppText variant="caption" color={Colors.textSecondary}>
+                      {product.reviewCount} reviews
+                    </AppText>
+                 </View>
+                 <View style={styles.reviewSnippet}>
+                    <AppText variant="body" color={Colors.textSecondary} style={{ fontStyle: 'italic' }}>
+                      "Great product, highly recommend! The quality is amazing for the price."
+                    </AppText>
+                 </View>
+              </View>
+            </View>
           </View>
         </ScrollView>
 
-        <View style={styles.footer}>
-          <Button
-            title="Add to Cart"
-            onPress={() => {
-              addToCart(product);
-              router.push('/(tabs)/cart' as any);
-            }}
-            fullWidth
-          />
+        <View style={[
+          styles.footer,
+          { paddingBottom: Math.max(insets.bottom, Spacing.base) }
+        ]}>
+          <View style={styles.footerButtons}>
+            <Button
+              title="Add to Cart"
+              variant="outline"
+              onPress={() => {
+                addToCart(product);
+                router.push('/(tabs)/cart' as any);
+              }}
+              style={[styles.flexButton, { borderRadius: 8 }]}
+            />
+            <Button
+              title="Buy Now"
+              onPress={() => {
+                addToCart(product);
+                router.push('/checkout/review' as any);
+              }}
+              style={[styles.flexButton, { borderRadius: 25 }]}
+            />
+          </View>
         </View>
       </View>
     </>
@@ -203,5 +340,109 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: Colors.border,
     ...Colors.shadow.lg,
+  },
+  footerButtons: {
+    flexDirection: 'row',
+    gap: Spacing.md,
+  },
+  flexButton: {
+    flex: 1,
+  },
+  fixedHeader: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1000,
+    backgroundColor: Colors.primary,
+    ...Colors.shadow.md,
+  },
+  headerTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: Spacing.base,
+    gap: Spacing.sm,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  searchContainer: {
+    flex: 1,
+    paddingVertical: Spacing.xs,
+  },
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.white,
+    borderRadius: 8,
+    paddingHorizontal: Spacing.md,
+    height: 40,
+    gap: Spacing.sm,
+    ...Colors.shadow.sm,
+  },
+  imageActions: {
+    position: 'absolute',
+    top: Spacing.base,
+    right: Spacing.base,
+    gap: Spacing.sm,
+    zIndex: 10,
+  },
+  reviewsSection: {
+    borderTopWidth: 8,
+    borderTopColor: '#f5f5f5',
+    paddingTop: Spacing.lg,
+    marginTop: Spacing.xl,
+    paddingBottom: Spacing.xl,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: Spacing.md,
+  },
+  viewAllReviews: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  ratingOverview: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xl,
+  },
+  ratingBigCount: {
+    alignItems: 'center',
+    gap: 4,
+  },
+  reviewSnippet: {
+    flex: 1,
+    backgroundColor: '#f9f9f9',
+    padding: Spacing.md,
+    borderRadius: 8,
+  },
+  specificationsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing.md,
+    marginTop: Spacing.sm,
+  },
+  specItem: {
+    width: '45%',
+    backgroundColor: '#f8f9fa',
+    padding: Spacing.md,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#eee',
+  },
+  similarProductsContainer: {
+    gap: Spacing.md,
+    paddingRight: Spacing.xl,
+    marginTop: Spacing.sm,
+  },
+  similarProductItem: {
+    width: 160,
   },
 });
