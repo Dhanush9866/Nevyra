@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   TouchableOpacity,
   Text,
@@ -6,6 +5,7 @@ import {
   ActivityIndicator,
   ViewStyle,
   TextStyle,
+  StyleProp,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Colors from '@/constants/colors';
@@ -19,8 +19,8 @@ interface ButtonProps {
   size?: 'sm' | 'md' | 'lg';
   loading?: boolean;
   disabled?: boolean;
-  style?: ViewStyle;
-  textStyle?: TextStyle;
+  style?: StyleProp<ViewStyle>;
+  textStyle?: StyleProp<TextStyle>;
   fullWidth?: boolean;
 }
 
@@ -51,6 +51,9 @@ export default function Button({
   ];
 
   if (variant === 'primary' && !disabled) {
+    const flattenedStyle = StyleSheet.flatten(style);
+    const borderRadius = (flattenedStyle as any)?.borderRadius ?? 8;
+
     return (
       <TouchableOpacity
         onPress={onPress}
@@ -62,7 +65,7 @@ export default function Button({
           colors={[Colors.gradient.primary[0], Colors.gradient.primary[1]]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
-          style={styles.gradient}
+          style={[styles.gradient, { borderRadius }]}
         >
           {loading ? (
             <ActivityIndicator color={Colors.white} />
