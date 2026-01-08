@@ -64,7 +64,7 @@ const TopDeals = () => {
                     <h3 className="font-medium text-gray-900 text-sm line-clamp-1" title={product.title}>
                         {product.title}
                     </h3>
-                    <div className="text-sm font-bold text-green-600">
+                    <div className="text-sm font-bold text-gray-900">
                         {product.price}
                     </div>
                 </div>
