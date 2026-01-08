@@ -47,7 +47,7 @@ export default function ProfileScreen() {
       items: [
         { icon: Zap, label: 'Plus', route: '/plus' },
         { icon: User, label: 'Edit Profile', route: '/profile/edit' },
-        { icon: MapPin, label: 'Saved Addresses', route: '/address/list' },
+        { icon: MapPin, label: 'Saved Addresses', route: '/checkout/address-list' },
       ],
     },
     {
@@ -105,7 +105,7 @@ export default function ProfileScreen() {
             style={styles.gridItem}
             onPress={() => item.route && router.push(item.route as any)}
           >
-            <item.icon size={22} color={Colors.info} />
+            <item.icon size={22} color={Colors.primary} />
             <AppText variant="body" weight="medium" style={styles.gridLabel}>
               {item.label}
             </AppText>
@@ -139,7 +139,7 @@ export default function ProfileScreen() {
               onPress={() => item.route && router.push(item.route as any)}
             >
               <View style={styles.menuItemLeft}>
-                <item.icon size={20} color={Colors.info} />
+                <item.icon size={20} color={Colors.primary} />
                 <AppText variant="body" style={styles.menuItemLabel}>
                   {item.label}
                 </AppText>
@@ -154,7 +154,7 @@ export default function ProfileScreen() {
       {/* Logout Button */}
       <View style={styles.logoutContainer}>
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <AppText variant="body" weight="bold" color={Colors.info}>
+          <AppText variant="body" weight="bold" color={Colors.primary}>
             Log Out
           </AppText>
         </TouchableOpacity>
