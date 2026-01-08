@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChartContainer } from "@/components/ui/chart";
 import {
@@ -16,6 +16,9 @@ import {
   Legend
 } from "recharts";
 import { FloatingDock } from "@/components/FloatingDock";
+import { Loader2 } from "lucide-react";
+import { adminAPI } from "@/lib/api";
+import { useToast } from "@/hooks/use-toast";
 
 const revenueData = [
   { month: "Jan", revenue: 12000 },
@@ -51,6 +54,132 @@ const summaryStats = [
 ];
 
 const Analytics: React.FC = () => {
+  const [stats, setStats] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    loadAnalyticsData();
+  }, []);
+
+  const loadAnalyticsData = async () => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      if (!token) {
+        toast({
+          title: "Authentication Required",
+          description: "Please login to access analytics",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const response = await adminAPI.dashboard.getStats(token);
+      if (response.success) {
+        setStats(response.data);
+      } else {
+        throw new Error(response.message || 'Failed to load analytics data');
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to load analytics data",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) {
+      return (num / 1000000).toFixed(1) + 'M';
+    } else if (num >= 1000) {
+      return (num / 1000).toFixed(1) + 'K';
+    }
+    return num.toString();
+  };
+
+  // Generate sample data for charts (in a real app, this would come from the API)
+  const generateRevenueData = () => {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+    return months.map(month => ({
+      month,
+      revenue: Math.floor(Math.random() * 20000) + 10000
+    }));
+  };
+
+  const generateOrdersData = () => {
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    return days.map(day => ({
+      day,
+      orders: Math.floor(Math.random() * 100) + 50
+    }));
+  };
+
+  const generateCategoryData = () => {
+    if (!stats) return pieData;
+    
+    // In a real app, this would be calculated from actual product sales
+    return [
+      { label: "Electronics", value: 40, color: "#7c3aed" },
+      { label: "Fashion", value: 25, color: "#f472b6" },
+      { label: "Home", value: 20, color: "#34d399" },
+      { label: "Other", value: 15, color: "#fbbf24" },
+    ];
+  };
+
+  const getSummaryStats = () => {
+    if (!stats) return summaryStats;
+    
+    return [
+      { 
+        label: "Total Revenue", 
+        value: formatCurrency(stats.overview.monthlyRevenue), 
+        color: "text-purple-600" 
+      },
+      { 
+        label: "Total Orders", 
+        value: formatNumber(stats.overview.totalOrders), 
+        color: "text-pink-500" 
+      },
+      { 
+        label: "Avg Order Value", 
+        value: formatCurrency(stats.overview.avgOrderValue), 
+        color: "text-green-500" 
+      },
+      { 
+        label: "Growth Rate", 
+        value: `+${stats.overview.revenueGrowth}%`, 
+        color: "text-yellow-500" 
+      },
+    ];
+  };
+
+  if (loading) {
+    return (
+      <>
+        <FloatingDock />
+        <div className="min-h-screen bg-background py-8 sm:py-12 px-4 sm:px-6 md:px-12 pb-20 sm:pb-12">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-center h-64">
+              <Loader2 className="h-8 w-8 animate-spin mr-2" />
+              <span>Loading analytics...</span>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <FloatingDock />
@@ -59,7 +188,7 @@ const Analytics: React.FC = () => {
           <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 bg-gradient-primary bg-clip-text text-transparent">Analytics</h1>
           {/* Summary Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
-            {summaryStats.map((stat) => (
+            {getSummaryStats().map((stat) => (
               <Card key={stat.label} className="glass border-0 shadow-md">
                 <CardContent className="py-4 sm:py-6 text-center">
                   <div className={`text-lg sm:text-2xl font-bold ${stat.color}`}>{stat.value}</div>
@@ -74,7 +203,7 @@ const Analytics: React.FC = () => {
               <CardContent className="p-4 sm:p-6">
                 <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-purple-700">Monthly Revenue</h2>
                 <ChartContainer config={{ revenue: { color: "#7c3aed", label: "Revenue" } }}>
-                  <BarChart data={revenueData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                  <BarChart data={generateRevenueData()} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                     <XAxis dataKey="month" />
                     <YAxis />
                     <Tooltip />
@@ -87,7 +216,7 @@ const Analytics: React.FC = () => {
               <CardContent className="p-4 sm:p-6">
                 <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-pink-500">Orders This Week</h2>
                 <ChartContainer config={{ orders: { color: "#f472b6", label: "Orders" } }}>
-                  <LineChart data={ordersData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                  <LineChart data={generateOrdersData()} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                     <XAxis dataKey="day" />
                     <YAxis />
                     <Tooltip />
@@ -104,7 +233,7 @@ const Analytics: React.FC = () => {
                 <ChartContainer config={{ Electronics: { color: "#7c3aed", label: "Electronics" }, Fashion: { color: "#f472b6", label: "Fashion" }, Home: { color: "#34d399", label: "Home" }, Other: { color: "#fbbf24", label: "Other" } }}>
                   <PieChart width={320} height={220}>
                     <Pie
-                      data={pieData}
+                      data={generateCategoryData()}
                       dataKey="value"
                       nameKey="label"
                       cx="50%"
@@ -112,7 +241,7 @@ const Analytics: React.FC = () => {
                       outerRadius={80}
                       label
                     >
-                      {pieData.map((entry, index) => (
+                      {generateCategoryData().map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>

@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import { 
   Package, 
   ShoppingBag, 
@@ -8,17 +9,115 @@ import {
   Star,
   TrendingUp,
   Zap,
-  Sparkles
+  Sparkles,
+  Loader2
 } from "lucide-react";
 import { CommandPalette } from "@/components/CommandPalette";
 import { FloatingDock } from "@/components/FloatingDock";
 import { TileNavigation } from "@/components/TileNavigation";
 import { FloatingNotifications } from "@/components/FloatingNotifications";
 import { useNavigate } from "react-router-dom";
+import { adminAPI } from "@/lib/api";
+import { useToast } from "@/hooks/use-toast";
+
+interface DashboardStats {
+  overview: {
+    totalProducts: number;
+    totalOrders: number;
+    totalUsers: number;
+    totalCategories: number;
+    monthlyRevenue: number;
+    revenueGrowth: number;
+    avgOrderValue: number;
+  };
+  today: {
+    orders: number;
+    orderGrowth: number;
+  };
+  orders: {
+    processing: number;
+    shipped: number;
+    total: number;
+  };
+  products: {
+    total: number;
+    lowStock: number;
+    categories: number;
+  };
+  recentOrders: Array<{
+    id: string;
+    orderNumber: string;
+    customer: string;
+    amount: number;
+    status: string;
+    date: string;
+  }>;
+  topProducts: Array<{
+    id: string;
+    title: string;
+    soldCount: number;
+    price: number;
+    image: string | null;
+  }>;
+}
 
 const Index = () => {
   const navigate = useNavigate();
-  const navigationTiles = [
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    loadDashboardStats();
+  }, []);
+
+  const loadDashboardStats = async () => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      if (!token) {
+        toast({
+          title: "Authentication Required",
+          description: "Please login to access dashboard",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const response = await adminAPI.dashboard.getStats(token);
+      if (response.success) {
+        setStats(response.data);
+      } else {
+        throw new Error(response.message || 'Failed to load dashboard stats');
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to load dashboard data",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) {
+      return (num / 1000000).toFixed(1) + 'M';
+    } else if (num >= 1000) {
+      return (num / 1000).toFixed(1) + 'K';
+    }
+    return num.toString();
+  };
+
+  const navigationTiles = stats ? [
     {
       title: "Analytics",
       description: "Business intelligence & insights",
@@ -26,10 +125,10 @@ const Index = () => {
       gradient: "bg-gradient-to-br from-blue-500/20 to-cyan-500/20",
       size: "wide" as const,
       stats: [
-        { label: "Revenue", value: "₹847K", trend: "+12.5%" },
-        { label: "Conversion", value: "3.24%" },
-        { label: "Page Views", value: "284K" },
-        { label: "Bounce Rate", value: "2.4%" }
+        { label: "Revenue", value: formatCurrency(stats.overview.monthlyRevenue), trend: `+${stats.overview.revenueGrowth}%` },
+        { label: "Avg Order Value", value: formatCurrency(stats.overview.avgOrderValue) },
+        { label: "Total Orders", value: formatNumber(stats.overview.totalOrders) },
+        { label: "Growth Rate", value: `${stats.overview.revenueGrowth}%` }
       ],
       delay: 0,
       onClick: () => navigate("/analytics"),
@@ -41,9 +140,9 @@ const Index = () => {
       gradient: "bg-gradient-to-br from-emerald-500/20 to-teal-500/20",
       size: "medium" as const,
       stats: [
-        { label: "Today's Orders", value: "89", trend: "+12%" },
-        { label: "Processing", value: "34" },
-        { label: "Shipped", value: "156" }
+        { label: "Today's Orders", value: stats.today.orders.toString(), trend: `+${stats.today.orderGrowth}%` },
+        { label: "Processing", value: stats.orders.processing.toString() },
+        { label: "Shipped", value: stats.orders.shipped.toString() }
       ],
       delay: 100,
       onClick: () => navigate("/orders"),
@@ -55,10 +154,10 @@ const Index = () => {
       gradient: "bg-gradient-to-br from-purple-500/20 to-pink-500/20",
       size: "large" as const,
       stats: [
-        { label: "Total Products", value: "12,847", trend: "+156" },
-        { label: "Categories", value: "24" },
-        { label: "Low Stock", value: "23", trend: "-12" },
-        { label: "Best Seller", value: "iPhone 15" }
+        { label: "Total Products", value: formatNumber(stats.products.total) },
+        { label: "Categories", value: stats.products.categories.toString() },
+        { label: "Low Stock", value: stats.products.lowStock.toString() },
+        { label: "Best Seller", value: stats.topProducts[0]?.title || "N/A" }
       ],
       delay: 200,
       onClick: () => navigate("/products"),
@@ -70,9 +169,9 @@ const Index = () => {
       gradient: "bg-gradient-to-br from-orange-500/20 to-red-500/20",
       size: "medium" as const,
       stats: [
-        { label: "Total Customers", value: "45,231", trend: "+8.2%" },
-        { label: "New Today", value: "12" },
-        { label: "VIP Members", value: "1,847" }
+        { label: "Total Customers", value: formatNumber(stats.overview.totalUsers) },
+        { label: "New Today", value: "0" }, // This would need additional tracking
+        { label: "Active Users", value: formatNumber(stats.overview.totalUsers) }
       ],
       delay: 300,
       onClick: () => navigate("/customers"),
@@ -125,7 +224,7 @@ const Index = () => {
     //   ],
     //   delay: 700
     // }
-  ];
+  ] : [];
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
@@ -188,32 +287,43 @@ const Index = () => {
         {/* Quick Stats Bar */}
         <div className="max-w-7xl mx-auto mt-8 sm:mt-12">
           <div className="glass rounded-2xl p-4 sm:p-6 animate-slide-in-up" style={{ animationDelay: "800ms" }}>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6 text-center">
-              <div className="space-y-1">
-                <p className="text-2xl font-bold text-primary">₹2.8M</p>
-                <p className="text-xs text-muted-foreground">Monthly Revenue</p>
+            {loading ? (
+              <div className="flex items-center justify-center h-32">
+                <Loader2 className="h-8 w-8 animate-spin mr-2" />
+                <span>Loading dashboard stats...</span>
               </div>
-              <div className="space-y-1">
-                <p className="text-2xl font-bold text-emerald-500">98.7%</p>
-                <p className="text-xs text-muted-foreground">Uptime</p>
+            ) : stats ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6 text-center">
+                <div className="space-y-1">
+                  <p className="text-2xl font-bold text-primary">{formatCurrency(stats.overview.monthlyRevenue)}</p>
+                  <p className="text-xs text-muted-foreground">Monthly Revenue</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-2xl font-bold text-emerald-500">{stats.orders.processing}</p>
+                  <p className="text-xs text-muted-foreground">Processing Orders</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-2xl font-bold text-orange-500">{stats.orders.shipped}</p>
+                  <p className="text-xs text-muted-foreground">Shipped Orders</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-2xl font-bold text-blue-500">{formatNumber(stats.overview.totalUsers)}</p>
+                  <p className="text-xs text-muted-foreground">Customers</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-2xl font-bold text-purple-500">{formatNumber(stats.products.total)}</p>
+                  <p className="text-xs text-muted-foreground">Products</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-2xl font-bold text-pink-500">{stats.products.lowStock}</p>
+                  <p className="text-xs text-muted-foreground">Low Stock</p>
+                </div>
               </div>
-              <div className="space-y-1">
-                <p className="text-2xl font-bold text-orange-500">1,249</p>
-                <p className="text-xs text-muted-foreground">Active Orders</p>
+            ) : (
+              <div className="text-center text-muted-foreground">
+                <p>Failed to load dashboard statistics</p>
               </div>
-              <div className="space-y-1">
-                <p className="text-2xl font-bold text-blue-500">45K</p>
-                <p className="text-xs text-muted-foreground">Customers</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-2xl font-bold text-purple-500">4.8★</p>
-                <p className="text-xs text-muted-foreground">Rating</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-2xl font-bold text-pink-500">89%</p>
-                <p className="text-xs text-muted-foreground">Satisfaction</p>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </main>
