@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text as RNText, TextStyle, StyleSheet } from 'react-native';
+import { Text as RNText, TextStyle, StyleSheet, StyleProp } from 'react-native';
 import Colors from '@/constants/colors';
 import Typography from '@/constants/typography';
 
@@ -9,7 +9,7 @@ interface AppTextProps {
   color?: string;
   weight?: 'regular' | 'medium' | 'semibold' | 'bold';
   align?: 'left' | 'center' | 'right';
-  style?: TextStyle;
+  style?: StyleProp<TextStyle>;
   numberOfLines?: number;
 }
 
