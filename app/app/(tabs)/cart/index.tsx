@@ -17,7 +17,7 @@ import Spacing from '@/constants/spacing';
 const { width } = Dimensions.get('window');
 
 // Custom colors from the image
-const FLIPKART_BLUE = '#2874F0';
+const BRAND_BLUE = '#2874F0';
 const SUCCESS_GREEN = '#118D44';
 const ERROR_RED = '#D11243';
 const BACKGROUND_LIGHT = '#F1F3F6';
@@ -105,7 +105,7 @@ export default function CartScreen() {
             </AppText>
           </View>
           <TouchableOpacity style={styles.changeButton}>
-            <AppText variant="caption" weight="semibold" style={{ color: FLIPKART_BLUE }}>Change</AppText>
+            <AppText variant="caption" weight="semibold" style={{ color: BRAND_BLUE }}>Change</AppText>
           </TouchableOpacity>
         </View>
 
@@ -166,7 +166,7 @@ export default function CartScreen() {
                     source={{ uri: 'https://static-assets-web.flixcart.com/www/linchpin/fk-cp-zion/img/wow-logo_365955.png' }}
                     style={styles.wowIcon}
                   />
-                  <AppText variant="caption" weight="semibold" style={{ color: FLIPKART_BLUE }}>
+                  <AppText variant="caption" weight="semibold" style={{ color: BRAND_BLUE }}>
                     Buy at ₹{item.wowPrice.toLocaleString('en-IN')}
                   </AppText>
                 </View>
@@ -202,8 +202,8 @@ export default function CartScreen() {
                 <AppText variant="caption" weight="semibold" style={[styles.actionText, { color: ERROR_RED }]}>Remove</AppText>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.actionButton, styles.saveBtn]}>
-                <FileText size={16} color={FLIPKART_BLUE} />
-                <AppText variant="caption" weight="semibold" style={[styles.actionText, { color: FLIPKART_BLUE }]}>Save for later</AppText>
+                <FileText size={16} color={BRAND_BLUE} />
+                <AppText variant="caption" weight="semibold" style={[styles.actionText, { color: BRAND_BLUE }]}>Save for later</AppText>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.actionButton, styles.buyBtn]}>
                 <Zap size={16} color={Colors.white} />
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
   },
   activeTab: {
     borderBottomWidth: 3,
-    borderBottomColor: FLIPKART_BLUE,
+    borderBottomColor: BRAND_BLUE,
   },
   scrollView: {
     flex: 1,
