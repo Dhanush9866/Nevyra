@@ -1,90 +1,258 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Image } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ShoppingBag } from 'lucide-react-native';
+import {
+  ChevronDown,
+  Trash2,
+  FileText,
+  Zap,
+  Info,
+  X,
+  Star
+} from 'lucide-react-native';
 import AppText from '@/components/atoms/AppText';
-import Button from '@/components/atoms/Button';
-import CartItem from '@/components/organisms/CartItem';
 import Colors from '@/constants/colors';
 import Spacing from '@/constants/spacing';
-import { useCart } from '@/store/CartContext';
+
+const { width } = Dimensions.get('window');
+
+// Custom colors from the image
+const FLIPKART_BLUE = '#2874F0';
+const SUCCESS_GREEN = '#118D44';
+const ERROR_RED = '#D11243';
+const BACKGROUND_LIGHT = '#F1F3F6';
+
+const MOCK_ITEMS = [
+  {
+    id: '1',
+    title: 'HP Professional 15 (2025) Intel...',
+    specs: '15.6 inch, Turbo Silver, 1.5 kg, With MS Office',
+    rating: 4.0,
+    reviews: 15,
+    mrp: 98990,
+    price: 57490,
+    discount: 41,
+    wowPrice: 54615,
+    protectFee: 156,
+    emi: { amount: 11498, coins: 45992 },
+    offersCount: 12,
+    deliveryDate: 'Jan 12, Mon',
+    stockStatus: 'Only few left',
+    image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop'
+  },
+  {
+    id: '2',
+    title: 'Sony WH-1000XM5 Bluetooth Headphones',
+    specs: 'Active Noise Cancelling, 30hr Battery, Black',
+    rating: 4.8,
+    reviews: 2450,
+    mrp: 34990,
+    price: 26990,
+    discount: 22,
+    wowPrice: 25490,
+    protectFee: 99,
+    emi: { amount: 4498, coins: 10000 },
+    offersCount: 8,
+    deliveryDate: 'Jan 11, Sun',
+    stockStatus: 'In Stock',
+    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=2070&auto=format&fit=crop'
+  },
+  {
+    id: '3',
+    title: 'Apple iPhone 15 (Blue, 128 GB)',
+    specs: '128 GB ROM, 15.49 cm (6.1 inch) Super Retina XDR Display',
+    rating: 4.6,
+    reviews: 12380,
+    mrp: 69900,
+    price: 65999,
+    discount: 5,
+    wowPrice: 63999,
+    protectFee: 499,
+    emi: { amount: 10999, coins: 50000 },
+    offersCount: 5,
+    deliveryDate: 'Jan 10, Sat',
+    stockStatus: 'Only 2 left',
+    image: 'https://images.unsplash.com/photo-1510557880182-3d4d3cba3f21?q=80&w=2070&auto=format&fit=crop'
+  }
+];
 
 export default function CartScreen() {
   const router = useRouter();
-  const { items, updateQuantity, removeFromCart, totalAmount } = useCart();
 
-  if (items.length === 0) {
-    return (
-      <View style={styles.emptyContainer}>
-        <ShoppingBag size={80} color={Colors.textLight} />
-        <AppText variant="h4" weight="semibold" style={styles.emptyTitle}>
-          Your cart is empty
-        </AppText>
-        <AppText variant="body" color={Colors.textSecondary} align="center">
-          Add items to your cart to see them here
-        </AppText>
-        <Button
-          title="Start Shopping"
-          onPress={() => router.push('/(tabs)/(home)')}
-          style={styles.emptyButton}
-        />
-      </View>
-    );
-  }
+  const totalMRP = MOCK_ITEMS.reduce((sum, item) => sum + item.mrp, 0);
+  const totalDisplayPrice = MOCK_ITEMS.reduce((sum, item) => sum + item.price, 0);
+  const totalSavings = totalMRP - totalDisplayPrice;
 
   return (
     <View style={styles.container}>
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
       >
-        <View style={styles.itemsList}>
-          {items.map((item) => (
-            <CartItem
-              key={item.id}
-              item={item}
-              onQuantityChange={updateQuantity}
-              onRemove={removeFromCart}
-              onPress={() => router.push(`/product/${item.product.id}` as any)}
-            />
-          ))}
+        {/* Delivery Section */}
+        <View style={styles.deliveryContainer}>
+          <View style={styles.deliveryLeft}>
+            <View style={styles.deliveryRow}>
+              <AppText variant="body" weight="medium">Deliver to: </AppText>
+              <AppText variant="body" weight="bold">Bablu, 533235</AppText>
+              <View style={styles.homeBadge}>
+                <AppText style={styles.homeBadgeText}>HOME</AppText>
+              </View>
+            </View>
+            <AppText variant="caption" color={Colors.textSecondary} numberOfLines={1}>
+              1-213/1, Atreyapuram Subdistrict,...
+            </AppText>
+          </View>
+          <TouchableOpacity style={styles.changeButton}>
+            <AppText variant="caption" weight="semibold" style={{ color: FLIPKART_BLUE }}>Change</AppText>
+          </TouchableOpacity>
         </View>
 
-        <View style={styles.summary}>
-          <View style={styles.summaryRow}>
-            <AppText variant="body" color={Colors.textSecondary}>
-              Subtotal ({items.length} items)
-            </AppText>
-            <AppText variant="body" weight="semibold">
-              ₹{totalAmount.toLocaleString('en-IN')}
-            </AppText>
+        {/* Cart Items */}
+        {MOCK_ITEMS.map((item) => (
+          <View key={item.id} style={styles.cartItemCard}>
+            <View style={styles.itemMainInfo}>
+              <View style={styles.itemImageContainer}>
+                <Image
+                  source={{ uri: item.image }}
+                  style={styles.itemImage}
+                  resizeMode="contain"
+                />
+                <TouchableOpacity style={styles.qtyDropdown}>
+                  <AppText variant="caption" weight="medium">Qty: 1</AppText>
+                  <ChevronDown size={14} color={Colors.black} />
+                </TouchableOpacity>
+                <AppText style={styles.stockStatus} weight="medium">{item.stockStatus}</AppText>
+              </View>
+
+              <View style={styles.itemDetails}>
+                <AppText variant="body" weight="medium" numberOfLines={1} style={styles.itemTitle}>
+                  {item.title}
+                </AppText>
+                <AppText variant="caption" color={Colors.textSecondary} style={styles.itemSpecs}>
+                  {item.specs}
+                </AppText>
+
+                <View style={styles.ratingRow}>
+                  <View style={styles.starsContainer}>
+                    {[1, 2, 3, 4].map((i) => (
+                      <Star key={i} size={12} color={Colors.success} fill={Colors.success} style={{ marginRight: 1 }} />
+                    ))}
+                    <Star size={12} color={Colors.textLight} fill={Colors.textLight} />
+                  </View>
+                  <AppText variant="caption" color={Colors.textSecondary} style={styles.ratingText}>
+                    {item.rating} • ({item.reviews})
+                  </AppText>
+                </View>
+
+                <View style={styles.priceContainer}>
+                  <View style={styles.priceRow}>
+                    <Zap size={14} color={Colors.success} />
+                    <AppText variant="body" weight="semibold" color={Colors.success} style={styles.discountText}>
+                      {item.discount}%
+                    </AppText>
+                    <AppText variant="body" color={Colors.textSecondary} style={styles.mrpText}>
+                      ₹{item.mrp.toLocaleString('en-IN')}
+                    </AppText>
+                    <AppText variant="h4" weight="semibold" style={styles.currentPrice}>
+                      ₹{item.price.toLocaleString('en-IN')}
+                    </AppText>
+                  </View>
+                </View>
+
+                <View style={styles.wowPriceRow}>
+                  <Image
+                    source={{ uri: 'https://static-assets-web.flixcart.com/www/linchpin/fk-cp-zion/img/wow-logo_365955.png' }}
+                    style={styles.wowIcon}
+                  />
+                  <AppText variant="caption" weight="semibold" style={{ color: FLIPKART_BLUE }}>
+                    Buy at ₹{item.wowPrice.toLocaleString('en-IN')}
+                  </AppText>
+                </View>
+
+                <View style={styles.feeRow}>
+                  <AppText variant="caption" color={Colors.textSecondary}>+ ₹{item.protectFee} Protect Promise Fee</AppText>
+                  <Info size={12} color={Colors.textSecondary} style={{ marginLeft: 4 }} />
+                </View>
+
+                <View style={styles.emiRow}>
+                  <AppText variant="caption" weight="medium">Or Pay ₹{item.emi.amount.toLocaleString('en-IN')} + </AppText>
+                  <View style={styles.coinIcon} />
+                  <AppText variant="caption" weight="medium"> {item.emi.coins}</AppText>
+                </View>
+
+                <TouchableOpacity>
+                  <AppText variant="caption" weight="semibold" color={Colors.success} style={styles.offersLink}>
+                    {item.offersCount} Offers Available
+                  </AppText>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View style={styles.deliveryDateRow}>
+              <AppText variant="caption" color={Colors.textSecondary}>
+                Delivery by {item.deliveryDate}
+              </AppText>
+            </View>
+
+            <View style={styles.itemActions}>
+              <TouchableOpacity style={[styles.actionButton, styles.removeBtn]}>
+                <Trash2 size={16} color={ERROR_RED} />
+                <AppText variant="caption" weight="semibold" style={[styles.actionText, { color: ERROR_RED }]}>Remove</AppText>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.actionButton, styles.saveBtn]}>
+                <FileText size={16} color={FLIPKART_BLUE} />
+                <AppText variant="caption" weight="semibold" style={[styles.actionText, { color: FLIPKART_BLUE }]}>Save for later</AppText>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.actionButton, styles.buyBtn]}>
+                <Zap size={16} color={Colors.white} />
+                <AppText variant="caption" weight="semibold" style={[styles.actionText, { color: Colors.white }]}>Buy this now</AppText>
+              </TouchableOpacity>
+            </View>
           </View>
-          <View style={styles.summaryRow}>
-            <AppText variant="body" color={Colors.textSecondary}>
-              Shipping
-            </AppText>
-            <AppText variant="body" weight="semibold" color={Colors.success}>
-              FREE
-            </AppText>
+        ))}
+
+        {/* Protection Teaser */}
+        <View style={styles.protectionCard}>
+          <View style={styles.protectionHeader}>
+            <AppText variant="body" weight="semibold">Complete Digital Protection</AppText>
+            <TouchableOpacity>
+              <X size={18} color={Colors.textSecondary} />
+            </TouchableOpacity>
           </View>
-          <View style={[styles.summaryRow, styles.totalRow]}>
-            <AppText variant="h4" weight="bold">
-              Total
-            </AppText>
-            <AppText variant="h4" weight="bold" color={Colors.primary}>
-              ₹{totalAmount.toLocaleString('en-IN')}
-            </AppText>
+          <View style={styles.protectionContent}>
+            <View style={styles.protectionPlaceholder} />
           </View>
         </View>
       </ScrollView>
 
-      <View style={styles.footer}>
-        <Button
-          title="Proceed to Checkout"
-          onPress={() => router.push('/checkout/address-list' as any)}
-          fullWidth
-        />
+      {/* Footer */}
+      <View style={styles.footerContainer}>
+        {/* Savings Banner */}
+        <View style={styles.savingsBanner}>
+          <View style={styles.savingsIcon}>
+            <AppText style={{ color: Colors.white, fontSize: 10 }}>%</AppText>
+          </View>
+          <AppText variant="caption" color={SUCCESS_GREEN} weight="semibold">
+            You'll save ₹{totalSavings.toLocaleString('en-IN')} on this order!
+          </AppText>
+        </View>
+
+        <View style={styles.footerCTA}>
+          <View style={styles.totalAmountContainer}>
+            <AppText variant="caption" color={Colors.textSecondary} style={{ textDecorationLine: 'line-through' }}>
+              ₹{totalMRP.toLocaleString('en-IN')}
+            </AppText>
+            <View style={styles.priceWithInfo}>
+              <AppText variant="h4" weight="semibold">₹{totalDisplayPrice.toLocaleString('en-IN')}</AppText>
+              <Info size={14} color={Colors.textSecondary} style={{ marginLeft: 4 }} />
+            </View>
+          </View>
+          <TouchableOpacity style={styles.placeOrderButton}>
+            <AppText variant="body" weight="semibold" style={styles.placeOrderText}>Place Order</AppText>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -93,54 +261,302 @@ export default function CartScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: BACKGROUND_LIGHT,
+  },
+  header: {
+    backgroundColor: Colors.white,
+    paddingTop: 10,
+  },
+  headerTitle: {
+    paddingHorizontal: Spacing.base,
+    paddingBottom: 15,
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
+  },
+  tab: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+  activeTab: {
+    borderBottomWidth: 3,
+    borderBottomColor: FLIPKART_BLUE,
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
+    paddingBottom: 120, // Extra space for footer
+  },
+  deliveryContainer: {
+    backgroundColor: Colors.white,
     padding: Spacing.base,
-    gap: Spacing.base,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
   },
-  itemsList: {
-    gap: Spacing.md,
+  deliveryLeft: {
+    flex: 1,
+    marginRight: 30, // Increased gap
   },
-  summary: {
-    backgroundColor: Colors.card,
-    borderRadius: 12,
+  deliveryRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  homeBadge: {
+    backgroundColor: '#F0F0F0',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    marginLeft: 8,
+  },
+  homeBadgeText: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: '#878787',
+  },
+  changeButton: {
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    paddingHorizontal: 10, // Reduced from 16
+    paddingVertical: 5, // Reduced from 8
+    borderRadius: 4,
+    minWidth: 70, // Ensure it doesn't get too small
+    alignItems: 'center',
+  },
+  cartItemCard: {
+    backgroundColor: Colors.white,
+    marginTop: 8,
     padding: Spacing.base,
-    gap: Spacing.md,
-    ...Colors.shadow.sm,
   },
-  summaryRow: {
+  itemMainInfo: {
+    flexDirection: 'row',
+  },
+  itemImageContainer: {
+    width: width * 0.25,
+    alignItems: 'center',
+  },
+  itemImage: {
+    width: 80,
+    height: 80,
+    marginBottom: 10,
+  },
+  qtyDropdown: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    backgroundColor: '#F9F9F9',
+  },
+  stockStatus: {
+    color: ERROR_RED,
+    fontSize: 10,
+    marginTop: 8,
+  },
+  itemDetails: {
+    flex: 1,
+    marginLeft: 15,
+  },
+  itemTitle: {
+    marginBottom: 2,
+  },
+  itemSpecs: {
+    marginBottom: 6,
+  },
+  ratingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  starsContainer: {
+    flexDirection: 'row',
+    marginRight: 6,
+  },
+  ratingText: {
+    lineHeight: 14,
+  },
+  priceContainer: {
+    marginBottom: 4,
+  },
+  priceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  discountText: {
+    marginLeft: 4,
+    marginRight: 8,
+  },
+  mrpText: {
+    textDecorationLine: 'line-through',
+    marginRight: 8,
+  },
+  currentPrice: {
+    color: Colors.black,
+  },
+  wowPriceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  wowIcon: {
+    width: 40,
+    height: 15,
+    marginRight: 6,
+    resizeMode: 'contain',
+  },
+  feeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  emiRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  coinIcon: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: '#FBC02D',
+    borderWidth: 1,
+    borderColor: '#F9A825',
+  },
+  offersLink: {
+    marginTop: 2,
+  },
+  deliveryDateRow: {
+    marginTop: 15,
+    paddingTop: 15,
+    borderTopWidth: 1,
+    borderTopColor: '#F0F0F0',
+  },
+  itemActions: {
+    flexDirection: 'row',
+    marginTop: 15,
+    borderTopWidth: 1,
+    borderTopColor: '#F0F0F0',
+    paddingTop: 15,
+    gap: 8,
+  },
+  actionButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+    borderRadius: 6,
+    borderWidth: 1,
+  },
+  removeBtn: {
+    backgroundColor: '#FFF5F5',
+    borderColor: '#FFE0E0',
+  },
+  saveBtn: {
+    backgroundColor: '#F0F7FF',
+    borderColor: '#E0EEFF',
+  },
+  buyBtn: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+  },
+  actionText: {
+    marginLeft: 6,
+    fontSize: 11,
+  },
+  protectionCard: {
+    backgroundColor: '#F1F7FF',
+    marginTop: 8,
+    padding: Spacing.base,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: '#DBE9FF',
+  },
+  protectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 10,
   },
-  totalRow: {
-    paddingTop: Spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: Colors.border,
+  protectionContent: {
+    // Add protection items here
   },
-  footer: {
-    padding: Spacing.base,
-    backgroundColor: Colors.card,
-    borderTopWidth: 1,
-    borderTopColor: Colors.border,
-    ...Colors.shadow.lg,
+  protectionPlaceholder: {
+    height: 40,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
   },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
+  footerContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: Colors.white,
+    paddingBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 10,
+  },
+  savingsBanner: {
+    backgroundColor: '#F6FFF9',
+    flexDirection: 'row',
     alignItems: 'center',
-    padding: Spacing.xl,
-    gap: Spacing.base,
-    backgroundColor: Colors.background,
+    justifyContent: 'center',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E8F5E9',
   },
-  emptyTitle: {
-    marginTop: Spacing.lg,
+  savingsIcon: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: SUCCESS_GREEN,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
   },
-  emptyButton: {
-    marginTop: Spacing.lg,
+  footerCTA: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: Spacing.base,
+    paddingVertical: 12,
+  },
+  totalAmountContainer: {
+    flex: 1,
+  },
+  priceWithInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  placeOrderButton: {
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 40,
+    paddingVertical: 12,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 1,
+    elevation: 2,
+  },
+  placeOrderText: {
+    color: Colors.white,
   },
 });
+
