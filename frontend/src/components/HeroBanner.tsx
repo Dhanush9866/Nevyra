@@ -99,73 +99,71 @@ const HeroBanner = () => {
   };
 
   return (
-    <div className="relative bg-white overflow-hidden min-h-[400px] md:h-[500px] flex items-center">
-      <div className="container mx-auto px-4 h-full relative z-10">
-        {slides.map((slide, index) => (
-          <div
-            key={slide.id}
-            className={`transition-all duration-1000 absolute inset-0 flex items-center justify-center ${slide.bgColor || "bg-white"
-              } ${index === currentSlide ? "opacity-100 z-10" : "opacity-0 z-0"}`}
-          >
-            <div className="container px-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+    <div className="container mx-auto px-4 relative bg-white overflow-hidden min-h-[400px] md:h-[500px] flex items-center my-4 shadow-sm rounded-none">
+      {slides.map((slide, index) => (
+        <div
+          key={slide.id}
+          className={`transition-all duration-1000 absolute inset-0 flex items-center justify-center ${slide.bgColor || "bg-white"
+            } ${index === currentSlide ? "opacity-100 z-10" : "opacity-0 z-0"}`}
+        >
+          <div className="container px-8 md:px-16">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
 
-                {/* Text Content */}
-                <div className="text-left z-10 space-y-6">
-                  <h1 className={`text-4xl md:text-5xl lg:text-6xl font-bold leading-tight ${slide.textColor || "text-primary"}`}>
-                    {slide.title}
-                  </h1>
-                  <p className={`text-lg md:text-xl font-medium tracking-wide ${slide.textColor || "text-gray-600"}`}>
-                    {slide.subtitle}
-                  </p>
-                  {/* Description - Optional to hide on mobile if cluttered */}
-                  <p className={`max-w-lg hidden sm:block ${slide.descriptionColor || "text-gray-500"}`}>
-                    {slide.description}
-                  </p>
+              {/* Text Content */}
+              <div className="text-left z-10 space-y-6">
+                <h1 className={`text-4xl md:text-5xl lg:text-6xl font-bold leading-tight ${slide.textColor || "text-primary"}`}>
+                  {slide.title}
+                </h1>
+                <p className={`text-lg md:text-xl font-medium tracking-wide ${slide.textColor || "text-gray-600"}`}>
+                  {slide.subtitle}
+                </p>
+                {/* Description - Optional to hide on mobile if cluttered */}
+                <p className={`max-w-lg hidden sm:block ${slide.descriptionColor || "text-gray-500"}`}>
+                  {slide.description}
+                </p>
 
-                  <div>
-                    <Button
-                      size="lg"
-                      className={`${slide.buttonColor} px-8 py-6 rounded-lg text-lg shadow-lg transition-all hover:scale-105`}
-                    >
-                      {slide.buttonText}
-                    </Button>
-                  </div>
+                <div>
+                  <Button
+                    size="lg"
+                    className={`${slide.buttonColor} px-8 py-6 rounded-lg text-lg shadow-lg transition-all hover:scale-105`}
+                  >
+                    {slide.buttonText}
+                  </Button>
                 </div>
+              </div>
 
-                {/* Image Content */}
-                <div className="relative flex justify-center md:justify-end">
-                  {/* Background blob for depth */}
-                  <img
-                    src={slide.image}
-                    alt={slide.title}
-                    className={`relative w-full max-w-[400px] md:max-w-[500px] h-auto object-contain hover:scale-105 transition-transform duration-500 ${(!slide.bgColor || slide.useBlend) ? "mix-blend-multiply" : "rounded-2xl shadow-2xl"
-                      }`}
-                    style={{
-                      filter: (!slide.bgColor || slide.useBlend) ? "contrast(1.15) brightness(1.15)" : "",
-                      ...(slide.id === 2 ? {
-                        maskImage: 'radial-gradient(closest-side, black 55%, transparent 100%)',
-                        WebkitMaskImage: 'radial-gradient(closest-side, black 55%, transparent 100%)'
-                      } : {})
-                    }}
-                  />
-                </div>
+              {/* Image Content */}
+              <div className="relative flex justify-center md:justify-end">
+                {/* Background blob for depth */}
+                <img
+                  src={slide.image}
+                  alt={slide.title}
+                  className={`relative w-full max-w-[400px] md:max-w-[500px] h-auto object-contain hover:scale-105 transition-transform duration-500 ${(!slide.bgColor || slide.useBlend) ? "mix-blend-multiply" : "rounded-2xl shadow-2xl"
+                    }`}
+                  style={{
+                    filter: (!slide.bgColor || slide.useBlend) ? "contrast(1.15) brightness(1.15)" : "",
+                    ...(slide.id === 2 ? {
+                      maskImage: 'radial-gradient(closest-side, black 55%, transparent 100%)',
+                      WebkitMaskImage: 'radial-gradient(closest-side, black 55%, transparent 100%)'
+                    } : {})
+                  }}
+                />
               </div>
             </div>
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
 
       {/* Navigation Arrows */}
       <button
         onClick={prevSlide}
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-primary p-3 rounded-full shadow-md transition-all z-20 hover:scale-110"
+        className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-primary p-3 rounded-none shadow-md transition-all z-20 hover:scale-110"
       >
         <ChevronLeft className="h-6 w-6" />
       </button>
       <button
         onClick={nextSlide}
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-primary p-3 rounded-full shadow-md transition-all z-20 hover:scale-110"
+        className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-primary p-3 rounded-none shadow-md transition-all z-20 hover:scale-110"
       >
         <ChevronRight className="h-6 w-6" />
       </button>
