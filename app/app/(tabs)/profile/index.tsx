@@ -47,11 +47,7 @@ export default function ProfileScreen() {
       items: [
         { icon: Zap, label: 'Plus', route: '/plus' },
         { icon: User, label: 'Edit Profile', route: '/profile/edit' },
-        { icon: CreditCard, label: 'Saved Credit / Debit & Gift Cards', route: '/cards' },
         { icon: MapPin, label: 'Saved Addresses', route: '/address/list' },
-        { icon: Languages, label: 'Select Language', route: '/language' },
-        { icon: Bell, label: 'Notification Settings', route: '/notifications' },
-        { icon: ShieldCheck, label: 'Privacy Center', route: '/privacy' },
       ],
     },
     {
