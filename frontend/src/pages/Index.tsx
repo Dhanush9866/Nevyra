@@ -85,7 +85,7 @@ const row3GridGroups = [
       { title: "Cameras & Accessories", offer: "Energy Efficient", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903374/nevyra/security-lighting/WhatsApp%20Image%202025-12-26%20at%207.58.06%20PM.jpg", category: "Electrical & Electronics", subcategory: "Cameras & Accessories,LED Bulbs" },
       { title: "Smart Door Locks", offer: "Cool Comfort", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903369/nevyra/security-lighting/WhatsApp%20Image%202025-12-26%20at%207.58.06%20PM%20%281%29.jpg", category: "Electrical & Electronics", subcategory: "Smart Door Locks,Ceiling Fan" },
       { title: "Lighting", offer: "Power Up", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903371/nevyra/security-lighting/WhatsApp%20Image%202025-12-26%20at%207.58.06%20PM%20%282%29.jpg", category: "Electrical & Electronics", subcategory: "Lighting,Batteries" },
-      { title: "CFL Bulbs", offer: "Safe Connections", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903372/nevyra/security-lighting/WhatsApp%20Image%202025-12-26%20at%207.58.06%20PM%20%283%29.jpg", category: "Electrical & Electronics", subcategory: "CFL Bulbs,Wiring Cables" },
+      { title: "CFL Bulbs", offer: "Safe Connections", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1767979028/WhatsApp_Image_2026-01-08_at_9.24.36_PM_wospgh.jpg", category: "Electrical & Electronics", subcategory: "CFL Bulbs,Wiring Cables" },
     ]
   },
 
@@ -115,7 +115,7 @@ const row5GridGroups = [
   {
     title: "Office & Books Deals",
     items: [
-      { title: "Cabinets", offer: "Window Dressing", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903365/nevyra/office-books/WhatsApp%20Image%202025-12-26%20at%208.27.46%20PM.jpg", category: "Home Interior & Decor", subcategory: "Cabinets,Curtains" },
+      { title: "Cabinets", offer: "Window Dressing", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1767979077/WhatsApp_Image_2026-01-08_at_9.23.46_PM_yivdem.jpg", category: "Home Interior & Decor", subcategory: "Cabinets,Curtains" },
       { title: "Printers & Scanners", offer: "Fresh Colors", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903363/nevyra/office-books/WhatsApp%20Image%202025-12-26%20at%208.27.46%20PM%20%281%29.jpg", category: "Home Interior & Decor", subcategory: "Printers & Scanners,Wall Paint" },
       { title: "Notebooks", offer: "Designer Walls", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903368/nevyra/office-books/WhatsApp%20Image%202025-12-26%20at%208.27.47%20PM.jpg", category: "Home Interior & Decor", subcategory: "Notebooks,Wallpaper" },
       { title: "Pens", offer: "Ambient Lighting", image: "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1766903367/nevyra/office-books/WhatsApp%20Image%202025-12-26%20at%208.27.47%20PM%20%281%29.jpg", category: "Home Interior & Decor", subcategory: "Pens,Cove Lights" },
