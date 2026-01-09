@@ -25,7 +25,9 @@ import ProductCard from '@/components/molecules/ProductCard';
 import HomeBannerCarousel from '@/components/organisms/HomeBannerCarousel';
 import Colors from '@/constants/colors';
 import Spacing from '@/constants/spacing';
-import { mockBanners, mockCategories, mockProducts } from '@/services/mockData';
+import { useQuery } from '@tanstack/react-query';
+import { apiService } from '@/services/api';
+import { mockBanners } from '@/services/mockData';
 import { useWishlist } from '@/store/WishlistContext';
 
 export default function HomeScreen() {
@@ -35,9 +37,22 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = React.useState(false);
   const scrollY = useRef(new Animated.Value(0)).current;
 
+  const { data: catData, isLoading: catLoading } = useQuery({
+    queryKey: ['categories'],
+    queryFn: () => apiService.getCategories(),
+  });
+
+  const { data: prodData, isLoading: prodLoading, refetch } = useQuery({
+    queryKey: ['trending-products'],
+    queryFn: () => apiService.getProducts({ limit: 8 }),
+  });
+
+  const categories = catData?.data?.filter((c: any) => !c.parentId) || [];
+  const products = prodData?.data || [];
+
   const onRefresh = () => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1000);
+    refetch().finally(() => setRefreshing(false));
   };
 
   // 1. Address Bar Animations
@@ -129,13 +144,20 @@ export default function HomeScreen() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.categoriesScroll}
           >
-            {mockCategories.map((category) => (
+            {catLoading ? (
+               <View style={{ paddingHorizontal: 20 }}>
+                 <AppText color={Colors.white}>Loading...</AppText>
+               </View>
+            ) : categories.map((category: any) => (
               <CategoryItem
-                key={category.id}
+                key={category._id || category.id}
                 name={category.name}
                 image={category.image}
                 scrollY={scrollY}
-                onPress={() => router.push('/(tabs)/categories' as any)}
+                onPress={() => router.push({
+                  pathname: '/product/list',
+                  params: { category: category.name }
+                })}
               />
             ))}
           </ScrollView>
@@ -181,7 +203,7 @@ export default function HomeScreen() {
               </TouchableOpacity>
             </View>
             <View style={styles.productsGrid}>
-              {mockProducts.slice(0, 4).map((product) => (
+              {products.slice(0, 4).map((product: any) => (
                 <View key={product.id} style={styles.productCard}>
                   <ProductCard
                     product={product}
@@ -231,7 +253,7 @@ export default function HomeScreen() {
               </TouchableOpacity>
             </View>
             <View style={styles.productsGrid}>
-              {mockProducts.slice(2, 6).map((product) => (
+              {products.slice(4, 8).map((product: any) => (
                 <View key={product.id} style={styles.productCard}>
                   <ProductCard
                     product={product}

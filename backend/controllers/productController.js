@@ -1,4 +1,4 @@
-const { Product, Category } = require("../models");
+const { Product, Category, SearchLog } = require("../models");
 const { validateAttributes } = require("../utils/validateAttributes");
 
 // Function to parse additional specifications
@@ -66,7 +66,14 @@ exports.list = async (req, res, next) => {
     const filter = {};
     if (category) filter.category = { $regex: new RegExp(`^${category}$`, "i") };
     if (subCategory) filter.subCategory = { $regex: new RegExp(`^${subCategory}$`, "i") };
-    if (search) filter.title = { $regex: search, $options: "i" };
+    if (search) {
+      filter.title = { $regex: search, $options: "i" };
+      // Log the search query asynchronously
+      SearchLog.create({ 
+        query: search.toLowerCase().trim(),
+        user: req.user ? req.user.id : null 
+      }).catch(err => console.error('Search log error:', err));
+    }
     
     console.log('MongoDB filter:', JSON.stringify(filter));
     
@@ -407,6 +414,81 @@ exports.getAll = async (req, res, next) => {
       success: true,
       message: "All products fetched",
       data: mappedProducts,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getPopularSearches = async (req, res, next) => {
+  try {
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    const popular = await SearchLog.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: sevenDaysAgo }
+        }
+      },
+      {
+        $group: {
+          _id: "$query",
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { count: -1 }
+      },
+      {
+        $limit: 5
+      }
+    ]);
+
+    const result = popular.map(item => item._id);
+
+    res.json({
+      success: true,
+      message: "Popular searches fetched",
+      data: result
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getSimilarProducts = async (req, res, next) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found"
+      });
+    }
+
+    const { category, subCategory } = product;
+    
+    // Find products in same subcategory first, then category
+    let similar = await Product.find({
+      _id: { $ne: product._id },
+      subCategory: subCategory,
+    }).limit(6);
+
+    if (similar.length < 3) {
+      const moreSimilar = await Product.find({
+        _id: { $ne: product._id, $nin: similar.map(p => p._id) },
+        category: category,
+      }).limit(6 - similar.length);
+      similar = [...similar, ...moreSimilar];
+    }
+
+    const mappedProducts = similar.map(mapProductId);
+
+    res.json({
+      success: true,
+      message: "Similar products fetched",
+      data: mappedProducts
     });
   } catch (err) {
     next(err);

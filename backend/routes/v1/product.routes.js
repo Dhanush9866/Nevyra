@@ -7,7 +7,9 @@ const adminMiddleware = require("../../middlewares/adminMiddleware");
 router.get("/", productController.list);
 router.get("/all", productController.getAll);
 router.get("/by-subcategories", productController.listByMultipleSubcategories);
+router.get("/popular-searches", productController.getPopularSearches);
 router.get("/:id", productController.details);
+router.get("/:id/similar", productController.getSimilarProducts);
 
 router.post("/", authMiddleware, adminMiddleware, productController.create);
 router.put("/:id", authMiddleware, adminMiddleware, productController.update);

@@ -17,18 +17,10 @@ import AppText from '@/components/atoms/AppText';
 import IconButton from '@/components/atoms/IconButton';
 import Colors from '@/constants/colors';
 import Spacing from '@/constants/spacing';
+import { mockCategories } from '@/services/mockData';
+import { Category } from '@/types';
 
-// Categories from frontend/src/components/CategoryCards.tsx
-const HARDCODED_CATEGORIES = [
-  { id: '1', name: "Medical & Pharmacy", slug: "medical-and-pharmacy", image: 'https://cdn-icons-png.flaticon.com/512/3022/3022567.png' },
-  { id: '2', name: "Groceries", slug: "groceries", image: 'https://cdn-icons-png.flaticon.com/512/3724/3724788.png' },
-  { id: '3', name: "Fashion & Beauty", slug: "fashion-and-beauty", image: 'https://cdn-icons-png.flaticon.com/512/3050/3050239.png' },
-  { id: '4', name: "Devices", slug: "devices", image: 'https://cdn-icons-png.flaticon.com/512/644/644458.png' },
-  { id: '5', name: "Electrical", slug: "electrical", image: 'https://cdn-icons-png.flaticon.com/512/3659/3659899.png' },
-  { id: '6', name: "Automotive", slug: "automotive", image: 'https://cdn-icons-png.flaticon.com/512/296/296216.png' },
-  { id: '7', name: "Sports", slug: "sports", image: 'https://cdn-icons-png.flaticon.com/512/857/857455.png' },
-  { id: '8', name: "Home Interior", slug: "home-interior", image: 'https://cdn-icons-png.flaticon.com/512/263/263115.png' },
-];
+// Categories are now imported from @/services/mockData
 
 // Mock subcategories
 const MOCK_SUBCATEGORIES: Record<string, Array<{ id: string, name: string, image: string }>> = {
@@ -83,27 +75,46 @@ const MOCK_SUBCATEGORIES: Record<string, Array<{ id: string, name: string, image
 
 const DEFAULT_IMAGE = 'https://cdn-icons-png.flaticon.com/512/263/263115.png'; // Generic Box
 
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  image: string;
-}
+// Category interface is now imported from @/types
+
+import { useQuery } from '@tanstack/react-query';
+import { apiService } from '@/services/api';
+import Loader from '@/components/atoms/Loader';
 
 export default function CategoriesScreen() {
   const router = useRouter();
-  const [selectedCategory, setSelectedCategory] = useState<Category>(HARDCODED_CATEGORIES[0]); // Default to first item
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+
+  const { data: catData, isLoading, error } = useQuery({
+    queryKey: ['categories'],
+    queryFn: () => apiService.getCategories(),
+  });
+
+  const categories = catData?.data || [];
+  
+  // Set default selected category once data is loaded
+  React.useEffect(() => {
+    if (categories.length > 0 && !selectedCategoryId) {
+      const topLevel = categories.find((c: any) => !c.parentId);
+      if (topLevel) setSelectedCategoryId(topLevel._id || topLevel.id);
+    }
+  }, [categories]);
+
+  const selectedCategory = useMemo(() => {
+    return categories.find((c: any) => (c._id || c.id) === selectedCategoryId) || categories[0];
+  }, [categories, selectedCategoryId]);
 
   const subCategories = useMemo(() => {
-    return MOCK_SUBCATEGORIES[selectedCategory.name] || MOCK_SUBCATEGORIES['Medical & Pharmacy']; // Fallback for demo
-  }, [selectedCategory]);
+    if (!selectedCategoryId) return [];
+    return categories.filter((c: any) => c.parentId === selectedCategoryId);
+  }, [categories, selectedCategoryId]);
 
   const renderSidebarItem = ({ item }: { item: Category }) => {
-    const isSelected = selectedCategory.id === item.id;
+    const isSelected = ((selectedCategory as any)?._id || selectedCategory?.id) === ((item as any)._id || item.id);
     return (
       <TouchableOpacity
         style={[styles.sidebarItem, isSelected && styles.sidebarItemSelected]}
-        onPress={() => setSelectedCategory(item)}
+        onPress={() => setSelectedCategoryId((item as any)._id || item.id)}
         activeOpacity={0.8}
       >
         <View style={styles.sidebarIconContainer}>
@@ -178,47 +189,80 @@ export default function CategoriesScreen() {
       </View>
 
       <View style={styles.content}>
-        {/* Sidebar */}
-        <View style={styles.sidebar}>
-          <FlatList
-            data={HARDCODED_CATEGORIES}
-            renderItem={renderSidebarItem}
-            keyExtractor={item => item.id}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.sidebarContent}
-          />
-        </View>
-
-        {/* Main Content */}
-        <ScrollView style={styles.mainContent} showsVerticalScrollIndicator={false}>
-          {/* Main Category Title */}
-          <View style={styles.mainHeader}>
-            <AppText variant="h4" weight="bold">{selectedCategory.name}</AppText>
+        {isLoading ? (
+          <View style={styles.center}>
+            <Loader />
           </View>
-
-          {/* Subcategories Grid */}
-          <View style={styles.grid}>
-            {subCategories.map((sub) => (
-              <TouchableOpacity key={sub.id} style={styles.gridItem}>
-                <View style={styles.gridImageContainer}>
-                  <Image
-                    source={{ uri: sub.image }}
-                    style={styles.gridImage}
-                    contentFit="contain"
-                  />
-                </View>
-                <AppText variant="caption" style={styles.gridText} numberOfLines={2}>
-                  {sub.name}
-                </AppText>
-              </TouchableOpacity>
-            ))}
-
-            {/* Add some dummy items if list is short to fill 3 columns for effect */}
-            {subCategories.length < 3 && (
-              <View style={{ width: '33%' }} />
-            )}
+        ) : error ? (
+          <View style={styles.center}>
+            <AppText color={Colors.error}>Failed to load categories</AppText>
           </View>
-        </ScrollView>
+        ) : (
+          <>
+            {/* Sidebar */}
+            <View style={styles.sidebar}>
+              <FlatList
+                data={categories.filter((c: any) => !c.parentId)}
+                renderItem={renderSidebarItem}
+                keyExtractor={item => item._id || item.id}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.sidebarContent}
+              />
+            </View>
+
+            {/* Main Content */}
+            <ScrollView style={styles.mainContent} showsVerticalScrollIndicator={false}>
+              {/* Main Category Title */}
+              <View style={styles.mainHeader}>
+                <AppText variant="h4" weight="bold">{selectedCategory?.name}</AppText>
+              </View>
+
+              {/* Subcategories Grid */}
+              <View style={styles.grid}>
+                {subCategories.length > 0 ? (
+                  subCategories.map((sub: any) => (
+                    <TouchableOpacity 
+                      key={sub._id || sub.id} 
+                      style={styles.gridItem}
+                      onPress={() => router.push({
+                        pathname: '/product/list',
+                        params: { 
+                          category: selectedCategory?.name,
+                          subcategory: sub.name 
+                        }
+                      })}
+                    >
+                      <View style={styles.gridImageContainer}>
+                        <Image
+                          source={{ uri: sub.image || DEFAULT_IMAGE }}
+                          style={styles.gridImage}
+                          contentFit="contain"
+                        />
+                      </View>
+                      <AppText variant="caption" style={styles.gridText} numberOfLines={2}>
+                        {sub.name}
+                      </AppText>
+                    </TouchableOpacity>
+                  ))
+                ) : (
+                  <TouchableOpacity 
+                    style={styles.viewAllTop}
+                    onPress={() => router.push({
+                      pathname: '/product/list',
+                      params: { category: selectedCategory?.name }
+                    })}
+                  >
+                     <AppText color={Colors.primary}>View all products in {selectedCategory?.name}</AppText>
+                  </TouchableOpacity>
+                )}
+                {/* Add some dummy items if list is short to fill 3 columns for effect */}
+                {subCategories.length < 3 && (
+                  <View style={{ width: '33%' }} />
+                )}
+              </View>
+            </ScrollView>
+          </>
+        )}
       </View>
     </View>
   );
@@ -270,7 +314,16 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     backgroundColor: Colors.white,
-    // Add border top to separate from search area slightly if needed, or visual separation
+  },
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  viewAllTop: {
+    padding: Spacing.base,
+    alignItems: 'center',
+    width: '100%',
   },
   sidebar: {
     width: 90,
