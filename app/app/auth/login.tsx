@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -26,12 +27,22 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
+
     setLoading(true);
     try {
-      await login(email, password);
-      router.replace('/(tabs)/(home)' as any);
+      const result = await login(email, password);
+      if (result.success) {
+        router.replace('/(tabs)/(home)' as any);
+      } else {
+        Alert.alert('Login Failed', result.message);
+      }
     } catch (error) {
       console.error('Login error:', error);
+      Alert.alert('Error', 'An unexpected error occurred. Please check your connection.');
     } finally {
       setLoading(false);
     }

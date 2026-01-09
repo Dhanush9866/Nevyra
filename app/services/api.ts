@@ -1,7 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const API_BASE_URL = 'http://localhost:8000/api/v1';
-
+const API_BASE_URL = 'http://10.123.124.42:8000/api/v1'; // Use local IP instead of localhost for mobile devices
 class ApiService {
   private baseURL: string;
 
@@ -14,10 +12,10 @@ class ApiService {
     options: RequestInit = {}
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
-    
+
     // Add auth token if available
     const token = await AsyncStorage.getItem('token');
-    
+
     const config: RequestInit = {
       headers: {
         'Content-Type': 'application/json',
@@ -35,6 +33,10 @@ class ApiService {
       const data = await response.json();
 
       if (!response.ok) {
+        if (response.status === 401) {
+          await AsyncStorage.removeItem('token');
+          await AsyncStorage.removeItem('user');
+        }
         throw new Error(data.message || 'Something went wrong');
       }
 
@@ -97,11 +99,11 @@ class ApiService {
 
   async getProductDetails(id: string) {
     const response = await this.request<{ success: boolean; data: any }>(`/products/${id}`);
-    
+
     if (response.success && response.data) {
       response.data = this.mapBackendProduct(response.data);
     }
-    
+
     return response;
   }
 
@@ -115,6 +117,140 @@ class ApiService {
 
   async getReviews(productId: string) {
     return this.request<{ success: boolean; data: any[] }>(`/reviews/product/${productId}`);
+  }
+
+  // Auth
+  async login(credentials: any) {
+    const response = await this.request<{ success: boolean; message: string; data: { token: string } }>(
+      '/auth/login',
+      {
+        method: 'POST',
+        body: JSON.stringify(credentials),
+      }
+    );
+
+    if (response.success && response.data.token) {
+      await AsyncStorage.setItem('token', response.data.token);
+    }
+
+    return response;
+  }
+
+  async register(userData: any) {
+    const response = await this.request<{ success: boolean; message: string; data: any }>(
+      '/auth/register',
+      {
+        method: 'POST',
+        body: JSON.stringify(userData),
+      }
+    );
+
+    return response;
+  }
+
+  async logout() {
+    await AsyncStorage.removeItem('token');
+  }
+
+  async getProfile() {
+    return this.request<{ success: boolean; message: string; data: any }>('/auth/profile');
+  }
+
+  async updateProfile(userData: { firstName?: string; lastName?: string; phone?: string; email?: string }) {
+    return this.request<{ success: boolean; message: string; data: any }>(
+      '/auth/profile',
+      {
+        method: 'PATCH',
+        body: JSON.stringify(userData),
+      }
+    );
+  }
+
+  async isAuthenticated() {
+    const token = await AsyncStorage.getItem('token');
+    return !!token;
+  }
+
+  // Address
+  async getAddresses() {
+    return this.request<{ success: boolean; data: any[]; message?: string }>('/auth/addresses');
+  }
+
+  async addAddress(addressData: any) {
+    return this.request<{ success: boolean; data: any[]; message?: string }>('/auth/addresses', {
+      method: 'POST',
+      body: JSON.stringify(addressData),
+    });
+  }
+
+  async updateAddress(index: number, addressData: any) {
+    return this.request<{ success: boolean; data: any[]; message?: string }>(`/auth/addresses/${index}`, {
+      method: 'PATCH',
+      body: JSON.stringify(addressData),
+    });
+  }
+
+  async deleteAddress(index: number) {
+    return this.request<{ success: boolean; data: any[]; message?: string }>(`/auth/addresses/${index}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // Cart
+  async getCart() {
+    const response = await this.request<{ success: boolean; data: any[] }>('/cart');
+    if (response.success && response.data) {
+      response.data = response.data.map((item: any) => ({
+        ...item,
+        productId: this.mapBackendProduct(item.productId),
+      }));
+    }
+    return response;
+  }
+
+  async addToCart(productId: string, quantity: number = 1, selectedFeatures: any = {}) {
+    return this.request<{ success: boolean; data: any }>('/cart', {
+      method: 'POST',
+      body: JSON.stringify({ productId, quantity, selectedFeatures }),
+    });
+  }
+
+  async updateCartQuantity(itemId: string, quantity: number) {
+    return this.request<{ success: boolean; data: any }>(`/cart/${itemId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ quantity }),
+    });
+  }
+
+  async removeFromCart(itemId: string) {
+    return this.request<{ success: boolean; data: null }>(`/cart/${itemId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // Wishlist
+  async getWishlist() {
+    const response = await this.request<{ success: boolean; data: any[] }>('/users/wishlist');
+    if (response.success && response.data) {
+      response.data = response.data.map((item: any) => ({
+        ...item,
+        productId: this.mapBackendProduct(item.productId),
+      }));
+    }
+    return response;
+  }
+
+  async addToWishlist(productId: string) {
+    return this.request<{ success: boolean; data: any }>('/users/wishlist', {
+      method: 'POST',
+      body: JSON.stringify({ productId }),
+    });
+  }
+
+  async removeFromWishlist(itemId: string) {
+    return this.request<{ success: boolean; data: null }>(`/users/wishlist/${itemId}`, {
+      method: 'DELETE',
+    });
   }
 }
 

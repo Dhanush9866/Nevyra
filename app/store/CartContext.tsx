@@ -1,83 +1,171 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import createContextHook from '@nkzw/create-context-hook';
 import { CartItem, Product } from '@/types';
+import { apiService } from '@/services/api';
+import { useAuth } from './AuthContext';
 
 export const [CartProvider, useCart] = createContextHook(() => {
+  const { isAuthenticated } = useAuth();
   const [items, setItems] = useState<CartItem[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const saveCart = useCallback(async () => {
-    try {
-      await AsyncStorage.setItem('cart', JSON.stringify(items));
-    } catch (error) {
-      console.error('Failed to save cart:', error);
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchCart();
+    } else {
+      loadLocalCart();
     }
-  }, [items]);
+  }, [isAuthenticated]);
 
-  useEffect(() => {
-    loadCart();
-  }, []);
+  const fetchCart = async () => {
+    setIsLoading(true);
+    try {
+      const response = await apiService.getCart();
+      if (response.success) {
+        const mappedItems: CartItem[] = response.data.map((item: any) => ({
+          id: item._id || item.id,
+          product: item.productId,
+          quantity: item.quantity,
+        }));
+        setItems(mappedItems);
+        await AsyncStorage.setItem('cart', JSON.stringify(mappedItems));
+      }
+    } catch (error) {
+      console.error('Failed to fetch cart:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  useEffect(() => {
-    saveCart();
-  }, [saveCart]);
-
-  const loadCart = async () => {
+  const loadLocalCart = async () => {
     try {
       const cartData = await AsyncStorage.getItem('cart');
       if (cartData) {
         setItems(JSON.parse(cartData));
+      } else {
+        setItems([]);
       }
     } catch (error) {
-      console.error('Failed to load cart:', error);
+      console.error('Failed to load local cart:', error);
     }
   };
 
-  const addToCart = (product: Product, quantity: number = 1) => {
+  const syncLocalCartToBackend = async () => {
+    if (!isAuthenticated || items.length === 0) return;
+    try {
+      // Simplistic sync: add each local item to backend
+      for (const item of items) {
+        await apiService.addToCart(item.product.id, item.quantity);
+      }
+      fetchCart(); // Refresh with backend data
+    } catch (error) {
+      console.error('Failed to sync cart:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      syncLocalCartToBackend();
+    }
+  }, [isAuthenticated]);
+
+  const addToCart = async (product: Product, quantity: number = 1) => {
+    if (isAuthenticated) {
+      try {
+        const response = await apiService.addToCart(product.id, quantity);
+        if (response.success) {
+          fetchCart();
+          return { success: true };
+        }
+      } catch (error: any) {
+        console.error('Add to cart failed:', error);
+        return { success: false, message: error.message };
+      }
+    }
+
+    // Fallback/Local logic
     setItems((prev) => {
       const existingItem = prev.find((item) => item.product.id === product.id);
+      let newItems;
       if (existingItem) {
-        return prev.map((item) =>
+        newItems = prev.map((item) =>
           item.product.id === product.id
             ? { ...item, quantity: item.quantity + quantity }
             : item
         );
+      } else {
+        newItems = [...prev, { id: Date.now().toString(), product, quantity }];
       }
-      return [...prev, { id: Date.now().toString(), product, quantity }];
+      AsyncStorage.setItem('cart', JSON.stringify(newItems));
+      return newItems;
+    });
+    return { success: true };
+  };
+
+  const updateQuantity = async (id: string, quantity: number) => {
+    if (quantity <= 0) {
+      return removeFromCart(id);
+    }
+
+    if (isAuthenticated) {
+      try {
+        const response = await apiService.updateCartQuantity(id, quantity);
+        if (response.success) {
+          fetchCart();
+        }
+      } catch (error) {
+        console.error('Update quantity failed:', error);
+      }
+    }
+
+    setItems((prev) => {
+      const newItems = prev.map((item) => (item.id === id ? { ...item, quantity } : item));
+      AsyncStorage.setItem('cart', JSON.stringify(newItems));
+      return newItems;
     });
   };
 
-  const updateQuantity = (id: string, quantity: number) => {
-    if (quantity <= 0) {
-      removeFromCart(id);
-      return;
+  const removeFromCart = async (id: string) => {
+    if (isAuthenticated) {
+      try {
+        const response = await apiService.removeFromCart(id);
+        if (response.success) {
+          fetchCart();
+        }
+      } catch (error) {
+        console.error('Remove from cart failed:', error);
+      }
     }
-    setItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, quantity } : item))
-    );
+
+    setItems((prev) => {
+      const newItems = prev.filter((item) => item.id !== id);
+      AsyncStorage.setItem('cart', JSON.stringify(newItems));
+      return newItems;
+    });
   };
 
-  const removeFromCart = (id: string) => {
-    setItems((prev) => prev.filter((item) => item.id !== id));
-  };
-
-  const clearCart = () => {
+  const clearCart = async () => {
     setItems([]);
+    await AsyncStorage.removeItem('cart');
+    // Note: Backend might need a clear cart endpoint or multiple removals
   };
 
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+  const totalItems = items.reduce((sum: number, item: CartItem) => sum + item.quantity, 0);
   const totalAmount = items.reduce(
-    (sum, item) => sum + item.product.price * item.quantity,
+    (sum: number, item: CartItem) => sum + item.product.price * item.quantity,
     0
   );
 
   return {
     items,
+    isLoading,
     addToCart,
     updateQuantity,
     removeFromCart,
     clearCart,
     totalItems,
     totalAmount,
+    refreshCart: fetchCart,
   };
 });

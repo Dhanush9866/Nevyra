@@ -1,25 +1,77 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, TextInput } from 'react-native';
-import { useRouter, Stack } from 'expo-router';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, ScrollView, TextInput, Alert } from 'react-native';
+import { useRouter, Stack, useLocalSearchParams } from 'expo-router';
 import { User, Phone, MapPin } from 'lucide-react-native';
 import Button from '@/components/atoms/Button';
 import Colors from '@/constants/colors';
 import Spacing from '@/constants/spacing';
 import Typography from '@/constants/typography';
+import { useAuth } from '@/store/AuthContext';
+import { Address } from '@/types';
 
 export default function AddressFormScreen() {
   const router = useRouter();
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [addressLine1, setAddressLine1] = useState('');
-  const [addressLine2, setAddressLine2] = useState('');
-  const [city, setCity] = useState('');
-  const [state, setState] = useState('');
-  const [pincode, setPincode] = useState('');
+  const params = useLocalSearchParams();
+  const { addAddress, updateAddress } = useAuth();
+
+  const editMode = params.editMode === 'true';
+  const addressIndex = params.index ? parseInt(params.index as string, 10) : -1;
+  const initialData = params.addressData ? JSON.parse(params.addressData as string) as Address : null;
+
+  const [loading, setLoading] = useState(false);
+  const [firstName, setFirstName] = useState(initialData?.firstName || '');
+  const [lastName, setLastName] = useState(initialData?.lastName || '');
+  const [phone, setPhone] = useState(initialData?.phone || '');
+  const [addressLine1, setAddressLine1] = useState(initialData?.addressLine1 || '');
+  const [addressLine2, setAddressLine2] = useState(initialData?.addressLine2 || '');
+  const [city, setCity] = useState(initialData?.city || '');
+  const [state, setState] = useState(initialData?.state || '');
+  const [zipCode, setZipCode] = useState(initialData?.zipCode || '');
+
+  const handleSave = async () => {
+    if (!firstName || !lastName || !phone || !addressLine1 || !city || !state || !zipCode) {
+      Alert.alert('Error', 'Please fill in all required fields');
+      return;
+    }
+
+    setLoading(true);
+    const addressData: Partial<Address> = {
+      firstName,
+      lastName,
+      phone,
+      addressLine1,
+      addressLine2,
+      city,
+      state,
+      zipCode,
+    };
+
+    try {
+      let result;
+      if (editMode && addressIndex !== -1) {
+        result = await updateAddress(addressIndex, addressData);
+      } else {
+        result = await addAddress(addressData);
+      }
+
+      if (result.success) {
+        Alert.alert('Success', `Address ${editMode ? 'updated' : 'added'} successfully`, [
+          { text: 'OK', onPress: () => router.back() }
+        ]);
+      } else {
+        Alert.alert('Error', result.message);
+      }
+    } catch (error) {
+      console.error('Save address error:', error);
+      Alert.alert('Error', 'Something went wrong');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
-      <Stack.Screen options={{ title: 'Add Address' }} />
+      <Stack.Screen options={{ title: editMode ? 'Edit Address' : 'Add Address' }} />
       <View style={styles.container}>
         <ScrollView
           style={styles.scrollView}
@@ -27,9 +79,14 @@ export default function AddressFormScreen() {
         >
           <InputField
             icon={User}
-            placeholder="Full Name"
-            value={name}
-            onChangeText={setName}
+            placeholder="First Name"
+            value={firstName}
+            onChangeText={setFirstName}
+          />
+          <InputField
+            placeholder="Last Name"
+            value={lastName}
+            onChangeText={setLastName}
           />
           <InputField
             icon={Phone}
@@ -57,16 +114,17 @@ export default function AddressFormScreen() {
           />
           <InputField
             placeholder="Pincode"
-            value={pincode}
-            onChangeText={setPincode}
+            value={zipCode}
+            onChangeText={setZipCode}
             keyboardType="number-pad"
           />
         </ScrollView>
 
         <View style={styles.footer}>
           <Button
-            title="Save Address"
-            onPress={() => router.back()}
+            title={editMode ? 'Update Address' : 'Save Address'}
+            onPress={handleSave}
+            loading={loading}
             fullWidth
           />
         </View>

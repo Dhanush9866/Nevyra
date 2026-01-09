@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { User, Mail, Lock, Phone } from 'lucide-react-native';
@@ -27,12 +28,22 @@ export default function SignupScreen() {
   const [loading, setLoading] = useState(false);
 
   const handleSignup = async () => {
+    if (!name || !email || !phone || !password) {
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
+
     setLoading(true);
     try {
-      await signup(name, email, phone, password);
-      router.replace('/(tabs)/(home)' as any);
+      const result = await signup(name, email, phone, password);
+      if (result.success) {
+        router.replace('/(tabs)/(home)' as any);
+      } else {
+        Alert.alert('Signup Failed', result.message);
+      }
     } catch (error) {
       console.error('Signup error:', error);
+      Alert.alert('Error', 'An unexpected error occurred. Please check your connection.');
     } finally {
       setLoading(false);
     }

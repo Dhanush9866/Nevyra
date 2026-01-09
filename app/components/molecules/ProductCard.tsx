@@ -22,6 +22,8 @@ interface ProductCardProps {
 export default function ProductCard({
   product,
   onPress,
+  onWishlistPress,
+  isWishlisted,
   showAddToCart,
   onAddToCart,
 }: ProductCardProps) {
@@ -33,6 +35,18 @@ export default function ProductCard({
           style={styles.image}
           contentFit="cover"
         />
+
+        <TouchableOpacity
+          style={styles.wishlistButton}
+          onPress={onWishlistPress}
+          activeOpacity={0.7}
+        >
+          <Heart
+            size={18}
+            color={isWishlisted ? Colors.error : Colors.white}
+            fill={isWishlisted ? Colors.error : 'transparent'}
+          />
+        </TouchableOpacity>
 
         {!product.inStock && (
           <View style={styles.outOfStock}>
