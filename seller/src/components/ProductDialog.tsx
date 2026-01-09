@@ -197,26 +197,12 @@ export const ProductDialog: React.FC<ProductDialogProps> = ({
     
     setUploadingImages(true);
     try {
-      const token = localStorage.getItem('token') || '';
-      // Use the upload API endpoint
-      const formDataUpload = new FormData();
-      formData.images.forEach((file) => {
-        formDataUpload.append('images', file);
-      });
-
-      const response = await fetch('http://localhost:8000/api/upload/images', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        body: formDataUpload
-      });
-
-      const data = await response.json();
-      if (data.success) {
-        return data.data.urls;
+      const response = await sellerAPI.auth.uploadImages(formData.images);
+      
+      if (response.data.success) {
+        return response.data.data.urls;
       } else {
-        throw new Error(data.message || 'Upload failed');
+        throw new Error(response.data.message || 'Upload failed');
       }
     } catch (error) {
       toast.error('Failed to upload images');

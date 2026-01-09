@@ -18,8 +18,6 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
-const API_URL = "http://localhost:8000/api/admins/login";
-
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const [error, setError] = React.useState<string | null>(null);
