@@ -27,9 +27,9 @@ const Earnings: React.FC = () => {
   const totalNet = mockEarnings.reduce((sum, e) => sum + e.netAmount, 0);
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
     }).format(value);
   };
 
@@ -106,7 +106,7 @@ const Earnings: React.FC = () => {
                 fontSize={12}
               />
               <YAxis 
-                tickFormatter={(value) => `$${value}`}
+                tickFormatter={(value) => `₹${value}`}
                 stroke="hsl(var(--muted-foreground))"
                 fontSize={12}
               />

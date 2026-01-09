@@ -30,9 +30,9 @@ const Analytics: React.FC = () => {
   const [timeRange, setTimeRange] = useState('7d');
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
     }).format(value);
   };
 
@@ -126,7 +126,7 @@ const Analytics: React.FC = () => {
               />
               <YAxis 
                 yAxisId="left"
-                tickFormatter={(value) => `$${value}`}
+                tickFormatter={(value) => `₹${value}`}
                 stroke="hsl(var(--muted-foreground))"
                 fontSize={12}
               />
@@ -229,7 +229,7 @@ const Analytics: React.FC = () => {
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis 
                   type="number"
-                  tickFormatter={(value) => `$${value / 1000}k`}
+                  tickFormatter={(value) => `₹${value / 1000}k`}
                   stroke="hsl(var(--muted-foreground))"
                   fontSize={12}
                 />

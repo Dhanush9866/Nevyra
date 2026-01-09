@@ -616,7 +616,7 @@ export const mockOffers: Offer[] = [
   {
     id: 'offer-002',
     name: 'Earbuds Special',
-    description: '$15 off on Wireless Earbuds',
+    description: '₹15 off on Wireless Earbuds',
     discountType: 'flat',
     discountValue: 15,
     productIds: ['prod-001'],
@@ -630,7 +630,7 @@ export const mockOffers: Offer[] = [
   {
     id: 'offer-003',
     name: 'Bundle Deal',
-    description: '15% off on orders above $200',
+    description: '15% off on orders above ₹200',
     discountType: 'percentage',
     discountValue: 15,
     minOrderAmount: 200,
