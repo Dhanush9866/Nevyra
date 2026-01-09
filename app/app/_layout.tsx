@@ -39,6 +39,7 @@ function RootLayoutNav() {
         name="product/reviews"
         options={{ title: 'Reviews & Ratings' }}
       />
+      <Stack.Screen name="reviews/index" options={{ headerShown: false }} />
       <Stack.Screen name="search" options={{ headerShown: false }} />
       <Stack.Screen
         name="filter"
