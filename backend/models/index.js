@@ -12,4 +12,5 @@ module.exports = {
   Seller: require(path.join(__dirname, "Seller.js")),
   Payout: require(path.join(__dirname, "Payout.js")),
   Review: require(path.join(__dirname, "Review.js")),
+  SearchLog: require(path.join(__dirname, "SearchLog.js")),
 };

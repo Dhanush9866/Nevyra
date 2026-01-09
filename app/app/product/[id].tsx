@@ -13,18 +13,59 @@ import RatingStars from '@/components/molecules/RatingStars';
 import ProductCard from '@/components/molecules/ProductCard';
 import Colors from '@/constants/colors';
 import Spacing from '@/constants/spacing';
-import { mockProducts } from '@/services/mockData';
+import { useQuery } from '@tanstack/react-query';
+import { apiService } from '@/services/api';
+import Loader from '@/components/atoms/Loader';
 import { useCart } from '@/store/CartContext';
 import { useWishlist } from '@/store/WishlistContext';
+import { mockProducts } from '@/services/mockData';
 
 export default function ProductDetailScreen() {
-  const { id } = useLocalSearchParams();
+  const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { addToCart } = useCart();
   const { toggleWishlist, isWishlisted } = useWishlist();
 
-  const product = mockProducts.find((p) => p.id === id) || mockProducts[0];
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['product', id],
+    queryFn: () => apiService.getProductDetails(id as string),
+    enabled: !!id,
+  });
+
+  const { data: similarData } = useQuery({
+    queryKey: ['similar-products', id],
+    queryFn: () => apiService.getSimilarProducts(id as string),
+    enabled: !!id,
+  });
+
+  const { data: reviewsData } = useQuery({
+    queryKey: ['reviews', id],
+    queryFn: () => apiService.getReviews(id as string),
+    enabled: !!id,
+  });
+
+  const product = data?.data;
+  const similarProducts = similarData?.data || [];
+  const reviews = reviewsData?.data || [];
+  const latestReview = reviews.length > 0 ? reviews[0] : null;
+
+  if (isLoading) {
+    return (
+      <View style={styles.center}>
+        <Loader />
+      </View>
+    );
+  }
+
+  if (error || !product) {
+    return (
+      <View style={styles.center}>
+        <AppText color={Colors.error}>Product not found or failed to load</AppText>
+        <Button title="Go Back" onPress={() => router.back()} style={{ marginTop: Spacing.md }} />
+      </View>
+    );
+  }
 
   return (
     <>
@@ -155,7 +196,7 @@ export default function ProductDetailScreen() {
                 <AppText variant="h4" weight="bold">
                   Features
                 </AppText>
-                {product.features.map((feature, index) => (
+                {product.features.map((feature: string, index: number) => (
                   <View key={index} style={styles.featureItem}>
                     <Star
                       size={16}
@@ -171,53 +212,49 @@ export default function ProductDetailScreen() {
             )}
 
             {/* SPECIFICATIONS SECTION */}
-            <View style={styles.section}>
-              <AppText variant="h4" weight="bold">
-                Specifications
-              </AppText>
-              <View style={styles.specificationsGrid}>
-                <View style={styles.specItem}>
-                  <AppText variant="caption" color={Colors.textSecondary}>Brand</AppText>
-                  <AppText variant="body" weight="medium">{product.brand}</AppText>
-                </View>
-                <View style={styles.specItem}>
-                  <AppText variant="caption" color={Colors.textSecondary}>Model</AppText>
-                  <AppText variant="body" weight="medium">Premium-X1</AppText>
-                </View>
-                <View style={styles.specItem}>
-                  <AppText variant="caption" color={Colors.textSecondary}>Warranty</AppText>
-                  <AppText variant="body" weight="medium">1 Year</AppText>
-                </View>
-                <View style={styles.specItem}>
-                  <AppText variant="caption" color={Colors.textSecondary}>Material</AppText>
-                  <AppText variant="body" weight="medium">Premium Poly</AppText>
+            {product.specifications && Object.keys(product.specifications).length > 0 && (
+              <View style={styles.section}>
+                <AppText variant="h4" weight="bold">
+                  Specifications
+                </AppText>
+                <View style={styles.specificationsGrid}>
+                  {Object.entries(product.specifications).map(([key, value]: [string, any]) => (
+                    <View key={key} style={styles.specItem}>
+                      <AppText variant="caption" color={Colors.textSecondary}>{key}</AppText>
+                      <AppText variant="body" weight="medium">{String(value)}</AppText>
+                    </View>
+                  ))}
+                  {/* Fallback if list is short */}
+                  <View style={styles.specItem}>
+                    <AppText variant="caption" color={Colors.textSecondary}>Warranty</AppText>
+                    <AppText variant="body" weight="medium">1 Year Brand Warranty</AppText>
+                  </View>
                 </View>
               </View>
-            </View>
+            )}
 
             {/* SIMILAR PRODUCTS SECTION */}
-            <View style={styles.section}>
-              <View style={styles.sectionHeader}>
-                <AppText variant="h4" weight="bold">Similar Products</AppText>
-                <TouchableOpacity onPress={() => router.push('/(tabs)/categories')}>
-                  <AppText variant="caption" color={Colors.primary} weight="bold">View All</AppText>
-                </TouchableOpacity>
+            {similarProducts.length > 0 && (
+              <View style={styles.section}>
+                <View style={styles.sectionHeader}>
+                  <AppText variant="h4" weight="bold">Similar Products</AppText>
+                </View>
+                <ScrollView 
+                  horizontal 
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.similarProductsContainer}
+                >
+                  {similarProducts.map((item: any) => (
+                    <View key={item.id} style={styles.similarProductItem}>
+                      <ProductCard 
+                        product={item} 
+                        onPress={() => router.push(`/product/${item.id}` as any)} 
+                      />
+                    </View>
+                  ))}
+                </ScrollView>
               </View>
-              <ScrollView 
-                horizontal 
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.similarProductsContainer}
-              >
-                {mockProducts.filter(p => p.id !== product.id).slice(0, 5).map((item) => (
-                  <View key={item.id} style={styles.similarProductItem}>
-                    <ProductCard 
-                      product={item} 
-                      onPress={() => router.push(`/product/${item.id}` as any)} 
-                    />
-                  </View>
-                ))}
-              </ScrollView>
-            </View>
+            )}
 
             {/* RATINGS & REVIEWS SECTION */}
             <View style={[styles.section, styles.reviewsSection]}>
@@ -245,9 +282,15 @@ export default function ProductDetailScreen() {
                     </AppText>
                  </View>
                  <View style={styles.reviewSnippet}>
-                    <AppText variant="body" color={Colors.textSecondary} style={{ fontStyle: 'italic' }}>
-                      "Great product, highly recommend! The quality is amazing for the price."
-                    </AppText>
+                    {latestReview ? (
+                      <AppText variant="body" color={Colors.textSecondary} style={{ fontStyle: 'italic' }}>
+                        "{latestReview.comment}"
+                      </AppText>
+                    ) : (
+                      <AppText variant="body" color={Colors.textLight} style={{ fontStyle: 'italic' }}>
+                        No reviews yet. Be the first to review this product!
+                      </AppText>
+                    )}
                  </View>
               </View>
             </View>
@@ -287,6 +330,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
+  },
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: Spacing.xl,
   },
   imageContainer: {
     width: '100%',
