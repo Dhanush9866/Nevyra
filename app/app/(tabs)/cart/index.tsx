@@ -8,11 +8,15 @@ import {
   Zap,
   Info,
   X,
-  Star
+  Star,
+  Plus,
+  Minus
 } from 'lucide-react-native';
 import AppText from '@/components/atoms/AppText';
 import Colors from '@/constants/colors';
 import Spacing from '@/constants/spacing';
+import { useCart } from '@/store/CartContext';
+import { useAuth } from '@/store/AuthContext';
 
 const { width } = Dimensions.get('window');
 
@@ -78,10 +82,28 @@ const MOCK_ITEMS = [
 
 export default function CartScreen() {
   const router = useRouter();
+  const { items, totalAmount, removeFromCart, updateQuantity, isLoading } = useCart();
+  const { addresses } = useAuth();
 
-  const totalMRP = MOCK_ITEMS.reduce((sum, item) => sum + item.mrp, 0);
-  const totalDisplayPrice = MOCK_ITEMS.reduce((sum, item) => sum + item.price, 0);
+  const defaultAddress = addresses.find(a => a.isDefault) || addresses[0];
+
+  const totalMRP = items.reduce((sum, item) => sum + (item.product.originalPrice || item.product.price * 1.2) * item.quantity, 0);
+  const totalDisplayPrice = totalAmount;
   const totalSavings = totalMRP - totalDisplayPrice;
+
+  if (items.length === 0 && !isLoading) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <AppText variant="h4" color={Colors.textSecondary}>Your cart is empty</AppText>
+        <TouchableOpacity
+          style={[styles.placeOrderButton, { marginTop: 20 }]}
+          onPress={() => router.push('/(tabs)/(home)')}
+        >
+          <AppText variant="body" weight="semibold" style={styles.placeOrderText}>Shop Now</AppText>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -95,54 +117,83 @@ export default function CartScreen() {
           <View style={styles.deliveryLeft}>
             <View style={styles.deliveryRow}>
               <AppText variant="body" weight="medium">Deliver to: </AppText>
-              <AppText variant="body" weight="bold">Bablu, 533235</AppText>
-              <View style={styles.homeBadge}>
-                <AppText style={styles.homeBadgeText}>HOME</AppText>
-              </View>
+              <AppText variant="body" weight="bold">
+                {defaultAddress ? `${defaultAddress.firstName} ${defaultAddress.lastName}` : 'Guest User'}
+              </AppText>
+              {defaultAddress?.isDefault && (
+                <View style={styles.homeBadge}>
+                  <AppText style={styles.homeBadgeText}>DEFAULT</AppText>
+                </View>
+              )}
             </View>
             <AppText variant="caption" color={Colors.textSecondary} numberOfLines={1}>
-              1-213/1, Atreyapuram Subdistrict,...
+              {defaultAddress
+                ? `${defaultAddress.addressLine1}, ${defaultAddress.city}, ${defaultAddress.state}`
+                : 'Please add a delivery address'}
             </AppText>
           </View>
-          <TouchableOpacity style={styles.changeButton}>
+          <TouchableOpacity
+            style={styles.changeButton}
+            onPress={() => router.push('/checkout/address-list' as any)}
+          >
             <AppText variant="caption" weight="semibold" style={{ color: BRAND_BLUE }}>Change</AppText>
           </TouchableOpacity>
         </View>
 
         {/* Cart Items */}
-        {MOCK_ITEMS.map((item) => (
+        {items.map((item) => (
           <View key={item.id} style={styles.cartItemCard}>
             <View style={styles.itemMainInfo}>
               <View style={styles.itemImageContainer}>
                 <Image
-                  source={{ uri: item.image }}
+                  source={{ uri: item.product.images[0] }}
                   style={styles.itemImage}
                   resizeMode="contain"
                 />
-                <TouchableOpacity style={styles.qtyDropdown}>
-                  <AppText variant="caption" weight="medium">Qty: 1</AppText>
-                  <ChevronDown size={14} color={Colors.black} />
-                </TouchableOpacity>
-                <AppText style={styles.stockStatus} weight="medium">{item.stockStatus}</AppText>
+                <View style={styles.qtyContainer}>
+                  <TouchableOpacity
+                    onPress={() => updateQuantity(item.id, item.quantity - 1)}
+                    style={styles.qtyButton}
+                  >
+                    <Minus size={14} color={Colors.textSecondary} />
+                  </TouchableOpacity>
+                  <AppText variant="caption" weight="bold" style={styles.qtyText}>
+                    {item.quantity}
+                  </AppText>
+                  <TouchableOpacity
+                    onPress={() => updateQuantity(item.id, item.quantity + 1)}
+                    style={styles.qtyButton}
+                  >
+                    <Plus size={14} color={Colors.textSecondary} />
+                  </TouchableOpacity>
+                </View>
+                {!item.product.inStock && (
+                  <AppText style={styles.stockStatus} weight="medium">Out of Stock</AppText>
+                )}
               </View>
 
               <View style={styles.itemDetails}>
                 <AppText variant="body" weight="medium" numberOfLines={1} style={styles.itemTitle}>
-                  {item.title}
+                  {item.product.name}
                 </AppText>
                 <AppText variant="caption" color={Colors.textSecondary} style={styles.itemSpecs}>
-                  {item.specs}
+                  {item.product.brand} • {item.product.category}
                 </AppText>
 
                 <View style={styles.ratingRow}>
                   <View style={styles.starsContainer}>
-                    {[1, 2, 3, 4].map((i) => (
-                      <Star key={i} size={12} color={Colors.success} fill={Colors.success} style={{ marginRight: 1 }} />
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <Star
+                        key={i}
+                        size={12}
+                        color={i <= item.product.rating ? Colors.rating : Colors.textLight}
+                        fill={i <= item.product.rating ? Colors.rating : 'transparent'}
+                        style={{ marginRight: 1 }}
+                      />
                     ))}
-                    <Star size={12} color={Colors.textLight} fill={Colors.textLight} />
                   </View>
                   <AppText variant="caption" color={Colors.textSecondary} style={styles.ratingText}>
-                    {item.rating} • ({item.reviews})
+                    {item.product.rating} • ({item.product.reviewCount})
                   </AppText>
                 </View>
 
@@ -150,13 +201,13 @@ export default function CartScreen() {
                   <View style={styles.priceRow}>
                     <Zap size={14} color={Colors.success} />
                     <AppText variant="body" weight="semibold" color={Colors.success} style={styles.discountText}>
-                      {item.discount}%
+                      {item.product.discount || 0}% OFF
                     </AppText>
                     <AppText variant="body" color={Colors.textSecondary} style={styles.mrpText}>
-                      ₹{item.mrp.toLocaleString('en-IN')}
+                      ₹{(item.product.originalPrice || item.product.price * 1.2).toLocaleString('en-IN')}
                     </AppText>
                     <AppText variant="h4" weight="semibold" style={styles.currentPrice}>
-                      ₹{item.price.toLocaleString('en-IN')}
+                      ₹{item.product.price.toLocaleString('en-IN')}
                     </AppText>
                   </View>
                 </View>
@@ -167,24 +218,24 @@ export default function CartScreen() {
                     style={styles.wowIcon}
                   />
                   <AppText variant="caption" weight="semibold" style={{ color: BRAND_BLUE }}>
-                    Buy at ₹{item.wowPrice.toLocaleString('en-IN')}
+                    Buy at ₹{Math.round(item.product.price * 0.95).toLocaleString('en-IN')}
                   </AppText>
                 </View>
 
                 <View style={styles.feeRow}>
-                  <AppText variant="caption" color={Colors.textSecondary}>+ ₹{item.protectFee} Protect Promise Fee</AppText>
+                  <AppText variant="caption" color={Colors.textSecondary}>+ ₹150 Protect Promise Fee</AppText>
                   <Info size={12} color={Colors.textSecondary} style={{ marginLeft: 4 }} />
                 </View>
 
                 <View style={styles.emiRow}>
-                  <AppText variant="caption" weight="medium">Or Pay ₹{item.emi.amount.toLocaleString('en-IN')} + </AppText>
+                  <AppText variant="caption" weight="medium">Or Pay ₹{Math.round(item.product.price / 6).toLocaleString('en-IN')} + </AppText>
                   <View style={styles.coinIcon} />
-                  <AppText variant="caption" weight="medium"> {item.emi.coins}</AppText>
+                  <AppText variant="caption" weight="medium"> 5000</AppText>
                 </View>
 
                 <TouchableOpacity>
                   <AppText variant="caption" weight="semibold" color={Colors.success} style={styles.offersLink}>
-                    {item.offersCount} Offers Available
+                    12 Offers Available
                   </AppText>
                 </TouchableOpacity>
               </View>
@@ -192,12 +243,15 @@ export default function CartScreen() {
 
             <View style={styles.deliveryDateRow}>
               <AppText variant="caption" color={Colors.textSecondary}>
-                Delivery by {item.deliveryDate}
+                Delivery by 3-4 days
               </AppText>
             </View>
 
             <View style={styles.itemActions}>
-              <TouchableOpacity style={[styles.actionButton, styles.removeBtn]}>
+              <TouchableOpacity
+                style={[styles.actionButton, styles.removeBtn]}
+                onPress={() => removeFromCart(item.id)}
+              >
                 <Trash2 size={16} color={ERROR_RED} />
                 <AppText variant="caption" weight="semibold" style={[styles.actionText, { color: ERROR_RED }]}>Remove</AppText>
               </TouchableOpacity>
@@ -205,7 +259,10 @@ export default function CartScreen() {
                 <FileText size={16} color={BRAND_BLUE} />
                 <AppText variant="caption" weight="semibold" style={[styles.actionText, { color: BRAND_BLUE }]}>Save for later</AppText>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.actionButton, styles.buyBtn]}>
+              <TouchableOpacity
+                style={[styles.actionButton, styles.buyBtn]}
+                onPress={() => router.push('/checkout/address-list' as any)}
+              >
                 <Zap size={16} color={Colors.white} />
                 <AppText variant="caption" weight="semibold" style={[styles.actionText, { color: Colors.white }]}>Buy this now</AppText>
               </TouchableOpacity>
@@ -348,15 +405,21 @@ const styles = StyleSheet.create({
     height: 80,
     marginBottom: 10,
   },
-  qtyDropdown: {
+  qtyContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#E0E0E0',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
     borderRadius: 4,
     backgroundColor: '#F9F9F9',
+  },
+  qtyButton: {
+    padding: 6,
+  },
+  qtyText: {
+    paddingHorizontal: 8,
+    minWidth: 24,
+    textAlign: 'center',
   },
   stockStatus: {
     color: ERROR_RED,

@@ -11,11 +11,11 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
 import { useRouter, Stack } from 'expo-router';
-import { 
-  Search, 
-  ShoppingCart, 
-  Bell, 
-  MapPin, 
+import {
+  Search,
+  ShoppingCart,
+  Bell,
+  MapPin,
   ChevronDown,
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -29,6 +29,7 @@ import { useQuery } from '@tanstack/react-query';
 import { apiService } from '@/services/api';
 import { mockBanners } from '@/services/mockData';
 import { useWishlist } from '@/store/WishlistContext';
+import { useAuth } from '@/store/AuthContext';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -36,6 +37,12 @@ export default function HomeScreen() {
   const { toggleWishlist, isWishlisted } = useWishlist();
   const [refreshing, setRefreshing] = React.useState(false);
   const scrollY = useRef(new Animated.Value(0)).current;
+  const { addresses } = useAuth();
+
+  const defaultAddress = addresses.find(a => a.isDefault) || addresses[0];
+  const addressDisplay = defaultAddress
+    ? `${defaultAddress.city}, ${defaultAddress.state} - ${defaultAddress.zipCode}`
+    : 'Select a delivery address';
 
   const { data: catData, isLoading: catLoading } = useQuery({
     queryKey: ['categories'],
@@ -61,7 +68,7 @@ export default function HomeScreen() {
     outputRange: [40, 0],
     extrapolate: 'clamp',
   });
-  
+
   const addressOpacity = scrollY.interpolate({
     inputRange: [0, 30],
     outputRange: [1, 0],
@@ -88,8 +95,8 @@ export default function HomeScreen() {
 
       {/* FULL PERSISTENT BRANDED HEADER */}
       <Animated.View style={[
-        styles.fixedHeader, 
-        { 
+        styles.fixedHeader,
+        {
           paddingTop: insets.top,
         }
       ]}>
@@ -99,16 +106,16 @@ export default function HomeScreen() {
           end={{ x: 1, y: 0 }}
           style={StyleSheet.absoluteFill}
         />
-        
+
         {/* Animated Address Bar */}
-        <Animated.View style={{ 
-          height: addressHeight, 
+        <Animated.View style={{
+          height: addressHeight,
           opacity: addressOpacity,
           transform: [{ translateY: addressTranslateY }],
           overflow: 'hidden'
         }}>
-          <TouchableOpacity 
-            style={styles.addressBar} 
+          <TouchableOpacity
+            style={styles.addressBar}
             activeOpacity={0.7}
             onPress={() => router.push('/checkout/address-list' as any)}
           >
@@ -117,7 +124,7 @@ export default function HomeScreen() {
               Deliver to:
             </AppText>
             <AppText variant="caption" color={Colors.white} weight="bold" numberOfLines={1} style={{ flex: 1, marginLeft: 4 }}>
-              Madhurawada, Visakhapatnam - 530048
+              {addressDisplay}
             </AppText>
             <ChevronDown size={14} color={Colors.white} />
           </TouchableOpacity>
@@ -145,9 +152,9 @@ export default function HomeScreen() {
             contentContainerStyle={styles.categoriesScroll}
           >
             {catLoading ? (
-               <View style={{ paddingHorizontal: 20 }}>
-                 <AppText color={Colors.white}>Loading...</AppText>
-               </View>
+              <View style={{ paddingHorizontal: 20 }}>
+                <AppText color={Colors.white}>Loading...</AppText>
+              </View>
             ) : categories.map((category: any) => (
               <CategoryItem
                 key={category._id || category.id}

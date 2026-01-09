@@ -8,15 +8,17 @@ export interface User {
 }
 
 export interface Address {
-  id: string;
-  name: string;
+  id?: string;
+  firstName: string;
+  lastName: string;
+  email?: string;
   phone: string;
   addressLine1: string;
   addressLine2?: string;
   city: string;
   state: string;
-  pincode: string;
-  isDefault: boolean;
+  zipCode: string;
+  isDefault?: boolean;
 }
 
 export interface Product {

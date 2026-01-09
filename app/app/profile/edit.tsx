@@ -8,6 +8,7 @@ import {
     Image,
     KeyboardAvoidingView,
     Platform,
+    Alert,
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { Edit2 } from 'lucide-react-native';
@@ -19,11 +20,12 @@ import { useAuth } from '@/store/AuthContext';
 
 export default function EditProfileScreen() {
     const router = useRouter();
-    const { user } = useAuth();
+    const { user, updateProfile } = useAuth();
+    const [loading, setLoading] = useState(false);
 
     const [firstName, setFirstName] = useState(user?.name?.split(' ')[0] || '');
-    const [lastName, setLastName] = useState(user?.name?.split(' ')[1] || '');
-    const [mobile, setMobile] = useState('+91 98765 43210'); // Mock data
+    const [lastName, setLastName] = useState(user?.name?.split(' ').slice(1).join(' ') || '');
+    const [mobile, setMobile] = useState(user?.phone || '');
     const [email, setEmail] = useState(user?.email || '');
 
     const [isSelectingAvatar, setIsSelectingAvatar] = useState(false);
@@ -38,6 +40,36 @@ export default function EditProfileScreen() {
     const handleAvatarSelect = (avatarSource: any) => {
         setSelectedAvatar(avatarSource);
         setIsSelectingAvatar(false);
+    };
+
+    const handleSubmit = async () => {
+        if (!firstName || !lastName) {
+            Alert.alert('Error', 'First Name and Last Name are required');
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const result = await updateProfile({
+                firstName,
+                lastName,
+                phone: mobile,
+                email: email,
+            });
+
+            if (result.success) {
+                Alert.alert('Success', 'Profile updated successfully', [
+                    { text: 'OK', onPress: () => router.back() }
+                ]);
+            } else {
+                Alert.alert('Update Failed', result.message);
+            }
+        } catch (error) {
+            console.error('Update profile error:', error);
+            Alert.alert('Error', 'An unexpected error occurred.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -136,40 +168,51 @@ export default function EditProfileScreen() {
                         <View style={styles.underlineActive} />
                     </View>
 
-                    <View style={styles.submitButtonContainer}>
-                        <TouchableOpacity style={styles.submitButton}>
-                            <AppText variant="h4" weight="bold" color={Colors.primary}>SUBMIT</AppText>
-                        </TouchableOpacity>
-                    </View>
-
-                    <View style={styles.infoGroup}>
+                    <View style={styles.inputGroup}>
                         <AppText variant="caption" color={Colors.textSecondary} style={styles.label}>
                             Mobile Number
                         </AppText>
-                        <View style={styles.infoRow}>
-                            <AppText variant="body" weight="medium" style={styles.infoValue}>
-                                {mobile}
-                            </AppText>
-                            <TouchableOpacity>
-                                <AppText variant="caption" weight="bold" color={Colors.primary}>Update</AppText>
-                            </TouchableOpacity>
-                        </View>
-                        <View style={styles.underlineLight} />
+                        <TextInput
+                            style={styles.input}
+                            value={mobile}
+                            onChangeText={setMobile}
+                            placeholder="Enter Mobile Number"
+                            placeholderTextColor={Colors.textLight}
+                            keyboardType="phone-pad"
+                        />
+                        <View style={styles.underline} />
                     </View>
 
-                    <View style={styles.infoGroup}>
+                    <View style={styles.inputGroup}>
                         <AppText variant="caption" color={Colors.textSecondary} style={styles.label}>
                             Email ID
                         </AppText>
-                        <View style={styles.infoRow}>
-                            <AppText variant="body" weight="medium" style={styles.infoValue}>
-                                {email}
+                        <TextInput
+                            style={styles.input}
+                            value={email}
+                            onChangeText={setEmail}
+                            placeholder="Enter Email ID"
+                            placeholderTextColor={Colors.textLight}
+                            keyboardType="email-address"
+                            autoCapitalize="none"
+                        />
+                        <View style={styles.underline} />
+                    </View>
+
+                    <View style={styles.submitButtonContainer}>
+                        <TouchableOpacity
+                            style={styles.submitButton}
+                            onPress={handleSubmit}
+                            disabled={loading}
+                        >
+                            <AppText
+                                variant="h4"
+                                weight="bold"
+                                color={loading ? Colors.textLight : Colors.primary}
+                            >
+                                {loading ? 'SAVING...' : 'SUBMIT'}
                             </AppText>
-                            <TouchableOpacity>
-                                <AppText variant="caption" weight="bold" color={Colors.primary}>Verify</AppText>
-                            </TouchableOpacity>
-                        </View>
-                        <View style={styles.underlineLight} />
+                        </TouchableOpacity>
                     </View>
 
                 </View>

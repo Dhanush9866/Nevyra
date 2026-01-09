@@ -27,6 +27,8 @@ const corsOptions = {
     'https://nevyra-frontend.vercel.app', // Alternative deployed frontend URL
     'https://nevyra.vercel.app', // Alternative deployed frontend URL
     'http://localhost:8082', // Admin Panel
+    'http://10.123.124.42:8081',
+    'http://10.0.2.2:8081',
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
