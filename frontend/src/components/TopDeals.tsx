@@ -11,18 +11,18 @@ import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 
 const topDealsData = [
-  { id: "td1", title: "Wireless Earbuds", price: "$29.99", image: "https://images.unsplash.com/photo-1572569028738-411a56111005?auto=format&fit=crop&w=300&q=80" },
-  { id: "td2", title: "Smart Speaker", price: "$49.99", image: "https://images.unsplash.com/photo-1589492477829-5e65395b66cc?auto=format&fit=crop&w=300&q=80" },
-  { id: "td3", title: "Gaming Mouse", price: "$39.99", image: "https://images.unsplash.com/photo-1527814050087-3793815479db?auto=format&fit=crop&w=300&q=80" },
-  { id: "td4", title: "Mechanical Keyboard", price: "$89.99", image: "https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?auto=format&fit=crop&w=300&q=80" },
-  { id: "td5", title: "4K Monitor", price: "$299.99", image: "https://images.unsplash.com/photo-1586210579191-33b45e38fa2c?auto=format&fit=crop&w=300&q=80" },
-  { id: "td6", title: "External SSD", price: "$79.99", image: "https://images.unsplash.com/photo-1597872223015-a44784d4b8aa?auto=format&fit=crop&w=300&q=80" },
-  { id: "td7", title: "Graphics Tablet", price: "$59.99", image: "https://images.unsplash.com/photo-1563203369-26f2e4a5ccf7?auto=format&fit=crop&w=300&q=80" },
-  { id: "td8", title: "Webcam HD", price: "$45.00", image: "https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?auto=format&fit=crop&w=300&q=80" },
-  { id: "td9", title: "USB-C Hub", price: "$34.99", image: "https://images.unsplash.com/photo-1616410011236-7a421b19a586?auto=format&fit=crop&w=300&q=80" },
-  { id: "td10", title: "Laptop Stand", price: "$25.50", image: "https://images.unsplash.com/photo-1593642702749-b7d2a804fbcf?auto=format&fit=crop&w=300&q=80" },
-  { id: "td11", title: "Noise Cancelling Headphones", price: "$199.99", image: "https://images.unsplash.com/photo-1546435770-a3e2feadf72c?auto=format&fit=crop&w=300&q=80" },
-  { id: "td12", title: "Smart Watch Strap", price: "$15.99", image: "https://images.unsplash.com/photo-1551816230-ef5deaed4a26?auto=format&fit=crop&w=300&q=80" },
+  { id: "td1", title: "Wireless Earbuds", price: "₹29.99", image: "https://images.unsplash.com/photo-1572569028738-411a56111005?auto=format&fit=crop&w=300&q=80" },
+  { id: "td2", title: "Smart Speaker", price: "₹49.99", image: "https://images.unsplash.com/photo-1589492477829-5e65395b66cc?auto=format&fit=crop&w=300&q=80" },
+  { id: "td3", title: "Gaming Mouse", price: "₹39.99", image: "https://images.unsplash.com/photo-1527814050087-3793815479db?auto=format&fit=crop&w=300&q=80" },
+  { id: "td4", title: "Mechanical Keyboard", price: "₹89.99", image: "https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?auto=format&fit=crop&w=300&q=80" },
+  { id: "td5", title: "4K Monitor", price: "₹299.99", image: "https://images.unsplash.com/photo-1586210579191-33b45e38fa2c?auto=format&fit=crop&w=300&q=80" },
+  { id: "td6", title: "External SSD", price: "₹79.99", image: "https://images.unsplash.com/photo-1597872223015-a44784d4b8aa?auto=format&fit=crop&w=300&q=80" },
+  { id: "td7", title: "Graphics Tablet", price: "₹59.99", image: "https://images.unsplash.com/photo-1563203369-26f2e4a5ccf7?auto=format&fit=crop&w=300&q=80" },
+  { id: "td8", title: "Webcam HD", price: "₹45.00", image: "https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?auto=format&fit=crop&w=300&q=80" },
+  { id: "td9", title: "USB-C Hub", price: "₹34.99", image: "https://images.unsplash.com/photo-1616410011236-7a421b19a586?auto=format&fit=crop&w=300&q=80" },
+  { id: "td10", title: "Laptop Stand", price: "₹25.50", image: "https://images.unsplash.com/photo-1593642702749-b7d2a804fbcf?auto=format&fit=crop&w=300&q=80" },
+  { id: "td11", title: "Noise Cancelling Headphones", price: "₹199.99", image: "https://images.unsplash.com/photo-1546435770-a3e2feadf72c?auto=format&fit=crop&w=300&q=80" },
+  { id: "td12", title: "Smart Watch Strap", price: "₹15.99", image: "https://images.unsplash.com/photo-1551816230-ef5deaed4a26?auto=format&fit=crop&w=300&q=80" },
 ];
 
 const TopDeals = () => {

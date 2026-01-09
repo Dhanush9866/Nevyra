@@ -44,18 +44,18 @@ const row1GridGroups = [
 // Title: "Home Interior & Electrical Deals"
 // TODO: Fetch products from categories: "Home Interior" + "Electrical"
 const row2Products = [
-  { id: "1", title: "Modern Sofa", price: "$499", image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=300&q=80", description: "Velvet Finish" },
-  { id: "2", title: "Wooden Chair", price: "$120", image: "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?auto=format&fit=crop&w=300&q=80", description: "Teak Wood" },
-  { id: "3", title: "Coffee Table", price: "$150", image: "https://images.unsplash.com/photo-1532372320572-cda25653a26d?auto=format&fit=crop&w=300&q=80", description: "Glass Top" },
-  { id: "4", title: "Bookshelf", price: "$200", image: "https://images.unsplash.com/photo-1594620302200-9a762244a156?auto=format&fit=crop&w=300&q=80", description: "5-Tier" },
-  { id: "5", title: "King Size Bed", price: "$899", image: "https://images.unsplash.com/photo-1505693416388-b0346efee535?auto=format&fit=crop&w=300&q=80", description: "With Storage" },
-  { id: "6", title: "Lamp Shade", price: "$45", image: "https://images.unsplash.com/photo-1513506003011-3b03c80165bd?auto=format&fit=crop&w=300&q=80", description: "Ambient Light" },
-  { id: "7", title: "Office Desk", price: "$250", image: "https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&w=300&q=80", description: "Ergonomic" },
-  { id: "8", title: "Recliner", price: "$350", image: "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?auto=format&fit=crop&w=300&q=80", description: "Leather" },
-  { id: "9", title: "Dining Table", price: "$600", image: "https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=300&q=80", description: "Solid Wood" },
-  { id: "10", title: "Nightstand", price: "$80", image: "https://images.unsplash.com/photo-1532372320978-9b4d05249840?auto=format&fit=crop&w=300&q=80", description: "Modern" },
-  { id: "11", title: "Wardrobe", price: "$800", image: "https://images.unsplash.com/photo-1595428774223-ef52624120d2?auto=format&fit=crop&w=300&q=80", description: "Spacious" },
-  { id: "12", title: "Bookshelf Large", price: "$300", image: "https://images.unsplash.com/photo-1506544521782-b13c7793d256?auto=format&fit=crop&w=300&q=80", description: "Library Style" },
+  { id: "1", title: "Modern Sofa", price: "₹499", image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=300&q=80", description: "Velvet Finish" },
+  { id: "2", title: "Wooden Chair", price: "₹120", image: "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?auto=format&fit=crop&w=300&q=80", description: "Teak Wood" },
+  { id: "3", title: "Coffee Table", price: "₹150", image: "https://images.unsplash.com/photo-1532372320572-cda25653a26d?auto=format&fit=crop&w=300&q=80", description: "Glass Top" },
+  { id: "4", title: "Bookshelf", price: "₹200", image: "https://images.unsplash.com/photo-1594620302200-9a762244a156?auto=format&fit=crop&w=300&q=80", description: "5-Tier" },
+  { id: "5", title: "King Size Bed", price: "₹899", image: "https://images.unsplash.com/photo-1505693416388-b0346efee535?auto=format&fit=crop&w=300&q=80", description: "With Storage" },
+  { id: "6", title: "Lamp Shade", price: "₹45", image: "https://images.unsplash.com/photo-1513506003011-3b03c80165bd?auto=format&fit=crop&w=300&q=80", description: "Ambient Light" },
+  { id: "7", title: "Office Desk", price: "₹250", image: "https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&w=300&q=80", description: "Ergonomic" },
+  { id: "8", title: "Recliner", price: "₹350", image: "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?auto=format&fit=crop&w=300&q=80", description: "Leather" },
+  { id: "9", title: "Dining Table", price: "₹600", image: "https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=300&q=80", description: "Solid Wood" },
+  { id: "10", title: "Nightstand", price: "₹80", image: "https://images.unsplash.com/photo-1532372320978-9b4d05249840?auto=format&fit=crop&w=300&q=80", description: "Modern" },
+  { id: "11", title: "Wardrobe", price: "₹800", image: "https://images.unsplash.com/photo-1595428774223-ef52624120d2?auto=format&fit=crop&w=300&q=80", description: "Spacious" },
+  { id: "12", title: "Bookshelf Large", price: "₹300", image: "https://images.unsplash.com/photo-1506544521782-b13c7793d256?auto=format&fit=crop&w=300&q=80", description: "Library Style" },
 ];
 const row2Title = "Home Interior & Electrical Deals";
 
@@ -95,18 +95,18 @@ const row3GridGroups = [
 // Title: "Devices & Automotive Deals"
 // TODO: Fetch products from categories: "Devices" + "Automotive"
 const row4Products = [
-  { id: "101", title: "iPhone 15 Pro", price: "$999", image: "https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=300&q=80", description: "Titanium Blue" },
-  { id: "102", title: "Samsung S24", price: "$899", image: "https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?auto=format&fit=crop&w=300&q=80", description: "Onyx Black" },
-  { id: "103", title: "Pixel 8", price: "$699", image: "https://images.unsplash.com/photo-1598327105666-5b89351aff23?auto=format&fit=crop&w=300&q=80", description: "Hazel" },
-  { id: "104", title: "OnePlus 12", price: "$799", image: "https://images.unsplash.com/photo-1621330381970-4b93fb8b4503?auto=format&fit=crop&w=300&q=80", description: "Emerald" },
-  { id: "105", title: "AirPods Pro", price: "$249", image: "https://images.unsplash.com/photo-1588423771073-b8903fbb85b5?auto=format&fit=crop&w=300&q=80", description: "2nd Gen" },
-  { id: "106", title: "Galaxy Watch 6", price: "$299", image: "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?auto=format&fit=crop&w=300&q=80", description: "Classic" },
-  { id: "107", title: "iPad Air", price: "$599", image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=300&q=80", description: "M1 Chip" },
-  { id: "108", title: "Power Bank", price: "$49", image: "https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?auto=format&fit=crop&w=300&q=80", description: "20000mAh" },
-  { id: "109", title: "Bluetooth Speaker", price: "$120", image: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?auto=format&fit=crop&w=300&q=80", description: "Portable" },
-  { id: "110", title: "Action Camera", price: "$399", image: "https://images.unsplash.com/photo-1564466013-4e4d0812702b?auto=format&fit=crop&w=300&q=80", description: "4K 60fps" },
-  { id: "111", title: "Drone", price: "$799", image: "https://images.unsplash.com/photo-1473968512647-3e447244af8f?auto=format&fit=crop&w=300&q=80", description: "Camera Drone" },
-  { id: "112", title: "VR Headset", price: "$499", image: "https://images.unsplash.com/photo-1622979135225-d2ba269fb1bd?auto=format&fit=crop&w=300&q=80", description: "Immersive" },
+  { id: "101", title: "iPhone 15 Pro", price: "₹999", image: "https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=300&q=80", description: "Titanium Blue" },
+  { id: "102", title: "Samsung S24", price: "₹899", image: "https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?auto=format&fit=crop&w=300&q=80", description: "Onyx Black" },
+  { id: "103", title: "Pixel 8", price: "₹699", image: "https://images.unsplash.com/photo-1598327105666-5b89351aff23?auto=format&fit=crop&w=300&q=80", description: "Hazel" },
+  { id: "104", title: "OnePlus 12", price: "₹799", image: "https://images.unsplash.com/photo-1621330381970-4b93fb8b4503?auto=format&fit=crop&w=300&q=80", description: "Emerald" },
+  { id: "105", title: "AirPods Pro", price: "₹249", image: "https://images.unsplash.com/photo-1588423771073-b8903fbb85b5?auto=format&fit=crop&w=300&q=80", description: "2nd Gen" },
+  { id: "106", title: "Galaxy Watch 6", price: "₹299", image: "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?auto=format&fit=crop&w=300&q=80", description: "Classic" },
+  { id: "107", title: "iPad Air", price: "₹599", image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=300&q=80", description: "M1 Chip" },
+  { id: "108", title: "Power Bank", price: "₹49", image: "https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?auto=format&fit=crop&w=300&q=80", description: "20000mAh" },
+  { id: "109", title: "Bluetooth Speaker", price: "₹120", image: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?auto=format&fit=crop&w=300&q=80", description: "Portable" },
+  { id: "110", title: "Action Camera", price: "₹399", image: "https://images.unsplash.com/photo-1564466013-4e4d0812702b?auto=format&fit=crop&w=300&q=80", description: "4K 60fps" },
+  { id: "111", title: "Drone", price: "₹799", image: "https://images.unsplash.com/photo-1473968512647-3e447244af8f?auto=format&fit=crop&w=300&q=80", description: "Camera Drone" },
+  { id: "112", title: "VR Headset", price: "₹499", image: "https://images.unsplash.com/photo-1622979135225-d2ba269fb1bd?auto=format&fit=crop&w=300&q=80", description: "Immersive" },
 ];
 const row4Title = "Devices & Automotive Deals";
 
@@ -145,18 +145,18 @@ const row5GridGroups = [
 // Title: "Fashion, Beauty & Personal Care Deals"
 // TODO: Fetch products from categories: "Fashion & Beauty" + "Medical & Pharmacy"
 const row6Products = [
-  { id: "201", title: "Summer Dress", price: "$49", image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=300&q=80", description: "Floral Print" },
-  { id: "202", title: "Denim Jacket", price: "$79", image: "https://images.unsplash.com/photo-1578932750294-f5075e85f44a?auto=format&fit=crop&w=300&q=80", description: "Classic Blue" },
-  { id: "203", title: "Sneakers", price: "$120", image: "https://images.unsplash.com/photo-1560769629-975ec94e6a86?auto=format&fit=crop&w=300&q=80", description: "Running" },
-  { id: "204", title: "Handbag", price: "$150", image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=300&q=80", description: "Leather" },
-  { id: "205", title: "Wayfarer Glasses", price: "$99", image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=300&q=80", description: "UV Protection" },
-  { id: "206", title: "Gold Watch", price: "$299", image: "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=300&q=80", description: "Luxury" },
-  { id: "207", title: "Beach Hat", price: "$25", image: "https://images.unsplash.com/photo-1582736159677-bb894672e811?auto=format&fit=crop&w=300&q=80", description: "Straw" },
-  { id: "208", title: "Scarf", price: "$35", image: "https://images.unsplash.com/photo-1520975661595-6453674ddc18?auto=format&fit=crop&w=300&q=80", description: "Silk" },
-  { id: "209", title: "Heels", price: "$89", image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=300&q=80", description: "Stilettos" },
-  { id: "210", title: "Blazer", price: "$110", image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&w=300&q=80", description: "Formal" },
-  { id: "211", title: "Boots", price: "$140", image: "https://images.unsplash.com/photo-1608256246200-53e635b5b65f?auto=format&fit=crop&w=300&q=80", description: "Leather" },
-  { id: "212", title: "Belt", price: "$45", image: "https://images.unsplash.com/photo-1624222247344-550fb60583dc?auto=format&fit=crop&w=300&q=80", description: "Classic" },
+  { id: "201", title: "Summer Dress", price: "₹49", image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=300&q=80", description: "Floral Print" },
+  { id: "202", title: "Denim Jacket", price: "₹79", image: "https://images.unsplash.com/photo-1578932750294-f5075e85f44a?auto=format&fit=crop&w=300&q=80", description: "Classic Blue" },
+  { id: "203", title: "Sneakers", price: "₹120", image: "https://images.unsplash.com/photo-1560769629-975ec94e6a86?auto=format&fit=crop&w=300&q=80", description: "Running" },
+  { id: "204", title: "Handbag", price: "₹150", image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=300&q=80", description: "Leather" },
+  { id: "205", title: "Wayfarer Glasses", price: "₹99", image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=300&q=80", description: "UV Protection" },
+  { id: "206", title: "Gold Watch", price: "₹299", image: "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=300&q=80", description: "Luxury" },
+  { id: "207", title: "Beach Hat", price: "₹25", image: "https://images.unsplash.com/photo-1582736159677-bb894672e811?auto=format&fit=crop&w=300&q=80", description: "Straw" },
+  { id: "208", title: "Scarf", price: "₹35", image: "https://images.unsplash.com/photo-1520975661595-6453674ddc18?auto=format&fit=crop&w=300&q=80", description: "Silk" },
+  { id: "209", title: "Heels", price: "₹89", image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=300&q=80", description: "Stilettos" },
+  { id: "210", title: "Blazer", price: "₹110", image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&w=300&q=80", description: "Formal" },
+  { id: "211", title: "Boots", price: "₹140", image: "https://images.unsplash.com/photo-1608256246200-53e635b5b65f?auto=format&fit=crop&w=300&q=80", description: "Leather" },
+  { id: "212", title: "Belt", price: "₹45", image: "https://images.unsplash.com/photo-1624222247344-550fb60583dc?auto=format&fit=crop&w=300&q=80", description: "Classic" },
 ];
 const row6Title = "Fashion, Beauty & Personal Care Deals";
 
@@ -195,18 +195,18 @@ const row7GridGroups = [
 // Title: "Groceries & Sports Essentials"
 // TODO: Fetch products from categories: "Groceries" + "Sports"
 const row8Products = [
-  { id: "301", title: "Coffee Beans", price: "$15", image: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&w=300&q=80", description: "Arabica" },
-  { id: "302", title: "Tea Set", price: "$49", image: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=300&q=80", description: "Ceramic" },
-  { id: "303", title: "Spices", price: "$25", image: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=300&q=80", description: "Assorted" },
-  { id: "304", title: "Olive Oil", price: "$20", image: "https://images.unsplash.com/photo-1474979266404-7cbf9c732a56?auto=format&fit=crop&w=300&q=80", description: "Extra Virgin" },
-  { id: "305", title: "Honey", price: "$12", image: "https://images.unsplash.com/photo-1587049352851-8d4e89186eff?auto=format&fit=crop&w=300&q=80", description: "Organic" },
-  { id: "306", title: "Chocolate", price: "$8", image: "https://images.unsplash.com/photo-1511381978829-04286b368db6?auto=format&fit=crop&w=300&q=80", description: "Dark" },
-  { id: "307", title: "Cereal", price: "$6", image: "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=300&q=80", description: "Healthy" },
-  { id: "308", title: "Juice", price: "$5", image: "https://images.unsplash.com/photo-1600271886742-f049cd451bba?auto=format&fit=crop&w=300&q=80", description: "Fresh" },
-  { id: "309", title: "Pasta", price: "$4", image: "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?auto=format&fit=crop&w=300&q=80", description: "Italian" },
-  { id: "310", title: "Rice", price: "$10", image: "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=300&q=80", description: "Basmati" },
-  { id: "311", title: "Sauces", price: "$7", image: "https://images.unsplash.com/photo-1472476443507-c7a392dd6182?auto=format&fit=crop&w=300&q=80", description: "Assorted" },
-  { id: "312", title: "Snacks", price: "$9", image: "https://images.unsplash.com/photo-1621939514649-28b12e81d196?auto=format&fit=crop&w=300&q=80", description: "Mix" },
+  { id: "301", title: "Coffee Beans", price: "₹15", image: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&w=300&q=80", description: "Arabica" },
+  { id: "302", title: "Tea Set", price: "₹49", image: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=300&q=80", description: "Ceramic" },
+  { id: "303", title: "Spices", price: "₹25", image: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=300&q=80", description: "Assorted" },
+  { id: "304", title: "Olive Oil", price: "₹20", image: "https://images.unsplash.com/photo-1474979266404-7cbf9c732a56?auto=format&fit=crop&w=300&q=80", description: "Extra Virgin" },
+  { id: "305", title: "Honey", price: "₹12", image: "https://images.unsplash.com/photo-1587049352851-8d4e89186eff?auto=format&fit=crop&w=300&q=80", description: "Organic" },
+  { id: "306", title: "Chocolate", price: "₹8", image: "https://images.unsplash.com/photo-1511381978829-04286b368db6?auto=format&fit=crop&w=300&q=80", description: "Dark" },
+  { id: "307", title: "Cereal", price: "₹6", image: "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=300&q=80", description: "Healthy" },
+  { id: "308", title: "Juice", price: "₹5", image: "https://images.unsplash.com/photo-1600271886742-f049cd451bba?auto=format&fit=crop&w=300&q=80", description: "Fresh" },
+  { id: "309", title: "Pasta", price: "₹4", image: "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?auto=format&fit=crop&w=300&q=80", description: "Italian" },
+  { id: "310", title: "Rice", price: "₹10", image: "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=300&q=80", description: "Basmati" },
+  { id: "311", title: "Sauces", price: "₹7", image: "https://images.unsplash.com/photo-1472476443507-c7a392dd6182?auto=format&fit=crop&w=300&q=80", description: "Assorted" },
+  { id: "312", title: "Snacks", price: "₹9", image: "https://images.unsplash.com/photo-1621939514649-28b12e81d196?auto=format&fit=crop&w=300&q=80", description: "Mix" },
 ];
 const row8Title = "Groceries & Sports Essentials";
 

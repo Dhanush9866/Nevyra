@@ -19,7 +19,7 @@ export default function OrderListItem({ order, onPress }: OrderListItemProps) {
 
     const getStatusText = () => {
         const date = new Date(order.deliveryDate || order.createdAt);
-        const dateStr = date.toLocaleDateString('en-US', {
+        const dateStr = date.toLocaleDateString('en-IN', {
             month: 'short',
             day: 'numeric',
             year: 'numeric',
