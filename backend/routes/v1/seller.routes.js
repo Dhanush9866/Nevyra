@@ -1,29 +1,17 @@
 const express = require("express");
 const router = express.Router();
-const sellerController = require("../controllers/sellerController");
-const authMiddleware = require("../middlewares/authMiddleware");
-console.log("Seller routes loaded");
+const sellerController = require("../../controllers/sellerController");
+const authMiddleware = require("../../middlewares/authMiddleware");
+
 // All routes require authentication
 router.use(authMiddleware);
-
-// Debug middleware
-router.use((req, res, next) => {
-    console.log("Inside seller router. URL:", req.url, "Method:", req.method);
-    next();
-});
 
 // Test route
 router.get("/ping", (req, res) => res.send("pong"));
 
 // Product Management
-router.post("/products", (req, res, next) => {
-    console.log("POST /products matched");
-    sellerController.createProduct(req, res, next);
-});
-router.get("/products", (req, res, next) => {
-    console.log("GET /products matched");
-    sellerController.getMyProducts(req, res, next);
-});
+router.post("/products", sellerController.createProduct);
+router.get("/products", sellerController.getMyProducts);
 router.put("/products/:id", sellerController.updateMyProduct);
 router.delete("/products/:id", sellerController.deleteMyProduct);
 

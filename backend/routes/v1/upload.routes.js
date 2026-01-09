@@ -1,8 +1,7 @@
 const express = require('express');
 const multer = require('multer');
-const { uploadImage, uploadMultipleImages } = require('../utils/cloudinary');
-const authMiddleware = require('../middlewares/authMiddleware');
-const adminMiddleware = require('../middlewares/adminMiddleware');
+const { uploadImage, uploadMultipleImages } = require('../../utils/cloudinary');
+const authMiddleware = require('../../middlewares/authMiddleware');
 
 const router = express.Router();
 
@@ -17,8 +16,7 @@ const upload = multer({
   },
 });
 
-// POST /api/upload/image - single image
-// POST /api/upload/image - single image - Allow authenticated users (Sellers need this)
+// POST /api/v1/upload/image - single image
 router.post('/image', authMiddleware, upload.single('image'), async (req, res, next) => {
   try {
     if (!req.file) {
@@ -32,7 +30,6 @@ router.post('/image', authMiddleware, upload.single('image'), async (req, res, n
     if (!result || result.success === false) {
       return res.status(500).json({ success: false, message: result?.error || 'Upload failed' });
     }
-    // Support both util return shapes
     const url = result.url || result.secure_url;
     return res.json({ success: true, message: 'Image uploaded successfully', data: { url } });
   } catch (err) {
@@ -40,8 +37,7 @@ router.post('/image', authMiddleware, upload.single('image'), async (req, res, n
   }
 });
 
-// POST /api/upload/images - multiple images
-// POST /api/upload/images - multiple images
+// POST /api/v1/upload/images - multiple images
 router.post('/images', authMiddleware, upload.array('images', 10), async (req, res, next) => {
   try {
     if (!req.files || req.files.length === 0) {
@@ -49,7 +45,6 @@ router.post('/images', authMiddleware, upload.array('images', 10), async (req, r
     }
     const dataURIs = req.files.map(f => `data:${f.mimetype};base64,${f.buffer.toString('base64')}`);
 
-    // If util exposes bulk uploader, use it; otherwise upload sequentially
     let urls = [];
     if (typeof uploadMultipleImages === 'function') {
       const bulk = await uploadMultipleImages(dataURIs);

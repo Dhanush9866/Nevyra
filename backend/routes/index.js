@@ -1,22 +1,18 @@
 const express = require("express");
 const router = express.Router();
+const v1Routes = require("./v1");
 
-router.use("/auth", require("./auth"));
-router.use("/seller", require("./seller")); // Moved up for priority
-router.use("/products", require("./products"));
-router.use("/categories", require("./categories"));
-router.use("/cart", require("./cart"));
-router.use("/orders", require("./orders"));
-router.use("/users", require("./users"));
-router.use("/admins", require("./admins"));
-router.use("/payments", require("./payments"));
-console.log('Loading upload routes...');
-router.use("/upload", require("./upload"));
-console.log('Upload routes loaded');
-console.log('Upload routes loaded');
-router.use("/dashboard", require("./dashboard"));
-router.use("/contact", require("./contact"));
-router.use("/reviews", require("./reviews"));
-// router.use("/seller", require("./seller")); // Removed duplicate
+/**
+ * API Versioning
+ * Primary entry point for version 1 of the API.
+ */
+router.use("/v1", v1Routes);
+
+/**
+ * Backward Compatibility
+ * To ensure existing Mobile App, Website, and Panels remain functional
+ * during the migration, we preserve the unversioned paths.
+ */
+router.use("/", v1Routes);
 
 module.exports = router;
