@@ -47,7 +47,7 @@ const SellerLanding = () => {
                             </p>
 
                             <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 pt-4 justify-center">
-                                <a href="http://localhost:8081" target="_blank" rel="noopener noreferrer">
+                                <a href="https://nevyra-seller.onrender.com" target="_blank" rel="noopener noreferrer">
                                     <Button size="lg" className="bg-[#8B5CF6] hover:bg-[#7C3AED] text-white text-lg px-8 py-6 rounded-full shadow-lg shadow-purple-500/30 transition-all hover:scale-105">
                                         Start Selling Now
                                     </Button>
