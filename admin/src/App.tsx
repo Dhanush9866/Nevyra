@@ -11,6 +11,7 @@ import RequireAuth from "./components/RequireAuth";
 import Products from "./pages/Products";
 import Orders from "./pages/Orders";
 import Customers from "./pages/Customers";
+import Settings from "./pages/Settings";
 
 import Analytics from "./pages/Analytics";
 import Sellers from "./pages/Sellers";
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/payouts" element={<RequireAuth><Payouts /></RequireAuth>} />
           <Route path="/customers" element={<RequireAuth><Customers /></RequireAuth>} />
           <Route path="/analytics" element={<RequireAuth><Analytics /></RequireAuth>} />
+          <Route path="/settings" element={<RequireAuth><Settings /></RequireAuth>} />
           <Route path="/" element={<RequireAuth><Index /></RequireAuth>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

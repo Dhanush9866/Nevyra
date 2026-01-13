@@ -1,6 +1,5 @@
- const API_BASE_URL = 'https://api.zythova.com/api/v1';
-
-// const API_BASE_URL = 'http://localhost:8000/api/v1';
+const API_BASE_URL = 'http://localhost:8000/api/v1';
+// const API_BASE_URL = 'https://api.zythova.com/api/v1';
 
 export interface LoginRequest {
   email: string;
@@ -74,6 +73,13 @@ class ApiService {
     return this.request(`/products/by-subcategories${query ? `?${query}` : ''}`);
   }
 
+  async getTopDeals(limit: number = 10): Promise<{ success: boolean; message: string; data: any[] }> {
+    return this.request(`/products/top-deals?limit=${limit}`);
+  }
+
+  async getSettings(): Promise<{ success: boolean; message: string; data: any }> {
+    return this.request('/settings');
+  }
 
   // Cart
   async getCart(): Promise<{ success: boolean; message: string; data: any[] }> {
@@ -328,4 +334,4 @@ export const authUtils = {
   isAuthenticated: (): boolean => {
     return !!localStorage.getItem('token');
   },
-}; 
+};

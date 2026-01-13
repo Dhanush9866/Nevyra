@@ -8,6 +8,7 @@ router.get("/", productController.list);
 router.get("/all", productController.getAll);
 router.get("/by-subcategories", productController.listByMultipleSubcategories);
 router.get("/popular-searches", productController.getPopularSearches);
+router.get("/top-deals", productController.getTopDeals);
 router.get("/:id", productController.details);
 router.get("/:id/similar", productController.getSimilarProducts);
 

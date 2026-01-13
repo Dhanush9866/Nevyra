@@ -7,6 +7,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { useNavigate } from "react-router-dom";
 
 interface ProductItem {
   id: string;
@@ -22,13 +23,14 @@ interface HomeProductCarouselProps {
 }
 
 const HomeProductCarousel: React.FC<HomeProductCarouselProps> = ({ title, products }) => {
+  const navigate = useNavigate();
   return (
     <div className="container mx-auto px-4 py-8 bg-white my-4 shadow-sm rounded-none relative">
-       <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-4">
+      <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-4">
         <h2 className="text-xl md:text-2xl font-bold text-gray-900">{title}</h2>
         {/* We can add a View All button here later if needed to balance the header */}
       </div>
-      
+
       <Carousel
         opts={{
           align: "start",
@@ -49,7 +51,10 @@ const HomeProductCarousel: React.FC<HomeProductCarouselProps> = ({ title, produc
         <CarouselContent className="-ml-2 md:-ml-4">
           {products.map((product) => (
             <CarouselItem key={product.id} className="basis-1/2 md:basis-1/4 lg:basis-1/5 pl-2 md:pl-4">
-              <div className="group cursor-pointer flex flex-col items-center p-2 rounded-none hover:shadow-md transition-shadow duration-300 border border-transparent hover:border-gray-100 h-full">
+              <div
+                className="group cursor-pointer flex flex-col items-center p-2 rounded-none hover:shadow-md transition-shadow duration-300 border border-transparent hover:border-gray-100 h-full"
+                onClick={() => navigate(`/product/${product.id}`)}
+              >
                 {/* Image Container: Fixed aspect ratio to prevent height jumping */}
                 <div className="w-full aspect-square overflow-hidden rounded-none flex items-center justify-center mb-3 bg-gray-50">
                   <img
@@ -58,16 +63,16 @@ const HomeProductCarousel: React.FC<HomeProductCarouselProps> = ({ title, produc
                     className="max-h-full max-w-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-300 rounded-none"
                   />
                 </div>
-                
+
                 {/* Text Content: Centered and concise */}
                 <div className="text-center w-full space-y-1">
-                    <h3 className="font-medium text-gray-900 text-sm line-clamp-1" title={product.title}>
-                        {product.title}
-                    </h3>
-                     {/* Optional: Add price back if desired for "Best Sellers" look, or keep minimal */}
-                    <div className="text-sm font-bold text-gray-900">
-                        {product.price}
-                    </div>
+                  <h3 className="font-medium text-gray-900 text-sm line-clamp-1" title={product.title}>
+                    {product.title}
+                  </h3>
+                  {/* Optional: Add price back if desired for "Best Sellers" look, or keep minimal */}
+                  <div className="text-sm font-bold text-gray-900">
+                    {product.price}
+                  </div>
                 </div>
               </div>
             </CarouselItem>
