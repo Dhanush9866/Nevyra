@@ -6,20 +6,20 @@ function parseAdditionalSpecifications(specsString) {
   if (!specsString || typeof specsString !== 'string') {
     return {};
   }
-  
+
   const specifications = {};
-  
+
   // Split by semicolon to get individual specifications
   const specsArray = specsString.split(';').filter(spec => spec.trim());
-  
+
   specsArray.forEach(spec => {
     // Split by colon to separate key and value
     const [key, value] = spec.split(':').map(s => s.trim());
-    
+
     if (key && value) {
       // Convert key to uppercase and clean it
       const cleanKey = key.toUpperCase().replace(/[^A-Z0-9]/g, '');
-      
+
       // Handle multiple values separated by commas
       if (value.includes(',')) {
         specifications[cleanKey] = value.split(',').map(v => v.trim()).filter(v => v);
@@ -28,7 +28,7 @@ function parseAdditionalSpecifications(specsString) {
       }
     }
   });
-  
+
   return specifications;
 }
 
@@ -59,27 +59,41 @@ function mapProductId(product) {
 exports.list = async (req, res, next) => {
   try {
     const { page = 1, limit = 10, category, subCategory, search } = req.query;
-    
+
     console.log('========== PRODUCT LIST REQUEST ==========');
     console.log('Query params:', { page, limit, category, subCategory, search });
-    
+
     const filter = {};
-    if (category) filter.category = { $regex: new RegExp(`^${category}$`, "i") };
-    if (subCategory) filter.subCategory = { $regex: new RegExp(`^${subCategory}$`, "i") };
+    if (category) {
+      if (category.includes(',')) {
+        const categoryArray = category.split(',').map(c => new RegExp(`^${c.trim()}$`, "i"));
+        filter.category = { $in: categoryArray };
+      } else {
+        filter.category = { $regex: new RegExp(`^${category}$`, "i") };
+      }
+    }
+    if (subCategory) {
+      if (subCategory.includes(',')) {
+        const subCategoryArray = subCategory.split(',').map(s => new RegExp(`^${s.trim()}$`, "i"));
+        filter.subCategory = { $in: subCategoryArray };
+      } else {
+        filter.subCategory = { $regex: new RegExp(`^${subCategory}$`, "i") };
+      }
+    }
     if (search) {
       filter.title = { $regex: search, $options: "i" };
       // Log the search query asynchronously
-      SearchLog.create({ 
+      SearchLog.create({
         query: search.toLowerCase().trim(),
-        user: req.user ? req.user.id : null 
+        user: req.user ? req.user.id : null
       }).catch(err => console.error('Search log error:', err));
     }
-    
+
     console.log('MongoDB filter:', JSON.stringify(filter));
-    
+
     const skip = (parseInt(page) - 1) * parseInt(limit);
     console.log('Pagination:', { skip, limit: parseInt(limit) });
-    
+
     const [products, count] = await Promise.all([
       Product.find(filter)
         .skip(skip)
@@ -89,15 +103,15 @@ exports.list = async (req, res, next) => {
         ),
       Product.countDocuments(filter),
     ]);
-    
-    console.log('Database results:', { 
-      productsFound: products.length, 
+
+    console.log('Database results:', {
+      productsFound: products.length,
       totalCount: count,
       firstProduct: products[0] ? products[0].title : 'none'
     });
-    
+
     const mappedProducts = products.map(mapProductId);
-    
+
     const response = {
       success: true,
       message: "Products fetched",
@@ -109,13 +123,13 @@ exports.list = async (req, res, next) => {
         totalPages: Math.ceil(count / limit),
       },
     };
-    
+
     console.log('Response summary:', {
       dataLength: response.data.length,
       pagination: response.pagination
     });
     console.log('==========================================');
-    
+
     res.json(response);
   } catch (err) {
     console.error('Error in product list:', err);
@@ -127,26 +141,26 @@ exports.list = async (req, res, next) => {
 exports.listByMultipleSubcategories = async (req, res, next) => {
   try {
     const { page = 1, limit = 10, category, subCategories, search } = req.query;
-    
+
     console.log('========== MULTI-SUBCATEGORY PRODUCT LIST REQUEST ==========');
     console.log('Query params:', { page, limit, category, subCategories, search });
-    
+
     const filter = {};
     if (category) filter.category = { $regex: new RegExp(`^${category}$`, "i") };
-    
+
     // Handle comma-separated subcategories
     if (subCategories) {
       const subCategoryArray = subCategories.split(',').map(s => new RegExp(`^${s.trim()}$`, "i"));
       filter.subCategory = { $in: subCategoryArray };
     }
-    
+
     if (search) filter.title = { $regex: search, $options: "i" };
-    
+
     console.log('MongoDB filter:', JSON.stringify(filter));
-    
+
     const skip = (parseInt(page) - 1) * parseInt(limit);
     console.log('Pagination:', { skip, limit: parseInt(limit) });
-    
+
     const [products, count] = await Promise.all([
       Product.find(filter)
         .skip(skip)
@@ -156,15 +170,15 @@ exports.listByMultipleSubcategories = async (req, res, next) => {
         ),
       Product.countDocuments(filter),
     ]);
-    
-    console.log('Database results:', { 
-      productsFound: products.length, 
+
+    console.log('Database results:', {
+      productsFound: products.length,
       totalCount: count,
       firstProduct: products[0] ? products[0].title : 'none'
     });
-    
+
     const mappedProducts = products.map(mapProductId);
-    
+
     const response = {
       success: true,
       message: "Products fetched by multiple subcategories",
@@ -176,13 +190,13 @@ exports.listByMultipleSubcategories = async (req, res, next) => {
         totalPages: Math.ceil(count / limit),
       },
     };
-    
+
     console.log('Response summary:', {
       dataLength: response.data.length,
       pagination: response.pagination
     });
     console.log('==========================================');
-    
+
     res.json(response);
   } catch (err) {
     console.error('Error in multi-subcategory product list:', err);
@@ -194,7 +208,7 @@ exports.listByMultipleSubcategories = async (req, res, next) => {
 exports.details = async (req, res, next) => {
   try {
     const product = await Product.findById(req.params.id);
-   
+
     const sendData = mapProductId(product);
 
 
@@ -228,18 +242,18 @@ exports.create = async (req, res, next) => {
       attributes,
       additionalSpecifications,
     } = req.body;
-    
+
     if (!title || !price || !category || !images || !subCategory)
       return res.status(400).json({
         success: false,
         message: "Missing required fields",
         data: null,
       });
-    
+
     // Resolve category and subcategory names from IDs
     let categoryName = category;
     let subCategoryName = subCategory;
-    
+
     // Check if category is an ObjectId (24 character hex string)
     if (category.match(/^[0-9a-fA-F]{24}$/)) {
       const categoryDoc = await Category.findById(category);
@@ -252,7 +266,7 @@ exports.create = async (req, res, next) => {
       }
       categoryName = categoryDoc.name;
     }
-    
+
     // Check if subCategory is an ObjectId (24 character hex string)
     if (subCategory.match(/^[0-9a-fA-F]{24}$/)) {
       const subCategoryDoc = await Category.findById(subCategory);
@@ -265,7 +279,7 @@ exports.create = async (req, res, next) => {
       }
       subCategoryName = subCategoryDoc.name;
     }
-    
+
     if (attributes && !validateAttributes(categoryName, attributes)) {
       return res.status(400).json({
         success: false,
@@ -273,11 +287,11 @@ exports.create = async (req, res, next) => {
         data: null,
       });
     }
-    
+
     // Parse additional specifications if provided
-    const parsedSpecs = additionalSpecifications ? 
+    const parsedSpecs = additionalSpecifications ?
       parseAdditionalSpecifications(additionalSpecifications) : {};
-    
+
     const product = new Product({
       title,
       price,
@@ -324,11 +338,11 @@ exports.update = async (req, res, next) => {
       attributes,
       additionalSpecifications,
     } = req.body;
-    
+
     // Resolve category and subcategory names from IDs if provided
     let categoryName = category;
     let subCategoryName = subCategory;
-    
+
     if (category !== undefined) {
       // Check if category is an ObjectId (24 character hex string)
       if (category.match(/^[0-9a-fA-F]{24}$/)) {
@@ -343,7 +357,7 @@ exports.update = async (req, res, next) => {
         categoryName = categoryDoc.name;
       }
     }
-    
+
     if (subCategory !== undefined) {
       // Check if subCategory is an ObjectId (24 character hex string)
       if (subCategory.match(/^[0-9a-fA-F]{24}$/)) {
@@ -358,7 +372,7 @@ exports.update = async (req, res, next) => {
         subCategoryName = subCategoryDoc.name;
       }
     }
-    
+
     if (categoryName && attributes && !validateAttributes(categoryName, attributes)) {
       return res.status(400).json({
         success: false,
@@ -378,7 +392,7 @@ exports.update = async (req, res, next) => {
     if (soldCount !== undefined) product.soldCount = soldCount;
     if (attributes !== undefined) product.attributes = attributes;
     if (additionalSpecifications !== undefined) {
-      product.additionalSpecifications = additionalSpecifications ? 
+      product.additionalSpecifications = additionalSpecifications ?
         parseAdditionalSpecifications(additionalSpecifications) : {};
     }
     await product.save();
@@ -468,7 +482,7 @@ exports.getSimilarProducts = async (req, res, next) => {
     }
 
     const { category, subCategory } = product;
-    
+
     // Find products in same subcategory first, then category
     let similar = await Product.find({
       _id: { $ne: product._id },
@@ -489,6 +503,28 @@ exports.getSimilarProducts = async (req, res, next) => {
       success: true,
       message: "Similar products fetched",
       data: mappedProducts
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getTopDeals = async (req, res, next) => {
+  try {
+    const { limit = 10 } = req.query;
+    const products = await Product.find()
+      .sort({ soldCount: -1 })
+      .limit(parseInt(limit))
+      .select(
+        "title price category subCategory images inStock rating reviews stockQuantity soldCount attributes"
+      );
+
+    const mappedProducts = products.map(mapProductId);
+
+    res.json({
+      success: true,
+      message: "Top deals fetched",
+      data: mappedProducts,
     });
   } catch (err) {
     next(err);

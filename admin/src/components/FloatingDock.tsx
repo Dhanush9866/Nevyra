@@ -25,9 +25,7 @@ const dockItems = [
   { id: "sellers", icon: ShieldCheck, label: "Sellers", color: "from-yellow-500 to-orange-500" },
   { id: "payouts", icon: Banknote, label: "Payouts", color: "from-green-600 to-emerald-600" },
   { id: "customers", icon: Users, label: "Customers", color: "from-orange-500 to-red-500" },
-  // { id: "inventory", icon: Warehouse, label: "Inventory", color: "from-cyan-500 to-blue-500" },
-  // { id: "marketing", icon: Megaphone, label: "Marketing", color: "from-pink-500 to-rose-500" },
-  // { id: "settings", icon: Settings, label: "Settings", color: "from-gray-500 to-slate-500" },
+  { id: "settings", icon: Settings, label: "Settings", color: "from-gray-500 to-slate-500" },
 ];
 
 export function FloatingDock() {
@@ -45,6 +43,7 @@ export function FloatingDock() {
     payouts: "/payouts",
     customers: "/customers",
     analytics: "/analytics",
+    settings: "/settings",
   };
 
   // Update active item based on current route

@@ -5,73 +5,41 @@ import { Input } from "@/components/ui/input";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { apiService } from "@/lib/api";
+import { Loader2 } from "lucide-react";
+import Navbar from "@/components/Navbar";
 
-import laptopProduct from "@/assets/laptop-product.jpg";
-import phoneProduct from "@/assets/phone-product.jpg";
-import shoesProduct from "@/assets/shoes-product.jpg";
-import dressProduct from "@/assets/dress-product.jpg";
-
-// Mock search results data
-const mockProducts = [
-  {
-    id: 1,
-    name: "Gaming Laptop",
-    price: 1299.99,
-    image: laptopProduct,
-    rating: 4.5,
-    reviews: 128,
-    category: "Electronics"
-  },
-  {
-    id: 2,
-    name: "Wireless Headphones",
-    price: 89.99,
-    image: phoneProduct,
-    rating: 4.2,
-    reviews: 89,
-    category: "Electronics"
-  },
-  {
-    id: 3,
-    name: "Running Shoes",
-    price: 129.99,
-    image: shoesProduct,
-    rating: 4.7,
-    reviews: 256,
-    category: "Sports"
-  },
-  {
-    id: 4,
-    name: "Summer Dress",
-    price: 59.99,
-    image: dressProduct,
-    rating: 4.3,
-    reviews: 67,
-    category: "Fashion"
-  }
-];
+// No mock data needed anymore
 
 const SearchResults = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [results, setResults] = useState(mockProducts);
+  const [results, setResults] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const isMobile = useIsMobile();
 
-  // Get search query from URL params
   useEffect(() => {
     const query = searchParams.get("q");
     if (query) {
       setSearchQuery(query);
-      // Filter results based on query
-      const filtered = mockProducts.filter(product =>
-        product.name.toLowerCase().includes(query.toLowerCase()) ||
-        product.category.toLowerCase().includes(query.toLowerCase())
-      );
-      setResults(filtered);
+      fetchResults(query);
     }
   }, [searchParams]);
+
+  const fetchResults = async (query: string) => {
+    setLoading(true);
+    try {
+      const response = await apiService.getProducts({ search: query, limit: 50 });
+      if (response.success) {
+        setResults(response.data);
+      }
+    } catch (error) {
+      console.error("Search error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSearch = (query: string) => {
     navigate(`/search?q=${encodeURIComponent(query)}`);
@@ -100,19 +68,19 @@ const SearchResults = () => {
           </Button>
 
           <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="text"
               placeholder="Search for products, brands and more"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 text-sm"
+              className="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 border-none focus-visible:ring-primary/20 rounded-xl"
               onKeyPress={(e) => {
                 if (e.key === "Enter") {
                   handleSearch(searchQuery);
                 }
               }}
             />
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           </div>
 
           {/* Logo */}
@@ -171,54 +139,50 @@ const SearchResults = () => {
       </div>
 
       {/* Results */}
-      <div className="p-3">
-        {results.length > 0 ? (
-          <div className={viewMode === "grid" ? "grid grid-cols-2 gap-3" : "space-y-3"}>
+      <div className="p-3 max-w-7xl mx-auto">
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <Loader2 className="h-10 w-10 text-primary animate-spin mb-4" />
+            <p className="text-slate-500 font-medium">Scanning catalog for "{searchQuery}"...</p>
+          </div>
+        ) : results.length > 0 ? (
+          <div className={viewMode === "grid" ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4" : "space-y-3"}>
             {results.map((product) => (
               <Card
                 key={product.id}
-                className="cursor-pointer hover:shadow-md transition-shadow border border-border"
+                className="cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 overflow-hidden group"
                 onClick={() => handleProductClick(product.id)}
               >
-                <CardContent className="p-3">
-                  <div className={viewMode === "grid" ? "space-y-2" : "flex space-x-3"}>
-                    <div className={viewMode === "grid" ? "aspect-square" : "w-20 h-20 flex-shrink-0"}>
+                <CardContent className="p-0">
+                  <div className={viewMode === "grid" ? "flex flex-col" : "flex p-3 gap-4"}>
+                    <div className={viewMode === "grid" ? "aspect-square w-full relative overflow-hidden bg-slate-50" : "w-32 h-32 flex-shrink-0 relative overflow-hidden bg-slate-50 rounded-xl"}>
                       <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-full h-full object-cover rounded-md"
+                        src={product.images?.[0] || "https://via.placeholder.com/300"}
+                        alt={product.title}
+                        className="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-500"
                       />
                     </div>
 
-                    <div className={viewMode === "grid" ? "space-y-1" : "flex-1 space-y-1"}>
-                      <h3 className="font-medium text-sm line-clamp-2 text-foreground leading-tight">
-                        {product.name}
+                    <div className={viewMode === "grid" ? "p-4 space-y-2" : "flex-1 py-2 space-y-2"}>
+                      <h3 className="font-bold text-sm line-clamp-2 text-slate-800 leading-tight h-10 group-hover:text-primary transition-colors">
+                        {product.title}
                       </h3>
 
-                      <div className="flex items-center space-x-1">
-                        <div className="flex items-center">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`h-3 w-3 ${i < Math.floor(product.rating)
-                                ? "fill-yellow-400 text-yellow-400"
-                                : "text-gray-300"
-                                }`}
-                            />
-                          ))}
+                      <div className="flex items-center gap-1">
+                        <div className="flex items-center px-1.5 py-0.5 rounded bg-green-600 text-[10px] font-bold text-white">
+                          <span>{product.rating || "4.1"}</span>
+                          <Star className="h-2 w-2 ml-0.5 fill-current" />
                         </div>
-                        <span className="text-xs text-muted-foreground ml-1">
-                          ({product.reviews})
+                        <span className="text-[10px] text-slate-400 font-medium whitespace-nowrap">
+                          ({product.reviews?.length || 0} reviews)
                         </span>
                       </div>
 
-                      <p className="text-xs text-muted-foreground">
-                        {product.category}
-                      </p>
-
-                      <p className="font-semibold text-base text-foreground">
-                        ${product.price}
-                      </p>
+                      <div className="flex items-center justify-between pt-1">
+                        <p className="font-black text-lg text-slate-900">
+                          ₹{product.price}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </CardContent>

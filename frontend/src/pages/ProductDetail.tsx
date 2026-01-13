@@ -62,7 +62,7 @@ const ProductDetail = () => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [selectedFeatures, setSelectedFeatures] = useState<SelectedFeatures>({});
   const [addingToCart, setAddingToCart] = useState(false);
-  
+
   // Reviews state
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
@@ -72,7 +72,7 @@ const ProductDetail = () => {
     title: "",
     comment: ""
   });
-  
+
   const { user, isAuthenticated } = useAuth();
 
   useEffect(() => {
@@ -365,11 +365,6 @@ const ProductDetail = () => {
                 alt={product.title}
                 className="w-full h-96 object-cover rounded-lg border border-border"
               />
-              {discount > 0 && (
-                <Badge className="absolute top-4 left-4 bg-discount text-white text-lg px-3 py-1">
-                  {discount}% OFF
-                </Badge>
-              )}
             </div>
             {product.images && product.images.length > 1 && (
               <div className="flex gap-2 overflow-x-auto">
@@ -414,10 +409,7 @@ const ProductDetail = () => {
               <div className="flex items-center gap-3">
                 <span className="text-3xl font-bold text-price">₹{product.price.toLocaleString()}</span>
                 {discount > 0 && (
-                  <>
-                    <span className="text-xl text-muted-foreground line-through">₹{originalPrice.toLocaleString()}</span>
-                    <Badge className="bg-discount text-white">{discount}% off</Badge>
-                  </>
+                  <span className="text-xl text-muted-foreground line-through">₹{originalPrice.toLocaleString()}</span>
                 )}
               </div>
               <p className="text-sm text-muted-foreground">Inclusive of all taxes</p>
@@ -477,35 +469,6 @@ const ProductDetail = () => {
               </Card>
             )}
 
-            {/* Delivery Check */}
-            <Card>
-              <CardContent className="p-4">
-                <h3 className="font-semibold text-foreground mb-3">Delivery Options</h3>
-                <div className="flex gap-2 mb-3">
-                  <Input
-                    placeholder="Enter pincode"
-                    value={pincode}
-                    onChange={(e) => setPincode(e.target.value)}
-                    className="flex-1"
-                  />
-                  <Button variant="outline">Check</Button>
-                </div>
-                <div className="space-y-2 text-sm">
-                  <div className="flex items-center gap-2">
-                    <Truck className="h-4 w-4 text-success" />
-                    <span>Free delivery by tomorrow</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <RotateCcw className="h-4 w-4 text-primary" />
-                    <span>7 days replacement policy</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Shield className="h-4 w-4 text-primary" />
-                    <span>2 year warranty</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
 
             {/* Quantity and Actions */}
             <div className="space-y-4">
@@ -572,16 +535,12 @@ const ProductDetail = () => {
           </div>
         </div>
 
-        {/* Product Details Tabs */}
-        <Tabs defaultValue="description" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="description">Description</TabsTrigger>
-            <TabsTrigger value="specifications">Specifications</TabsTrigger>
-            <TabsTrigger value="reviews">Reviews ({reviews.length})</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="description" className="space-y-4">
-            <Card>
+        {/* Product Details Sections Stacked */}
+        <div className="w-full space-y-12 mt-16 mb-20">
+          {/* Description Section */}
+          <section id="description" className="space-y-6">
+            <h2 className="text-3xl font-black text-slate-900 border-b-2 border-primary w-fit pb-1">Description</h2>
+            <Card className="border-none shadow-none bg-slate-50/50 rounded-3xl">
               <CardContent className="p-6">
                 <h3 className="font-semibold text-foreground mb-4">Product Description</h3>
                 <div className="prose prose-gray max-w-none">
@@ -600,11 +559,13 @@ const ProductDetail = () => {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
+          </section>
 
-          <TabsContent value="specifications" className="space-y-4">
-            <Card>
-              <CardContent className="p-6">
+          {/* Specifications Section */}
+          <section id="specifications" className="space-y-6">
+            <h2 className="text-3xl font-black text-slate-900 border-b-2 border-primary w-fit pb-1">Specifications</h2>
+            <Card className="border-none shadow-none bg-slate-50/50 rounded-3xl">
+              <CardContent className="p-8">
                 <h3 className="font-semibold text-foreground mb-4">Product Specifications</h3>
                 <div className="space-y-3">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -654,9 +615,11 @@ const ProductDetail = () => {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
+          </section>
 
-          <TabsContent value="reviews" className="space-y-6">
+          {/* Reviews Section */}
+          <section id="reviews" className="space-y-8">
+            <h2 className="text-3xl font-black text-slate-900 border-b-2 border-primary w-fit pb-1">Reviews ({reviews.length})</h2>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Ratings Summary */}
               <Card className="lg:col-span-1">
@@ -785,12 +748,12 @@ const ProductDetail = () => {
                           </div>
                           {review.title && <h4 className="font-bold mb-2">{review.title}</h4>}
                           <p className="text-muted-foreground whitespace-pre-wrap">{review.comment}</p>
-                          
+
                           {user && (user._id === review.user._id || (user as any).isAdmin) && (
                             <div className="mt-4 flex justify-end">
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
+                              <Button
+                                variant="ghost"
+                                size="sm"
                                 className="text-destructive hover:text-destructive hover:bg-destructive/10"
                                 onClick={() => handleDeleteReview(review._id)}
                               >
@@ -810,8 +773,8 @@ const ProductDetail = () => {
                 </div>
               </div>
             </div>
-          </TabsContent>
-        </Tabs>
+          </section>
+        </div>
       </div>
 
       <Footer />

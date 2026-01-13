@@ -1,6 +1,6 @@
-//const API_BASE_URL = 'http://localhost:8000/api/v1';
+const API_BASE_URL = 'http://localhost:8000/api/v1';
 
-const API_BASE_URL = 'https://api.zythova.com/api/v1';
+// const API_BASE_URL = 'https://api.zythova.com/api/v1';
 
 // Helper function to handle API responses
 const handleResponse = async (response) => {
@@ -235,18 +235,37 @@ export const adminAPI = {
 
   // ==================== PAYOUT APIs ====================
   payouts: {
-      getAll: async (token) => {
-          return apiRequest('/admins/payouts', {
-              headers: { 'Authorization': `Bearer ${token}` }
-          });
-      },
-      updateStatus: async (id, data, token) => {
-          return apiRequest(`/admins/payouts/${id}`, {
-              method: 'PATCH',
-              headers: { 'Authorization': `Bearer ${token}` },
-              body: JSON.stringify(data) // status, transactionId, notes
-          });
-      }
+    getAll: async (token) => {
+      return apiRequest('/admins/payouts', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+    },
+    updateStatus: async (id, data, token) => {
+      return apiRequest(`/admins/payouts/${id}`, {
+        method: 'PATCH',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(data) // status, transactionId, notes
+      });
+    }
+  },
+
+  // ==================== SETTINGS APIs ====================
+  settings: {
+    // Get all settings
+    get: async (token) => {
+      return apiRequest('/settings', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+    },
+
+    // Update hero banners
+    updateHeroBanners: async (heroBanners, token) => {
+      return apiRequest('/settings/hero-banners', {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ heroBanners }),
+      });
+    }
   }
 };
 

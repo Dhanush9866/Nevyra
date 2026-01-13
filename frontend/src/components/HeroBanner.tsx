@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { apiService } from "@/lib/api";
+import { useNavigate } from "react-router-dom";
 
-const slides = [
+const defaultSlides = [
   {
     id: 1,
     title: "Everything You Need, One Platform",
@@ -76,6 +78,37 @@ const slides = [
 
 const HeroBanner = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [slides, setSlides] = useState(defaultSlides);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await apiService.getSettings();
+        if (response.success && response.data.heroBanners && response.data.heroBanners.length > 0) {
+          const fetchedSlides = response.data.heroBanners.map((banner: any, index: number) => ({
+            id: index + 1,
+            title: banner.title || "Special Offer",
+            subtitle: banner.subtitle || "Limited time only",
+            description: "",
+            image: banner.url,
+            buttonText: banner.buttonText || "Shop Now",
+            link: banner.link || "/products",
+            buttonColor: "bg-primary hover:bg-primary/90",
+            bgColor: "bg-white",
+            useBlend: true
+          }));
+          setSlides(fetchedSlides);
+        }
+      } catch (error) {
+        console.error("Failed to fetch hero settings:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSettings();
+  }, []);
 
   // Auto-advance slides
   useEffect(() => {
@@ -98,56 +131,67 @@ const HeroBanner = () => {
     setCurrentSlide(index);
   };
 
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 relative bg-gray-50 overflow-hidden min-h-[400px] md:h-[500px] flex items-center my-4 shadow-sm rounded-none">
+        <div className="container px-8 md:px-16 animate-pulse">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div className="space-y-6">
+              <div className="h-12 md:h-16 bg-gray-200 rounded-lg w-3/4"></div>
+              <div className="h-6 bg-gray-200 rounded-lg w-1/2"></div>
+              <div className="h-24 bg-gray-200 rounded-lg w-full hidden sm:block"></div>
+              <div className="h-12 bg-gray-200 rounded-lg w-32"></div>
+            </div>
+            <div className="flex justify-center md:justify-end">
+              <div className="w-64 h-64 bg-gray-200 rounded-full"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="container mx-auto px-4 relative bg-white overflow-hidden min-h-[400px] md:h-[500px] flex items-center my-4 shadow-sm rounded-none">
+    <div className="relative overflow-hidden h-[450px] md:h-[600px] w-full shadow-lg">
       {slides.map((slide, index) => (
         <div
           key={slide.id}
-          className={`transition-all duration-1000 absolute inset-0 flex items-center justify-center ${slide.bgColor || "bg-white"
-            } ${index === currentSlide ? "opacity-100 z-10" : "opacity-0 z-0"}`}
+          className={`transition-all duration-1000 absolute inset-0 ${index === currentSlide ? "opacity-100 z-10" : "opacity-0 z-0"}`}
         >
-          <div className="container px-8 md:px-16">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+          {/* Background Image - Clean and Clear */}
+          <div className="absolute inset-0 w-full h-full">
+            <img
+              src={slide.image}
+              alt={slide.title}
+              className="w-full h-full object-cover"
+            />
+          </div>
 
-              {/* Text Content */}
-              <div className="text-left z-10 space-y-6">
-                <h1 className={`text-4xl md:text-5xl lg:text-6xl font-bold leading-tight ${slide.textColor || "text-primary"}`}>
+          <div className="container relative h-full px-6 md:px-12 flex items-center">
+            <div className="max-w-2xl text-left z-10 space-y-6">
+              {/* Text Content with Strong Shadows for Clarity */}
+              <div className="animate-slide-in-up">
+                <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold leading-tight text-white mb-4 drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)]">
                   {slide.title}
                 </h1>
-                <p className={`text-lg md:text-xl font-medium tracking-wide ${slide.textColor || "text-gray-600"}`}>
+                <p className="text-xl md:text-2xl font-medium tracking-wide text-white mb-2 drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]">
                   {slide.subtitle}
                 </p>
-                {/* Description - Optional to hide on mobile if cluttered */}
-                <p className={`max-w-lg hidden sm:block ${slide.descriptionColor || "text-gray-500"}`}>
-                  {slide.description}
-                </p>
+                {slide.description && (
+                  <p className="max-w-lg hidden sm:block text-white/90 text-lg drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">
+                    {slide.description}
+                  </p>
+                )}
 
-                <div>
+                <div className="mt-8">
                   <Button
                     size="lg"
-                    className={`${slide.buttonColor} px-8 py-6 rounded-lg text-lg shadow-lg transition-all hover:scale-105`}
+                    className="bg-primary hover:bg-primary/90 text-white px-10 py-7 rounded-full text-xl shadow-2xl transition-all hover:scale-105 active:scale-95 border border-white/30 backdrop-blur-sm"
+                    onClick={() => navigate((slide as any).link || "/products")}
                   >
                     {slide.buttonText}
                   </Button>
                 </div>
-              </div>
-
-              {/* Image Content */}
-              <div className="relative flex justify-center md:justify-end">
-                {/* Background blob for depth */}
-                <img
-                  src={slide.image}
-                  alt={slide.title}
-                  className={`relative w-full max-w-[400px] md:max-w-[500px] h-auto object-contain hover:scale-105 transition-transform duration-500 ${(!slide.bgColor || slide.useBlend) ? "mix-blend-multiply" : "rounded-2xl shadow-2xl"
-                    }`}
-                  style={{
-                    filter: (!slide.bgColor || slide.useBlend) ? "contrast(1.15) brightness(1.15)" : "",
-                    ...(slide.id === 2 ? {
-                      maskImage: 'radial-gradient(closest-side, black 55%, transparent 100%)',
-                      WebkitMaskImage: 'radial-gradient(closest-side, black 55%, transparent 100%)'
-                    } : {})
-                  }}
-                />
               </div>
             </div>
           </div>
@@ -157,13 +201,13 @@ const HeroBanner = () => {
       {/* Navigation Arrows */}
       <button
         onClick={prevSlide}
-        className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-primary p-3 rounded-none shadow-md transition-all z-20 hover:scale-110"
+        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white p-4 rounded-full backdrop-blur-md transition-all z-20 hover:scale-110 active:scale-95 border border-white/30"
       >
         <ChevronLeft className="h-6 w-6" />
       </button>
       <button
         onClick={nextSlide}
-        className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-primary p-3 rounded-none shadow-md transition-all z-20 hover:scale-110"
+        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white p-4 rounded-full backdrop-blur-md transition-all z-20 hover:scale-110 active:scale-95 border border-white/30"
       >
         <ChevronRight className="h-6 w-6" />
       </button>
@@ -175,8 +219,8 @@ const HeroBanner = () => {
             key={index}
             onClick={() => goToSlide(index)}
             className={`w-3 h-3 rounded-full transition-all duration-300 ${index === currentSlide
-              ? "bg-primary w-8"
-              : "bg-gray-300 hover:bg-primary/50"
+              ? "bg-white w-10"
+              : "bg-white/30 hover:bg-white/60"
               }`}
           />
         ))}

@@ -911,7 +911,13 @@ const Navbar = () => {
   const isMobile = useIsMobile();
   const { user, isAuthenticated, logout } = useAuth();
   const [cartCount, setCartCount] = useState(0);
+  const [searchValue, setSearchValue] = useState("");
 
+  const handleSearchCommit = (value: string) => {
+    if (value.trim()) {
+      navigate(`/search?q=${encodeURIComponent(value.trim())}`);
+    }
+  };
   const refreshCartCount = async () => {
     try {
       const res = await apiService.getCart();
@@ -969,25 +975,19 @@ const Navbar = () => {
               <Input
                 type="text"
                 placeholder="Search for products, brands and more"
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
                 className="w-full pl-4 pr-12 py-2 bg-background text-foreground border border-gray-300 rounded-md focus:border-primary"
                 onKeyPress={(e) => {
                   if (e.key === "Enter") {
-                    const target = e.target as HTMLInputElement;
-                    if (target.value.trim()) {
-                      navigate(`/search?q=${encodeURIComponent(target.value.trim())}`);
-                    }
+                    handleSearchCommit(searchValue);
                   }
                 }}
               />
               <Button
                 size="sm"
                 className="absolute right-0 top-0 h-full px-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-l-none rounded-r-md"
-                onClick={() => {
-                  const input = document.querySelector('input[placeholder="Search for products, brands and more"]') as HTMLInputElement;
-                  if (input && input.value.trim()) {
-                    navigate(`/search?q=${encodeURIComponent(input.value.trim())}`);
-                  }
-                }}
+                onClick={() => handleSearchCommit(searchValue)}
               >
                 <Search className="h-4 w-4" />
               </Button>
@@ -1049,14 +1049,19 @@ const Navbar = () => {
             <Input
               type="text"
               placeholder="Search for products, brands and more"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
               className="w-full pl-4 pr-12 py-2 bg-background text-foreground border border-gray-300 rounded-md focus:border-primary"
-              onFocus={handleSearchFocus}
-              readOnly
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  handleSearchCommit(searchValue);
+                }
+              }}
             />
             <Button
               size="sm"
               className="absolute right-0 top-0 h-full px-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-l-none rounded-r-md"
-              onClick={handleSearchFocus}
+              onClick={() => handleSearchCommit(searchValue)}
             >
               <Search className="h-4 w-4" />
             </Button>
@@ -1263,15 +1268,14 @@ const Navbar = () => {
                             <div className="font-medium text-foreground mb-2 text-sm">
                               {section.name}
                             </div>
-                            <div className="pl-4 space-y-1">
+                            <div className="grid grid-cols-2 gap-2 mt-2">
                               {section.items.map((item, itemIndex) => (
                                 <Link
                                   key={itemIndex}
                                   to={`/category/${categoryToSlug(category.name)}`}
-                                  className="block text-xs text-muted-foreground hover:text-foreground py-1 px-2 rounded hover:bg-muted flex items-center"
+                                  className="flex items-center justify-center text-[10px] font-semibold text-slate-600 bg-white border border-slate-100 py-2 px-3 rounded-lg shadow-sm active:scale-95 transition-transform text-center"
                                   onClick={() => setIsMobileMenuOpen(false)}
                                 >
-                                  <span className="w-1.5 h-1.5 bg-primary rounded-full mr-2"></span>
                                   {item}
                                 </Link>
                               ))}
@@ -1280,16 +1284,18 @@ const Navbar = () => {
                         ))
                       ) : (
                         // Default mobile layout for other categories
-                        category.subcategories.map((subcategory, index) => (
-                          <Link
-                            key={index}
-                            to={`/category/${categoryToSlug(category.name)}`}
-                            className="block text-sm text-muted-foreground hover:text-foreground py-2 px-2 rounded hover:bg-muted"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                          >
-                            {subcategory as string}
-                          </Link>
-                        ))
+                        <div className="grid grid-cols-2 gap-2 mt-2">
+                          {category.subcategories.map((subcategory, index) => (
+                            <Link
+                              key={index}
+                              to={`/category/${categoryToSlug(category.name)}`}
+                              className="flex items-center justify-center text-[10px] font-semibold text-slate-600 bg-white border border-slate-100 py-2 px-3 rounded-lg shadow-sm active:scale-95 transition-transform text-center"
+                              onClick={() => setIsMobileMenuOpen(false)}
+                            >
+                              {subcategory as string}
+                            </Link>
+                          ))}
+                        </div>
                       )}
                     </div>
                   )}
