@@ -29,7 +29,7 @@ const HomeCategoryGrid: React.FC<HomeCategoryGridProps> = ({ groups }) => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-white my-4 shadow-sm rounded-none">
+    <div className="w-full max-w-[98%] mx-auto px-2 py-8 bg-white my-4 shadow-sm rounded-none">
       {/* 
         Grid layout: 
         cols-1 on small
@@ -47,8 +47,8 @@ const HomeCategoryGrid: React.FC<HomeCategoryGridProps> = ({ groups }) => {
             <CardContent className="p-4 flex-grow flex flex-col">
               <div className="grid grid-cols-2 gap-4 flex-grow">
                 {group.items.slice(0, 4).map((item, itemIdx) => (
-                  <div 
-                    key={itemIdx} 
+                  <div
+                    key={itemIdx}
                     className="group cursor-pointer flex flex-col"
                     onClick={() => handleItemClick(item)}
                   >
@@ -71,7 +71,7 @@ const HomeCategoryGrid: React.FC<HomeCategoryGridProps> = ({ groups }) => {
 
               <div className="mt-4 pt-2">
                 {/* Replaced 'See all offers' link with 'Shop Now' button & No Border Radius */}
-                <Button 
+                <Button
                   className="w-full rounded-none bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
                   onClick={() => navigate(`/category/all`)} // Fallback to all products
                 >

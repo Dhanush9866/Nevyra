@@ -19,7 +19,7 @@ const Cart = () => {
       try {
         const res = await apiService.getCart();
         if (res.success) setCartItems(res.data);
-      } catch {}
+      } catch { }
     })();
   }, []);
 
@@ -35,14 +35,14 @@ const Cart = () => {
           item._id === id ? { ...item, quantity: newQuantity } : item
         )
       );
-    } catch {}
+    } catch { }
   };
 
   const removeItem = async (id: string) => {
     try {
       await apiService.removeCartItem(id);
       setCartItems((items) => items.filter((item: any) => item._id !== id));
-    } catch {}
+    } catch { }
   };
 
   const subtotal = cartItems.reduce(
@@ -124,7 +124,7 @@ const Cart = () => {
                           <div className="flex flex-wrap gap-2">
                             {Object.entries(item.selectedFeatures).map(([key, value]) => (
                               <span key={key} className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
-                                {key}: {value}
+                                {key}: {String(value)}
                               </span>
                             ))}
                           </div>

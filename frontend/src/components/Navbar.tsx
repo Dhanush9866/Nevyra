@@ -912,10 +912,37 @@ const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const [cartCount, setCartCount] = useState(0);
   const [searchValue, setSearchValue] = useState("");
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
-  const handleSearchCommit = (value: string) => {
-    if (value.trim()) {
-      navigate(`/search?q=${encodeURIComponent(value.trim())}`);
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      if (searchValue.trim().length > 1) {
+        try {
+          const res = await apiService.getSearchSuggestions(searchValue);
+          if (res.success) {
+            setSuggestions(res.data);
+            setShowSuggestions(true);
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      } else {
+        setSuggestions([]);
+        setShowSuggestions(false);
+      }
+    };
+
+    const debounceTimer = setTimeout(fetchSuggestions, 100);
+    return () => clearTimeout(debounceTimer);
+  }, [searchValue]);
+
+  const handleSearchCommit = (e?: React.FormEvent, value?: string) => {
+    if (e) e.preventDefault();
+    setShowSuggestions(false);
+    const query = value || searchValue;
+    if (query.trim()) {
+      navigate(`/search?q=${encodeURIComponent(query.trim())}`);
     }
   };
   const refreshCartCount = async () => {
@@ -971,27 +998,46 @@ const Navbar = () => {
 
           {/* Search Bar */}
           <div className="flex-1 max-w-2xl mx-4 hidden md:block">
-            <div className="relative">
+            <form onSubmit={(e) => handleSearchCommit(e)} className="relative">
               <Input
                 type="text"
                 placeholder="Search for products, brands and more"
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
                 className="w-full pl-4 pr-12 py-2 bg-background text-foreground border border-gray-300 rounded-md focus:border-primary"
-                onKeyPress={(e) => {
-                  if (e.key === "Enter") {
-                    handleSearchCommit(searchValue);
-                  }
-                }}
               />
               <Button
+                type="submit"
                 size="sm"
                 className="absolute right-0 top-0 h-full px-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-l-none rounded-r-md"
-                onClick={() => handleSearchCommit(searchValue)}
               >
                 <Search className="h-4 w-4" />
               </Button>
-            </div>
+
+              {showSuggestions && suggestions.length > 0 && (
+                <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-b-md shadow-lg z-50 mt-1 max-h-96 overflow-y-auto w-full">
+                  {suggestions.map((item) => (
+                    <div
+                      key={item.id}
+                      className="px-4 py-3 hover:bg-gray-50 cursor-pointer flex items-center gap-3 border-b border-gray-100 last:border-0"
+                      onClick={() => {
+                        navigate(`/product/${item.id}`);
+                        setShowSuggestions(false);
+                        setSearchValue('');
+                      }}
+                    >
+                      <div className="w-10 h-10 bg-gray-100 rounded flex-shrink-0 overflow-hidden">
+                        <img src={item.image || "/placeholder.png"} alt={item.title} className="w-full h-full object-contain mix-blend-multiply" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-800 line-clamp-1">{item.title}</p>
+                        <p className="text-xs text-gray-500">{item.category} • ₹{item.price}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </form>
           </div>
 
 
@@ -1045,27 +1091,45 @@ const Navbar = () => {
 
         {/* Mobile Search */}
         <div className="mt-3 md:hidden">
-          <div className="relative">
+          <form onSubmit={(e) => handleSearchCommit(e)} className="relative">
             <Input
               type="text"
               placeholder="Search for products, brands and more"
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
               className="w-full pl-4 pr-12 py-2 bg-background text-foreground border border-gray-300 rounded-md focus:border-primary"
-              onKeyPress={(e) => {
-                if (e.key === "Enter") {
-                  handleSearchCommit(searchValue);
-                }
-              }}
             />
             <Button
+              type="submit"
               size="sm"
               className="absolute right-0 top-0 h-full px-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-l-none rounded-r-md"
-              onClick={() => handleSearchCommit(searchValue)}
             >
               <Search className="h-4 w-4" />
             </Button>
-          </div>
+          </form>
+          {showSuggestions && suggestions.length > 0 && (
+            <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-b-md shadow-lg z-50 mt-1 max-h-60 overflow-y-auto">
+              {suggestions.map((item) => (
+                <div
+                  key={item.id}
+                  className="px-4 py-3 hover:bg-gray-50 cursor-pointer flex items-center gap-3 border-b border-gray-100 last:border-0"
+                  onClick={() => {
+                    navigate(`/product/${item.id}`);
+                    setShowSuggestions(false);
+                    setSearchValue('');
+                  }}
+                >
+                  <div className="w-10 h-10 bg-gray-100 rounded flex-shrink-0 overflow-hidden">
+                    <img src={item.image || "/placeholder.png"} alt={item.title} className="w-full h-full object-contain mix-blend-multiply" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-800 line-clamp-1">{item.title}</p>
+                    <p className="text-xs text-gray-500">{item.category} • ₹{item.price}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 

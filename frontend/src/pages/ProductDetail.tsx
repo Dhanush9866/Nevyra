@@ -19,6 +19,8 @@ interface Product {
   id: string;
   title: string;
   price: number;
+  mrp?: number;
+  discount?: number;
   category: string;
   subCategory: string;
   images: string[];
@@ -77,6 +79,7 @@ const ProductDetail = () => {
 
   useEffect(() => {
     if (productId) {
+      window.scrollTo(0, 0);
       fetchProduct();
       checkWishlistStatus();
       fetchReviews();
@@ -230,11 +233,7 @@ const ProductDetail = () => {
       : "https://via.placeholder.com/400x400?text=No+Image";
   };
 
-  const calculateDiscount = (price: number) => {
-    // Simulate original price for discount calculation
-    const originalPrice = price * 1.5;
-    return Math.round(((originalPrice - price) / originalPrice) * 100);
-  };
+
 
   const fetchReviews = async () => {
     if (!productId) return;
@@ -343,8 +342,9 @@ const ProductDetail = () => {
     );
   }
 
-  const discount = calculateDiscount(product.price);
-  const originalPrice = product.price * 1.5;
+  const discountValue = product.discount && product.discount > 0
+    ? product.discount
+    : (product.mrp && product.mrp > product.price ? Math.round(((product.mrp - product.price) / product.mrp) * 100) : 0);
 
   return (
     <div className="min-h-screen bg-background font-roboto">
@@ -408,8 +408,13 @@ const ProductDetail = () => {
             <div className="space-y-2">
               <div className="flex items-center gap-3">
                 <span className="text-3xl font-bold text-price">₹{product.price.toLocaleString()}</span>
-                {discount > 0 && (
-                  <span className="text-xl text-muted-foreground line-through">₹{originalPrice.toLocaleString()}</span>
+                {product.mrp && product.mrp > product.price && (
+                  <>
+                    <span className="text-xl text-muted-foreground line-through">₹{product.mrp.toLocaleString()}</span>
+                    <span className="text-lg font-bold text-green-600">
+                      {discountValue}% OFF
+                    </span>
+                  </>
                 )}
               </div>
               <p className="text-sm text-muted-foreground">Inclusive of all taxes</p>

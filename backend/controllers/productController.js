@@ -58,10 +58,10 @@ function mapProductId(product) {
 
 exports.list = async (req, res, next) => {
   try {
-    const { page = 1, limit = 10, category, subCategory, search } = req.query;
+    const { page = 1, limit = 10, category, subCategory, search, minPrice, maxPrice, minRating, inStock } = req.query;
 
     console.log('========== PRODUCT LIST REQUEST ==========');
-    console.log('Query params:', { page, limit, category, subCategory, search });
+    console.log('Query params:', { page, limit, category, subCategory, search, minPrice, maxPrice, minRating, inStock });
 
     const filter = {};
     if (category) {
@@ -87,6 +87,21 @@ exports.list = async (req, res, next) => {
         query: search.toLowerCase().trim(),
         user: req.user ? req.user.id : null
       }).catch(err => console.error('Search log error:', err));
+    }
+
+    // New filters
+    if (minPrice || maxPrice) {
+      filter.price = {};
+      if (minPrice) filter.price.$gte = Number(minPrice);
+      if (maxPrice) filter.price.$lte = Number(maxPrice);
+    }
+
+    if (minRating) {
+      filter.rating = { $gte: Number(minRating) };
+    }
+
+    if (inStock === 'true' || inStock === true) {
+      filter.inStock = true;
     }
 
     console.log('MongoDB filter:', JSON.stringify(filter));
@@ -140,10 +155,10 @@ exports.list = async (req, res, next) => {
 // New endpoint for filtering by multiple subcategories (comma-separated)
 exports.listByMultipleSubcategories = async (req, res, next) => {
   try {
-    const { page = 1, limit = 10, category, subCategories, search } = req.query;
+    const { page = 1, limit = 10, category, subCategories, search, minPrice, maxPrice, minRating, inStock } = req.query;
 
     console.log('========== MULTI-SUBCATEGORY PRODUCT LIST REQUEST ==========');
-    console.log('Query params:', { page, limit, category, subCategories, search });
+    console.log('Query params:', { page, limit, category, subCategories, search, minPrice, maxPrice, minRating, inStock });
 
     const filter = {};
     if (category) filter.category = { $regex: new RegExp(`^${category}$`, "i") };
@@ -155,6 +170,21 @@ exports.listByMultipleSubcategories = async (req, res, next) => {
     }
 
     if (search) filter.title = { $regex: search, $options: "i" };
+
+    // New filters
+    if (minPrice || maxPrice) {
+      filter.price = {};
+      if (minPrice) filter.price.$gte = Number(minPrice);
+      if (maxPrice) filter.price.$lte = Number(maxPrice);
+    }
+
+    if (minRating) {
+      filter.rating = { $gte: Number(minRating) };
+    }
+
+    if (inStock === 'true' || inStock === true) {
+      filter.inStock = true;
+    }
 
     console.log('MongoDB filter:', JSON.stringify(filter));
 
@@ -241,6 +271,8 @@ exports.create = async (req, res, next) => {
       soldCount,
       attributes,
       additionalSpecifications,
+      mrp,
+      discount,
     } = req.body;
 
     if (!title || !price || !category || !images || !subCategory)
@@ -305,6 +337,8 @@ exports.create = async (req, res, next) => {
       soldCount,
       attributes,
       additionalSpecifications: parsedSpecs,
+      mrp: mrp || 0,
+      discount: discount || 0,
     });
     await product.save();
     res.status(201).json({
@@ -337,6 +371,8 @@ exports.update = async (req, res, next) => {
       soldCount,
       attributes,
       additionalSpecifications,
+      mrp,
+      discount,
     } = req.body;
 
     // Resolve category and subcategory names from IDs if provided
@@ -391,10 +427,10 @@ exports.update = async (req, res, next) => {
     if (stockQuantity !== undefined) product.stockQuantity = stockQuantity;
     if (soldCount !== undefined) product.soldCount = soldCount;
     if (attributes !== undefined) product.attributes = attributes;
-    if (additionalSpecifications !== undefined) {
-      product.additionalSpecifications = additionalSpecifications ?
-        parseAdditionalSpecifications(additionalSpecifications) : {};
-    }
+    product.additionalSpecifications = additionalSpecifications ?
+      parseAdditionalSpecifications(additionalSpecifications) : {};
+    if (mrp !== undefined) product.mrp = mrp;
+    if (discount !== undefined) product.discount = discount;
     await product.save();
     res.json({
       success: true,
@@ -525,6 +561,37 @@ exports.getTopDeals = async (req, res, next) => {
       success: true,
       message: "Top deals fetched",
       data: mappedProducts,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getSuggestions = async (req, res, next) => {
+  try {
+    const { search } = req.query;
+    if (!search) {
+      return res.json({ success: true, data: [] });
+    }
+
+    // Find products matching title
+    const suggestions = await Product.find({
+      title: { $regex: search, $options: "i" }
+    })
+      .select("title _id category images price")
+      .limit(8)
+      .lean();
+
+    res.json({
+      success: true,
+      message: "Suggestions fetched",
+      data: suggestions.map(p => ({
+        id: p._id,
+        title: p.title,
+        category: p.category,
+        image: p.images && p.images.length > 0 ? p.images[0] : null,
+        price: p.price
+      }))
     });
   } catch (err) {
     next(err);

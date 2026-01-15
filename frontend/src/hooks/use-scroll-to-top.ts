@@ -5,6 +5,11 @@ export const useScrollToTop = () => {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    // Immediate scroll to top
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "instant", // Use instant to prevent smooth scroll interference
+    });
   }, [pathname]);
 }; 

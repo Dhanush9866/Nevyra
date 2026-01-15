@@ -168,24 +168,32 @@ const Index = () => {
           id: p.id,
           title: p.title,
           price: `₹${p.price}`,
+          mrp: p.mrp,
+          discount: p.discount,
           image: p.images[0] || "https://via.placeholder.com/300"
         })));
         if (res4.success) setRow4Products(res4.data.map(p => ({
           id: p.id,
           title: p.title,
           price: `₹${p.price}`,
+          mrp: p.mrp,
+          discount: p.discount,
           image: p.images[0] || "https://via.placeholder.com/300"
         })));
         if (res6.success) setRow6Products(res6.data.map(p => ({
           id: p.id,
           title: p.title,
           price: `₹${p.price}`,
+          mrp: p.mrp,
+          discount: p.discount,
           image: p.images[0] || "https://via.placeholder.com/300"
         })));
         if (res8.success) setRow8Products(res8.data.map(p => ({
           id: p.id,
           title: p.title,
           price: `₹${p.price}`,
+          mrp: p.mrp,
+          discount: p.discount,
           image: p.images[0] || "https://via.placeholder.com/300"
         })));
       } catch (error) {

@@ -15,6 +15,14 @@ const productSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    mrp: {
+      type: Number,
+      default: 0,
+    },
+    discount: {
+      type: Number,
+      default: 0,
+    },
     category: {
       type: String,
       required: true,

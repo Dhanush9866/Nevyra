@@ -60,6 +60,10 @@ class ApiService {
     return this.request(`/products${query ? `?${query}` : ''}`);
   }
 
+  async getSearchSuggestions(query: string): Promise<{ success: boolean; message: string; data: any[] }> {
+    return this.request(`/products/suggestions?search=${encodeURIComponent(query)}`);
+  }
+
   async getProductsByCategory(category: string, limit: number = 10): Promise<{ success: boolean; message: string; data: any[] }> {
     return this.request(`/products?category=${encodeURIComponent(category)}&limit=${limit}`);
   }

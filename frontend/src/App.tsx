@@ -51,7 +51,7 @@ const AppContent = () => {
       <Route path="/order/:orderId" element={<OrderDetails />} />
       <Route path="/admin" element={<AdminDashboard />} />
       <Route path="/search-suggestions" element={<SearchSuggestions />} />
-      <Route path="/search" element={<SearchResults />} />
+      <Route path="/search" element={<ProductListing />} />
       <Route path="/wishlist" element={<Wishlist />} />
       <Route path="/bestseller" element={<BestSeller />} />
       <Route path="/seller" element={<SellerLanding />} />
@@ -89,7 +89,7 @@ const App = () => (
             <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
             <Route path="/admin" element={<RequireAuth requireAdmin><AdminDashboard /></RequireAuth>} />
             <Route path="/search-suggestions" element={<SearchSuggestions />} />
-            <Route path="/search" element={<SearchResults />} />
+            <Route path="/search" element={<ProductListing />} />
             <Route path="/wishlist" element={<RequireAuth><Wishlist /></RequireAuth>} />
             <Route path="/orders" element={<RequireAuth><Orders /></RequireAuth>} />
             <Route path="/order/:orderId" element={<RequireAuth><OrderDetails /></RequireAuth>} />

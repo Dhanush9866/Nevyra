@@ -19,6 +19,8 @@ interface Category {
 interface ProductFormData {
   title: string;
   price: string;
+  mrp?: string;
+  discount?: string;
   category: string;
   subCategory: string;
   stockQuantity: string;
@@ -40,6 +42,8 @@ interface AddProductFormProps {
     id: string;
     title: string;
     price: number;
+    mrp?: number;
+    discount?: number;
     category: string;
     subCategory: string;
     stockQuantity: number;
@@ -72,7 +76,19 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
   const [loading, setLoading] = useState(false);
   const [uploadingImages, setUploadingImages] = useState(false);
   const [imagePreview, setImagePreview] = useState<string[]>([]);
+
   const { toast } = useToast();
+
+  // Calculation Logic
+  useEffect(() => {
+    const mrp = parseFloat(formData.mrp || '0');
+    const discount = parseFloat(formData.discount || '0');
+
+    if (mrp > 0 && discount >= 0 && discount <= 100) {
+      const sellingPrice = mrp - (mrp * discount / 100);
+      setFormData(prev => ({ ...prev, price: sellingPrice.toFixed(2) }));
+    }
+  }, [formData.mrp, formData.discount]);
 
   // Load categories on component mount
   useEffect(() => {
@@ -86,6 +102,8 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
         ...prev,
         title: product.title || '',
         price: product.price != null ? String(product.price) : '',
+        mrp: product.mrp != null ? String(product.mrp) : '', // Add MRP
+        discount: product.discount != null ? String(product.discount) : '', // Add Discount
         category: '', // will resolve to id after categories load
         subCategory: '',
         stockQuantity: product.stockQuantity != null ? String(product.stockQuantity) : '',
@@ -93,8 +111,8 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
         rating: product.rating != null ? String(product.rating) : '0',
         reviews: product.reviews != null ? String(product.reviews) : '0',
         soldCount: product.soldCount != null ? String(product.soldCount) : '0',
-        additionalSpecifications: typeof product.additionalSpecifications === 'string' 
-          ? product.additionalSpecifications 
+        additionalSpecifications: typeof product.additionalSpecifications === 'string'
+          ? product.additionalSpecifications
           : JSON.stringify(product.additionalSpecifications || {})
       }));
       // show existing image previews
@@ -106,7 +124,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
   useEffect(() => {
     if (formData.category) {
       const parentCategory = categories.find(cat => cat._id === formData.category);
-      
+
       if (parentCategory) {
         const subs = categories.filter(cat => cat.parentId === parentCategory._id);
         setSubCategories(subs);
@@ -161,7 +179,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     setFormData(prev => ({ ...prev, images: [...prev.images, ...files] }));
-    
+
     // Create preview URLs
     const newPreviews = files.map(file => URL.createObjectURL(file));
     setImagePreview(prev => [...prev, ...newPreviews]);
@@ -177,7 +195,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
 
   const uploadImages = async (): Promise<string[]> => {
     if (formData.images.length === 0) return [];
-    
+
     setUploadingImages(true);
     try {
       const response = await adminAPI.upload.multipleImages(formData.images, token);
@@ -195,7 +213,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.title || !formData.price || !formData.category || !formData.subCategory) {
       toast({
         title: "Validation Error",
@@ -209,11 +227,13 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
     try {
       // Upload images first
       const imageUrls = await uploadImages();
-      
+
       // Prepare product data
       const productData = {
         title: formData.title,
         price: parseFloat(formData.price),
+        mrp: parseFloat(formData.mrp || '0'),
+        discount: parseFloat(formData.discount || '0'),
         category: formData.category,
         subCategory: formData.subCategory,
         stockQuantity: parseInt(formData.stockQuantity) || 0,
@@ -230,7 +250,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
       const response = mode === 'edit' && product
         ? await adminAPI.products.update(product.id, productData, token)
         : await adminAPI.products.create(productData, token);
-      
+
       if (response.success) {
         toast({
           title: "Success",
@@ -281,7 +301,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
                   required
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="price">Price (₹) *</Label>
                 <Input
@@ -292,6 +312,37 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
                   onChange={(e) => handleInputChange('price', e.target.value)}
                   placeholder="0.00"
                   required
+                  readOnly // Price is calculated
+                  className="bg-gray-100"
+                />
+              </div>
+            </div>
+
+            {/* Price & Discount */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="mrp">MRP (₹)</Label>
+                <Input
+                  id="mrp"
+                  type="number"
+                  step="0.01"
+                  value={formData.mrp}
+                  onChange={(e) => handleInputChange('mrp', e.target.value)}
+                  placeholder="0.00"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="discount">Discount (%)</Label>
+                <Input
+                  id="discount"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  max="100"
+                  value={formData.discount}
+                  onChange={(e) => handleInputChange('discount', e.target.value)}
+                  placeholder="0"
                 />
               </div>
             </div>
@@ -313,11 +364,11 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="subCategory">Sub Category *</Label>
-                <Select 
-                  value={formData.subCategory} 
+                <Select
+                  value={formData.subCategory}
                   onValueChange={(value) => handleInputChange('subCategory', value)}
                   disabled={!formData.category}
                 >
@@ -347,7 +398,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
                   placeholder="0"
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="rating">Rating</Label>
                 <Input
@@ -361,7 +412,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
                   placeholder="0.0"
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="reviews">Reviews Count</Label>
                 <Input
@@ -406,7 +457,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
                   <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB each</p>
                 </label>
               </div>
-              
+
               {/* Image Previews */}
               {imagePreview.length > 0 && (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">

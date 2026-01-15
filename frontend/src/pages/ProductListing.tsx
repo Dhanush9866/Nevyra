@@ -32,6 +32,7 @@ type ProductItem = {
   title: string;
   price: number;
   mrp?: number;
+  discount?: number;
   images?: string[];
   rating?: number;
   reviewsCount?: number;
@@ -167,6 +168,8 @@ const ProductListing = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20; // 4 columns * 5 rows
   const { toast } = useToast();
+  const [sortBy, setSortBy] = useState("popularity");
+  const [showFilters, setShowFilters] = useState(false);
 
   // Map URL category name to display category name
   const categoryMap: Record<string, string> = {
@@ -182,51 +185,102 @@ const ProductListing = () => {
   };
 
   // Get the current category display name
-  const currentCategory = categoryName && categoryName !== 'all' 
-    ? categoryMap[categoryName] || categoryName 
-    : 'Electronics';
+  const currentCategory = categoryName && categoryName !== 'all'
+    ? categoryMap[categoryName] || categoryName
+    : (searchParams.get('search') || searchParams.get('q') ? "Search Results" : 'Electronics');
 
   // Get subcategories for the current category
   const currentSubcategories = categories[currentCategory as keyof typeof categories] || [];
 
+  const [selectedRating, setSelectedRating] = useState<number | null>(null);
+  const [inStock, setInStock] = useState(false);
+  const [fastDelivery, setFastDelivery] = useState(false);
+
+  // Debounced price range state for API calls
+  const [debouncedPriceRange, setDebouncedPriceRange] = useState(priceRange);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedPriceRange(priceRange);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [priceRange]);
+
   useEffect(() => {
     (async () => {
+      window.scrollTo(0, 0); // Force scroll to top on category change
       console.log('========== FRONTEND PRODUCT FETCH ==========');
       const params: any = { limit: 100 };
-      
+
       // Handle Category from URL param
       if (categoryName && categoryName !== 'all') {
         params.category = categoryMap[categoryName] || categoryName;
       }
 
-      // Handle SubCategory from Query param
-      const subCategory = searchParams.get('subCategory');
-      if (subCategory) {
-        // Check if it contains comma-separated values
-        if (subCategory.includes(',')) {
-          // Use the new multi-subcategory endpoint
-          params.subCategories = subCategory;
-        } else {
-          // Use the regular single subcategory param
-          params.subCategory = subCategory;
-        }
+      // Handle Filters
+      // 1. Subcategories
+      // Prioritize state (sidebar filter) over URL param, or merge them?
+      // For now, let's use the state if it has items.
+      const subCategoryParam = searchParams.get('subCategory');
+
+      let finalSubIndices: string[] = [];
+      if (selectedSubcategories.length > 0) {
+        finalSubIndices = selectedSubcategories;
+      } else if (subCategoryParam) {
+        // Initial load from URL
+        finalSubIndices = subCategoryParam.split(',');
+        // We should probably sync this to state if it's the first run, 
+        // but for now let's just use it for the fetch.
+        // Note: Managing 2 sources of truth is tricky. 
+        // Ideally we sync URL to state on mount. 
+        // For simplistic implementation:
       }
+
+      if (finalSubIndices.length > 0) {
+        params.subCategories = finalSubIndices.join(',');
+      }
+
+      // 2. Search
+      const searchQuery = searchParams.get('search') || searchParams.get('q');
+      if (searchQuery) {
+        params.search = searchQuery;
+      }
+
+      // 3. Price
+      params.minPrice = debouncedPriceRange[0];
+      params.maxPrice = debouncedPriceRange[1];
+
+      // 4. Rating
+      if (selectedRating !== null) {
+        params.minRating = selectedRating;
+      }
+
+      // 4. Availability
+      if (inStock) {
+        params.inStock = true;
+      }
+      // if (fastDelivery) params.fastDelivery = true; // Add backend support if needed
 
       try {
         console.log('API request params:', params);
-        
-        // Use the appropriate endpoint based on whether we have multiple subcategories
-        const res = params.subCategories 
+
+        // Always use the multi-subcategory endpoint if we want advanced filtering?
+        // Or generic getProducts? getProducts wraps /products which likely supports standard filters.
+        // Let's assume getProducts handles standard filters.
+        // But getProductsByMultipleSubcategories is specific. 
+        // Let's stick to getProducts or getProductsByMultipleSubcategories depending on subcats.
+
+        const res = params.subCategories
           ? await apiService.getProductsByMultipleSubcategories(params)
           : await apiService.getProducts(params);
-          
+
         console.log('API response received:', {
           success: res.success,
           dataLength: res.data?.length,
           pagination: res.pagination,
           message: res.message
         });
-        
+
         if (res.success) {
           const mappedProducts = res.data.map((p: any) => ({
             _id: p.id || p._id,
@@ -238,28 +292,32 @@ const ProductListing = () => {
             reviewsCount: p.reviewsCount || 0,
             brand: p.brand || p.category,
           }));
-          console.log('Products mapped:', {
-            count: mappedProducts.length,
-            firstProduct: mappedProducts[0]?.title,
-            lastProduct: mappedProducts[mappedProducts.length - 1]?.title
-          });
           setProducts(mappedProducts);
-          console.log('State updated with products');
         } else {
           console.error('API returned success: false', res.message);
+          setProducts([]);
         }
       } catch (err) {
         console.error('Error fetching products:', err);
+        setProducts([]);
       }
-      console.log('==========================================');
     })();
-    setCurrentPage(1); // Reset to first page when category changes
-  }, [categoryName]);
-  
-  const [sortBy, setSortBy] = useState("popularity");
-  const [showFilters, setShowFilters] = useState(false);
+    setCurrentPage(1);
+  }, [categoryName, selectedSubcategories, debouncedPriceRange, selectedRating, inStock, fastDelivery, searchParams]);
 
-
+  // Sync URL subCategory param to state on mount
+  useEffect(() => {
+    const subParam = searchParams.get('subCategory');
+    if (subParam) {
+      const initialSubs = subParam.split(',');
+      // Only set if state is empty to avoid overwriting user interaction? 
+      // Or always set? Usually strictly controlled or strictly URL. 
+      // Let's set it if empty.
+      if (selectedSubcategories.length === 0) {
+        setSelectedSubcategories(initialSubs);
+      }
+    }
+  }, [searchParams]); // Simple dependency
 
   const handleSubcategoryChange = (subcategory: string, checked: boolean) => {
     if (checked) {
@@ -296,22 +354,9 @@ const ProductListing = () => {
     }
   };
 
-  const filteredProducts = products.filter((product) => {
-    const inPriceRange =
-      product.price >= priceRange[0] && product.price <= priceRange[1];
-    
-    // Filter by selected subcategories (if any are selected)
-    const inSelectedSubcategories =
-      selectedSubcategories.length === 0 || 
-      selectedSubcategories.some(subcat => 
-        product.title?.toLowerCase().includes(subcat.toLowerCase()) ||
-        product.brand?.toLowerCase().includes(subcat.toLowerCase())
-      );
-    
-    return inPriceRange && inSelectedSubcategories;
-  });
-
-  const sortedProducts = [...filteredProducts].sort((a, b) => {
+  // Removed client-side filteredProducts logic. 
+  // We now trust 'products' is already filtered by server.
+  const sortedProducts = [...products].sort((a, b) => {
     switch (sortBy) {
       case "price-low-high":
         return a.price - b.price;
@@ -320,7 +365,7 @@ const ProductListing = () => {
       case "rating":
         return (b.rating || 0) - (a.rating || 0);
       case "newest":
-        return 0;
+        return 0; // Backend handles if needed, or keeping it no-op
       default:
         return 0;
     }
@@ -387,22 +432,26 @@ const ProductListing = () => {
             <div className="bg-card border-0 sticky top-4">
               <div className="p-0">
                 {/* Clear Filters Button */}
-                {selectedSubcategories.length > 0 && (
+                {(selectedSubcategories.length > 0 || selectedRating !== null || inStock || (priceRange[0] !== 0 || priceRange[1] !== 1000000)) && (
                   <div className="mb-3">
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => setSelectedSubcategories([])}
+                      onClick={() => {
+                        setSelectedSubcategories([]);
+                        setPriceRange([0, 1000000]);
+                        setSelectedRating(null);
+                        setInStock(false);
+                      }}
                       className="w-full text-xs"
                     >
-                      Clear Filters ({selectedSubcategories.length})
+                      Clear Filters
                     </Button>
                   </div>
                 )}
                 {/* Category Filter with Subcategories */}
                 <div className="mb-4 border-b pb-3">
                   <h4 className="font-bold text-foreground mb-2 text-base">{currentCategory}</h4>
-                  {/* Scrollable subcategories container */}
                   <div className="max-h-[400px] overflow-y-auto pr-2 space-y-1 filter-scroll">
                     {currentSubcategories.map((subcategory) => (
                       <div key={subcategory} className="flex items-center space-x-2 py-0.5">
@@ -452,7 +501,12 @@ const ProductListing = () => {
                   <div className="space-y-1">
                     {[4, 3, 2, 1].map((rating) => (
                       <div key={rating} className="flex items-center space-x-2 py-0.5">
-                        <Checkbox id={`rating-${rating}`} className="h-3 w-3" />
+                        <Checkbox
+                          id={`rating-${rating}`}
+                          className="h-3 w-3"
+                          checked={selectedRating === rating}
+                          onCheckedChange={(checked) => setSelectedRating(checked ? rating : null)}
+                        />
                         <label
                           htmlFor={`rating-${rating}`}
                           className="text-xs text-foreground cursor-pointer flex items-center hover:text-primary"
@@ -473,7 +527,12 @@ const ProductListing = () => {
                   </h4>
                   <div className="space-y-1">
                     <div className="flex items-center space-x-2 py-0.5">
-                      <Checkbox id="in-stock" className="h-3 w-3" />
+                      <Checkbox
+                        id="in-stock"
+                        className="h-3 w-3"
+                        checked={inStock}
+                        onCheckedChange={(checked) => setInStock(checked as boolean)}
+                      />
                       <label
                         htmlFor="in-stock"
                         className="text-xs text-foreground cursor-pointer hover:text-primary"
@@ -481,15 +540,7 @@ const ProductListing = () => {
                         In Stock
                       </label>
                     </div>
-                    <div className="flex items-center space-x-2 py-0.5">
-                      <Checkbox id="fast-delivery" className="h-3 w-3" />
-                      <label
-                        htmlFor="fast-delivery"
-                        className="text-xs text-foreground cursor-pointer hover:text-primary"
-                      >
-                        Fast Delivery
-                      </label>
-                    </div>
+                    {/* Fast delivery placeholder if needed */}
                   </div>
                 </div>
               </div>
@@ -513,7 +564,7 @@ const ProductListing = () => {
                           className="w-full h-32 md:h-48 object-cover"
                         />
                         <Badge className="absolute top-1 left-1 bg-discount text-white text-xs rounded-none">
-                          {product.mrp && product.mrp > product.price ? Math.round(((product.mrp - product.price) / product.mrp) * 100) : 0}% OFF
+                          {product.discount > 0 ? product.discount : (product.mrp && product.mrp > product.price ? Math.round(((product.mrp - product.price) / product.mrp) * 100) : 0)}% OFF
                         </Badge>
                       </div>
 
@@ -537,9 +588,11 @@ const ProductListing = () => {
                         <span className="text-lg font-bold text-price">
                           ₹{product.price.toLocaleString()}
                         </span>
-                        <span className="text-xs text-muted-foreground line-through">
-                          ₹{(product.mrp || product.price).toLocaleString()}
-                        </span>
+                        {product.mrp > product.price && (
+                          <span className="text-xs text-muted-foreground line-through">
+                            ₹{product.mrp.toLocaleString()}
+                          </span>
+                        )}
                       </div>
                     </Link>
 
@@ -566,8 +619,8 @@ const ProductListing = () => {
                 <Pagination>
                   <PaginationContent>
                     <PaginationItem>
-                      <PaginationPrevious 
-                        href="#" 
+                      <PaginationPrevious
+                        href="#"
                         onClick={(e) => {
                           e.preventDefault();
                           if (currentPage > 1) handlePageChange(currentPage - 1);
@@ -575,7 +628,7 @@ const ProductListing = () => {
                         className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
                       />
                     </PaginationItem>
-                    
+
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
                       // Show only first, last, and pages around current
                       if (
@@ -612,8 +665,8 @@ const ProductListing = () => {
                     })}
 
                     <PaginationItem>
-                      <PaginationNext 
-                        href="#" 
+                      <PaginationNext
+                        href="#"
                         onClick={(e) => {
                           e.preventDefault();
                           if (currentPage < totalPages) handlePageChange(currentPage + 1);
