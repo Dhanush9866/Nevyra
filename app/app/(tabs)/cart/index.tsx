@@ -271,7 +271,7 @@ export default function CartScreen() {
         ))}
 
         {/* Protection Teaser */}
-        <View style={styles.protectionCard}>
+        {/* <View style={styles.protectionCard}>
           <View style={styles.protectionHeader}>
             <AppText variant="body" weight="semibold">Complete Digital Protection</AppText>
             <TouchableOpacity>
@@ -281,7 +281,7 @@ export default function CartScreen() {
           <View style={styles.protectionContent}>
             <View style={styles.protectionPlaceholder} />
           </View>
-        </View>
+        </View> */}
       </ScrollView>
 
       {/* Footer */}
