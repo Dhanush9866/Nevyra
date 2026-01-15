@@ -31,7 +31,7 @@ export default function OrderListScreen() {
         style={styles.container}
         contentContainerStyle={styles.content}
       >
-        <OrderPromoBanner />
+        {/* <OrderPromoBanner /> */}
 
         {/* Search and Filters Row */}
         <View style={styles.searchRowContainer}>

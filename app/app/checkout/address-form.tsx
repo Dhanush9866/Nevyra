@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, TextInput, Alert } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, Stack, useLocalSearchParams } from 'expo-router';
 import { User, Phone, MapPin } from 'lucide-react-native';
 import Button from '@/components/atoms/Button';
@@ -13,6 +14,7 @@ export default function AddressFormScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { addAddress, updateAddress } = useAuth();
+  const insets = useSafeAreaInsets();
 
   const editMode = params.editMode === 'true';
   const addressIndex = params.index ? parseInt(params.index as string, 10) : -1;
@@ -120,7 +122,7 @@ export default function AddressFormScreen() {
           />
         </ScrollView>
 
-        <View style={styles.footer}>
+        <View style={[styles.footer, { paddingBottom: Spacing.base + insets.bottom }]}>
           <Button
             title={editMode ? 'Update Address' : 'Save Address'}
             onPress={handleSave}

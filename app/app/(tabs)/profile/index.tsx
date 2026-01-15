@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Image, Linking } from 'react-native';
 import { useRouter } from 'expo-router';
 import {
   Package,
@@ -36,16 +36,13 @@ export default function ProfileScreen() {
 
   const topGridItems = [
     { icon: Package, label: 'Orders', route: '/order/list' },
-    { icon: Heart, label: 'Wishlist', route: '/wishlist' },
-    { icon: Gift, label: 'Coupons', route: '/coupons' },
-    { icon: Headphones, label: 'Help Center', route: '/help' },
+    { icon: Heart, label: 'Wishlist', route: '/wishlist' }
   ];
 
   const Sections = [
     {
       title: 'Account Settings',
       items: [
-        { icon: Zap, label: 'Plus', route: '/plus' },
         { icon: User, label: 'Edit Profile', route: '/profile/edit' },
         { icon: MapPin, label: 'Saved Addresses', route: '/checkout/address-list' },
       ],
@@ -60,7 +57,7 @@ export default function ProfileScreen() {
     {
       title: 'Earn with Nevyra',
       items: [
-        { icon: Store, label: 'Sell on Nevyra', route: '/sell' },
+        { icon: Store, label: 'Sell on Nevyra', route: 'https://nevyra-seller.onrender.com/' },
       ],
     },
     {
@@ -74,28 +71,6 @@ export default function ProfileScreen() {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Header Section */}
-      <View style={styles.headerContainer}>
-        <View style={styles.headerCard}>
-          <View style={styles.headerTop}>
-            <AppText variant="h3" weight="bold" style={styles.userName}>
-              {user?.name || 'sunand sunand'}
-            </AppText>
-            <View style={styles.coinBadge}>
-              <Zap size={14} color="#FFB800" fill="#FFB800" />
-              <AppText variant="caption" weight="bold">0</AppText>
-            </View>
-          </View>
-          <AppText variant="caption" color={Colors.textSecondary} style={styles.headerSubtext}>
-            FREE Youtube Premium, SuperCoin cashback and more privileges with <AppText weight="bold">BLACK</AppText>
-          </AppText>
-          <TouchableOpacity style={styles.exploreButton}>
-            <AppText variant="body" weight="bold" color={Colors.white}>
-              Explore BLACK
-            </AppText>
-          </TouchableOpacity>
-        </View>
-      </View>
 
       {/* Top Grid */}
       <View style={styles.gridContainer}>
@@ -115,17 +90,6 @@ export default function ProfileScreen() {
 
       <View style={styles.divider} />
 
-      {/* Recently Viewed Stores */}
-      <View style={styles.section}>
-        <AppText variant="h4" weight="bold" style={styles.sectionTitle}>
-          Recently Viewed Stores
-        </AppText>
-        <View style={styles.emptyRecentStores}>
-          <AppText variant="caption" color={Colors.textLight}>No recently viewed stores</AppText>
-        </View>
-        <View style={styles.sectionDivider} />
-      </View>
-
       {/* Sections */}
       {Sections.map((section, sIndex) => (
         <View key={sIndex} style={styles.section}>
@@ -136,7 +100,15 @@ export default function ProfileScreen() {
             <TouchableOpacity
               key={iIndex}
               style={styles.menuItem}
-              onPress={() => item.route && router.push(item.route as any)}
+              onPress={() => {
+                if (item.route) {
+                  if (item.route.startsWith('http')) {
+                    Linking.openURL(item.route);
+                  } else {
+                    router.push(item.route as any);
+                  }
+                }
+              }}
             >
               <View style={styles.menuItemLeft}>
                 <item.icon size={20} color={Colors.primary} />
