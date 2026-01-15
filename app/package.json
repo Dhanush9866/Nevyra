@@ -1,7 +1,9 @@
 {
+  
   "name": "expo-app",
   "main": "expo-router/entry",
   "version": "1.0.0",
+  "packageManager": "npm@10.0.0",
   "scripts": {
     "start": "npx expo start",
     "start-web": "npx expo start --web",
