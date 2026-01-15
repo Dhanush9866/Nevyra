@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-const API_BASE_URL = 'http://10.123.124.42:8000/api/v1'; // Use local IP instead of localhost for mobile devices
+import { API_BASE_URL } from '@/config/env';
 class ApiService {
   private baseURL: string;
 
