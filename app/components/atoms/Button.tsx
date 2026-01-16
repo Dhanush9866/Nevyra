@@ -6,6 +6,7 @@ import {
   ViewStyle,
   TextStyle,
   StyleProp,
+  View,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Colors from '@/constants/colors';
@@ -22,6 +23,7 @@ interface ButtonProps {
   style?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
   fullWidth?: boolean;
+  icon?: React.ReactNode;
 }
 
 export default function Button({
@@ -34,6 +36,7 @@ export default function Button({
   style,
   textStyle,
   fullWidth = false,
+  icon,
 }: ButtonProps) {
   const buttonStyles = [
     styles.button,
@@ -70,7 +73,10 @@ export default function Button({
           {loading ? (
             <ActivityIndicator color={Colors.white} />
           ) : (
-            <Text style={textStyles}>{title}</Text>
+            <View style={styles.contentContainer}>
+              <Text style={textStyles}>{title}</Text>
+              {icon && <View style={styles.iconContainer}>{icon}</View>}
+            </View>
           )}
         </LinearGradient>
       </TouchableOpacity>
@@ -89,7 +95,10 @@ export default function Button({
           color={variant === 'primary' ? Colors.white : Colors.primary}
         />
       ) : (
-        <Text style={textStyles}>{title}</Text>
+        <View style={styles.contentContainer}>
+          <Text style={textStyles}>{title}</Text>
+          {icon && <View style={styles.iconContainer}>{icon}</View>}
+        </View>
       )}
     </TouchableOpacity>
   );
@@ -164,5 +173,13 @@ const styles = StyleSheet.create({
   },
   textText: {
     color: Colors.primary,
+  },
+  contentContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconContainer: {
+    marginLeft: Spacing.sm,
   },
 });
