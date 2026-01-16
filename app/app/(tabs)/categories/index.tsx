@@ -8,9 +8,11 @@ import {
   FlatList,
   TextInput,
   SafeAreaView,
+  StatusBar,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, Stack } from 'expo-router';
-import { Search, Bell, ShoppingCart } from 'lucide-react-native';
+import { Search, Bell, ShoppingCart, MapPin, ChevronDown } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import AppText from '@/components/atoms/AppText';
@@ -19,6 +21,7 @@ import Colors from '@/constants/colors';
 import Spacing from '@/constants/spacing';
 import { mockCategories } from '@/services/mockData';
 import { Category } from '@/types';
+import { useAuth } from '@/store/AuthContext';
 
 // Categories are now imported from @/services/mockData
 
@@ -83,7 +86,14 @@ import Loader from '@/components/atoms/Loader';
 
 export default function CategoriesScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const { addresses } = useAuth();
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+
+  const defaultAddress = addresses.find(a => a.isDefault) || addresses[0];
+  const addressDisplay = defaultAddress
+    ? `${defaultAddress.city}, ${defaultAddress.state} - ${defaultAddress.zipCode}`
+    : 'Select a delivery address';
 
   const { data: catData, isLoading, error } = useQuery({
     queryKey: ['categories'],
@@ -139,52 +149,44 @@ export default function CategoriesScreen() {
 
   return (
     <View style={styles.container}>
-      <Stack.Screen
-        options={{
-          headerShown: true,
-          headerTransparent: true,
-          headerTitle: '',
-          headerLeft: () => (
-            <LinearGradient
-              colors={['rgba(123, 47, 191, 0.9)', 'transparent']}
-              style={styles.headerGradient}
-            >
-              <AppText variant="h3" color={Colors.white} weight="bold">
-                Zythova
-              </AppText>
-            </LinearGradient>
-          ),
-          headerRight: () => (
-            <View style={styles.headerActions}>
-              <IconButton
-                icon={Bell}
-                onPress={() => router.push('/notifications' as any)}
-                color={Colors.white}
-              />
-              <IconButton
-                icon={ShoppingCart}
-                onPress={() => router.push('/(tabs)/cart')}
-                color={Colors.white}
-              />
-            </View>
-          ),
-        }}
-      />
+      <StatusBar barStyle="light-content" />
+      <Stack.Screen options={{ headerShown: false }} />
 
-      <LinearGradient
-        colors={[Colors.gradient.primary[0], 'transparent']}
-        style={styles.topGradient}
-      />
+      {/* Header matching Home Screen */}
+      <View style={[styles.headerContainer, { paddingTop: insets.top }]}>
+        <LinearGradient
+          colors={[Colors.primary, '#8e44ad']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={StyleSheet.absoluteFill}
+        />
+        
+        {/* Address Bar
+        <TouchableOpacity
+          style={styles.addressBar}
+          activeOpacity={0.7}
+          onPress={() => router.push('/checkout/address-list' as any)}
+        >
+          <MapPin size={16} color={Colors.white} />
+          <AppText variant="caption" color="rgba(255,255,255,0.9)" style={{ marginLeft: 4 }}>
+            Deliver to:
+          </AppText>
+          <AppText variant="caption" color={Colors.white} weight="bold" numberOfLines={1} style={{ flex: 1, marginLeft: 4 }}>
+            {addressDisplay}
+          </AppText>
+          <ChevronDown size={14} color={Colors.white} />
+        </TouchableOpacity> */}
 
-      {/* Search Bar - Styled like Home */}
-      <View style={styles.fixedSearchContainer}>
-        <View style={styles.searchBar}>
-          <Search size={20} color={Colors.textSecondary} />
-          <TextInput
-            placeholder="Search products..."
-            placeholderTextColor={Colors.textLight}
-            style={styles.searchInput}
-          />
+        {/* Search Bar */}
+        <View style={styles.searchContainer}>
+          <View style={styles.searchBar}>
+            <Search size={20} color={Colors.textSecondary} />
+            <TextInput
+              placeholder="Search products..."
+              placeholderTextColor={Colors.textLight}
+              style={styles.searchInput}
+            />
+          </View>
         </View>
       </View>
 
@@ -273,41 +275,36 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
   },
-  topGradient: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 250,
+  headerContainer: {
+    backgroundColor: Colors.primary,
+    ...Colors.shadow.md,
+    zIndex: 100,
   },
-  headerGradient: {
+  addressBar: {
     paddingHorizontal: Spacing.base,
     paddingVertical: Spacing.sm,
-  },
-  headerActions: {
     flexDirection: 'row',
-    gap: Spacing.xs,
+    alignItems: 'center',
   },
-  fixedSearchContainer: {
-    marginTop: 100, // Clear header
-    paddingHorizontal: Spacing.base, // 16
-    marginBottom: Spacing.sm,
-    zIndex: 10,
+  searchContainer: {
+    paddingHorizontal: Spacing.base,
+    paddingBottom: Spacing.md,
+    paddingTop: Spacing.xs,
   },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Colors.white,
-    borderRadius: 12,
-    paddingHorizontal: Spacing.base,
-    height: 48,
-    gap: Spacing.md,
-    ...Colors.shadow.md,
+    borderRadius: 8,
+    paddingHorizontal: Spacing.md,
+    height: 44,
+    gap: Spacing.sm,
+    ...Colors.shadow.sm,
   },
   searchInput: {
     flex: 1,
     height: '100%',
-    fontSize: 16,
+    fontSize: 14,
     color: Colors.text,
   },
   content: {
