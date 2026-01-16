@@ -30,8 +30,8 @@ export default function EditProfileScreen() {
 
     const [isSelectingAvatar, setIsSelectingAvatar] = useState(false);
 
-    const avatarMale = require('@/assets/images/avatar_male.png');
-    const avatarFemale = require('@/assets/images/avatar_female.png');
+    const avatarMale = require('@/assets/images/avatarMale.png');
+    const avatarFemale = require('@/assets/images/avatarFemale.png');
 
     const [selectedAvatar, setSelectedAvatar] = useState(
         user?.name ? `https://i.pravatar.cc/150?u=${user.name}` : avatarMale
