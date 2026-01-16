@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity, FlatList } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Heart, Plus, ShoppingCart, List } from 'lucide-react-native'; // Lucide icons for placeholders
+import { Heart, Plus, ShoppingCart, List, ArrowRight } from 'lucide-react-native'; // Lucide icons for placeholders
 import { Image } from 'expo-image';
 import AppText from '@/components/atoms/AppText';
 import Button from '@/components/atoms/Button';
@@ -62,61 +62,13 @@ export default function WishlistScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
-        <AppText variant="h3" weight="bold">Lists and Registries</AppText>
-      </View>
 
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Horizontal Lists */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.listsContainer}
-        >
-          {lists.map(renderListCard)}
-        </ScrollView>
 
-        {/* All Saves Header */}
-        <View style={styles.sectionHeader}>
-          <AppText variant="h4" weight="bold">All saves</AppText>
-          <TouchableOpacity>
-            <AppText variant="body" color={Colors.primary} weight="medium">Add item</AppText>
-          </TouchableOpacity>
-        </View>
-
-        {/* Filters */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.filtersContainer}
-        >
-          <TouchableOpacity style={styles.filterChipOutlined}>
-            <AppText variant="caption" weight="medium">Filters</AppText>
-          </TouchableOpacity>
-
-          {filters.map((filter) => (
-            <TouchableOpacity
-              key={filter}
-              style={[
-                styles.filterChip,
-                activeFilter === filter && styles.filterChipActive
-              ]}
-              onPress={() => setActiveFilter(filter)}
-            >
-              <AppText
-                variant="caption"
-                weight="medium"
-                color={activeFilter === filter ? Colors.white : Colors.text}
-              >
-                {filter}
-              </AppText>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
 
         {/* Product Grid */}
         {items.length === 0 ? (
@@ -129,6 +81,7 @@ export default function WishlistScreen() {
               title="Start Shopping"
               onPress={() => router.push('/(tabs)/(home)')}
               style={styles.emptyButton}
+              icon={<ArrowRight size={18} color={Colors.white} />}
             />
           </View>
         ) : (
@@ -269,6 +222,8 @@ const styles = StyleSheet.create({
   },
   emptyButton: {
     marginTop: Spacing.lg,
-    minWidth: 200,
+    minWidth: 220,
+    borderRadius: 30,
+    ...Colors.shadow.md,
   },
 });

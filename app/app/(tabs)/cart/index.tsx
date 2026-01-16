@@ -10,9 +10,11 @@ import {
   X,
   Star,
   Plus,
-  Minus
+  Minus,
+  ArrowRight
 } from 'lucide-react-native';
 import AppText from '@/components/atoms/AppText';
+import Button from '@/components/atoms/Button';
 import Colors from '@/constants/colors';
 import Spacing from '@/constants/spacing';
 import { useCart } from '@/store/CartContext';
@@ -95,12 +97,12 @@ export default function CartScreen() {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
         <AppText variant="h4" color={Colors.textSecondary}>Your cart is empty</AppText>
-        <TouchableOpacity
-          style={[styles.placeOrderButton, { marginTop: 20 }]}
+        <Button
+          title="Shop Now"
           onPress={() => router.push('/(tabs)/(home)')}
-        >
-          <AppText variant="body" weight="semibold" style={styles.placeOrderText}>Shop Now</AppText>
-        </TouchableOpacity>
+          style={styles.emptyButton}
+          icon={<ArrowRight size={18} color={Colors.white} />}
+        />
       </View>
     );
   }
@@ -271,7 +273,7 @@ export default function CartScreen() {
         ))}
 
         {/* Protection Teaser */}
-        <View style={styles.protectionCard}>
+        {/* <View style={styles.protectionCard}>
           <View style={styles.protectionHeader}>
             <AppText variant="body" weight="semibold">Complete Digital Protection</AppText>
             <TouchableOpacity>
@@ -281,7 +283,7 @@ export default function CartScreen() {
           <View style={styles.protectionContent}>
             <View style={styles.protectionPlaceholder} />
           </View>
-        </View>
+        </View> */}
       </ScrollView>
 
       {/* Footer */}
@@ -620,6 +622,12 @@ const styles = StyleSheet.create({
   },
   placeOrderText: {
     color: Colors.white,
+  },
+  emptyButton: {
+    marginTop: 24,
+    minWidth: 200,
+    borderRadius: 30,
+    ...Colors.shadow.md,
   },
 });
 

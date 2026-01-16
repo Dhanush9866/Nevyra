@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import { CheckCircle } from 'lucide-react-native';
+import { CheckCircle, ArrowRight } from 'lucide-react-native';
 import AppText from '@/components/atoms/AppText';
 import Button from '@/components/atoms/Button';
 import Colors from '@/constants/colors';
@@ -34,6 +34,8 @@ export default function OrderSuccessScreen() {
           title="Continue Shopping"
           onPress={() => router.replace('/(tabs)/(home)' as any)}
           fullWidth
+          style={styles.pillButton}
+          icon={<ArrowRight size={18} color={Colors.white} />}
         />
         <Button
           title="View Orders"
@@ -64,5 +66,9 @@ const styles = StyleSheet.create({
   },
   footer: {
     gap: Spacing.md,
+  },
+  pillButton: {
+    borderRadius: 30,
+    ...Colors.shadow.md,
   },
 });
