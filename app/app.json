@@ -41,6 +41,7 @@
       "typedRoutes": true
     },
     "extra": {
+      "apiUrl": "https://api.zythova.com/api/v1",
       "router": {
         "origin": "https://rork.com/"
       },
