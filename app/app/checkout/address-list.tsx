@@ -1,4 +1,5 @@
 import { View, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, Stack } from 'expo-router';
 import { Edit2, Trash2, Plus } from 'lucide-react-native';
 import AppText from '@/components/atoms/AppText';
@@ -11,6 +12,7 @@ import { Address } from '@/types';
 export default function AddressListScreen() {
   const router = useRouter();
   const { addresses, deleteAddress } = useAuth();
+  const insets = useSafeAreaInsets();
 
   const handleDelete = (index: number) => {
     Alert.alert(
@@ -110,7 +112,7 @@ export default function AddressListScreen() {
           )}
         </ScrollView>
 
-        <View style={styles.footer}>
+        <View style={[styles.footer, { paddingBottom: Spacing.base + insets.bottom }]}>
           <Button
             title="Add New Address"
             onPress={() => router.push('/checkout/address-form' as any)}

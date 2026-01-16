@@ -221,27 +221,7 @@ export default function HomeScreen() {
                 </View>
               ))}
             </View>
-          </View>
-
-          {/* Special Banner */}
-          <LinearGradient
-            colors={[Colors.primary, '#9b4dca']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.promoBanner}
-          >
-            <View>
-              <AppText variant="h4" color={Colors.white} weight="bold">
-                End of Season Sale
-              </AppText>
-              <AppText variant="body" color={Colors.white}>
-                Up to 70% OFF on all categories
-              </AppText>
-            </View>
-            <TouchableOpacity style={styles.promoButton}>
-              <AppText color={Colors.primary} weight="bold">Shop Now</AppText>
-            </TouchableOpacity>
-          </LinearGradient>
+          </View> 
 
           {/* Deals of the Day */}
           <View style={styles.section}>
