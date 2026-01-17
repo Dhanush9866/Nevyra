@@ -9,12 +9,9 @@ import {
   Animated,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BlurView } from 'expo-blur';
 import { useRouter, Stack } from 'expo-router';
 import {
   Search,
-  ShoppingCart,
-  Bell,
   MapPin,
   ChevronDown,
 } from 'lucide-react-native';
@@ -22,14 +19,27 @@ import { LinearGradient } from 'expo-linear-gradient';
 import AppText from '@/components/atoms/AppText';
 import CategoryItem from '@/components/molecules/CategoryItem';
 import ProductCard from '@/components/molecules/ProductCard';
+import HorizontalProductSection from '@/components/organisms/HorizontalProductSection';
 import HomeBannerCarousel from '@/components/organisms/HomeBannerCarousel';
 import Colors from '@/constants/colors';
 import Spacing from '@/constants/spacing';
 import { useQuery } from '@tanstack/react-query';
 import { apiService } from '@/services/api';
-import { mockBanners } from '@/services/mockData';
+import { mockBanners, mockProducts as fallbackMockProducts } from '@/services/mockData';
 import { useWishlist } from '@/store/WishlistContext';
 import { useAuth } from '@/store/AuthContext';
+
+// Color themes for sections (Background + Darker Button)
+const SECTION_THEMES = [
+  { bg: '#FFE0B2', btn: '#FB8C00' }, // Orange (Orange 700)
+  { bg: '#FFCCBC', btn: '#FF5722' }, // Deep Peach (Deep Orange 500)
+  { bg: '#DCEDC8', btn: '#689F38' }, // Light Green (Light Green 700)
+  { bg: '#B3E5FC', btn: '#0288D1' }, // Light Blue (Light Blue 700)
+  { bg: '#E1BEE7', btn: '#8E24AA' }, // Purple (Purple 700)
+  { bg: '#FFF9C4', btn: '#FBC02D' }, // Yellow (Yellow 700)
+  { bg: '#D1C4E9', btn: '#5E35B1' }, // Deep Purple (Deep Purple 600)
+  { bg: '#F0F4C3', btn: '#AFB42B' }, // Lime (Lime 700)
+];
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -49,13 +59,18 @@ export default function HomeScreen() {
     queryFn: () => apiService.getCategories(),
   });
 
+  // Fetch larger set of products to categorize
   const { data: prodData, isLoading: prodLoading, refetch } = useQuery({
-    queryKey: ['trending-products'],
-    queryFn: () => apiService.getProducts({ limit: 8 }),
+    queryKey: ['all-products-home'],
+    queryFn: () => apiService.getProducts({ limit: 100 }),
   });
 
   const categories = catData?.data?.filter((c: any) => !c.parentId) || [];
-  const products = prodData?.data || [];
+  const fetchedProducts = prodData?.data || [];
+
+  // Merge fetched products with fallback mock data to ensure we have content for demo
+  // We prioritize fetched products but use mock to fill gaps per category
+  const allProducts = [...fetchedProducts, ...fallbackMockProducts];
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -78,13 +93,6 @@ export default function HomeScreen() {
   const addressTranslateY = scrollY.interpolate({
     inputRange: [0, 50],
     outputRange: [0, -20],
-    extrapolate: 'clamp',
-  });
-
-  // 2. Header Style Animations
-  const headerTranslateY = scrollY.interpolate({
-    inputRange: [40, 80],
-    outputRange: [0, -10], // Move up slightly as address bar disappears
     extrapolate: 'clamp',
   });
 
@@ -178,7 +186,7 @@ export default function HomeScreen() {
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           { useNativeDriver: false }
         )}
-        contentContainerStyle={{ paddingTop: insets.top + 230 }} // Further increased to add visible gap
+        contentContainerStyle={{ paddingTop: insets.top + 230 }}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -191,56 +199,42 @@ export default function HomeScreen() {
           <HomeBannerCarousel banners={mockBanners} />
         </View>
 
-        {/* 5. Product Grids & Sections */}
         <View style={styles.mainContent}>
-          {/* Trending Products */}
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <AppText variant="h4" weight="bold">
-                Trending Offers
-              </AppText>
-              <TouchableOpacity onPress={() => router.push('/(tabs)/categories')}>
-                <AppText
-                  variant="caption"
-                  color={Colors.primary}
-                  weight="semibold"
-                >
-                  View All
-                </AppText>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.productsGrid}>
-              {products.slice(0, 4).map((product: any) => (
-                <View key={product.id} style={styles.productCard}>
-                  <ProductCard
-                    product={product}
-                    onPress={() => router.push(`/product/${product.id}` as any)}
-                    onWishlistPress={() => toggleWishlist(product)}
-                    isWishlisted={isWishlisted(product.id)}
-                  />
-                </View>
-              ))}
-            </View>
-          </View> 
+          {/* Dynamically Render Category Sections */}
+          {categories.slice(0, 8).map((category: any, index: number) => {
+            // Filter products for this specific category
+            const categoryProducts = allProducts.filter((p: any) =>
+              p.category === category.name ||
+              p.category?.name === category.name ||
+              // Relaxed matching/fallback logic
+              (fallbackMockProducts.some(mp => mp.category === category.name) ? false : true)
+            ).slice(0, 6); // Take first 6 items
 
-          {/* Deals of the Day */}
+            // Use modulo to cycle through themes
+            const theme = SECTION_THEMES[index % SECTION_THEMES.length];
+
+            // Fallback products if category is empty to keep UI populated
+            const displayItems = categoryProducts.length > 0 ? categoryProducts : allProducts.slice(index * 2, (index * 2) + 4);
+
+            return (
+              <HorizontalProductSection
+                key={category._id || category.id}
+                title={`Deals on ${category.name}`}
+                backgroundColor={theme.bg}
+                buttonColor={theme.btn}
+                onPress={(id) => router.push(`/product/${id}` as any)}
+                items={displayItems}
+              />
+            );
+          })}
+
+          {/* Fallback Grid if needed */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <AppText variant="h4" weight="bold">
-                Deals of the Day
-              </AppText>
-              <TouchableOpacity>
-                <AppText
-                  variant="caption"
-                  color={Colors.primary}
-                  weight="semibold"
-                >
-                  View All
-                </AppText>
-              </TouchableOpacity>
+              <AppText variant="h4" weight="bold">More to Explore</AppText>
             </View>
             <View style={styles.productsGrid}>
-              {products.slice(4, 8).map((product: any) => (
+              {allProducts.slice(0, 4).map((product: any) => (
                 <View key={product.id} style={styles.productCard}>
                   <ProductCard
                     product={product}
@@ -272,10 +266,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
     ...Colors.shadow.md,
   },
-  headerActions: {
-    flexDirection: 'row',
-    gap: Spacing.xs,
-  },
   addressBar: {
     paddingHorizontal: Spacing.base,
     paddingVertical: Spacing.sm,
@@ -284,7 +274,7 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     paddingHorizontal: Spacing.base,
-    paddingBottom: Spacing.xs, // Balanced gap
+    paddingBottom: Spacing.xs,
     paddingTop: Spacing.xs,
   },
   searchBar: {
@@ -299,11 +289,11 @@ const styles = StyleSheet.create({
   },
   categoriesArea: {
     paddingBottom: Spacing.sm,
-    paddingTop: Spacing.xs, // Added small top gap
+    paddingTop: Spacing.xs,
   },
   categoriesScroll: {
     paddingHorizontal: Spacing.base,
-    gap: Spacing.sm, // Even tighter horizontal gap
+    gap: Spacing.sm,
     alignItems: 'center',
   },
   heroSection: {
@@ -318,9 +308,6 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.lg,
   },
   sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     paddingHorizontal: Spacing.base,
     marginBottom: Spacing.md,
   },
@@ -333,20 +320,4 @@ const styles = StyleSheet.create({
     width: '50%',
     paddingHorizontal: Spacing.xs,
   },
-  promoBanner: {
-    marginHorizontal: Spacing.base,
-    borderRadius: 12,
-    padding: Spacing.lg,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginVertical: Spacing.sm,
-  },
-  promoButton: {
-    backgroundColor: Colors.white,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
-    borderRadius: 6,
-  },
 });
-

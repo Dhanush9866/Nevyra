@@ -148,7 +148,7 @@ exports.profile = async (req, res, next) => {
 exports.updateProfile = async (req, res, next) => {
   try {
     const userId = req.user.id;
-    const { firstName, lastName, phone, email } = req.body;
+    const { firstName, lastName, phone, email, avatar } = req.body;
     const user = await User.findById(userId);
     if (!user) {
       return res
@@ -198,6 +198,7 @@ exports.updateProfile = async (req, res, next) => {
       }
       user.email = email;
     }
+    if (avatar !== undefined) user.avatar = avatar;
     await user.save();
     const userData = user.toObject();
     delete userData.password;
@@ -257,6 +258,35 @@ exports.resetPassword = async (req, res, next) => {
     user.resetPasswordOTPExpires = undefined;
     await user.save();
     return res.json({ success: true, message: "Password reset successful" });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.changePassword = async (req, res, next) => {
+  try {
+    const { newPassword } = req.body;
+    const userId = req.user.id;
+
+    if (!newPassword) {
+      return res.status(400).json({ success: false, message: "New password is required" });
+    }
+
+    // We can enforce strong password here if we want, using same validator
+    if (!isStrongPassword(newPassword)) {
+      return res.status(400).json({ success: false, message: "Password is too weak. Must contain 8+ chars and diverse types." });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+    user.password = hashed;
+    await user.save();
+
+    return res.json({ success: true, message: "Password updated successfully" });
   } catch (err) {
     next(err);
   }

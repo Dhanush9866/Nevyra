@@ -9,7 +9,9 @@ import {
     KeyboardAvoidingView,
     Platform,
     Alert,
+    ActivityIndicator,
 } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { Stack, useRouter } from 'expo-router';
 import { Edit2 } from 'lucide-react-native';
 import AppText from '@/components/atoms/AppText';
@@ -20,26 +22,38 @@ import { useAuth } from '@/store/AuthContext';
 
 export default function EditProfileScreen() {
     const router = useRouter();
-    const { user, updateProfile } = useAuth();
+    const { user, updateProfile, uploadProfileImage } = useAuth();
     const [loading, setLoading] = useState(false);
+    const [uploadingImage, setUploadingImage] = useState(false);
 
     const [firstName, setFirstName] = useState(user?.name?.split(' ')[0] || '');
     const [lastName, setLastName] = useState(user?.name?.split(' ').slice(1).join(' ') || '');
     const [mobile, setMobile] = useState(user?.phone || '');
     const [email, setEmail] = useState(user?.email || '');
 
-    const [isSelectingAvatar, setIsSelectingAvatar] = useState(false);
+    const handlePickImage = async () => {
+        try {
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: true,
+                aspect: [1, 1],
+                quality: 0.5,
+            });
 
-    const avatarMale = "https://res.cloudinary.com/dk6rrrwum/image/upload/v1768559670/avatarmale_y15p1f.jpg";
-    const avatarFemale = "https://res.cloudinary.com/dk6rrrwum/image/upload/v1768559670/avatarfemale_h7wtgg.jpg";
-
-    const [selectedAvatar, setSelectedAvatar] = useState(
-        user?.name ? `https://i.pravatar.cc/150?u=${user.name}` : avatarMale
-    );
-
-    const handleAvatarSelect = (avatarSource: any) => {
-        setSelectedAvatar(avatarSource);
-        setIsSelectingAvatar(false);
+            if (!result.canceled) {
+                setUploadingImage(true);
+                const res = await uploadProfileImage(result.assets[0].uri);
+                setUploadingImage(false);
+                if (res.success) {
+                    Alert.alert('Success', 'Profile picture updated');
+                } else {
+                    Alert.alert('Error', res.message || 'Failed to upload image');
+                }
+            }
+        } catch (error) {
+            setUploadingImage(false);
+            Alert.alert('Error', 'Failed to pick image');
+        }
     };
 
     const handleSubmit = async () => {
@@ -97,45 +111,31 @@ export default function EditProfileScreen() {
                 showsVerticalScrollIndicator={false}
             >
                 <View style={styles.profileImageContainer}>
-                    {isSelectingAvatar ? (
-                        <View style={styles.avatarSelectionContainer}>
-                            <TouchableOpacity
-                                onPress={() => handleAvatarSelect(avatarMale)}
-                                activeOpacity={0.8}
-                                style={styles.avatarOption}
-                            >
+                    <View style={styles.imageWrapper}>
+                        <TouchableOpacity onPress={handlePickImage} activeOpacity={0.9} disabled={uploadingImage}>
+                            {uploadingImage ? (
+                                <View style={[styles.profileImage, { justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.borderLight }]}>
+                                    <ActivityIndicator size="small" color={Colors.primary} />
+                                </View>
+                            ) : user?.avatar ? (
                                 <Image
-                                    source={avatarMale}
-                                    style={styles.selectionImage}
-                                />
-                            </TouchableOpacity>
-
-                            <AppText variant="body" weight="bold" color={Colors.white} style={styles.orText}>or</AppText>
-
-                            <TouchableOpacity
-                                onPress={() => handleAvatarSelect(avatarFemale)}
-                                activeOpacity={0.8}
-                                style={styles.avatarOption}
-                            >
-                                <Image
-                                    source={avatarFemale}
-                                    style={styles.selectionImage}
-                                />
-                            </TouchableOpacity>
-                        </View>
-                    ) : (
-                        <View style={styles.imageWrapper}>
-                            <TouchableOpacity onPress={() => setIsSelectingAvatar(true)} activeOpacity={0.9}>
-                                <Image
-                                    source={typeof selectedAvatar === 'string' ? { uri: selectedAvatar } : selectedAvatar}
+                                    source={{ uri: user.avatar }}
                                     style={styles.profileImage}
                                 />
+                            ) : (
+                                <View style={[styles.profileImage, { justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.primary }]}>
+                                    <AppText variant="h2" weight="bold" color={Colors.white}>
+                                        {user?.name?.charAt(0).toUpperCase() || 'U'}
+                                    </AppText>
+                                </View>
+                            )}
+                            {!uploadingImage && (
                                 <View style={styles.editIconContainer}>
                                     <Edit2 size={16} color={Colors.primary} />
                                 </View>
-                            </TouchableOpacity>
-                        </View>
-                    )}
+                            )}
+                        </TouchableOpacity>
+                    </View>
                 </View>
 
                 <View style={styles.formContainer}>

@@ -1,33 +1,29 @@
-import React from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, Image, Linking } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import {
   Package,
   Heart,
-  Gift,
-  Headphones,
-  Zap,
   User,
-  CreditCard,
   MapPin,
-  Languages,
   Bell,
-  ShieldCheck,
-  PenSquare,
-  MessageSquare,
+  Lock,
   Store,
   FileText,
   HelpCircle,
   ChevronRight,
+  Edit,
+  ArrowLeft,
 } from 'lucide-react-native';
 import AppText from '@/components/atoms/AppText';
 import Colors from '@/constants/colors';
 import Spacing from '@/constants/spacing';
 import { useAuth } from '@/store/AuthContext';
+import { Linking } from 'react-native';
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { user, logout } = useAuth();
+  const { user, addresses, logout } = useAuth();
 
   const handleLogout = async () => {
     await logout();
@@ -41,23 +37,25 @@ export default function ProfileScreen() {
 
   const Sections = [
     {
-      title: 'Account Settings',
+      title: 'My Account',
       items: [
         { icon: User, label: 'Edit Profile', route: '/profile/edit' },
+        { icon: Lock, label: 'Change Password', route: '/profile/change-password' },
+        { icon: Bell, label: 'Notification Settings', route: '/profile/notifications' },
         { icon: MapPin, label: 'Saved Addresses', route: '/checkout/address-list' },
       ],
     },
     {
       title: 'My Activity',
       items: [
-        { icon: PenSquare, label: 'Reviews', route: '/reviews' },
-        { icon: MessageSquare, label: 'Questions & Answers', route: '/qa' },
+        { icon: Edit, label: 'Reviews', route: '/reviews' },
+        { icon: HelpCircle, label: 'Questions & Answers', route: '/qa' },
       ],
     },
     {
-      title: 'Earn with Nevyra',
+      title: 'My Shopping',
       items: [
-        { icon: Store, label: 'Sell on Nevyra', route: 'https://nevyra-seller.onrender.com/' },
+        { icon: Store, label: 'Sell on Zythova', route: 'https://nevyra-seller.onrender.com/' },
       ],
     },
     {
@@ -70,70 +68,124 @@ export default function ProfileScreen() {
   ];
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-
-      {/* Top Grid */}
-      <View style={styles.gridContainer}>
-        {topGridItems.map((item, index) => (
-          <TouchableOpacity
-            key={index}
-            style={styles.gridItem}
-            onPress={() => item.route && router.push(item.route as any)}
-          >
-            <item.icon size={22} color={Colors.primary} />
-            <AppText variant="body" weight="medium" style={styles.gridLabel}>
-              {item.label}
-            </AppText>
-          </TouchableOpacity>
-        ))}
+    <View style={styles.container}>
+      {/* Header with Back Button */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <ArrowLeft size={24} color={Colors.text} />
+        </TouchableOpacity>
+        <AppText variant="h4" weight="bold">My Profile</AppText>
+        <View style={{ width: 24 }} />
       </View>
 
-      <View style={styles.divider} />
-
-      {/* Sections */}
-      {Sections.map((section, sIndex) => (
-        <View key={sIndex} style={styles.section}>
-          <AppText variant="h4" weight="bold" style={styles.sectionTitle}>
-            {section.title}
-          </AppText>
-          {section.items.map((item, iIndex) => (
-            <TouchableOpacity
-              key={iIndex}
-              style={styles.menuItem}
-              onPress={() => {
-                if (item.route) {
-                  if (item.route.startsWith('http')) {
-                    Linking.openURL(item.route);
-                  } else {
-                    router.push(item.route as any);
-                  }
-                }
-              }}
-            >
-              <View style={styles.menuItemLeft}>
-                <item.icon size={20} color={Colors.primary} />
-                <AppText variant="body" style={styles.menuItemLabel}>
-                  {item.label}
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {/* Profile Info */}
+        <View style={styles.profileSection}>
+          <View style={styles.profileContent}>
+            <View style={styles.profileDataRow}>
+              <View style={styles.avatarContainer}>
+                {user?.avatar ? (
+                  <Image source={{ uri: user.avatar }} style={styles.avatarImage} />
+                ) : (
+                  <AppText variant="h2" weight="bold" color={Colors.white}>
+                    {user?.name?.charAt(0).toUpperCase() || 'U'}
+                  </AppText>
+                )}
+              </View>
+              <View style={styles.userDetails}>
+                <AppText variant="h3" weight="bold" style={styles.userName} numberOfLines={1}>
+                  {user?.name || 'Guest'}
+                </AppText>
+                <AppText variant="body" color={Colors.textSecondary}>
+                  {user?.phone || '+91 -'}
                 </AppText>
               </View>
-              <ChevronRight size={18} color={Colors.textLight} />
+            </View>
+            <TouchableOpacity style={styles.editButton} onPress={() => router.push('/profile/edit' as any)}>
+              <AppText variant="small" weight="bold" color={Colors.primary}>
+                <Edit size={14} color={Colors.primary} /> Edit
+              </AppText>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.deliveryInfoContainer}>
+            <TouchableOpacity
+              style={styles.deliveryInfo}
+              onPress={() => router.push('/checkout/address-list' as any)}
+            >
+              <AppText variant="body" color={Colors.textSecondary}>
+                Delivering to: <AppText weight="bold" color={Colors.text}>
+                  {addresses.find(a => a.isDefault)?.city || addresses[0]?.city || 'Select Location'}
+                </AppText>
+              </AppText>
+              <ChevronRight size={16} color={Colors.text} style={{ transform: [{ rotate: '90deg' }], marginLeft: 4 }} />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Top Grid */}
+        <View style={styles.gridContainer}>
+          {topGridItems.map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.gridItem}
+              onPress={() => item.route && router.push(item.route as any)}
+            >
+              <item.icon size={22} color={Colors.primary} />
+              <AppText variant="body" weight="medium" style={styles.gridLabel}>
+                {item.label}
+              </AppText>
             </TouchableOpacity>
           ))}
-          <View style={styles.sectionDivider} />
         </View>
-      ))}
 
-      {/* Logout Button */}
-      <View style={styles.logoutContainer}>
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <AppText variant="body" weight="bold" color={Colors.primary}>
-            Log Out
-          </AppText>
-        </TouchableOpacity>
-      </View>
+        <View style={styles.divider} />
 
-      <View style={styles.bottomPadding} />
-    </ScrollView>
+        {/* Sections */}
+        {Sections.map((section, sIndex) => (
+          <View key={sIndex} style={styles.section}>
+            <AppText variant="h4" weight="bold" style={styles.sectionTitle}>
+              {section.title}
+            </AppText>
+            {section.items.map((item, iIndex) => (
+              <TouchableOpacity
+                key={iIndex}
+                style={styles.menuItem}
+                onPress={() => {
+                  if (item.route) {
+                    if (item.route.startsWith('http')) {
+                      Linking.openURL(item.route);
+                    } else {
+                      router.push(item.route as any);
+                    }
+                  }
+                }}
+              >
+                <View style={styles.menuItemLeft}>
+                  <item.icon size={20} color={Colors.primary} />
+                  <AppText variant="body" style={styles.menuItemLabel}>
+                    {item.label}
+                  </AppText>
+                </View>
+                <ChevronRight size={18} color={Colors.textLight} />
+              </TouchableOpacity>
+            ))}
+            <View style={styles.sectionDivider} />
+          </View>
+        ))}
+
+        {/* Logout Button */}
+        <View style={styles.logoutContainer}>
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <AppText variant="body" weight="bold" color={Colors.primary}>
+              Log Out
+            </AppText>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.bottomPadding} />
+      </ScrollView>
+    </View>
   );
 }
 
@@ -142,47 +194,100 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F1F3F6',
   },
-  headerContainer: {
-    padding: Spacing.base,
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: 50,
+    paddingBottom: Spacing.md,
+    paddingHorizontal: Spacing.base,
     backgroundColor: Colors.white,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
   },
-  headerCard: {
-    backgroundColor: '#F5F9FF',
-    padding: Spacing.base,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#E0E9F5',
+  backButton: {
+    padding: 4,
   },
-  headerTop: {
+  profileSection: {
+    backgroundColor: Colors.white,
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.sm,
+  },
+  profileContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: Spacing.xs,
-  },
-  userName: {
-    fontSize: 18,
-  },
-  coinBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.white,
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: 2,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    gap: 4,
-  },
-  headerSubtext: {
-    fontSize: 12,
-    lineHeight: 18,
+    alignItems: 'flex-start', // Align to top
+    paddingHorizontal: Spacing.base,
     marginBottom: Spacing.md,
   },
-  exploreButton: {
-    backgroundColor: '#1B1B1B',
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.lg,
-    borderRadius: 4,
+  profileDataRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+    flex: 1,
+  },
+  avatarContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: Colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#F0E6FF',
+    elevation: 2,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    overflow: 'hidden', // Ensure image clips
+  },
+  avatarImage: {
+    width: '100%',
+    height: '100%',
+  },
+  avatarEditBadge: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: Colors.primary,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: Colors.white,
+  },
+  userDetails: {
+    gap: 2,
+    flex: 1,
+  },
+  userName: {
+    fontSize: 22,
+    color: '#333',
+    letterSpacing: 0.5,
+  },
+  editButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    backgroundColor: '#F8F0FF',
+    borderWidth: 1,
+    borderColor: '#E6D6FF',
+    marginTop: 8,
+  },
+  deliveryInfoContainer: {
+    paddingHorizontal: Spacing.base,
+    paddingTop: Spacing.sm,
+  },
+  deliveryInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F8F9FA',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
     alignSelf: 'flex-start',
   },
   gridContainer: {
@@ -218,10 +323,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.base,
     marginBottom: Spacing.md,
     fontSize: 16,
-  },
-  emptyRecentStores: {
-    paddingHorizontal: Spacing.base,
-    paddingBottom: Spacing.md,
   },
   menuItem: {
     flexDirection: 'row',

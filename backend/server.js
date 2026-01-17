@@ -30,6 +30,9 @@ const corsOptions = {
     'http://localhost:8082', // Admin Panel
     'http://10.123.124.42:8081',
     'http://10.0.2.2:8081',
+    'http://10.233.236.42:8000',
+    'http://10.233.236.42:8081',
+    'http://10.233.236.42:3000',
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
