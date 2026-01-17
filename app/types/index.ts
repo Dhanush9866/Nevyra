@@ -80,6 +80,7 @@ export interface OrderItem {
 
 export type OrderStatus =
   | 'pending'
+  | 'processing'
   | 'confirmed'
   | 'shipped'
   | 'out_for_delivery'

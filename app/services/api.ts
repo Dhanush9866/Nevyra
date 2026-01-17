@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 
-const API_BASE_URL = Constants.expoConfig?.extra?.apiUrl ; // Use local IP instead of localhost for mobile devices
+const API_BASE_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:8000/api/v1'; // Use local IP instead of localhost for mobile devices
 class ApiService {
   private baseURL: string;
 
@@ -63,7 +63,7 @@ class ApiService {
       rating: p.rating || 0,
       reviewCount: p.reviews || 0,
       inStock: p.inStock !== undefined ? p.inStock : true,
-      brand: p.brand || 'Nevyra',
+      brand: p.brand || 'Zythova',
       specifications: p.attributes || p.specifications || {},
     };
   }
@@ -158,7 +158,7 @@ class ApiService {
     return this.request<{ success: boolean; message: string; data: any }>('/auth/profile');
   }
 
-  async updateProfile(userData: { firstName?: string; lastName?: string; phone?: string; email?: string }) {
+  async updateProfile(userData: { firstName?: string; lastName?: string; phone?: string; email?: string; avatar?: string }) {
     return this.request<{ success: boolean; message: string; data: any }>(
       '/auth/profile',
       {
@@ -166,6 +166,49 @@ class ApiService {
         body: JSON.stringify(userData),
       }
     );
+  }
+
+  async changePassword(newPassword: string) {
+    return this.request<{ success: boolean; message: string }>(
+      '/auth/change-password',
+      {
+        method: 'POST',
+        body: JSON.stringify({ newPassword }),
+      }
+    );
+  }
+
+  async uploadImage(imageUri: string) {
+    const url = `${this.baseURL}/upload/image`;
+    const token = await AsyncStorage.getItem('token');
+
+    // Create FormData
+    const formData = new FormData();
+    formData.append('image', {
+      uri: imageUri,
+      name: 'profile.jpg',
+      type: 'image/jpeg',
+    } as any);
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Upload failed');
+      }
+      return data;
+    } catch (error) {
+      console.error('Upload error:', error);
+      throw error;
+    }
   }
 
   async isAuthenticated() {

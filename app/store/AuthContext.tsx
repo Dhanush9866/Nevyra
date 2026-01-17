@@ -32,6 +32,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
               name: `${profileResponse.data.firstName} ${profileResponse.data.lastName}`,
               email: profileResponse.data.email,
               phone: profileResponse.data.phone,
+              avatar: profileResponse.data.avatar,
               createdAt: profileResponse.data.createdAt,
             };
             await AsyncStorage.setItem('user', JSON.stringify(freshUser));
@@ -116,6 +117,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
             name: `${profileResponse.data.firstName} ${profileResponse.data.lastName}`,
             email: profileResponse.data.email,
             phone: profileResponse.data.phone,
+            avatar: profileResponse.data.avatar,
             createdAt: profileResponse.data.createdAt,
           };
 
@@ -132,16 +134,18 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     }
   };
 
-  const updateProfile = async (userData: { firstName?: string; lastName?: string; phone?: string; email?: string }) => {
+  const updateProfile = async (userData: { firstName?: string; lastName?: string; phone?: string; email?: string; avatar?: string }) => {
     try {
       const response = await apiService.updateProfile(userData);
       if (response.success) {
+        // preserve existing user data if not returned fully, but usually response.data is full user
         const updatedUser: User = {
-          id: response.data._id || response.data.id,
+          id: response.data._id || response.data.id || user?.id,
           name: `${response.data.firstName} ${response.data.lastName}`,
           email: response.data.email,
           phone: response.data.phone,
-          createdAt: response.data.createdAt,
+          avatar: response.data.avatar,
+          createdAt: response.data.createdAt || user?.createdAt,
         };
         await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
         setUser(updatedUser);
@@ -151,6 +155,27 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     } catch (error: any) {
       console.error('Update profile error:', error);
       return { success: false, message: error.message || 'An error occurred during profile update' };
+    }
+  };
+
+  const uploadProfileImage = async (uri: string) => {
+    try {
+      const response = await apiService.uploadImage(uri);
+      if (response.success && response.data?.url) {
+        return await updateProfile({ avatar: response.data.url });
+      }
+      return { success: false, message: response.message || 'Upload failed' };
+    } catch (error: any) {
+      return { success: false, message: error.message || 'Upload error' };
+    }
+  };
+
+  const changePassword = async (newPassword: string) => {
+    try {
+      const response = await apiService.changePassword(newPassword);
+      return response;
+    } catch (error: any) {
+      return { success: false, message: error.message || 'Change password failed' };
     }
   };
 
@@ -205,5 +230,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     addAddress,
     updateAddress,
     deleteAddress,
+    uploadProfileImage,
+    changePassword,
   };
 });

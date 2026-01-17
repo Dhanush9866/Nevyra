@@ -3,7 +3,7 @@ import {
   Home,
   ShoppingBag,
   ShoppingCart,
-  Heart,
+  Package,
   User,
 } from 'lucide-react-native';
 import React from 'react';
@@ -76,10 +76,10 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="wishlist"
+        name="orders"
         options={{
-          title: 'Wishlist',
-          tabBarIcon: ({ color, size }) => <Heart size={size} color={color} />,
+          title: 'Orders',
+          tabBarIcon: ({ color, size }) => <Package size={size} color={color} />,
         }}
       />
       <Tabs.Screen
@@ -87,6 +87,12 @@ export default function TabLayout() {
         options={{
           title: 'Profile',
           tabBarIcon: ({ color, size }) => <User size={size} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="wishlist"
+        options={{
+          href: null,
         }}
       />
     </Tabs>

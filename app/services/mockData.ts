@@ -220,7 +220,7 @@ export const mockAddresses: Address[] = [
 export const mockOrders: Order[] = [
   {
     id: '1',
-    orderNumber: 'ORD123456',
+    orderNumber: 'ORD78654128359',
     items: [
       {
         id: '1',
@@ -230,35 +230,16 @@ export const mockOrders: Order[] = [
       },
     ],
     totalAmount: 349,
-    status: 'delivered',
+    status: 'processing',
     shippingAddress: mockAddresses[0],
     paymentMethod: 'UPI',
-    createdAt: '2025-10-15T10:00:00Z',
-    deliveryDate: '2025-10-19T10:00:00Z',
-    trackingNumber: 'TRK123456',
+    createdAt: '2024-04-20T10:00:00Z',
+    deliveryDate: '2024-04-27T10:00:00Z',
+    trackingNumber: 'TRK78654128359',
   },
   {
     id: '2',
-    orderNumber: 'ORD123457',
-    items: [
-      {
-        id: '1',
-        product: mockProducts[1],
-        quantity: 1,
-        price: mockProducts[1].price,
-      },
-    ],
-    totalAmount: 899,
-    status: 'cancelled',
-    shippingAddress: mockAddresses[0],
-    paymentMethod: 'Card',
-    createdAt: '2025-08-20T14:30:00Z',
-    deliveryDate: '2025-08-27T14:30:00Z',
-    trackingNumber: 'TRK123457',
-  },
-  {
-    id: '3',
-    orderNumber: 'ORD123458',
+    orderNumber: 'ORD67843218954',
     items: [
       {
         id: '1',
@@ -268,12 +249,50 @@ export const mockOrders: Order[] = [
       },
     ],
     totalAmount: 1499,
+    status: 'shipped',
+    shippingAddress: mockAddresses[0],
+    paymentMethod: 'Card',
+    createdAt: '2024-04-18T14:30:00Z',
+    deliveryDate: '2024-04-25T14:30:00Z',
+    trackingNumber: 'TRK67843218954',
+  },
+  {
+    id: '3',
+    orderNumber: 'ORD92836798142',
+    items: [
+      {
+        id: '1',
+        product: mockProducts[5],
+        quantity: 1,
+        price: mockProducts[5].price,
+      },
+    ],
+    totalAmount: 1299,
     status: 'delivered',
     shippingAddress: mockAddresses[0],
     paymentMethod: 'UPI',
-    createdAt: '2025-07-05T10:00:00Z',
-    deliveryDate: '2025-07-11T10:00:00Z',
-    trackingNumber: 'TRK123458',
+    createdAt: '2024-04-16T10:00:00Z',
+    deliveryDate: '2024-04-22T10:00:00Z',
+    trackingNumber: 'TRK92836798142',
+  },
+  {
+    id: '4',
+    orderNumber: 'ORD56948731105',
+    items: [
+      {
+        id: '1',
+        product: mockProducts[3],
+        quantity: 1,
+        price: mockProducts[3].price,
+      },
+    ],
+    totalAmount: 3499,
+    status: 'cancelled',
+    shippingAddress: mockAddresses[0],
+    paymentMethod: 'Card',
+    createdAt: '2024-04-12T08:20:00Z',
+    deliveryDate: '2024-04-19T08:20:00Z',
+    trackingNumber: 'TRK56948731105',
   },
 ];
 
