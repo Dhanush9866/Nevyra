@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
-import { useRouter } from 'expo-router';
+import React from 'react';
+import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { useRouter, useFocusEffect } from 'expo-router';
 import {
   Package,
   Heart,
@@ -15,15 +15,23 @@ import {
   Edit,
   ArrowLeft,
 } from 'lucide-react-native';
+import { Image } from 'expo-image';
+import { Linking } from 'react-native';
 import AppText from '@/components/atoms/AppText';
 import Colors from '@/constants/colors';
 import Spacing from '@/constants/spacing';
 import { useAuth } from '@/store/AuthContext';
-import { Linking } from 'react-native';
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { user, addresses, logout } = useAuth();
+  const { user, addresses, logout, refreshUser } = useAuth();
+
+  // Refresh user data when screen comes into focus (e.g., after returning from edit screen)
+  useFocusEffect(
+    React.useCallback(() => {
+      refreshUser();
+    }, [refreshUser])
+  );
 
   const handleLogout = async () => {
     await logout();
@@ -67,9 +75,11 @@ export default function ProfileScreen() {
     },
   ];
 
+  // Create unique key for avatar image to force re-render when avatar changes
+  const avatarKey = user?.avatar || 'no-avatar';
+
   return (
     <View style={styles.container}>
-      {/* Header with Back Button */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <ArrowLeft size={24} color={Colors.text} />
@@ -79,13 +89,18 @@ export default function ProfileScreen() {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Profile Info */}
         <View style={styles.profileSection}>
           <View style={styles.profileContent}>
             <View style={styles.profileDataRow}>
               <View style={styles.avatarContainer}>
                 {user?.avatar ? (
-                  <Image source={{ uri: user.avatar }} style={styles.avatarImage} />
+                  <Image
+                    key={avatarKey}
+                    source={{ uri: user.avatar }}
+                    style={styles.avatarImage}
+                    contentFit="cover"
+                    cachePolicy="none"
+                  />
                 ) : (
                   <AppText variant="h2" weight="bold" color={Colors.white}>
                     {user?.name?.charAt(0).toUpperCase() || 'U'}
@@ -123,7 +138,6 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        {/* Top Grid */}
         <View style={styles.gridContainer}>
           {topGridItems.map((item, index) => (
             <TouchableOpacity
@@ -141,7 +155,6 @@ export default function ProfileScreen() {
 
         <View style={styles.divider} />
 
-        {/* Sections */}
         {Sections.map((section, sIndex) => (
           <View key={sIndex} style={styles.section}>
             <AppText variant="h4" weight="bold" style={styles.sectionTitle}>
@@ -174,7 +187,6 @@ export default function ProfileScreen() {
           </View>
         ))}
 
-        {/* Logout Button */}
         <View style={styles.logoutContainer}>
           <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
             <AppText variant="body" weight="bold" color={Colors.primary}>
@@ -216,7 +228,7 @@ const styles = StyleSheet.create({
   profileContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start', // Align to top
+    alignItems: 'flex-start',
     paddingHorizontal: Spacing.base,
     marginBottom: Spacing.md,
   },
@@ -240,24 +252,11 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
-    overflow: 'hidden', // Ensure image clips
+    overflow: 'hidden',
   },
   avatarImage: {
     width: '100%',
     height: '100%',
-  },
-  avatarEditBadge: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: Colors.primary,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: Colors.white,
   },
   userDetails: {
     gap: 2,

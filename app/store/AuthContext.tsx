@@ -23,7 +23,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
         setUser(JSON.parse(userData));
         setIsAuthenticated(true);
 
-        // Optionally refresh profile from server to ensure it's up to date
+        // Refresh profile from server to ensure it's up to date
         try {
           const profileResponse = await apiService.getProfile();
           if (profileResponse.success) {
@@ -32,12 +32,11 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
               name: `${profileResponse.data.firstName} ${profileResponse.data.lastName}`,
               email: profileResponse.data.email,
               phone: profileResponse.data.phone,
-              avatar: profileResponse.data.avatar,
+              avatar: profileResponse.data.avatar || null,
               createdAt: profileResponse.data.createdAt,
             };
             await AsyncStorage.setItem('user', JSON.stringify(freshUser));
             setUser(freshUser);
-            // Fetch addresses as well
             await fetchAddresses();
           }
         } catch (err) {
@@ -109,7 +108,6 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
       const response = await apiService.login({ email, password });
 
       if (response.success) {
-        // Fetch full profile after login
         const profileResponse = await apiService.getProfile();
         if (profileResponse.success) {
           const userData: User = {
@@ -117,7 +115,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
             name: `${profileResponse.data.firstName} ${profileResponse.data.lastName}`,
             email: profileResponse.data.email,
             phone: profileResponse.data.phone,
-            avatar: profileResponse.data.avatar,
+            avatar: profileResponse.data.avatar || null,
             createdAt: profileResponse.data.createdAt,
           };
 
@@ -134,17 +132,17 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     }
   };
 
-  const updateProfile = async (userData: { firstName?: string; lastName?: string; phone?: string; email?: string; avatar?: string }) => {
+  const updateProfile = async (userData: { firstName?: string; lastName?: string; phone?: string; email?: string }) => {
     try {
       const response = await apiService.updateProfile(userData);
       if (response.success) {
-        // preserve existing user data if not returned fully, but usually response.data is full user
         const updatedUser: User = {
           id: response.data._id || response.data.id || user?.id,
           name: `${response.data.firstName} ${response.data.lastName}`,
           email: response.data.email,
           phone: response.data.phone,
-          avatar: response.data.avatar,
+          // Preserve current avatar - don't let backend response overwrite it
+          avatar: user?.avatar || response.data.avatar || null,
           createdAt: response.data.createdAt || user?.createdAt,
         };
         await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
@@ -160,12 +158,34 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
 
   const uploadProfileImage = async (uri: string) => {
     try {
-      const response = await apiService.uploadImage(uri);
-      if (response.success && response.data?.url) {
-        return await updateProfile({ avatar: response.data.url });
+      // Upload image to server
+      const uploadResponse = await apiService.uploadImage(uri);
+      if (!uploadResponse.success || !uploadResponse.data?.url) {
+        return { success: false, message: uploadResponse.message || 'Upload failed' };
       }
-      return { success: false, message: response.message || 'Upload failed' };
+
+      const imageUrl = uploadResponse.data.url;
+      console.log('[AuthContext] Image uploaded, new URL:', imageUrl);
+
+      // Update profile with new avatar URL
+      const updateResponse = await apiService.updateProfile({ avatar: imageUrl });
+      if (!updateResponse.success) {
+        return { success: false, message: updateResponse.message || 'Failed to update profile' };
+      }
+
+      // Immediately update local state with new avatar
+      if (user) {
+        const updatedUser: User = {
+          ...user,
+          avatar: imageUrl,
+        };
+        await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+        setUser(updatedUser);
+      }
+
+      return { success: true };
     } catch (error: any) {
+      console.error('[AuthContext] uploadProfileImage error:', error);
       return { success: false, message: error.message || 'Upload error' };
     }
   };
@@ -186,7 +206,6 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     password: string
   ) => {
     try {
-      // Split name into firstName and lastName
       const nameParts = name.trim().split(' ');
       const firstName = nameParts[0];
       const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : nameParts[0];
@@ -200,7 +219,6 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
       });
 
       if (response.success) {
-        // After signup, we automatically login
         return await login(email, password);
       }
       return { success: false, message: response.message || 'Signup failed' };
@@ -215,6 +233,34 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     await AsyncStorage.removeItem('user');
     setUser(null);
     setIsAuthenticated(false);
+  };
+
+  const refreshUser = async () => {
+    try {
+      const profileResponse = await apiService.getProfile();
+      if (profileResponse.success) {
+        // Preserve current avatar if it exists (might be newly uploaded and server hasn't synced yet)
+        const serverAvatar = profileResponse.data.avatar || null;
+        const currentAvatar = user?.avatar || null;
+        
+        const freshUser = {
+          id: profileResponse.data._id || profileResponse.data.id,
+          name: `${profileResponse.data.firstName} ${profileResponse.data.lastName}`,
+          email: profileResponse.data.email,
+          phone: profileResponse.data.phone,
+          // Use current avatar if it exists, otherwise use server avatar
+          avatar: currentAvatar || serverAvatar,
+          createdAt: profileResponse.data.createdAt,
+        };
+        await AsyncStorage.setItem('user', JSON.stringify(freshUser));
+        setUser(freshUser);
+        return { success: true };
+      }
+      return { success: false };
+    } catch (error) {
+      console.error('Failed to refresh user:', error);
+      return { success: false };
+    }
   };
 
   return {
@@ -232,5 +278,6 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     deleteAddress,
     uploadProfileImage,
     changePassword,
+    refreshUser,
   };
 });

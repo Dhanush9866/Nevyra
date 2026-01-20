@@ -1,21 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     StyleSheet,
     TextInput,
     ScrollView,
     TouchableOpacity,
-    Image,
     KeyboardAvoidingView,
     Platform,
     Alert,
     ActivityIndicator,
 } from 'react-native';
+import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
-import { Stack, useRouter } from 'expo-router';
+import { Stack, useRouter, useFocusEffect } from 'expo-router';
 import { Edit2 } from 'lucide-react-native';
 import AppText from '@/components/atoms/AppText';
-import Button from '@/components/atoms/Button';
 import Colors from '@/constants/colors';
 import Spacing from '@/constants/spacing';
 import { useAuth } from '@/store/AuthContext';
@@ -26,10 +25,25 @@ export default function EditProfileScreen() {
     const [loading, setLoading] = useState(false);
     const [uploadingImage, setUploadingImage] = useState(false);
 
-    const [firstName, setFirstName] = useState(user?.name?.split(' ')[0] || '');
-    const [lastName, setLastName] = useState(user?.name?.split(' ').slice(1).join(' ') || '');
-    const [mobile, setMobile] = useState(user?.phone || '');
-    const [email, setEmail] = useState(user?.email || '');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [mobile, setMobile] = useState('');
+    const [email, setEmail] = useState('');
+    const [selectedImageUri, setSelectedImageUri] = useState<string | null>(null);
+
+    // Sync form fields with user data when screen focuses or user changes
+    useFocusEffect(
+        React.useCallback(() => {
+            if (user) {
+                const nameParts = user.name?.split(' ') || [];
+                setFirstName(nameParts[0] || '');
+                setLastName(nameParts.slice(1).join(' ') || '');
+                setMobile(user.phone || '');
+                setEmail(user.email || '');
+                setSelectedImageUri(null); // Reset image selection when screen opens
+            }
+        }, [user])
+    );
 
     const handlePickImage = async () => {
         try {
@@ -40,18 +54,27 @@ export default function EditProfileScreen() {
                 quality: 0.5,
             });
 
-            if (!result.canceled) {
+            if (!result.canceled && result.assets[0]) {
+                const pickedUri = result.assets[0].uri;
+                setSelectedImageUri(pickedUri);
+                
+                // Upload image immediately
                 setUploadingImage(true);
-                const res = await uploadProfileImage(result.assets[0].uri);
+                const res = await uploadProfileImage(pickedUri);
                 setUploadingImage(false);
+
                 if (res.success) {
-                    Alert.alert('Success', 'Profile picture updated');
+                    // Image uploaded and saved - selectedImageUri will show the local preview
+                    // user.avatar will be updated in context, so when we navigate back it shows correctly
                 } else {
+                    setSelectedImageUri(null);
                     Alert.alert('Error', res.message || 'Failed to upload image');
                 }
             }
         } catch (error) {
+            console.error('Pick image error:', error);
             setUploadingImage(false);
+            setSelectedImageUri(null);
             Alert.alert('Error', 'Failed to pick image');
         }
     };
@@ -86,6 +109,9 @@ export default function EditProfileScreen() {
         }
     };
 
+    // Determine which image to show: selected local image > uploaded avatar > default
+    const displayImageUri = selectedImageUri || user?.avatar || null;
+
     return (
         <KeyboardAvoidingView
             style={styles.container}
@@ -97,9 +123,7 @@ export default function EditProfileScreen() {
                     headerStyle: { backgroundColor: Colors.primary },
                     headerTintColor: Colors.white,
                     headerShadowVisible: false,
-                    headerRight: () => (
-                        <View />
-                    ),
+                    headerRight: () => <View />,
                 }}
             />
 
@@ -112,18 +136,25 @@ export default function EditProfileScreen() {
             >
                 <View style={styles.profileImageContainer}>
                     <View style={styles.imageWrapper}>
-                        <TouchableOpacity onPress={handlePickImage} activeOpacity={0.9} disabled={uploadingImage}>
+                        <TouchableOpacity 
+                            onPress={handlePickImage} 
+                            activeOpacity={0.9} 
+                            disabled={uploadingImage}
+                        >
                             {uploadingImage ? (
-                                <View style={[styles.profileImage, { justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.borderLight }]}>
+                                <View style={[styles.profileImage, styles.loadingContainer]}>
                                     <ActivityIndicator size="small" color={Colors.primary} />
                                 </View>
-                            ) : user?.avatar ? (
+                            ) : displayImageUri ? (
                                 <Image
-                                    source={{ uri: user.avatar }}
+                                    source={{ uri: displayImageUri }}
                                     style={styles.profileImage}
+                                    contentFit="cover"
+                                    cachePolicy="none"
+                                    key={displayImageUri}
                                 />
                             ) : (
-                                <View style={[styles.profileImage, { justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.primary }]}>
+                                <View style={[styles.profileImage, styles.defaultAvatarContainer]}>
                                     <AppText variant="h2" weight="bold" color={Colors.white}>
                                         {user?.name?.charAt(0).toUpperCase() || 'U'}
                                     </AppText>
@@ -139,7 +170,6 @@ export default function EditProfileScreen() {
                 </View>
 
                 <View style={styles.formContainer}>
-
                     <View style={styles.inputGroup}>
                         <AppText variant="caption" color={Colors.textSecondary} style={styles.label}>
                             First Name
@@ -214,7 +244,6 @@ export default function EditProfileScreen() {
                             </AppText>
                         </TouchableOpacity>
                     </View>
-
                 </View>
             </ScrollView>
         </KeyboardAvoidingView>
@@ -257,6 +286,16 @@ const styles = StyleSheet.create({
         borderWidth: 3,
         borderColor: Colors.white,
     },
+    loadingContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: Colors.borderLight,
+    },
+    defaultAvatarContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: Colors.primary,
+    },
     editIconContainer: {
         position: 'absolute',
         bottom: 0,
@@ -298,11 +337,6 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.primary,
         marginTop: Spacing.xs,
     },
-    underlineLight: {
-        height: 1,
-        backgroundColor: Colors.borderLight,
-        marginTop: Spacing.sm,
-    },
     submitButtonContainer: {
         alignItems: 'center',
         marginVertical: Spacing.xl,
@@ -311,39 +345,4 @@ const styles = StyleSheet.create({
         paddingVertical: Spacing.sm,
         paddingHorizontal: Spacing.lg,
     },
-    infoGroup: {
-        marginBottom: Spacing.lg,
-    },
-    infoRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    infoValue: {
-        fontSize: 16,
-    },
-    avatarSelectionContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: Spacing.lg,
-    },
-    avatarOption: {
-        padding: 4,
-        backgroundColor: Colors.white,
-        borderRadius: 60,
-        elevation: 4,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-    },
-    selectionImage: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
-    },
-    orText: {
-        marginHorizontal: Spacing.sm,
-    }
 });
