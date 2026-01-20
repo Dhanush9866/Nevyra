@@ -182,12 +182,35 @@ class ApiService {
     const url = `${this.baseURL}/upload/image`;
     const token = await AsyncStorage.getItem('token');
 
+    console.log('[ApiService] Uploading image to:', url);
+    console.log('[ApiService] Image URI:', imageUri);
+
     // Create FormData
     const formData = new FormData();
+
+    // IMPORTANT:
+    // - On React Native / Expo, keep the URI intact (including `file://`) for FormData uploads.
+    // - Stripping `file://` (previous iOS behavior) can break uploads, resulting in "success"
+    //   paths never being reached and the avatar never updating.
+    const uri = imageUri;
+
+    // Best-effort filename + mime type
+    const filename = (imageUri.split('/').pop() || 'profile.jpg').split('?')[0];
+    const match = /\.(\w+)$/.exec(filename);
+    const ext = (match?.[1] || 'jpg').toLowerCase();
+    const type =
+      ext === 'jpg' || ext === 'jpeg'
+        ? 'image/jpeg'
+        : ext === 'png'
+          ? 'image/png'
+          : ext === 'webp'
+            ? 'image/webp'
+            : `image/${ext}`;
+
     formData.append('image', {
-      uri: imageUri,
-      name: 'profile.jpg',
-      type: 'image/jpeg',
+      uri: uri,
+      name: filename,
+      type: type,
     } as any);
 
     try {
@@ -200,13 +223,22 @@ class ApiService {
         body: formData,
       });
 
-      const data = await response.json();
+      const responseText = await response.text();
+      console.log('[ApiService] Raw upload response:', responseText);
+
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (e) {
+        throw new Error('Invalid JSON response from server');
+      }
+
       if (!response.ok) {
         throw new Error(data.message || 'Upload failed');
       }
       return data;
     } catch (error) {
-      console.error('Upload error:', error);
+      console.error('[ApiService] Upload error:', error);
       throw error;
     }
   }

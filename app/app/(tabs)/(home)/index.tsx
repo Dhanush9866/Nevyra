@@ -20,6 +20,7 @@ import AppText from '@/components/atoms/AppText';
 import CategoryItem from '@/components/molecules/CategoryItem';
 import ProductCard from '@/components/molecules/ProductCard';
 import HorizontalProductSection from '@/components/organisms/HorizontalProductSection';
+import VerticalProductSection from '@/components/organisms/VerticalProductSection';
 import HomeBannerCarousel from '@/components/organisms/HomeBannerCarousel';
 import Colors from '@/constants/colors';
 import Spacing from '@/constants/spacing';
@@ -200,7 +201,7 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.mainContent}>
-          {/* Dynamically Render Category Sections */}
+          {/* Dynamically Render Category Sections - Alternating Horizontal and Vertical */}
           {categories.slice(0, 8).map((category: any, index: number) => {
             // Filter products for this specific category
             const categoryProducts = allProducts.filter((p: any) =>
@@ -216,16 +217,34 @@ export default function HomeScreen() {
             // Fallback products if category is empty to keep UI populated
             const displayItems = categoryProducts.length > 0 ? categoryProducts : allProducts.slice(index * 2, (index * 2) + 4);
 
-            return (
-              <HorizontalProductSection
-                key={category._id || category.id}
-                title={`Deals on ${category.name}`}
-                backgroundColor={theme.bg}
-                buttonColor={theme.btn}
-                onPress={(id) => router.push(`/product/${id}` as any)}
-                items={displayItems}
-              />
-            );
+            // Alternate between horizontal and vertical sections
+            // Even indices (0, 2, 4, 6) = Horizontal
+            // Odd indices (1, 3, 5, 7) = Vertical
+            const isHorizontal = index % 2 === 0;
+
+            if (isHorizontal) {
+              return (
+                <HorizontalProductSection
+                  key={category._id || category.id}
+                  title={`Deals on ${category.name}`}
+                  backgroundColor={theme.bg}
+                  buttonColor={theme.btn}
+                  onPress={(id) => router.push(`/product/${id}` as any)}
+                  items={displayItems}
+                />
+              );
+            } else {
+              return (
+                <VerticalProductSection
+                  key={category._id || category.id}
+                  title={`Shop for ${category.name}`}
+                  backgroundColor={theme.bg}
+                  buttonColor={theme.btn}
+                  onPress={(id) => router.push(`/product/${id}` as any)}
+                  items={displayItems}
+                />
+              );
+            }
           })}
 
           {/* Fallback Grid if needed */}
