@@ -109,6 +109,10 @@ class ApiService {
     return response;
   }
 
+  async getSettings() {
+    return this.request<{ success: boolean; data: any }>('/settings');
+  }
+
   async getPopularSearches() {
     return this.request<{ success: boolean; data: string[] }>('/products/popular-searches');
   }
@@ -174,6 +178,36 @@ class ApiService {
       {
         method: 'POST',
         body: JSON.stringify({ newPassword }),
+      }
+    );
+  }
+
+  async forgotPassword(email: string) {
+    return this.request<{ success: boolean; message: string; data?: any }>(
+      '/auth/forgot-password',
+      {
+        method: 'POST',
+        body: JSON.stringify({ email }),
+      }
+    );
+  }
+
+  async verifyOTP(email: string, otp: string) {
+    return this.request<{ success: boolean; message: string; data?: any }>(
+      '/auth/verify-otp',
+      {
+        method: 'POST',
+        body: JSON.stringify({ email, otp }),
+      }
+    );
+  }
+
+  async resetPassword(email: string, otp: string, newPassword: string) {
+    return this.request<{ success: boolean; message: string; data?: any }>(
+      '/auth/reset-password',
+      {
+        method: 'POST',
+        body: JSON.stringify({ email, otp, newPassword }),
       }
     );
   }
