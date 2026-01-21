@@ -895,6 +895,8 @@ const categories: Category[] = [
   },
 ];
 
+const navbarCategories = categories.slice(0, 8);
+
 // Helper function to convert category name to URL-safe slug
 const categoryToSlug = (categoryName: string): string => {
   return categoryName
@@ -1073,8 +1075,8 @@ const Navbar = () => {
       <div className="bg-background border-t border-border">
         <div className="container mx-auto px-2">
           {/* Desktop Categories */}
-          <div className="hidden md:flex items-center space-x-4 py-2 overflow-x-auto no-scrollbar whitespace-nowrap">
-            {categories.map((category) => (
+          <div className="hidden md:flex items-center justify-between py-2 overflow-x-auto no-scrollbar whitespace-nowrap w-full">
+            {navbarCategories.map((category) => (
               <HoverCard
                 key={category.name}
                 openDelay={0}
@@ -1181,7 +1183,7 @@ const Navbar = () => {
           {/* Mobile Categories Quick Access */}
           <div className="md:hidden py-2 overflow-x-auto">
             <div className="flex space-x-2 min-w-max">
-              {categories.map((category) => (
+              {navbarCategories.map((category) => (
                 <Link
                   key={category.name}
                   to={`/category/${categoryToSlug(category.name)}`}
@@ -1239,7 +1241,7 @@ const Navbar = () => {
               </div>
 
               {/* Categories */}
-              {categories.map((category) => (
+              {navbarCategories.map((category) => (
                 <div key={category.name} className="border-b border-border pb-2">
                   <div className="w-full flex items-center justify-between font-medium text-foreground mb-2 py-2 hover:bg-muted rounded px-2">
                     <Link

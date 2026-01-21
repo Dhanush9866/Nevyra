@@ -74,8 +74,8 @@ export default function ProductDetailScreen() {
 
       {/* CUSTOM FIXED HEADER WITH SEARCH */}
       <View style={[
-        styles.fixedHeader, 
-        { 
+        styles.fixedHeader,
+        {
           paddingTop: insets.top,
           paddingBottom: Spacing.sm,
         }
@@ -86,9 +86,9 @@ export default function ProductDetailScreen() {
           end={{ x: 1, y: 0 }}
           style={StyleSheet.absoluteFill}
         />
-        
+
         <View style={styles.headerTopRow}>
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={() => router.back()}
             style={styles.backButton}
           >
@@ -120,45 +120,42 @@ export default function ProductDetailScreen() {
       </View>
 
       <View style={styles.container}>
-        <ScrollView 
+        <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingTop: insets.top + 60 }}
         >
-            <View style={styles.imageContainer}>
-              <Image
-                source={{ uri: product.images[0] }}
-                style={styles.image}
-                contentFit="cover"
-              />
-              
-              {/* Image Actions Overlay */}
-              <View style={styles.imageActions}>
-                <IconButton
-                  icon={Share2}
-                  onPress={() => {}}
-                  color={Colors.white}
-                  backgroundColor="rgba(0,0,0,0.4)"
-                  size={20}
-                />
-                <IconButton
-                  icon={Heart}
-                  onPress={() => toggleWishlist(product)}
-                  color={isWishlisted(product.id) ? Colors.error : Colors.white}
-                  backgroundColor="rgba(0,0,0,0.4)"
-                  size={20}
-                />
-              </View>
+          <View style={styles.imageContainer}>
+            <Image
+              source={{ uri: product.images[0] }}
+              style={styles.image}
+              contentFit="cover"
+            />
 
-              <LinearGradient
-                colors={['transparent', Colors.background]}
-                style={styles.imageGradient}
+            {/* Image Actions Overlay */}
+            <View style={styles.imageActions}>
+              <IconButton
+                icon={Share2}
+                onPress={() => { }}
+                color={Colors.white}
+                backgroundColor="rgba(0,0,0,0.4)"
+                size={20}
               />
-              {product.discount && product.discount > 0 && (
-                <View style={styles.discountBadge}>
-                  <Badge text={`${product.discount}% OFF`} variant="error" />
-                </View>
-              )}
+              <IconButton
+                icon={Heart}
+                onPress={() => toggleWishlist(product)}
+                color={isWishlisted(product.id) ? Colors.error : Colors.white}
+                backgroundColor="rgba(0,0,0,0.4)"
+                size={20}
+              />
             </View>
+
+
+            {product.discount && product.discount > 0 && (
+              <View style={styles.discountBadge}>
+                <Badge text={`${product.discount}% OFF`} variant="error" />
+              </View>
+            )}
+          </View>
 
           <View style={styles.content}>
             <AppText variant="caption" color={Colors.textSecondary}>
@@ -239,16 +236,16 @@ export default function ProductDetailScreen() {
                 <View style={styles.sectionHeader}>
                   <AppText variant="h4" weight="bold">Similar Products</AppText>
                 </View>
-                <ScrollView 
-                  horizontal 
+                <ScrollView
+                  horizontal
                   showsHorizontalScrollIndicator={false}
                   contentContainerStyle={styles.similarProductsContainer}
                 >
                   {similarProducts.map((item: any) => (
                     <View key={item.id} style={styles.similarProductItem}>
-                      <ProductCard 
-                        product={item} 
-                        onPress={() => router.push(`/product/${item.id}` as any)} 
+                      <ProductCard
+                        product={item}
+                        onPress={() => router.push(`/product/${item.id}` as any)}
                       />
                     </View>
                   ))}
@@ -272,26 +269,26 @@ export default function ProductDetailScreen() {
                   <ChevronRight size={14} color={Colors.primary} />
                 </TouchableOpacity>
               </View>
-              
+
               <View style={styles.ratingOverview}>
-                 <View style={styles.ratingBigCount}>
-                    <AppText variant="h1" weight="bold">{product.rating}</AppText>
-                    <RatingStars rating={product.rating} />
-                    <AppText variant="caption" color={Colors.textSecondary}>
-                      {product.reviewCount} reviews
+                <View style={styles.ratingBigCount}>
+                  <AppText variant="h1" weight="bold">{product.rating}</AppText>
+                  <RatingStars rating={product.rating} />
+                  <AppText variant="caption" color={Colors.textSecondary}>
+                    {product.reviewCount} reviews
+                  </AppText>
+                </View>
+                <View style={styles.reviewSnippet}>
+                  {latestReview ? (
+                    <AppText variant="body" color={Colors.textSecondary} style={{ fontStyle: 'italic' }}>
+                      "{latestReview.comment}"
                     </AppText>
-                 </View>
-                 <View style={styles.reviewSnippet}>
-                    {latestReview ? (
-                      <AppText variant="body" color={Colors.textSecondary} style={{ fontStyle: 'italic' }}>
-                        "{latestReview.comment}"
-                      </AppText>
-                    ) : (
-                      <AppText variant="body" color={Colors.textLight} style={{ fontStyle: 'italic' }}>
-                        No reviews yet. Be the first to review this product!
-                      </AppText>
-                    )}
-                 </View>
+                  ) : (
+                    <AppText variant="body" color={Colors.textLight} style={{ fontStyle: 'italic' }}>
+                      No reviews yet. Be the first to review this product!
+                    </AppText>
+                  )}
+                </View>
               </View>
             </View>
           </View>
@@ -346,13 +343,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  imageGradient: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 100,
-  },
+
   discountBadge: {
     position: 'absolute',
     top: 100,

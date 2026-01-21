@@ -26,6 +26,10 @@ function RootLayoutNav() {
         name="auth/forgot-password"
         options={{ title: 'Reset Password' }}
       />
+      <Stack.Screen
+        name="auth/reset-password"
+        options={{ title: 'Set New Password' }}
+      />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen
         name="product/[id]"

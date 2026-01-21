@@ -60,6 +60,24 @@ export default function HomeScreen() {
     queryFn: () => apiService.getCategories(),
   });
 
+  const { data: settingsData } = useQuery({
+    queryKey: ['settings'],
+    queryFn: () => apiService.getSettings(),
+  });
+
+  const heroBanners = React.useMemo(() => {
+    if (settingsData?.data?.heroBanners?.length) {
+      return settingsData.data.heroBanners.map((banner: any, index: number) => ({
+        id: (index + 1).toString(),
+        image: banner.url,
+        title: banner.title || "Special Offer",
+        subtitle: banner.subtitle || "Limited time only",
+        link: banner.link || "/products",
+      }));
+    }
+    return mockBanners;
+  }, [settingsData]);
+
   // Fetch larger set of products to categorize
   const { data: prodData, isLoading: prodLoading, refetch } = useQuery({
     queryKey: ['all-products-home'],
@@ -164,7 +182,7 @@ export default function HomeScreen() {
               <View style={{ paddingHorizontal: 20 }}>
                 <AppText color={Colors.white}>Loading...</AppText>
               </View>
-            ) : categories.map((category: any) => (
+            ) : categories.slice(0, 8).map((category: any) => (
               <CategoryItem
                 key={category._id || category.id}
                 name={category.name}
@@ -197,7 +215,7 @@ export default function HomeScreen() {
         }
       >
         <View style={styles.heroSection}>
-          <HomeBannerCarousel banners={mockBanners} />
+          <HomeBannerCarousel banners={heroBanners} />
         </View>
 
         <View style={styles.mainContent}>

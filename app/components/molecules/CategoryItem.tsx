@@ -41,7 +41,7 @@ export default function CategoryItem({
 
   // Stop the text from translating UP to prevent overlap with search bar
   const textTranslateY = 0;
-  
+
   const backgroundColor = scrollY ? scrollY.interpolate({
     inputRange: [30, 50],
     outputRange: ['rgba(255,255,255,0)', 'rgba(255,255,255,0.12)'],
@@ -55,9 +55,9 @@ export default function CategoryItem({
       style={styles.container}
     >
       <Animated.View style={[
-        styles.imageContainer, 
-        { 
-          transform: [{ scale }], 
+        styles.imageContainer,
+        {
+          transform: [{ scale }],
           opacity,
           height: imageHeight,
           marginBottom: scrollY ? scrollY.interpolate({
@@ -75,7 +75,7 @@ export default function CategoryItem({
       </Animated.View>
       <Animated.View style={[
         styles.textWrapper,
-        { 
+        {
           transform: [{ translateY: textTranslateY }],
           backgroundColor: backgroundColor as any
         }
@@ -98,7 +98,7 @@ export default function CategoryItem({
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    width: 'auto',
+    width: 76,
   },
   imageContainer: {
     width: 64,

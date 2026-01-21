@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, TextInput } from 'react-native';
-import { Stack } from 'expo-router';
+import { View, StyleSheet, TextInput, Alert } from 'react-native';
+import { Stack, useRouter } from 'expo-router';
 import { Mail } from 'lucide-react-native';
 import AppText from '@/components/atoms/AppText';
 import Button from '@/components/atoms/Button';
@@ -10,6 +10,35 @@ import Typography from '@/constants/typography';
 
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const handleSendResetLink = async () => {
+    if (!email) {
+      alert('Please enter your email address');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const { apiService } = require('@/services/api');
+      const response = await apiService.forgotPassword(email);
+
+      if (response.success) {
+        // Navigate to OTP screen with email params
+        router.push({
+          pathname: '/auth/otp',
+          params: { email }
+        });
+      } else {
+        alert(response.message || 'Failed to send reset link');
+      }
+    } catch (error: any) {
+      alert(error.message || 'Something went wrong');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -44,7 +73,12 @@ export default function ForgotPasswordScreen() {
           />
         </View>
 
-        <Button title="Send Reset Link" onPress={() => {}} fullWidth />
+        <Button
+          title={loading ? "Sending..." : "Send OTP"}
+          onPress={handleSendResetLink}
+          disabled={loading}
+          fullWidth
+        />
       </View>
     </>
   );
