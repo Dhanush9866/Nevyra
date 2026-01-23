@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity, FlatList } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { Heart, Plus, ShoppingCart, List, ArrowRight } from 'lucide-react-native'; // Lucide icons for placeholders
 import { Image } from 'expo-image';
 import AppText from '@/components/atoms/AppText';
@@ -14,9 +14,15 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function WishlistScreen() {
   const router = useRouter();
-  const { items, toggleWishlist } = useWishlist();
+  const { items, toggleWishlist, refreshWishlist } = useWishlist();
   const { addToCart } = useCart();
   const insets = useSafeAreaInsets();
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshWishlist();
+    }, [refreshWishlist])
+  );
 
   // Mock data for the top lists
   const lists = [

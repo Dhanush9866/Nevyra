@@ -7,6 +7,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider } from '@/store/AuthContext';
 import { CartProvider } from '@/store/CartContext';
 import { WishlistProvider } from '@/store/WishlistContext';
+import { CheckoutProvider } from '@/store/CheckoutContext';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -90,7 +91,9 @@ export default function RootLayout() {
           <AuthProvider>
             <CartProvider>
               <WishlistProvider>
-                <RootLayoutNav />
+                <CheckoutProvider>
+                  <RootLayoutNav />
+                </CheckoutProvider>
               </WishlistProvider>
             </CartProvider>
           </AuthProvider>

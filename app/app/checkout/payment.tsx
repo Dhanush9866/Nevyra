@@ -6,6 +6,7 @@ import AppText from '@/components/atoms/AppText';
 import Button from '@/components/atoms/Button';
 import Colors from '@/constants/colors';
 import Spacing from '@/constants/spacing';
+import { useCheckout } from '@/store/CheckoutContext';
 
 const paymentMethods = [
   { id: 'upi', name: 'UPI', icon: Smartphone },
@@ -16,6 +17,7 @@ const paymentMethods = [
 
 export default function PaymentMethodScreen() {
   const router = useRouter();
+  const { selectedPaymentMethod, setSelectedPaymentMethod } = useCheckout();
 
   return (
     <>
@@ -31,8 +33,12 @@ export default function PaymentMethodScreen() {
           {paymentMethods.map((method) => (
             <TouchableOpacity
               key={method.id}
-              style={styles.methodCard}
+              style={[
+                styles.methodCard,
+                selectedPaymentMethod === method.id && styles.selectedCard
+              ]}
               activeOpacity={0.8}
+              onPress={() => setSelectedPaymentMethod(method.id)}
             >
               <method.icon size={24} color={Colors.primary} />
               <AppText variant="body" weight="medium">
@@ -47,6 +53,7 @@ export default function PaymentMethodScreen() {
             title="Continue to Review"
             onPress={() => router.push('/checkout/review' as any)}
             fullWidth
+            disabled={!selectedPaymentMethod}
           />
         </View>
       </View>
@@ -74,6 +81,12 @@ const styles = StyleSheet.create({
     padding: Spacing.base,
     gap: Spacing.md,
     ...Colors.shadow.sm,
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  selectedCard: {
+    borderColor: Colors.primary,
+    backgroundColor: '#F0F7FF',
   },
   footer: {
     padding: Spacing.base,

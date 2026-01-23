@@ -12,13 +12,26 @@ interface OrderListItemProps {
 }
 
 export default function OrderListItem({ order, onPress }: OrderListItemProps) {
-    const firstItem = order.items[0];
+    const firstItem = order.items?.[0];
     const isDelivered = order.status === 'delivered';
     const isCancelled = order.status === 'cancelled';
-    const isProcessing = order.status === 'processing' || order.status === 'pending';
+    const isProcessing = order.status === 'pending' || order.status === 'processing';
     const isShipped = order.status === 'shipped';
 
     const getStatusBadge = () => {
+        if (order.returnStatus && order.returnStatus !== 'None') {
+            const getColor = () => {
+                switch (order.returnStatus) {
+                    case 'Pending': return { color: '#F59E0B', bgColor: '#FEF3C7' };
+                    case 'Approved': return { color: '#3B82F6', bgColor: '#DBEAFE' };
+                    case 'Success': return { color: '#10B981', bgColor: '#D1FAE5' };
+                    case 'Rejected': return { color: '#EF4444', bgColor: '#FEE2E2' };
+                    default: return { color: '#757575', bgColor: '#F5F5F5' };
+                }
+            };
+            const theme = getColor();
+            return { text: `Return ${order.returnStatus}`, ...theme };
+        }
         if (isProcessing) {
             return { text: 'Processing', color: '#FFA500', bgColor: '#FFF3E0' };
         }
@@ -31,12 +44,13 @@ export default function OrderListItem({ order, onPress }: OrderListItemProps) {
         if (isCancelled) {
             return { text: 'Cancelled', color: '#F44336', bgColor: '#FFEBEE' };
         }
-        return { text: order.status, color: '#757575', bgColor: '#F5F5F5' };
+        return { text: order.status.charAt(0).toUpperCase() + order.status.slice(1), color: '#757575', bgColor: '#F5F5F5' };
     };
 
     const statusBadge = getStatusBadge();
 
     const formatDate = (dateString: string) => {
+        if (!dateString) return '';
         const date = new Date(dateString);
         return date.toLocaleDateString('en-IN', {
             day: 'numeric',
@@ -49,7 +63,7 @@ export default function OrderListItem({ order, onPress }: OrderListItemProps) {
         <TouchableOpacity onPress={onPress} activeOpacity={0.7} style={styles.container}>
             <View style={styles.imageContainer}>
                 <Image
-                    source={{ uri: firstItem.product.images[0] }}
+                    source={{ uri: firstItem?.product?.images?.[0] || 'https://via.placeholder.com/150' }}
                     style={styles.image}
                     contentFit="contain"
                     transition={300}
@@ -58,7 +72,7 @@ export default function OrderListItem({ order, onPress }: OrderListItemProps) {
 
             <View style={styles.detailsContainer}>
                 <AppText variant="body" weight="bold" style={styles.productName} numberOfLines={1}>
-                    {firstItem.product.name}
+                    {(firstItem?.product?.name || 'Multiple Items')} {order.items?.length > 1 ? `(+${order.items.length - 1} more)` : ''}
                 </AppText>
 
                 <AppText variant="caption" color={Colors.textSecondary} style={styles.orderId}>

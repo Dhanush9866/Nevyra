@@ -1,5 +1,6 @@
+import { useCallback } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity, StatusBar } from 'react-native';
-import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
+import { useLocalSearchParams, useRouter, Stack, useFocusEffect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { Heart, Star, Share2, Search, ArrowLeft, ShoppingCart, ChevronRight } from 'lucide-react-native';
@@ -27,11 +28,17 @@ export default function ProductDetailScreen() {
   const { addToCart } = useCart();
   const { toggleWishlist, isWishlisted } = useWishlist();
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['product', id],
     queryFn: () => apiService.getProductDetails(id as string),
     enabled: !!id,
   });
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch])
+  );
 
   const { data: similarData } = useQuery({
     queryKey: ['similar-products', id],

@@ -8,6 +8,18 @@ const orderSchema = new mongoose.Schema(
       required: true,
     },
     totalAmount: { type: Number, required: true },
+    orderNumber: { type: String, unique: true },
+    shippingAddress: {
+      firstName: { type: String, required: true },
+      lastName: { type: String, required: true },
+      email: { type: String },
+      phone: { type: String, required: true },
+      addressLine1: { type: String, required: true },
+      addressLine2: { type: String },
+      city: { type: String, required: true },
+      state: { type: String, required: true },
+      zipCode: { type: String, required: true },
+    },
     status: {
       type: String,
       enum: ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"],

@@ -2,7 +2,11 @@ const { Order, OrderItem, CartItem, Product } = require("../models");
 
 exports.create = async (req, res, next) => {
   try {
-    const { paymentMethod, paymentDetails } = req.body;
+    const { paymentMethod, paymentDetails, shippingAddress } = req.body;
+
+    if (!shippingAddress) {
+      return res.status(400).json({ success: false, message: "Shipping address is required" });
+    }
 
     const cartItems = await CartItem.find({ userId: req.user.id }).populate(
       "productId"
@@ -15,8 +19,13 @@ exports.create = async (req, res, next) => {
     cartItems.forEach((item) => {
       totalAmount += item.quantity * (item.productId.price || 0);
     });
+
+    const orderNumber = `ORD${Date.now()}${Math.floor(Math.random() * 1000)}`;
+
     const order = new Order({
       userId: req.user.id,
+      orderNumber,
+      shippingAddress,
       totalAmount,
       status: "Pending",
       paymentMethod: paymentMethod || "cod",

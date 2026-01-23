@@ -85,7 +85,7 @@ const MOCK_ITEMS = [
 
 export default function CartScreen() {
   const router = useRouter();
-  const { items, totalAmount, removeFromCart, updateQuantity, isLoading } = useCart();
+  const { items, totalAmount, removeFromCart, updateQuantity, isLoading, refreshCart } = useCart();
   const { addresses } = useAuth();
   const [focusKey, setFocusKey] = React.useState(0);
 
@@ -94,6 +94,12 @@ export default function CartScreen() {
       // Reset the slide button state when screen comes into focus
       setFocusKey(prev => prev + 1);
     }, [])
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshCart();
+    }, [refreshCart])
   );
 
   const defaultAddress = addresses.find(a => a.isDefault) || addresses[0];
@@ -332,7 +338,10 @@ export default function CartScreen() {
               <Info size={14} color={Colors.textSecondary} style={{ marginLeft: 4 }} />
             </View>
           </View>
-          <TouchableOpacity style={styles.placeOrderButton}>
+          <TouchableOpacity 
+            style={styles.placeOrderButton}
+            onPress={() => router.push('/checkout/review' as any)}
+          >
             <AppText variant="body" weight="semibold" style={styles.placeOrderText}>Place Order</AppText>
           </TouchableOpacity>
         </View>

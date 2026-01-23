@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useCallback } from 'react';
 import {
   View,
   StyleSheet,
@@ -9,7 +9,7 @@ import {
   Animated,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useRouter, Stack } from 'expo-router';
+import { useRouter, Stack, useFocusEffect } from 'expo-router';
 import {
   Search,
   MapPin,
@@ -55,12 +55,12 @@ export default function HomeScreen() {
     ? `${defaultAddress.city}, ${defaultAddress.state} - ${defaultAddress.zipCode}`
     : 'Select a delivery address';
 
-  const { data: catData, isLoading: catLoading } = useQuery({
+  const { data: catData, isLoading: catLoading, refetch: refetchCategories } = useQuery({
     queryKey: ['categories'],
     queryFn: () => apiService.getCategories(),
   });
 
-  const { data: settingsData } = useQuery({
+  const { data: settingsData, refetch: refetchSettings } = useQuery({
     queryKey: ['settings'],
     queryFn: () => apiService.getSettings(),
   });
@@ -79,10 +79,18 @@ export default function HomeScreen() {
   }, [settingsData]);
 
   // Fetch larger set of products to categorize
-  const { data: prodData, isLoading: prodLoading, refetch } = useQuery({
+  const { data: prodData, isLoading: prodLoading, refetch: refetchProducts } = useQuery({
     queryKey: ['all-products-home'],
     queryFn: () => apiService.getProducts({ limit: 100 }),
   });
+
+  useFocusEffect(
+    useCallback(() => {
+      refetchCategories();
+      refetchSettings();
+      refetchProducts();
+    }, [refetchCategories, refetchSettings, refetchProducts])
+  );
 
   const categories = catData?.data?.filter((c: any) => !c.parentId && c.image) || [];
   const fetchedProducts = prodData?.data || [];
@@ -93,7 +101,11 @@ export default function HomeScreen() {
 
   const onRefresh = () => {
     setRefreshing(true);
-    refetch().finally(() => setRefreshing(false));
+    Promise.all([
+      refetchCategories(),
+      refetchSettings(),
+      refetchProducts()
+    ]).finally(() => setRefreshing(false));
   };
 
   // 1. Address Bar Animations
