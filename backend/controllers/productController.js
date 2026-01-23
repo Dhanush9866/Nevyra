@@ -58,10 +58,21 @@ function mapProductId(product) {
 
 exports.list = async (req, res, next) => {
   try {
-    const { page = 1, limit = 10, category, subCategory, search } = req.query;
+    const {
+      page = 1,
+      limit = 10,
+      category,
+      subCategory,
+      search,
+      sort,
+      brand,
+      minPrice,
+      maxPrice,
+      rating
+    } = req.query;
 
     console.log('========== PRODUCT LIST REQUEST ==========');
-    console.log('Query params:', { page, limit, category, subCategory, search });
+    console.log('Query params:', { page, limit, category, subCategory, search, sort, brand, minPrice, maxPrice, rating });
 
     const filter = {};
     if (category) {
@@ -89,13 +100,58 @@ exports.list = async (req, res, next) => {
       }).catch(err => console.error('Search log error:', err));
     }
 
+    // Price Filter
+    if (minPrice || maxPrice) {
+      filter.price = {};
+      if (minPrice) filter.price.$gte = Number(minPrice);
+      if (maxPrice) filter.price.$lte = Number(maxPrice);
+    }
+
+    // Rating Filter
+    if (rating) {
+      filter.rating = { $gte: Number(rating) };
+    }
+
+    // Brand Filter (assuming it might be in attributes or we search title)
+    if (brand) {
+      const brandArray = brand.split(',').map(b => new RegExp(`${b.trim()}`, "i"));
+      // Search in title or attributes.brand
+      filter.$or = [
+        { title: { $in: brandArray } },
+        { "attributes.brand": { $in: brandArray } }
+      ];
+    }
+
     console.log('MongoDB filter:', JSON.stringify(filter));
 
+    // Sorting
+    let sortOptions = {};
+    switch (sort) {
+      case 'price_asc':
+        sortOptions = { price: 1 };
+        break;
+      case 'price_desc':
+        sortOptions = { price: -1 };
+        break;
+      case 'rating':
+        sortOptions = { rating: -1 };
+        break;
+      case 'newest':
+        sortOptions = { createdAt: -1 };
+        break;
+      case 'popularity':
+        sortOptions = { soldCount: -1 };
+        break;
+      default:
+        sortOptions = { createdAt: -1 }; // Default to newest
+    }
+
     const skip = (parseInt(page) - 1) * parseInt(limit);
-    console.log('Pagination:', { skip, limit: parseInt(limit) });
+    console.log('Pagination:', { skip, limit: parseInt(limit), sort: sortOptions });
 
     const [products, count] = await Promise.all([
       Product.find(filter)
+        .sort(sortOptions)
         .skip(skip)
         .limit(parseInt(limit))
         .select(

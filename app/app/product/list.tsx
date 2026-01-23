@@ -11,31 +11,47 @@ import Loader from '@/components/atoms/Loader';
 import Colors from '@/constants/colors';
 import Spacing from '@/constants/spacing';
 import { apiService } from '@/services/api';
+import { useCart } from '@/store/CartContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function ProductListScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { category, subcategory, query } = useLocalSearchParams<{ 
-    category?: string; 
+  const { category, subcategory, query, sort: paramSort, priceRange, rating: paramRating } = useLocalSearchParams<{
+    category?: string;
     subcategory?: string;
     query?: string;
+    sort?: string;
+    priceRange?: string;
+    rating?: string;
   }>();
+  const { totalItems } = useCart();
 
   const title = query || subcategory || category || 'Products';
 
+  const [sort, setSort] = useState<string | undefined>(paramSort);
+  const [activeFilters, setActiveFilters] = useState<string[]>([]);
+
   const { data, isLoading, error } = useQuery({
-    queryKey: ['products', { category, subcategory, query }],
-    queryFn: () => 
-      apiService.getProducts({
+    queryKey: ['products', { category, subcategory, query, sort: paramSort || sort, activeFilters, priceRange, paramRating }],
+    queryFn: () => {
+      const minPrice = priceRange ? parseInt(priceRange.split('-')[0]) : undefined;
+      const maxPrice = priceRange ? (priceRange.includes('above') ? 100000 : parseInt(priceRange.split('-')[1])) : undefined;
+
+      return apiService.getProducts({
         category,
         subCategory: subcategory,
-        search: query,
-      }),
+        search: activeFilters.includes('5g') ? `${query || ''} 5G`.trim() : query,
+        sort: activeFilters.includes('new') ? 'newest' : (paramSort || sort),
+        minPrice,
+        maxPrice,
+        rating: paramRating ? parseInt(paramRating) : undefined,
+      });
+    },
   });
 
   const products = data?.data || [];
-  
+
   const uniqueCategories = useMemo(() => {
     const cats = products.map((p: any) => p.category);
     return [...new Set(cats)];
@@ -49,8 +65,8 @@ export default function ProductListScreen() {
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
             <ArrowLeft size={24} color={Colors.text} />
           </TouchableOpacity>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             style={styles.searchBarSubstitute}
             onPress={() => router.push('/search' as any)}
           >
@@ -62,13 +78,43 @@ export default function ProductListScreen() {
 
           <TouchableOpacity onPress={() => router.push('/(tabs)/cart')} style={styles.cartButton}>
             <ShoppingCart size={24} color={Colors.text} />
-            <View style={styles.badge}>
-              <AppText variant="caption" color={Colors.white} weight="bold" style={{ fontSize: 10 }}>8</AppText>
-            </View>
+            {totalItems > 0 && (
+              <View style={styles.badge}>
+                <AppText variant="caption" color={Colors.white} weight="bold" style={{ fontSize: 10 }}>
+                  {totalItems}
+                </AppText>
+              </View>
+            )}
           </TouchableOpacity>
         </View>
 
-        <FilterBar />
+        <FilterBar
+          activeSort={sort || paramSort}
+          activeFilters={[
+            ...activeFilters,
+            ...(priceRange ? ['price'] : []),
+            ...(paramRating ? ['filter'] : [])
+          ]}
+          onSelectSort={(id) => {
+            if (id === 'filter' || id === 'sort' || id === 'price') {
+              router.push({
+                pathname: '/filter',
+                params: {
+                  sort: sort || paramSort,
+                  priceRange,
+                  rating: paramRating
+                }
+              });
+            } else {
+              setSort(id === sort ? undefined : id);
+            }
+          }}
+          onToggleFilter={(id) => {
+            setActiveFilters(prev =>
+              prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]
+            );
+          }}
+        />
 
         <ScrollView
           contentContainerStyle={styles.results}
@@ -86,12 +132,12 @@ export default function ProductListScreen() {
             <View style={styles.detailedList}>
               {/* Brand Header - Generic for demo */}
               <View style={styles.brandHeader}>
-                 <View style={{ flex: 1 }}>
-                    <AppText variant="h4" weight="bold">{title}</AppText>
-                    <AppText variant="caption" color={Colors.textLight}>
-                      Top quality products in this category
-                    </AppText>
-                 </View>
+                <View style={{ flex: 1 }}>
+                  <AppText variant="h4" weight="bold">{title}</AppText>
+                  <AppText variant="caption" color={Colors.textLight}>
+                    Top quality products in this category
+                  </AppText>
+                </View>
               </View>
 
               {/* Related Categories */}
@@ -100,8 +146,8 @@ export default function ProductListScreen() {
                   <AppText variant="caption" weight="bold" style={styles.relatedTitle}>RELATED CATEGORIES</AppText>
                   <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipsContainer}>
                     {uniqueCategories.map((cat: any) => (
-                      <TouchableOpacity 
-                        key={cat} 
+                      <TouchableOpacity
+                        key={cat}
                         style={styles.categoryChip}
                         onPress={() => router.push({ pathname: '/product/list', params: { category: cat } })}
                       >

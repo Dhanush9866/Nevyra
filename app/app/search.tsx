@@ -17,16 +17,25 @@ import { apiService } from '@/services/api';
 import { useQuery } from '@tanstack/react-query';
 import { Search as SearchIcon } from 'lucide-react-native';
 
+import { useCart } from '@/store/CartContext';
+
 export default function SearchScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { totalItems } = useCart();
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
-  
+  const [activeFilters, setActiveFilters] = useState<string[]>([]);
+
   const { data: popularData } = useQuery({
     queryKey: ['popular-searches'],
     queryFn: () => apiService.getPopularSearches(),
+  });
+
+  const { data: categoriesData } = useQuery({
+    queryKey: ['categories'],
+    queryFn: () => apiService.getCategories(),
   });
 
   const popularSearches = popularData?.data || [
@@ -36,7 +45,11 @@ export default function SearchScreen() {
     'Bluetooth Speaker',
     'Yoga Mat'
   ];
-  
+
+  const categories = categoriesData?.success
+    ? categoriesData.data.filter((c: any) => !c.parentId && c.image)
+    : mockCategories;
+
   // Load history on mount
   React.useEffect(() => {
     const loadHistory = async () => {
@@ -51,7 +64,10 @@ export default function SearchScreen() {
     const handler = setTimeout(async () => {
       if (query.trim().length > 1) {
         try {
-          const response = await apiService.getProducts({ search: query, limit: 10 });
+          const response = await apiService.getProducts({
+            search: activeFilters.includes('5g') ? `${query} 5G` : query,
+            limit: 10
+          });
           if (response.success) {
             setSuggestions(response.data);
           }
@@ -64,7 +80,7 @@ export default function SearchScreen() {
     }, 500);
 
     return () => clearTimeout(handler);
-  }, [query]);
+  }, [query, activeFilters]);
 
   const saveSearch = async (term: string) => {
     const newHistory = [term, ...recentSearches.filter(i => i !== term)].slice(0, 5);
@@ -77,7 +93,10 @@ export default function SearchScreen() {
     saveSearch(term);
     router.push({
       pathname: '/product/list',
-      params: { query: term }
+      params: {
+        query: term,
+        ...(activeFilters.includes('5g') ? { activeFilters: '5g' } : {})
+      }
     });
   };
 
@@ -109,8 +128,8 @@ export default function SearchScreen() {
           <View style={styles.recentList}>
             {recentSearches.map((item, index) => (
               <View key={index} style={styles.recentItem}>
-                <TouchableOpacity 
-                  style={styles.recentItemText} 
+                <TouchableOpacity
+                  style={styles.recentItemText}
                   onPress={() => handleSearch(item)}
                 >
                   <AppText variant="body" color={Colors.textSecondary}>{item}</AppText>
@@ -134,8 +153,8 @@ export default function SearchScreen() {
         </View>
         <View style={styles.tagCloud}>
           {popularSearches.map((item, index) => (
-            <TouchableOpacity 
-              key={index} 
+            <TouchableOpacity
+              key={index}
               style={styles.tag}
               onPress={() => handleSearch(item)}
             >
@@ -151,9 +170,9 @@ export default function SearchScreen() {
           <AppText variant="body" weight="bold" style={styles.sectionTitle}>Browse Categories</AppText>
         </View>
         <View style={styles.categoryGrid}>
-          {mockCategories.map((category) => (
-            <TouchableOpacity 
-              key={category.id} 
+          {categories.map((category: any) => (
+            <TouchableOpacity
+              key={category.id || category._id}
               style={styles.categoryCard}
               onPress={() => router.push({
                 pathname: '/product/list',
@@ -190,13 +209,31 @@ export default function SearchScreen() {
           </View>
           <TouchableOpacity onPress={() => router.push('/(tabs)/cart')} style={styles.cartButton}>
             <ShoppingCart size={24} color={Colors.text} />
-            <View style={styles.badge}>
-              <AppText variant="caption" color={Colors.white} weight="bold" style={{ fontSize: 10 }}>8</AppText>
-            </View>
+            {totalItems > 0 && (
+              <View style={styles.badge}>
+                <AppText variant="caption" color={Colors.white} weight="bold" style={{ fontSize: 10 }}>
+                  {totalItems}
+                </AppText>
+              </View>
+            )}
           </TouchableOpacity>
         </View>
 
-        {query.length > 0 && <FilterBar />}
+        {query.length > 0 && (
+          <FilterBar
+            activeFilters={activeFilters}
+            onSelectSort={(id) => {
+              if (id === 'filter' || id === 'sort' || id === 'price') {
+                router.push('/filter');
+              }
+            }}
+            onToggleFilter={(id) => {
+              setActiveFilters(prev =>
+                prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]
+              );
+            }}
+          />
+        )}
 
         {query.length === 0 ? (
           renderEmptyState()
@@ -208,8 +245,8 @@ export default function SearchScreen() {
             {suggestions.length > 0 ? (
               <View style={styles.suggestionsList}>
                 {suggestions.map((item) => (
-                  <TouchableOpacity 
-                    key={item.id} 
+                  <TouchableOpacity
+                    key={item.id}
                     style={styles.suggestionItem}
                     onPress={() => handleSearch(item.name)}
                   >

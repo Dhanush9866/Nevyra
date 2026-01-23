@@ -57,7 +57,6 @@ export default function ProfileScreen() {
       title: 'My Activity',
       items: [
         { icon: Edit, label: 'Reviews', route: '/reviews' },
-        { icon: HelpCircle, label: 'Questions & Answers', route: '/qa' },
       ],
     },
     {
