@@ -265,11 +265,11 @@ exports.resetPassword = async (req, res, next) => {
 
 exports.changePassword = async (req, res, next) => {
   try {
-    const { newPassword } = req.body;
+    const { oldPassword, newPassword } = req.body;
     const userId = req.user.id;
 
-    if (!newPassword) {
-      return res.status(400).json({ success: false, message: "New password is required" });
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({ success: false, message: "Old and new passwords are required" });
     }
 
     // We can enforce strong password here if we want, using same validator
@@ -280,6 +280,11 @@ exports.changePassword = async (req, res, next) => {
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ success: false, message: "Incorrect old password" });
     }
 
     const hashed = await bcrypt.hash(newPassword, 10);
