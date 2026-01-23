@@ -1,5 +1,5 @@
-// const API_BASE_URL = 'http://localhost:8000/api/v1';
-const API_BASE_URL = 'https://api.zythova.com/api/v1';
+const API_BASE_URL = 'http://localhost:8000/api/v1';
+// const API_BASE_URL = 'https://api.zythova.com/api/v1';
 
 export interface LoginRequest {
   email: string;

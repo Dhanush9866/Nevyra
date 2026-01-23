@@ -1,26 +1,196 @@
-import React from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, Share } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Share, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Image } from 'expo-image';
-import { Ionicons, MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import AppText from '@/components/atoms/AppText';
 import Colors from '@/constants/colors';
 import Spacing from '@/constants/spacing';
-import { mockOrders } from '@/services/mockData';
+import { apiService } from '@/services/api';
+import { Order } from '@/types';
+import { Alert, TextInput } from 'react-native';
+
+// Rating Card Component for individual products
+interface RatingCardProps {
+  item: any;
+  orderId: string;
+}
+
+function RatingCard({ item, orderId }: RatingCardProps) {
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+
+  const handleSubmitRating = async () => {
+    if (rating === 0) {
+      Alert.alert('Error', 'Please select a rating');
+      return;
+    }
+    if (!comment.trim()) {
+      Alert.alert('Error', 'Please write a review comment');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const response = await apiService.submitReview(item.product.id, {
+        rating,
+        comment: comment.trim(),
+        title: `Review for ${item.product.name}`,
+      });
+
+      if (response.success) {
+        Alert.alert('Success', 'Thank you for your review!');
+        setHasSubmitted(true);
+      } else {
+        Alert.alert('Error', response.message || 'Failed to submit review');
+      }
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'Failed to submit review');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (hasSubmitted) {
+    return (
+      <View style={styles.rateBox}>
+        <View style={styles.rateHeader}>
+          <Ionicons name="checkmark-circle" size={20} color={Colors.success} />
+          <AppText weight="medium" color={Colors.success}>Review submitted!</AppText>
+        </View>
+        <AppText variant="caption" color={Colors.textSecondary} style={{ marginTop: 4 }}>
+          Thank you for rating {item.product.name}
+        </AppText>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.rateBox}>
+      <View style={styles.productRatingHeader}>
+        <Image
+          source={{ uri: item.product?.images?.[0] || 'https://via.placeholder.com/50' }}
+          style={styles.productThumb}
+        />
+        <View style={{ flex: 1 }}>
+          <AppText weight="semibold" numberOfLines={2}>{item.product?.name || 'Product'}</AppText>
+          <AppText variant="caption" color={Colors.textSecondary}>Qty: {item.quantity}</AppText>
+        </View>
+      </View>
+
+      <View style={styles.starsRow}>
+        {[1, 2, 3, 4, 5].map((star) => (
+          <TouchableOpacity
+            key={star}
+            onPress={() => setRating(star)}
+            activeOpacity={0.7}
+          >
+            <Ionicons
+              name={star <= rating ? "star" : "star-outline"}
+              size={32}
+              color={star <= rating ? "#FFB800" : Colors.textLight}
+            />
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      <TextInput
+        style={styles.reviewInput}
+        placeholder="Write your review here..."
+        placeholderTextColor={Colors.textLight}
+        multiline
+        numberOfLines={3}
+        value={comment}
+        onChangeText={setComment}
+        textAlignVertical="top"
+      />
+
+      <TouchableOpacity
+        style={[styles.submitButton, isSubmitting && styles.submitButtonDisabled]}
+        onPress={handleSubmitRating}
+        disabled={isSubmitting}
+      >
+        {isSubmitting ? (
+          <ActivityIndicator color={Colors.white} size="small" />
+        ) : (
+          <AppText weight="bold" color={Colors.white}>Submit Review</AppText>
+        )}
+      </TouchableOpacity>
+    </View>
+  );
+}
 
 export default function OrderDetailScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
+  const [order, setOrder] = useState<Order | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Find the order or use the first one from mock
-  const order = mockOrders.find((o) => o.id === id) || mockOrders[0];
-  const firstItem = order.items[0];
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    } catch (e) {
+      return '';
+    }
+  };
 
-  const copyToClipboard = async (text: string) => {
+  useEffect(() => {
+    const fetchOrderDetail = async () => {
+      if (!id) return;
+      setLoading(true);
+      try {
+        const response = await apiService.getOrderDetails(id as string);
+        if (response.success) {
+          setOrder(response.data);
+          console.log(`order details`, response.data);
+
+        } else {
+          setError('Order not found');
+        }
+      } catch (err: any) {
+        console.error('Error fetching order details:', err);
+        setError(err.message || 'Something went wrong');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrderDetail();
+  }, [id]);
+
+  const copyToClipboard = async (text?: string) => {
+    if (!text) return;
     await Clipboard.setStringAsync(text);
   };
+
+  if (loading) {
+    return (
+      <View style={[styles.mainContainer, styles.centerContainer]}>
+        <ActivityIndicator size="large" color={Colors.primary} />
+      </View>
+    );
+  }
+
+  if (error || !order) {
+    return (
+      <View style={[styles.mainContainer, styles.centerContainer]}>
+        <AppText color={Colors.error} style={{ marginBottom: 12 }}>{error || 'Order not found'}</AppText>
+        <TouchableOpacity style={styles.retryButton} onPress={() => router.back()}>
+          <AppText color={Colors.white}>Go Back</AppText>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  const firstItem = order.items?.[0];
+  const orderDate = formatDate(order.createdAt);
+  const deliveryDate = order.deliveryDate ? formatDate(order.deliveryDate) : (order.status === 'delivered' ? 'Completed' : 'Expected soon');
 
   return (
     <View style={styles.mainContainer}>
@@ -43,7 +213,7 @@ export default function OrderDetailScreen() {
           <View style={styles.productCard}>
             <View style={styles.productImageContainer}>
               <Image
-                source={{ uri: firstItem.product.images[0] }}
+                source={{ uri: firstItem?.product?.images?.[0] || 'https://via.placeholder.com/150' }}
                 style={styles.productImage}
                 contentFit="contain"
                 transition={300}
@@ -51,10 +221,10 @@ export default function OrderDetailScreen() {
             </View>
             <View style={styles.productInfo}>
               <AppText variant="body" weight="medium" numberOfLines={2}>
-                {firstItem.product.name}
+                {firstItem?.product?.name || 'Unknown Product'}
               </AppText>
               <AppText variant="caption" color={Colors.textSecondary}>
-                400 ml
+                Qty: {firstItem?.quantity}
               </AppText>
             </View>
           </View>
@@ -76,13 +246,17 @@ export default function OrderDetailScreen() {
             <View style={styles.trackingHeader}>
               <View>
                 <AppText weight="bold" style={styles.deliveryStatusText}>
-                  Delivered, Oct 19, 2025
+                  {order.status.charAt(0).toUpperCase() + order.status.slice(1)}, {order.status === 'delivered' ? deliveryDate : orderDate}
                 </AppText>
                 <AppText variant="small" color={Colors.textSecondary}>
-                  Your item has been delivered
+                  {order.status === 'delivered' ? 'Your item has been delivered' : `Order is currently ${order.status}`}
                 </AppText>
               </View>
-              <Ionicons name="checkmark-circle" size={32} color={Colors.success} />
+              <Ionicons
+                name={order.status === 'delivered' ? "checkmark-circle" : "time-outline"}
+                size={32}
+                color={order.status === 'delivered' ? Colors.success : Colors.warning}
+              />
             </View>
 
             {/* Progress Bar */}
@@ -94,69 +268,40 @@ export default function OrderDetailScreen() {
               </View>
               <View style={styles.progressLabels}>
                 <View>
-                  <AppText variant="small" color={Colors.textSecondary}>Order Confirmed</AppText>
-                  <AppText variant="small" color={Colors.textSecondary}>Oct 16, 2025</AppText>
+                  <AppText variant="small" color={Colors.textSecondary}>Order Placed</AppText>
+                  <AppText variant="small" color={Colors.textSecondary}>{orderDate}</AppText>
                 </View>
                 <View style={{ alignItems: 'flex-end' }}>
-                  <AppText variant="small" color={Colors.textSecondary}>Delivered</AppText>
-                  <AppText variant="small" color={Colors.textSecondary}>Oct 19, 2025</AppText>
+                  <AppText variant="small" color={Colors.textSecondary}>{order.status.charAt(0).toUpperCase() + order.status.slice(1)}</AppText>
+                  <AppText variant="small" color={Colors.textSecondary}>{order.status === 'delivered' ? deliveryDate : ''}</AppText>
                 </View>
               </View>
             </View>
 
             <View style={styles.divider} />
-            <TouchableOpacity style={styles.seeAllUpdates}>
+            {/* <TouchableOpacity style={styles.seeAllUpdates}>
               <AppText weight="bold" color={Colors.info}>See all updates</AppText>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
         </View>
 
-        {/* Rating Section */}
-        <View style={styles.section}>
-          <AppText variant="h4" weight="bold" style={styles.sectionTitle}>
-            Rate your experience
-          </AppText>
-          <View style={styles.rateBox}>
-            <View style={styles.rateHeader}>
-              <Ionicons name="mail-outline" size={20} color={Colors.textSecondary} />
-              <AppText weight="medium">Rate the product</AppText>
-            </View>
-            <View style={styles.starsRow}>
-              {[1, 2, 3, 4, 5].map((s) => (
-                <Ionicons key={s} name="star-outline" size={32} color={Colors.textLight} />
-              ))}
-            </View>
-          </View>
-        </View>
-
-        {/* Promo Banner */}
-        <View style={styles.section}>
-          <TouchableOpacity activeOpacity={0.9}>
-            <LinearGradient
-              colors={['#7E22CE', '#9333EA']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.promoBanner}
-            >
-              <View style={styles.promoContent}>
-                <AppText color={Colors.white} weight="bold" variant="h4">
-                  Flipkart Bajaj Finserv Insta EMI Card
-                </AppText>
-                <AppText color={Colors.white} variant="small" style={styles.promoSubText}>
-                  Easy EMI + ₹400* Off on all orders
-                </AppText>
-                <TouchableOpacity style={styles.applyButton}>
-                  <AppText weight="bold" color={Colors.white} variant="small">Apply Now</AppText>
-                </TouchableOpacity>
-              </View>
-              <Image
-                source="https://static-assets-web.flixcart.com/fk-p-linchpin-web/fk-cp-zion/img/payment-method-credit-card_9a164b.png"
-                style={styles.promoImage}
-                contentFit="contain"
+        {/* Rating Section - Only show if order is delivered */}
+        {order.status === 'delivered' && order.items && order.items.length > 0 && (
+          <View style={styles.section}>
+            <AppText variant="h4" weight="bold" style={styles.sectionTitle}>
+              Rate your experience
+            </AppText>
+            {order.items.map((item, index) => (
+              <RatingCard
+                key={item.id || index}
+                item={item}
+                orderId={order.id}
               />
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
+            ))}
+          </View>
+        )}
+
+
 
         <View style={styles.grayDivider} />
 
@@ -171,9 +316,9 @@ export default function OrderDetailScreen() {
                 <Ionicons name="home-outline" size={20} color={Colors.text} />
               </View>
               <View style={styles.infoText}>
-                <AppText weight="bold">Home</AppText>
+                <AppText weight="bold">{order.shippingAddress?.firstName} {order.shippingAddress?.lastName}</AppText>
                 <AppText variant="caption" color={Colors.textSecondary}>
-                  1-213/1 Atreyapuram Subdistrict, Cbc ch...
+                  {order.shippingAddress?.addressLine1}, {order.shippingAddress?.city}, {order.shippingAddress?.state} - {order.shippingAddress?.zipCode}
                 </AppText>
               </View>
             </View>
@@ -182,9 +327,9 @@ export default function OrderDetailScreen() {
                 <Ionicons name="person-outline" size={20} color={Colors.text} />
               </View>
               <View style={styles.infoText}>
-                <AppText weight="bold">Bablu</AppText>
+                <AppText weight="bold">{order.shippingAddress?.firstName} {order.shippingAddress?.lastName}</AppText>
                 <AppText variant="caption" color={Colors.textSecondary}>
-                  9502926069, 9704726252
+                  {order.shippingAddress?.phone}
                 </AppText>
               </View>
             </View>
@@ -200,29 +345,22 @@ export default function OrderDetailScreen() {
           </AppText>
           <View style={styles.infoCard}>
             <View style={styles.priceRow}>
-              <AppText color={Colors.text}>Listing price</AppText>
-              <AppText weight="medium">₹500</AppText>
+              <AppText color={Colors.text}>Subtotal</AppText>
+              <AppText weight="medium">₹{order.totalAmount}</AppText>
             </View>
             <View style={styles.priceRow}>
               <View style={styles.rowWithIcon}>
-                <AppText color={Colors.text}>Selling price</AppText>
+                <AppText color={Colors.text}>Delivery</AppText>
                 <Ionicons name="information-circle-outline" size={16} color={Colors.textLight} />
               </View>
-              <AppText weight="medium">₹160</AppText>
-            </View>
-            <View style={styles.priceRow}>
-              <View style={styles.rowWithIcon}>
-                <AppText color={Colors.text}>Total fees</AppText>
-                <Ionicons name="chevron-down" size={16} color={Colors.textLight} />
-              </View>
-              <AppText weight="medium">₹16</AppText>
+              <AppText weight="medium" color={Colors.success}>FREE</AppText>
             </View>
 
             <View style={styles.priceDivider} />
 
             <View style={styles.priceRow}>
               <AppText variant="body" weight="bold">Total amount</AppText>
-              <AppText variant="body" weight="bold">₹176</AppText>
+              <AppText variant="body" weight="bold">₹{order.totalAmount}</AppText>
             </View>
 
             <View style={styles.paymentMethodCard}>
@@ -232,7 +370,7 @@ export default function OrderDetailScreen() {
                 </View>
                 <View style={styles.paymentRight}>
                   <MaterialIcons name="payments" size={24} color={Colors.text} />
-                  <AppText weight="medium" style={styles.paymentText}>Cash On Delivery</AppText>
+                  <AppText weight="medium" style={styles.paymentText}>{order.paymentMethod}</AppText>
                 </View>
               </View>
             </View>
@@ -243,16 +381,7 @@ export default function OrderDetailScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* Offers Accordion */}
-          <View style={styles.offersSection}>
-            <View style={styles.offersHeader}>
-              <View style={styles.rowWithIcon}>
-                <FontAwesome5 name="trophy" size={16} color={Colors.text} />
-                <AppText weight="semibold">Offers earned</AppText>
-              </View>
-              <Ionicons name="chevron-down" size={20} color={Colors.textLight} />
-            </View>
-          </View>
+
 
           {/* Bottom Order ID */}
           <View style={styles.bottomOrderIdSection}>
@@ -270,7 +399,7 @@ export default function OrderDetailScreen() {
 
           {/* Shop More Button */}
           <TouchableOpacity style={styles.shopMoreButton}>
-            <AppText weight="bold" color={Colors.info}>Shop more from Nevyra</AppText>
+            <AppText weight="bold" color={Colors.info}>Shop more from Zythova</AppText>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -550,5 +679,54 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: Spacing.md,
     alignItems: 'center',
+  },
+  centerContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: Spacing.xl,
+  },
+  retryButton: {
+    backgroundColor: Colors.primary,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm,
+    borderRadius: 8,
+    marginTop: Spacing.md,
+  },
+  productRatingHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+    marginBottom: Spacing.md,
+    paddingBottom: Spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.borderLight,
+  },
+  productThumb: {
+    width: 50,
+    height: 50,
+    borderRadius: 8,
+    backgroundColor: Colors.backgroundGray,
+  },
+  reviewInput: {
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 8,
+    padding: Spacing.md,
+    marginTop: Spacing.md,
+    minHeight: 80,
+    fontSize: 14,
+    color: Colors.text,
+    backgroundColor: Colors.white,
+  },
+  submitButton: {
+    backgroundColor: Colors.primary,
+    paddingVertical: Spacing.md,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: Spacing.md,
+  },
+  submitButtonDisabled: {
+    opacity: 0.6,
   },
 });

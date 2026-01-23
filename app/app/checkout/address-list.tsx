@@ -6,11 +6,13 @@ import Button from '@/components/atoms/Button';
 import Colors from '@/constants/colors';
 import Spacing from '@/constants/spacing';
 import { useAuth } from '@/store/AuthContext';
+import { useCheckout } from '@/store/CheckoutContext';
 import { Address } from '@/types';
 
 export default function AddressListScreen() {
   const router = useRouter();
   const { addresses, deleteAddress } = useAuth();
+  const { selectedAddress, setSelectedAddress } = useCheckout();
 
   const handleDelete = (index: number) => {
     Alert.alert(
@@ -57,12 +59,16 @@ export default function AddressListScreen() {
             </View>
           ) : (
             addresses.map((address, index) => (
-              <View key={index} style={styles.addressCard}>
-                <TouchableOpacity
-                  style={styles.addressInfo}
-                  activeOpacity={0.7}
-                  onPress={() => {/* Select address logic */ }}
-                >
+              <TouchableOpacity
+                key={index}
+                style={[
+                  styles.addressCard,
+                  (selectedAddress?.id === (address as any)._id || selectedAddress?.id === address.id) ? styles.selectedCard : null
+                ]}
+                activeOpacity={0.7}
+                onPress={() => setSelectedAddress(address)}
+              >
+                <View style={styles.addressInfo}>
                   <View style={styles.addressHeader}>
                     <AppText variant="body" weight="semibold">
                       {address.firstName} {address.lastName}
@@ -89,7 +95,7 @@ export default function AddressListScreen() {
                   <AppText variant="caption" color={Colors.textSecondary}>
                     Phone: {address.phone}
                   </AppText>
-                </TouchableOpacity>
+                </View>
 
                 <View style={styles.addressActions}>
                   <TouchableOpacity
@@ -105,7 +111,7 @@ export default function AddressListScreen() {
                     <Trash2 size={18} color={Colors.error || '#FF4444'} />
                   </TouchableOpacity>
                 </View>
-              </View>
+              </TouchableOpacity>
             ))
           )}
         </ScrollView>
@@ -121,7 +127,7 @@ export default function AddressListScreen() {
             title="Continue"
             onPress={() => router.push('/checkout/payment' as any)}
             fullWidth
-            disabled={addresses.length === 0}
+            disabled={!selectedAddress}
           />
         </View>
       </View>
@@ -148,6 +154,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     ...Colors.shadow.sm,
+    borderWidth: 1,
+    borderColor: 'transparent',
   },
   addressInfo: {
     flex: 1,
@@ -186,5 +194,10 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: Colors.border,
     gap: Spacing.md,
+  },
+  selectedCard: {
+    borderColor: Colors.primary,
+    borderWidth: 1,
+    backgroundColor: '#F0F7FF',
   },
 });

@@ -142,7 +142,10 @@ const Checkout = () => {
     if (paymentMethod === 'cod') {
       // Handle Cash on Delivery
       try {
-        const res = await apiService.createOrder({ paymentMethod: 'cod' });
+        const res = await apiService.createOrder({
+          paymentMethod: 'cod',
+          shippingAddress: selectedAddressData
+        });
         if (res.success) {
           toast({ title: "Success", description: "Order placed successfully!" });
           window.dispatchEvent(new Event('cart-updated'));
@@ -185,6 +188,7 @@ const Checkout = () => {
                 // 3. Create App Order
                 const createOrderRes = await apiService.createOrder({
                   paymentMethod: 'razorpay',
+                  shippingAddress: selectedAddressData,
                   paymentDetails: {
                     razorpayOrderId: response.razorpay_order_id || orderRes.data.orderId,
                     razorpayPaymentId: response.razorpay_payment_id,

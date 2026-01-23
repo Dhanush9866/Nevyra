@@ -68,6 +68,28 @@ class ApiService {
     };
   }
 
+  private mapBackendOrder(o: any) {
+    return {
+      id: o._id || o.id,
+      orderNumber: o.orderNumber || `ORD${(o._id || o.id).substring(0, 8).toUpperCase()}`,
+      items: (o.items || []).map((item: any) => ({
+        id: item._id || item.id,
+        product: item.productId ? this.mapBackendProduct(item.productId) : null,
+        quantity: item.quantity,
+        price: item.price,
+      })),
+      totalAmount: o.totalAmount,
+      status: (o.status || 'pending').toLowerCase(),
+      shippingAddress: o.shippingAddress || (o.userId?.addresses?.[0] || {}), // Fallback to first address if missing
+      paymentMethod: o.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online Payment',
+      createdAt: o.createdAt,
+      deliveryDate: o.deliveryDate,
+      trackingNumber: o.trackingNumber,
+      returnStatus: o.returnStatus || 'None',
+      returnReason: o.returnReason || '',
+    };
+  }
+
   // Categories
   async getCategories() {
     return this.request<{ success: boolean; data: any[] }>('/categories');
@@ -371,6 +393,44 @@ class ApiService {
   async removeFromWishlist(itemId: string) {
     return this.request<{ success: boolean; data: null }>(`/users/wishlist/${itemId}`, {
       method: 'DELETE',
+    });
+  }
+
+  // Orders
+  async getOrders() {
+    const response = await this.request<{ success: boolean; data: any[] }>('/orders');
+    if (response.success && response.data) {
+      response.data = response.data.map((order: any) => this.mapBackendOrder(order));
+    }
+    return response;
+  }
+
+  async getOrderDetails(id: string) {
+    const response = await this.request<{ success: boolean; data: any }>(`/orders/${id}`);
+    if (response.success && response.data) {
+      response.data = this.mapBackendOrder(response.data);
+    }
+    return response;
+  }
+
+  async cancelOrder(id: string) {
+    return this.request<{ success: boolean; message: string }>(`/orders/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status: 'Cancelled' }),
+    });
+  }
+
+  async createOrder(orderData: { paymentMethod: string; paymentDetails?: any; shippingAddress: any }) {
+    return this.request<{ success: boolean; message: string; data: any }>('/orders', {
+      method: 'POST',
+      body: JSON.stringify(orderData),
+    });
+  }
+
+  async submitReview(productId: string, reviewData: { rating: number; title?: string; comment: string; images?: string[] }) {
+    return this.request<{ success: boolean; message: string; data: any }>(`/reviews/product/${productId}`, {
+      method: 'POST',
+      body: JSON.stringify(reviewData),
     });
   }
 }

@@ -69,6 +69,8 @@ export interface Order {
   createdAt: string;
   deliveryDate?: string;
   trackingNumber?: string;
+  returnStatus?: 'None' | 'Pending' | 'Approved' | 'Rejected' | 'Success';
+  returnReason?: string;
 }
 
 export interface OrderItem {
