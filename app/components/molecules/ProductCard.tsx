@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Image } from 'expo-image';
-import { Heart } from 'lucide-react-native';
+import { Heart, Star } from 'lucide-react-native';
 import AppText from '../atoms/AppText';
 import Badge from '../atoms/Badge';
 import RatingStars from './RatingStars';
@@ -53,6 +53,15 @@ export default function ProductCard({
             <AppText variant="caption" color={Colors.white} weight="semibold">
               Out of Stock
             </AppText>
+          </View>
+        )}
+
+        {product.rating >= 4 && (
+          <View style={styles.ratingBadge}>
+            <AppText variant="caption" weight="bold" color={Colors.white} style={{ fontSize: 10 }}>
+              {product.rating.toFixed(1)}
+            </AppText>
+            <Star size={10} color={Colors.white} fill={Colors.white} />
           </View>
         )}
       </View>
@@ -147,5 +156,18 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: 'center',
     marginTop: Spacing.xs,
+  },
+  ratingBadge: {
+    position: 'absolute',
+    top: Spacing.sm,
+    left: Spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.success,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    gap: 4,
+    zIndex: 10,
   },
 });

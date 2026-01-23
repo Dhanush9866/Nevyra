@@ -11,6 +11,7 @@ import { useAuth } from '@/store/AuthContext';
 export default function ChangePasswordScreen() {
     const router = useRouter();
     const { changePassword } = useAuth();
+    const [oldPassword, setOldPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [loading, setLoading] = useState(false);
@@ -24,7 +25,7 @@ export default function ChangePasswordScreen() {
         if (!isMatch) return;
 
         setLoading(true);
-        const result = await changePassword(newPassword);
+        const result = await changePassword(oldPassword, newPassword);
         setLoading(false);
 
         if (result.success) {
@@ -38,16 +39,30 @@ export default function ChangePasswordScreen() {
 
     return (
         <View style={styles.container}>
-            {/* Header */}
+            {/* Header
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
                     <ArrowLeft size={24} color={Colors.text} />
                 </TouchableOpacity>
-                <AppText variant="h4" weight="bold">Change Password</AppText>
-                <View style={{ width: 24 }} />
-            </View>
+                <AppText variant="h4" weight="bold" style={{ flex: 1, textAlign: 'center', paddingRight: 40 }}>
+                    Change Password
+                </AppText>
+            </View> */}
 
             <View style={styles.formContainer}>
+                <View style={styles.inputGroup}>
+                    <AppText variant="caption" color={Colors.textSecondary} style={styles.label}>
+                        Old Password
+                    </AppText>
+                    <TextInput
+                        style={styles.input}
+                        value={oldPassword}
+                        onChangeText={setOldPassword}
+                        placeholder="Enter old password"
+                        placeholderTextColor={Colors.textLight}
+                        secureTextEntry
+                    />
+                </View>
                 <View style={styles.inputGroup}>
                     <AppText variant="caption" color={Colors.textSecondary} style={styles.label}>
                         New Password
@@ -82,15 +97,15 @@ export default function ChangePasswordScreen() {
                 </View>
 
                 <Button
-                    label="SUBMIT"
+                    title="SUBMIT"
                     onPress={handleSubmit}
                     loading={loading}
-                    disabled={!isMatch || loading}
-                    variant={isMatch ? 'primary' : 'disabled'}
+                    disabled={!isMatch || loading || !oldPassword}
+                    variant="primary"
                     style={styles.submitButton}
                 />
             </View>
-        </View>
+        </View >
     );
 }
 

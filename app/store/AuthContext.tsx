@@ -190,9 +190,9 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     }
   };
 
-  const changePassword = async (newPassword: string) => {
+  const changePassword = async (oldPassword: string, newPassword: string) => {
     try {
-      const response = await apiService.changePassword(newPassword);
+      const response = await apiService.changePassword(oldPassword, newPassword);
       return response;
     } catch (error: any) {
       return { success: false, message: error.message || 'Change password failed' };
@@ -242,7 +242,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
         // Preserve current avatar if it exists (might be newly uploaded and server hasn't synced yet)
         const serverAvatar = profileResponse.data.avatar || null;
         const currentAvatar = user?.avatar || null;
-        
+
         const freshUser = {
           id: profileResponse.data._id || profileResponse.data.id,
           name: `${profileResponse.data.firstName} ${profileResponse.data.lastName}`,
