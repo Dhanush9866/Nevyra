@@ -341,46 +341,6 @@ const ProductListing = () => {
     <div className="min-h-screen bg-background font-roboto">
       <Navbar />
 
-      <div className="w-full px-4 py-6">
-        {/* Breadcrumb and Header */}
-        <div className="mb-4">
-          <nav className="text-sm text-muted-foreground mb-2">
-            Home / {categoryName || "Category"}
-          </nav>
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <h1 className="text-2xl font-bold text-foreground capitalize">
-              {categoryName || "Products"} ({sortedProducts.length} items)
-            </h1>
-            <div className="flex items-center gap-4">
-              <Button
-                variant="outline"
-                size="sm"
-                className="md:hidden"
-                onClick={() => setShowFilters(!showFilters)}
-              >
-                <SlidersHorizontal className="h-4 w-4 mr-2" />
-                Filters
-              </Button>
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="popularity">Popularity</SelectItem>
-                  <SelectItem value="price-low-high">
-                    Price: Low to High
-                  </SelectItem>
-                  <SelectItem value="price-high-low">
-                    Price: High to Low
-                  </SelectItem>
-                  <SelectItem value="rating">Customer Rating</SelectItem>
-                  <SelectItem value="newest">Newest First</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </div>
-
         <div className="flex gap-4">
           {/* Sidebar Filters - Amazon Style */}
           <div className={`w-60 ${showFilters ? "block" : "hidden"} md:block`}>
