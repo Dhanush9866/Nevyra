@@ -2,7 +2,14 @@ const { Category } = require("../models");
 
 exports.list = async (req, res, next) => {
   try {
-    const categories = await Category.find();
+    const { parentId } = req.query;
+    let query = {};
+    if (parentId === "null") {
+      query.parentId = null;
+    } else if (parentId) {
+      query.parentId = parentId;
+    }
+    const categories = await Category.find(query);
     res.json({
       success: true,
       message: "Categories fetched",

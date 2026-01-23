@@ -99,7 +99,7 @@ exports.list = async (req, res, next) => {
         .skip(skip)
         .limit(parseInt(limit))
         .select(
-          "title price category subCategory images inStock rating reviews stockQuantity soldCount attributes"
+          "title description price category subCategory images inStock rating reviews stockQuantity soldCount attributes"
         ),
       Product.countDocuments(filter),
     ]);
@@ -166,7 +166,7 @@ exports.listByMultipleSubcategories = async (req, res, next) => {
         .skip(skip)
         .limit(parseInt(limit))
         .select(
-          "title price category subCategory images inStock rating reviews stockQuantity soldCount attributes"
+          "title description price category subCategory images inStock rating reviews stockQuantity soldCount attributes"
         ),
       Product.countDocuments(filter),
     ]);
@@ -230,6 +230,7 @@ exports.create = async (req, res, next) => {
   try {
     const {
       title,
+      description,
       price,
       category,
       subCategory,
@@ -294,6 +295,7 @@ exports.create = async (req, res, next) => {
 
     const product = new Product({
       title,
+      description,
       price,
       category: categoryName,
       subCategory: subCategoryName,
@@ -326,6 +328,7 @@ exports.update = async (req, res, next) => {
         .json({ success: false, message: "Product not found", data: null });
     const {
       title,
+      description,
       price,
       category,
       subCategory,
@@ -381,6 +384,7 @@ exports.update = async (req, res, next) => {
       });
     }
     if (title !== undefined) product.title = title;
+    if (description !== undefined) product.description = description;
     if (price !== undefined) product.price = price;
     if (category !== undefined) product.category = categoryName;
     if (subCategory !== undefined) product.subCategory = subCategoryName;
@@ -516,7 +520,7 @@ exports.getTopDeals = async (req, res, next) => {
       .sort({ soldCount: -1 })
       .limit(parseInt(limit))
       .select(
-        "title price category subCategory images inStock rating reviews stockQuantity soldCount attributes"
+        "title description price category subCategory images inStock rating reviews stockQuantity soldCount attributes"
       );
 
     const mappedProducts = products.map(mapProductId);
