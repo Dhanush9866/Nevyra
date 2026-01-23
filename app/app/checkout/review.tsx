@@ -125,13 +125,12 @@ export default function OrderReviewScreen() {
 
         <View style={styles.footer}>
           <Button
-            title={isPlacingOrder ? "" : "Place Order"}
+            title="Place Order"
             onPress={handlePlaceOrder}
             fullWidth
+            loading={isPlacingOrder}
             disabled={isPlacingOrder || !selectedAddress || !selectedPaymentMethod}
-          >
-            {isPlacingOrder && <ActivityIndicator color={Colors.white} />}
-          </Button>
+          />
         </View>
       </View>
     </>
