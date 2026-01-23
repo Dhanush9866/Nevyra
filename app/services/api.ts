@@ -69,8 +69,9 @@ class ApiService {
   }
 
   // Categories
-  async getCategories() {
-    return this.request<{ success: boolean; data: any[] }>('/categories');
+  async getCategories(parentId?: string) {
+    const query = parentId ? `?parentId=${parentId}` : '';
+    return this.request<{ success: boolean; data: any[] }>(`/categories${query}`);
   }
 
   // Products

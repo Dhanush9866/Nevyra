@@ -95,29 +95,33 @@ export default function CategoriesScreen() {
     ? `${defaultAddress.city}, ${defaultAddress.state} - ${defaultAddress.zipCode}`
     : 'Select a delivery address';
 
-  const { data: catData, isLoading, error } = useQuery({
-    queryKey: ['categories'],
-    queryFn: () => apiService.getCategories(),
+  // Fetch Root Categories
+  const { data: rootData, isLoading: isLoadingRoots, error: rootError } = useQuery({
+    queryKey: ['categories', 'root'],
+    queryFn: () => apiService.getCategories('null'),
   });
 
-  const categories = catData?.data || [];
+  const rootCategories = rootData?.data || [];
   
   // Set default selected category once data is loaded
   React.useEffect(() => {
-    if (categories.length > 0 && !selectedCategoryId) {
-      const topLevel = categories.find((c: any) => !c.parentId);
-      if (topLevel) setSelectedCategoryId(topLevel._id || topLevel.id);
+    if (rootCategories.length > 0 && !selectedCategoryId) {
+      setSelectedCategoryId(rootCategories[0]._id || rootCategories[0].id);
     }
-  }, [categories]);
+  }, [rootCategories]);
+
+  // Fetch Subcategories for selected root
+  const { data: subData, isLoading: isLoadingSubs, error: subError } = useQuery({
+    queryKey: ['categories', selectedCategoryId],
+    queryFn: () => apiService.getCategories(selectedCategoryId!),
+    enabled: !!selectedCategoryId,
+  });
+
+  const subCategories = subData?.data || [];
 
   const selectedCategory = useMemo(() => {
-    return categories.find((c: any) => (c._id || c.id) === selectedCategoryId) || categories[0];
-  }, [categories, selectedCategoryId]);
-
-  const subCategories = useMemo(() => {
-    if (!selectedCategoryId) return [];
-    return categories.filter((c: any) => c.parentId === selectedCategoryId);
-  }, [categories, selectedCategoryId]);
+    return rootCategories.find((c: any) => (c._id || c.id) === selectedCategoryId);
+  }, [rootCategories, selectedCategoryId]);
 
   const renderSidebarItem = ({ item }: { item: Category }) => {
     const isSelected = ((selectedCategory as any)?._id || selectedCategory?.id) === ((item as any)._id || item.id);
@@ -191,11 +195,11 @@ export default function CategoriesScreen() {
       </View>
 
       <View style={styles.content}>
-        {isLoading ? (
+        {isLoadingRoots ? (
           <View style={styles.center}>
             <Loader />
           </View>
-        ) : error ? (
+        ) : rootError ? (
           <View style={styles.center}>
             <AppText color={Colors.error}>Failed to load categories</AppText>
           </View>
@@ -204,7 +208,7 @@ export default function CategoriesScreen() {
             {/* Sidebar */}
             <View style={styles.sidebar}>
               <FlatList
-                data={categories.filter((c: any) => !c.parentId)}
+                data={rootCategories}
                 renderItem={renderSidebarItem}
                 keyExtractor={item => item._id || item.id}
                 showsVerticalScrollIndicator={false}
@@ -220,48 +224,58 @@ export default function CategoriesScreen() {
               </View>
 
               {/* Subcategories Grid */}
-              <View style={styles.grid}>
-                {subCategories.length > 0 ? (
-                  subCategories.map((sub: any) => (
+              {isLoadingSubs ? (
+                <View style={styles.center}>
+                  <Loader />
+                </View>
+              ) : subError ? (
+                <View style={styles.center}>
+                  <AppText color={Colors.error}>Failed to load subcategories</AppText>
+                </View>
+              ) : (
+                <View style={styles.grid}>
+                  {subCategories.length > 0 ? (
+                    subCategories.map((sub: any) => (
+                      <TouchableOpacity 
+                        key={sub._id || sub.id} 
+                        style={styles.gridItem}
+                        onPress={() => router.push({
+                          pathname: '/product/list',
+                          params: { 
+                            category: selectedCategory?.name,
+                            subcategory: sub.name 
+                          }
+                        })}
+                      >
+                        <View style={styles.gridImageContainer}>
+                          <Image
+                            source={{ uri: sub.image || DEFAULT_IMAGE }}
+                            style={styles.gridImage}
+                            contentFit="contain"
+                          />
+                        </View>
+                        <AppText variant="caption" style={styles.gridText} numberOfLines={2}>
+                          {sub.name}
+                        </AppText>
+                      </TouchableOpacity>
+                    ))
+                  ) : (
                     <TouchableOpacity 
-                      key={sub._id || sub.id} 
-                      style={styles.gridItem}
+                      style={styles.viewAllTop}
                       onPress={() => router.push({
                         pathname: '/product/list',
-                        params: { 
-                          category: selectedCategory?.name,
-                          subcategory: sub.name 
-                        }
+                        params: { category: selectedCategory?.name }
                       })}
                     >
-                      <View style={styles.gridImageContainer}>
-                        <Image
-                          source={{ uri: sub.image || DEFAULT_IMAGE }}
-                          style={styles.gridImage}
-                          contentFit="contain"
-                        />
-                      </View>
-                      <AppText variant="caption" style={styles.gridText} numberOfLines={2}>
-                        {sub.name}
-                      </AppText>
+                       <AppText color={Colors.primary}>View all products in {selectedCategory?.name}</AppText>
                     </TouchableOpacity>
-                  ))
-                ) : (
-                  <TouchableOpacity 
-                    style={styles.viewAllTop}
-                    onPress={() => router.push({
-                      pathname: '/product/list',
-                      params: { category: selectedCategory?.name }
-                    })}
-                  >
-                     <AppText color={Colors.primary}>View all products in {selectedCategory?.name}</AppText>
-                  </TouchableOpacity>
-                )}
-                {/* Add some dummy items if list is short to fill 3 columns for effect */}
-                {subCategories.length < 3 && (
-                  <View style={{ width: '33%' }} />
-                )}
-              </View>
+                  )}
+                  {/* Add some dummy items if list is short to fill 3 columns for effect */}
+                  {subCategories.length < 3 && subCategories.length > 0 && (
+                    <View style={{ width: '33%' }} />
+                  )}
+                </View>
+              )}
             </ScrollView>
           </>
         )}
