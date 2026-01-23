@@ -80,6 +80,11 @@ class ApiService {
     search?: string;
     page?: number;
     limit?: number;
+    sort?: string;
+    brand?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    rating?: number;
   }) {
     const query = new URLSearchParams();
     if (params.category) query.append('category', params.category);
@@ -87,6 +92,11 @@ class ApiService {
     if (params.search) query.append('search', params.search);
     if (params.page) query.append('page', params.page.toString());
     if (params.limit) query.append('limit', params.limit.toString());
+    if (params.sort) query.append('sort', params.sort);
+    if (params.brand) query.append('brand', params.brand);
+    if (params.minPrice) query.append('minPrice', params.minPrice.toString());
+    if (params.maxPrice) query.append('maxPrice', params.maxPrice.toString());
+    if (params.rating) query.append('rating', params.rating.toString());
 
     const response = await this.request<{ success: boolean; data: any[]; pagination: any }>(
       `/products?${query.toString()}`

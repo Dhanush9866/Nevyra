@@ -84,7 +84,7 @@ export default function HomeScreen() {
     queryFn: () => apiService.getProducts({ limit: 100 }),
   });
 
-  const categories = catData?.data?.filter((c: any) => !c.parentId) || [];
+  const categories = catData?.data?.filter((c: any) => !c.parentId && c.image) || [];
   const fetchedProducts = prodData?.data || [];
 
   // Merge fetched products with fallback mock data to ensure we have content for demo

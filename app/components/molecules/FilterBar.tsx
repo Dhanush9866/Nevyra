@@ -14,22 +14,57 @@ const FILTERS = [
   { id: 'price', label: 'Price', icon: ChevronDown },
 ];
 
-export default function FilterBar() {
+interface FilterBarProps {
+  activeSort?: string;
+  activeFilters?: string[];
+  onSelectSort?: (id: string) => void;
+  onToggleFilter?: (id: string) => void;
+}
+
+export default function FilterBar({
+  activeSort,
+  activeFilters = [],
+  onSelectSort,
+  onToggleFilter
+}: FilterBarProps) {
   return (
     <View style={styles.container}>
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false} 
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {FILTERS.map((filter) => (
-          <TouchableOpacity key={filter.id} style={styles.chip}>
-            <AppText variant="caption" weight="medium" style={styles.label}>
-              {filter.label}
-            </AppText>
-            {filter.icon && <filter.icon size={14} color={Colors.text} />}
-          </TouchableOpacity>
-        ))}
+        {FILTERS.map((filter) => {
+          const isActive = activeSort === filter.id || activeFilters.includes(filter.id);
+
+          return (
+            <TouchableOpacity
+              key={filter.id}
+              style={[styles.chip, isActive && styles.activeChip]}
+              onPress={() => {
+                if (filter.id === 'sort' || filter.id === 'brand' || filter.id === 'price') {
+                  onSelectSort?.(filter.id);
+                } else {
+                  onToggleFilter?.(filter.id);
+                }
+              }}
+            >
+              <AppText
+                variant="caption"
+                weight="medium"
+                style={[styles.label, isActive && styles.activeLabel]}
+              >
+                {filter.label}
+              </AppText>
+              {filter.icon && (
+                <filter.icon
+                  size={14}
+                  color={isActive ? Colors.primary : Colors.text}
+                />
+              )}
+            </TouchableOpacity>
+          );
+        })}
       </ScrollView>
     </View>
   );
@@ -57,7 +92,14 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     gap: 4,
   },
+  activeChip: {
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primary + '10', // 10% opacity
+  },
   label: {
     color: Colors.text,
+  },
+  activeLabel: {
+    color: Colors.primary,
   },
 });
