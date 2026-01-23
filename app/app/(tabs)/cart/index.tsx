@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Image } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import {
   ChevronDown,
   Trash2,
@@ -84,8 +84,14 @@ const MOCK_ITEMS = [
 
 export default function CartScreen() {
   const router = useRouter();
-  const { items, totalAmount, removeFromCart, updateQuantity, isLoading } = useCart();
+  const { items, totalAmount, removeFromCart, updateQuantity, isLoading, refreshCart } = useCart();
   const { addresses } = useAuth();
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshCart();
+    }, [refreshCart])
+  );
 
   const defaultAddress = addresses.find(a => a.isDefault) || addresses[0];
 
@@ -308,7 +314,10 @@ export default function CartScreen() {
               <Info size={14} color={Colors.textSecondary} style={{ marginLeft: 4 }} />
             </View>
           </View>
-          <TouchableOpacity style={styles.placeOrderButton}>
+          <TouchableOpacity 
+            style={styles.placeOrderButton}
+            onPress={() => router.push('/checkout/review' as any)}
+          >
             <AppText variant="body" weight="semibold" style={styles.placeOrderText}>Place Order</AppText>
           </TouchableOpacity>
         </View>

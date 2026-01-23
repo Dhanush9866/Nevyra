@@ -420,6 +420,13 @@ class ApiService {
     });
   }
 
+  async requestReturn(id: string, reason: string) {
+    return this.request<{ success: boolean; message: string }>(`/orders/${id}/return`, {
+      method: 'POST',
+      body: JSON.stringify({ reason }),
+    });
+  }
+
   async createOrder(orderData: { paymentMethod: string; paymentDetails?: any; shippingAddress: any }) {
     return this.request<{ success: boolean; message: string; data: any }>('/orders', {
       method: 'POST',

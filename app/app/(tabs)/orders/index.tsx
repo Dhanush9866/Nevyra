@@ -10,8 +10,9 @@ import {
     StatusBar,
     SafeAreaView
 } from 'react-native';
-import { useRouter, Stack } from 'expo-router';
+import { useRouter, Stack, useFocusEffect } from 'expo-router';
 import { Search, X, Package, RotateCcw, ChevronRight } from 'lucide-react-native';
+import { Alert } from 'react-native';
 import AppText from '@/components/atoms/AppText';
 import OrderListItem from '@/components/organisms/OrderListItem';
 import Colors from '@/constants/colors';
@@ -31,9 +32,9 @@ export default function OrdersScreen() {
     const [searchQuery, setSearchQuery] = useState('');
     const [showSearch, setShowSearch] = useState(false);
 
-    const fetchOrders = async () => {
+    const fetchOrders = async (showLoading = true) => {
         try {
-            if (!refreshing) setLoading(true);
+            if (showLoading && !refreshing) setLoading(true);
             const response = await apiService.getOrders();
             if (response.success) {
                 setOrders(response.data);
@@ -49,6 +50,12 @@ export default function OrdersScreen() {
         }
     };
 
+    useFocusEffect(
+        useCallback(() => {
+            fetchOrders(false); // Refresh without full screen loader
+        }, [])
+    );
+
     useEffect(() => {
         fetchOrders();
     }, []);
@@ -57,6 +64,33 @@ export default function OrdersScreen() {
         setRefreshing(true);
         fetchOrders();
     }, []);
+
+    const handleCancelOrder = async (order: Order) => {
+        Alert.alert(
+            'Cancel Order',
+            `Are you sure you want to cancel order #${order.orderNumber}?`,
+            [
+                { text: 'No', style: 'cancel' },
+                {
+                    text: 'Yes, Cancel',
+                    style: 'destructive',
+                    onPress: async () => {
+                        try {
+                            const response = await apiService.cancelOrder(order.id);
+                            if (response.success) {
+                                Alert.alert('Success', 'Order cancelled successfully');
+                                fetchOrders();
+                            } else {
+                                Alert.alert('Error', response.message || 'Failed to cancel order');
+                            }
+                        } catch (error: any) {
+                            Alert.alert('Error', error.message || 'Failed to cancel order');
+                        }
+                    }
+                }
+            ]
+        );
+    };
 
     const filteredOrders = orders.filter(order => {
         // Search filter

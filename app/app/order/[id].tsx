@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity, Share, ActivityIndicator } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { Image } from 'expo-image';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
@@ -140,29 +140,109 @@ export default function OrderDetailScreen() {
     }
   };
 
-  useEffect(() => {
-    const fetchOrderDetail = async () => {
-      if (!id) return;
-      setLoading(true);
-      try {
-        const response = await apiService.getOrderDetails(id as string);
-        if (response.success) {
-          setOrder(response.data);
-          console.log(`order details`, response.data);
-
-        } else {
-          setError('Order not found');
-        }
-      } catch (err: any) {
-        console.error('Error fetching order details:', err);
-        setError(err.message || 'Something went wrong');
-      } finally {
-        setLoading(false);
+  const fetchOrderDetail = async (showLoading = true) => {
+    if (!id) return;
+    if (showLoading) setLoading(true);
+    try {
+      const response = await apiService.getOrderDetails(id as string);
+      if (response.success) {
+        setOrder(response.data);
+        console.log(`order details`, response.data);
+      } else {
+        setError('Order not found');
       }
-    };
+    } catch (err: any) {
+      console.error('Error fetching order details:', err);
+      setError(err.message || 'Something went wrong');
+    } finally {
+      if (showLoading) setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchOrderDetail();
   }, [id]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchOrderDetail(false);
+    }, [id])
+  );
+
+  const handleCancelOrder = async () => {
+    if (!order) return;
+
+    Alert.alert(
+      'Cancel Order',
+      'Are you sure you want to cancel this order?',
+      [
+        { text: 'No', style: 'cancel' },
+        { 
+          text: 'Yes, Cancel', 
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const response = await apiService.cancelOrder(order.id);
+              if (response.success) {
+                Alert.alert('Success', 'Order cancelled successfully');
+                fetchOrderDetail(); // Refresh order details
+              } else {
+                Alert.alert('Error', response.message || 'Failed to cancel order');
+              }
+            } catch (error: any) {
+              Alert.alert('Error', error.message || 'Failed to cancel order');
+            }
+          }
+        }
+      ]
+    );
+  };
+
+  const handleReturnOrder = async () => {
+    if (!order) return;
+
+    Alert.alert(
+      'Return Order',
+      'Please select a reason for return',
+      [
+        { text: 'Changed my mind', onPress: () => submitReturn('Changed my mind') },
+        { text: 'Defective/Damaged', onPress: () => submitReturn('Defective/Damaged') },
+        { text: 'Wrong item received', onPress: () => submitReturn('Wrong item received') },
+        { text: 'Cancel', style: 'cancel' }
+      ]
+    );
+  };
+
+  const submitReturn = async (reason: string) => {
+    try {
+      const response = await apiService.requestReturn(order!.id, reason);
+      if (response.success) {
+        Alert.alert('Success', 'Return request submitted successfully');
+        fetchOrderDetail();
+      } else {
+        Alert.alert('Error', response.message || 'Failed to submit return request');
+      }
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'Failed to submit return request');
+    }
+  };
+
+  const canReturn = () => {
+    if (!order || order.status !== 'delivered') return false;
+    if (order.returnStatus && order.returnStatus !== 'None') return false;
+    
+    const deliveryDate = order.deliveryDate ? new Date(order.deliveryDate) : new Date(order.createdAt);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - deliveryDate.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    return diffDays <= 10;
+  };
+
+  const canCancel = () => {
+    if (!order) return false;
+    return ['pending', 'processing', 'confirmed'].includes(order.status);
+  };
 
   const copyToClipboard = async (text?: string) => {
     if (!text) return;
@@ -397,8 +477,24 @@ export default function OrderDetailScreen() {
             </TouchableOpacity>
           </View>
 
+          {/* Action Buttons */}
+          <View style={styles.actionButtonsContainer}>
+            {canCancel() && (
+              <TouchableOpacity style={[styles.actionButton, styles.cancelButton]} onPress={handleCancelOrder}>
+                <Ionicons name="close-circle-outline" size={20} color={Colors.error} />
+                <AppText weight="bold" color={Colors.error}>Cancel Order</AppText>
+              </TouchableOpacity>
+            )}
+            {canReturn() && (
+              <TouchableOpacity style={[styles.actionButton, styles.returnButton]} onPress={handleReturnOrder}>
+                <Ionicons name="reload-outline" size={20} color={Colors.primary} />
+                <AppText weight="bold" color={Colors.primary}>Return Order</AppText>
+              </TouchableOpacity>
+            )}
+          </View>
+
           {/* Shop More Button */}
-          <TouchableOpacity style={styles.shopMoreButton}>
+          <TouchableOpacity style={styles.shopMoreButton} onPress={() => router.push('/(tabs)/(home)')}>
             <AppText weight="bold" color={Colors.info}>Shop more from Zythova</AppText>
           </TouchableOpacity>
         </View>
@@ -728,5 +824,26 @@ const styles = StyleSheet.create({
   },
   submitButtonDisabled: {
     opacity: 0.6,
+  },
+  actionButtonsContainer: {
+    marginTop: Spacing.xl,
+    gap: Spacing.md,
+  },
+  actionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.sm,
+    paddingVertical: Spacing.md,
+    borderRadius: 8,
+    borderWidth: 1,
+  },
+  cancelButton: {
+    borderColor: Colors.error,
+    backgroundColor: Colors.white,
+  },
+  returnButton: {
+    borderColor: Colors.primary,
+    backgroundColor: Colors.white,
   },
 });
