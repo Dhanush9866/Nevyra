@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { Star } from 'lucide-react-native';
 import AppText from '@/components/atoms/AppText';
 import Colors from '@/constants/colors';
 import Spacing from '@/constants/spacing';
@@ -52,6 +53,14 @@ export default function HorizontalProductSection({
                                     From ₹{item.price}
                                 </AppText>
                             </View>
+                            {(item.rating && item.rating >= 4) && (
+                                <View style={styles.ratingBadge}>
+                                    <AppText variant="caption" weight="bold" color={Colors.white} style={{ fontSize: 10 }}>
+                                        {item.rating.toFixed(1)}
+                                    </AppText>
+                                    <Star size={10} color={Colors.white} fill={Colors.white} />
+                                </View>
+                            )}
                         </View>
 
                         <AppText
@@ -64,7 +73,7 @@ export default function HorizontalProductSection({
                     </TouchableOpacity>
                 ))}
             </ScrollView>
-        </View>
+        </View >
     );
 }
 
@@ -127,5 +136,18 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontWeight: '500', // Reduced weight
         lineHeight: 16,
+    },
+    ratingBadge: {
+        position: 'absolute',
+        top: 8,
+        left: 8,
+        zIndex: 10,
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: Colors.success,
+        paddingHorizontal: 6,
+        paddingVertical: 2,
+        borderRadius: 4,
+        gap: 4,
     },
 });

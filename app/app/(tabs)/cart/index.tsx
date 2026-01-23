@@ -1,5 +1,5 @@
-import React, { useCallback } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Image } from 'react-native';
+import React from 'react';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Image, ActivityIndicator } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import {
   ChevronDown,
@@ -15,6 +15,7 @@ import {
 } from 'lucide-react-native';
 import AppText from '@/components/atoms/AppText';
 import Button from '@/components/atoms/Button';
+import SlideToActButton from '@/components/molecules/SlideToActButton';
 import Colors from '@/constants/colors';
 import Spacing from '@/constants/spacing';
 import { useCart } from '@/store/CartContext';
@@ -86,6 +87,14 @@ export default function CartScreen() {
   const router = useRouter();
   const { items, totalAmount, removeFromCart, updateQuantity, isLoading, refreshCart } = useCart();
   const { addresses } = useAuth();
+  const [focusKey, setFocusKey] = React.useState(0);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      // Reset the slide button state when screen comes into focus
+      setFocusKey(prev => prev + 1);
+    }, [])
+  );
 
   useFocusEffect(
     useCallback(() => {
@@ -99,15 +108,30 @@ export default function CartScreen() {
   const totalDisplayPrice = totalAmount;
   const totalSavings = totalMRP - totalDisplayPrice;
 
-  if (items.length === 0 && !isLoading) {
+  if (isLoading) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color={Colors.primary} />
+      </View>
+    );
+  }
+
+  if (items.length === 0) {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
         <AppText variant="h4" color={Colors.textSecondary}>Your cart is empty</AppText>
-        <Button
-          title="Shop Now"
-          onPress={() => router.push('/(tabs)/(home)')}
-          style={styles.emptyButton}
-          icon={<ArrowRight size={18} color={Colors.white} />}
+        <SlideToActButton
+          key={focusKey}
+          onComplete={() => {
+            // Add a small delay for better UX so user sees the "unlock"
+            setTimeout(() => {
+              router.push('/(tabs)/(home)' as any);
+            }, 300);
+          }}
+          width={280}
+          height={60}
+          lockedText="Slide to Shop"
+          unlockedText="Redirecting..."
         />
       </View>
     );

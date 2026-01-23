@@ -91,8 +91,9 @@ class ApiService {
   }
 
   // Categories
-  async getCategories() {
-    return this.request<{ success: boolean; data: any[] }>('/categories');
+  async getCategories(parentId?: string) {
+    const query = parentId ? `?parentId=${parentId}` : '';
+    return this.request<{ success: boolean; data: any[] }>(`/categories${query}`);
   }
 
   // Products
@@ -204,12 +205,12 @@ class ApiService {
     );
   }
 
-  async changePassword(newPassword: string) {
+  async changePassword(oldPassword: string, newPassword: string) {
     return this.request<{ success: boolean; message: string }>(
       '/auth/change-password',
       {
         method: 'POST',
-        body: JSON.stringify({ newPassword }),
+        body: JSON.stringify({ oldPassword, newPassword }),
       }
     );
   }

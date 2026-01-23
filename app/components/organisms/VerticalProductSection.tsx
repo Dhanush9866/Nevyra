@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { Star } from 'lucide-react-native';
 import AppText from '@/components/atoms/AppText';
 import Colors from '@/constants/colors';
 import Spacing from '@/constants/spacing';
@@ -51,6 +52,14 @@ export default function VerticalProductSection({
                                     style={styles.image}
                                     resizeMode="cover"
                                 />
+                                {item.rating && item.rating >= 4 && (
+                                    <View style={styles.ratingBadge}>
+                                        <AppText variant="caption" weight="bold" color={Colors.white} style={{ fontSize: 10 }}>
+                                            {item.rating.toFixed(1)}
+                                        </AppText>
+                                        <Star size={10} color={Colors.white} fill={Colors.white} />
+                                    </View>
+                                )}
                             </View>
 
                             <View style={styles.infoContainer}>
@@ -145,5 +154,18 @@ const styles = StyleSheet.create({
     subtitle: {
         fontSize: 13,
         color: '#000',
+    },
+    ratingBadge: {
+        position: 'absolute',
+        top: 8,
+        left: 8,
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: Colors.success,
+        paddingHorizontal: 6,
+        paddingVertical: 2,
+        borderRadius: 4,
+        gap: 4,
+        zIndex: 10,
     },
 });
