@@ -428,7 +428,7 @@ class ApiService {
     });
   }
 
-  async createOrder(orderData: { paymentMethod: string; paymentDetails?: any; shippingAddress: any }) {
+  async createOrder(orderData: { paymentMethod: string; paymentDetails?: any; shippingAddress: any; items?: any[]; totalAmount?: number }) {
     return this.request<{ success: boolean; message: string; data: any }>('/orders', {
       method: 'POST',
       body: JSON.stringify(orderData),
@@ -437,9 +437,30 @@ class ApiService {
 
   async submitReview(productId: string, reviewData: { rating: number; title?: string; comment: string; images?: string[] }) {
     return this.request<{ success: boolean; message: string; data: any }>(`/reviews/product/${productId}`, {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(reviewData),
     });
+  }
+
+  // Payments
+  async createPaymentOrder(amount: number) {
+    return this.request<{ success: boolean; data: { orderId: string; amount: number; currency: string } }>(
+      "/payments/create-order",
+      {
+        method: "POST",
+        body: JSON.stringify({ amount }),
+      }
+    );
+  }
+
+  async verifyPayment(paymentData: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) {
+    return this.request<{ success: boolean; message: string }>(
+      "/payments/verify",
+      {
+        method: "POST",
+        body: JSON.stringify(paymentData),
+      }
+    );
   }
 }
 

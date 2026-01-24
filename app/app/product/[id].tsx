@@ -19,7 +19,9 @@ import { apiService } from '@/services/api';
 import Loader from '@/components/atoms/Loader';
 import { useCart } from '@/store/CartContext';
 import { useWishlist } from '@/store/WishlistContext';
+import { useCheckout } from '@/store/CheckoutContext';
 import { mockProducts } from '@/services/mockData';
+import { CartItem } from '@/types';
 
 export default function ProductDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -27,6 +29,7 @@ export default function ProductDetailScreen() {
   const insets = useSafeAreaInsets();
   const { addToCart } = useCart();
   const { toggleWishlist, isWishlisted } = useWishlist();
+  const { setCheckoutItems } = useCheckout();
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['product', id],
@@ -318,8 +321,14 @@ export default function ProductDetailScreen() {
             <Button
               title="Buy Now"
               onPress={() => {
-                addToCart(product);
-                router.push('/checkout/review' as any);
+                // For Buy Now, we create a temporary CartItem and set it as the ONLY item in checkout
+                const item: CartItem = {
+                  id: Date.now().toString(),
+                  product: product,
+                  quantity: 1,
+                };
+                setCheckoutItems([item], 'buy_now');
+                router.push('/checkout/address-list' as any);
               }}
               style={[styles.flexButton, { borderRadius: 25 }]}
             />

@@ -1,9 +1,9 @@
 const Razorpay = require('razorpay');
 
-// Initialize Razorpay instance with direct credentials
+// Initialize Razorpay instance with credentials from environment variables
 const razorpay = new Razorpay({
-  key_id: "rzp_test_Hi1GYpZ5GO1ona",
-  key_secret: "MD1ZzE5z6dXc5LovE5byCQTm",
+  key_id: process.env.RAZORPAY_KEY_ID || "rzp_test_Hi1GYpZ5GO1ona", // Fallback to current if env missing
+  key_secret: process.env.RAZORPAY_KEY_SECRET || "MD1ZzE5z6dXc5LovE5byCQTm",
 });
 
 // Test Razorpay connection
@@ -181,8 +181,9 @@ const verifyPayment = async (req, res) => {
 
     // Create the expected signature
     const crypto = require('crypto');
+    const secret = process.env.RAZORPAY_KEY_SECRET || "MD1ZzE5z6dXc5LovE5byCQTm";
     const expectedSignature = crypto
-      .createHmac('sha256', "MD1ZzE5z6dXc5LovE5byCQTm")
+      .createHmac('sha256', secret)
       .update(body.toString())
       .digest('hex');
 

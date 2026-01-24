@@ -1,18 +1,20 @@
-import { View, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
-import { useRouter, Stack } from 'expo-router';
-import { Edit2, Trash2, Plus } from 'lucide-react-native';
-import AppText from '@/components/atoms/AppText';
-import Button from '@/components/atoms/Button';
+import { View, StyleSheet, Alert, TouchableOpacity, Platform } from 'react-native';
+import { useRouter, Stack, useLocalSearchParams } from 'expo-router';
+import { ChevronLeft } from 'lucide-react-native';
 import Colors from '@/constants/colors';
-import Spacing from '@/constants/spacing';
+import AppText from '@/components/atoms/AppText';
 import { useAuth } from '@/store/AuthContext';
 import { useCheckout } from '@/store/CheckoutContext';
 import { Address } from '@/types';
+import AddressSelector from '@/components/organisms/AddressSelector';
 
 export default function AddressListScreen() {
   const router = useRouter();
+  const { source } = useLocalSearchParams<{ source: string }>();
   const { addresses, deleteAddress } = useAuth();
   const { selectedAddress, setSelectedAddress } = useCheckout();
+
+  const isFromHome = source === 'home';
 
   const handleDelete = (index: number) => {
     Alert.alert(
@@ -45,159 +47,53 @@ export default function AddressListScreen() {
     } as any);
   };
 
+  const handleContinue = () => {
+    if (isFromHome || source === 'profile' || source === 'checkout') {
+      router.back();
+    } else {
+      router.push('/checkout/review' as any);
+    }
+  };
+
   return (
-    <>
-      <Stack.Screen options={{ title: 'Select Address' }} />
-      <View style={styles.container}>
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.content}
-        >
-          {addresses.length === 0 ? (
-            <View style={styles.emptyContainer}>
-              <AppText color={Colors.textSecondary}>No addresses found.</AppText>
-            </View>
-          ) : (
-            addresses.map((address, index) => (
-              <TouchableOpacity
-                key={index}
-                style={[
-                  styles.addressCard,
-                  (selectedAddress?.id === (address as any)._id || selectedAddress?.id === address.id) ? styles.selectedCard : null
-                ]}
-                activeOpacity={0.7}
-                onPress={() => setSelectedAddress(address)}
-              >
-                <View style={styles.addressInfo}>
-                  <View style={styles.addressHeader}>
-                    <AppText variant="body" weight="semibold">
-                      {address.firstName} {address.lastName}
-                    </AppText>
-                    {address.isDefault && (
-                      <View style={styles.defaultBadge}>
-                        <AppText variant="small" color={Colors.white}>
-                          DEFAULT
-                        </AppText>
-                      </View>
-                    )}
-                  </View>
-                  <AppText variant="body" color={Colors.textSecondary}>
-                    {address.addressLine1}
-                  </AppText>
-                  {address.addressLine2 && (
-                    <AppText variant="body" color={Colors.textSecondary}>
-                      {address.addressLine2}
-                    </AppText>
-                  )}
-                  <AppText variant="body" color={Colors.textSecondary}>
-                    {address.city}, {address.state} - {address.zipCode}
-                  </AppText>
-                  <AppText variant="caption" color={Colors.textSecondary}>
-                    Phone: {address.phone}
-                  </AppText>
-                </View>
+    <View style={styles.container}>
+      <Stack.Screen options={{ 
+        headerShown: true, 
+        headerTitle: 'Select Address',
+        headerTitleAlign: 'center',
+        headerLeft: () => (
+          <TouchableOpacity 
+            onPress={() => router.back()} 
+            style={styles.headerBack}
+          >
+            <ChevronLeft size={24} color={Colors.text} />
+            <AppText variant="body" weight="medium" style={{ marginLeft: 4 }}>Back</AppText>
+          </TouchableOpacity>
+        ),
+      }} />
 
-                <View style={styles.addressActions}>
-                  <TouchableOpacity
-                    onPress={() => handleEdit(address, index)}
-                    style={styles.actionButton}
-                  >
-                    <Edit2 size={18} color={Colors.primary} />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => handleDelete(index)}
-                    style={styles.actionButton}
-                  >
-                    <Trash2 size={18} color={Colors.error || '#FF4444'} />
-                  </TouchableOpacity>
-                </View>
-              </TouchableOpacity>
-            ))
-          )}
-        </ScrollView>
-
-        <View style={styles.footer}>
-          <Button
-            title="Add New Address"
-            onPress={() => router.push('/checkout/address-form' as any)}
-            variant="outline"
-            fullWidth
-          />
-          <Button
-            title="Continue"
-            onPress={() => router.push('/checkout/payment' as any)}
-            fullWidth
-            disabled={!selectedAddress}
-          />
-        </View>
-      </View>
-    </>
+      <AddressSelector
+        addresses={addresses}
+        selectedAddress={selectedAddress}
+        onSelect={setSelectedAddress}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onAddNew={() => router.push('/checkout/address-form' as any)}
+        onContinue={handleContinue}
+        continueButtonText={isFromHome ? 'Save and Continue' : 'Continue'}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: '#F1F3F6',
   },
-  scrollView: {
-    flex: 1,
-  },
-  content: {
-    padding: Spacing.base,
-    gap: Spacing.md,
-  },
-  addressCard: {
-    backgroundColor: Colors.card,
-    borderRadius: 12,
-    padding: Spacing.base,
+  headerBack: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    ...Colors.shadow.sm,
-    borderWidth: 1,
-    borderColor: 'transparent',
-  },
-  addressInfo: {
-    flex: 1,
-    gap: Spacing.xs,
-  },
-  addressHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: Spacing.xs,
-  },
-  addressActions: {
-    flexDirection: 'column',
-    justifyContent: 'flex-start',
-    gap: Spacing.md,
-    paddingLeft: Spacing.base,
-    borderLeftWidth: 1,
-    borderLeftColor: Colors.borderLight,
-  },
-  actionButton: {
-    padding: Spacing.xs,
-  },
-  emptyContainer: {
-    padding: Spacing['3xl'],
-    alignItems: 'center',
-  },
-  defaultBadge: {
-    backgroundColor: Colors.primary,
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: Spacing.xs,
-    borderRadius: 4,
-  },
-  footer: {
-    padding: Spacing.base,
-    backgroundColor: Colors.card,
-    borderTopWidth: 1,
-    borderTopColor: Colors.border,
-    gap: Spacing.md,
-  },
-  selectedCard: {
-    borderColor: Colors.primary,
-    borderWidth: 1,
-    backgroundColor: '#F0F7FF',
+    paddingLeft: Platform.OS === 'ios' ? 0 : 8,
   },
 });

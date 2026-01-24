@@ -2,55 +2,93 @@ const { Order, OrderItem, CartItem, Product } = require("../models");
 
 exports.create = async (req, res, next) => {
   try {
-    const { paymentMethod, paymentDetails, shippingAddress } = req.body;
+    const { paymentMethod, paymentDetails, shippingAddress, items, totalAmount: providedTotal } = req.body;
 
     if (!shippingAddress) {
       return res.status(400).json({ success: false, message: "Shipping address is required" });
     }
 
-    const cartItems = await CartItem.find({ userId: req.user.id }).populate(
-      "productId"
-    );
-    if (!cartItems.length)
-      return res
-        .status(400)
-        .json({ success: false, message: "Cart is empty", data: null });
-    let totalAmount = 0;
-    cartItems.forEach((item) => {
-      totalAmount += item.quantity * (item.productId.price || 0);
-    });
+    let orderItemsData = [];
+    let finalTotalAmount = 0;
+    let isCartOrder = false;
 
+    // 1. Resolve Items
+    if (items && Array.isArray(items) && items.length > 0) {
+      // Direct checkout (Buy Now)
+      for (const item of items) {
+        const product = await Product.findById(item.productId);
+        if (!product) throw new Error(`Product not found: ${item.productId}`);
+        
+        orderItemsData.push({
+          productId: product._id,
+          quantity: item.quantity || 1,
+          price: product.price,
+          selectedFeatures: item.selectedFeatures || {}
+        });
+        finalTotalAmount += (item.quantity || 1) * product.price;
+      }
+    } else {
+      // Cart checkout
+      const cartItems = await CartItem.find({ userId: req.user.id }).populate("productId");
+      if (!cartItems || cartItems.length === 0) {
+        return res.status(400).json({ success: false, message: "Cart is empty" });
+      }
+      
+      isCartOrder = true;
+      cartItems.forEach((item) => {
+        orderItemsData.push({
+          productId: item.productId._id,
+          quantity: item.quantity,
+          price: item.productId.price,
+          selectedFeatures: item.selectedFeatures || {}
+        });
+        finalTotalAmount += item.quantity * (item.productId.price || 0);
+      });
+    }
+
+    // 2. Create Order
     const orderNumber = `ORD${Date.now()}${Math.floor(Math.random() * 1000)}`;
 
     const order = new Order({
       userId: req.user.id,
       orderNumber,
       shippingAddress,
-      totalAmount,
+      totalAmount: providedTotal || finalTotalAmount,
       status: "Pending",
       paymentMethod: paymentMethod || "cod",
       paymentStatus: (paymentMethod === "razorpay" && paymentDetails?.razorpayPaymentId) ? "Paid" : "Pending",
       paymentDetails: paymentDetails || {},
     });
+    
     await order.save();
-    const orderItems = await Promise.all(
-      cartItems.map((item) => {
+
+    // 3. Create OrderItems
+    const savedOrderItems = await Promise.all(
+      orderItemsData.map((item) => {
         const orderItem = new OrderItem({
           orderId: order._id,
-          productId: item.productId._id,
+          productId: item.productId,
           quantity: item.quantity,
-          price: item.productId.price,
-          selectedFeatures: item.selectedFeatures || new Map(),
+          price: item.price,
+          selectedFeatures: item.selectedFeatures,
         });
         return orderItem.save();
       })
     );
-    // Clear cart after successful order
-    await CartItem.deleteMany({ userId: req.user.id });
+
+    // 4. Cleanup (Only if it was a full cart order)
+    if (isCartOrder) {
+      await CartItem.deleteMany({ userId: req.user.id });
+    } else {
+      // Optional: If any of the "Buy Now" products were in the cart, remove them
+      const productIds = orderItemsData.map(i => i.productId);
+      await CartItem.deleteMany({ userId: req.user.id, productId: { $in: productIds } });
+    }
+
     res.status(201).json({
       success: true,
       message: "Order created",
-      data: { order, orderItems },
+      data: { order, orderItems: savedOrderItems },
     });
   } catch (err) {
     next(err);

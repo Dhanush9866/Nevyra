@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, Alert, ActivityIndicator } from 'react-native';
+import React from 'react';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import { useRouter, Stack } from 'expo-router';
 import AppText from '@/components/atoms/AppText';
 import Button from '@/components/atoms/Button';
@@ -7,54 +7,52 @@ import Colors from '@/constants/colors';
 import Spacing from '@/constants/spacing';
 import { useCart } from '@/store/CartContext';
 import { useCheckout } from '@/store/CheckoutContext';
-import { apiService } from '@/services/api';
+import { useAuth } from '@/store/AuthContext';
+import CartItemCard from '@/components/molecules/CartItemCard';
 
 export default function OrderReviewScreen() {
   const router = useRouter();
-  const { totalAmount, items, clearCart } = useCart();
-  const { selectedAddress, selectedPaymentMethod, resetCheckout } = useCheckout();
-  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const { totalAmount: cartTotal, items: cartItems } = useCart();
+  const { selectedAddress, setSelectedAddress, checkoutItems } = useCheckout();
+  const { addresses } = useAuth();
 
-  const handlePlaceOrder = async () => {
-    if (!selectedAddress || !selectedPaymentMethod) {
-      Alert.alert('Error', 'Please select address and payment method');
-      return;
+  const displayItems = checkoutItems.length > 0 ? checkoutItems : cartItems;
+  const displayTotal = checkoutItems.length > 0 
+    ? checkoutItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0)
+    : cartTotal;
+
+  React.useEffect(() => {
+    if (!selectedAddress && addresses.length > 0) {
+      const defaultAddr = addresses.find(a => a.isDefault) || addresses[0];
+      setSelectedAddress(defaultAddr);
     }
-
-    setIsPlacingOrder(true);
-    try {
-      const response = await apiService.createOrder({
-        paymentMethod: selectedPaymentMethod,
-        shippingAddress: selectedAddress,
-        paymentDetails: {} // Add payment details if needed
-      });
-
-      if (response.success) {
-        clearCart();
-        resetCheckout();
-        router.push('/checkout/success' as any);
-      } else {
-        Alert.alert('Error', response.message || 'Failed to place order');
-      }
-    } catch (error: any) {
-      Alert.alert('Error', error.message || 'Something went wrong');
-    } finally {
-      setIsPlacingOrder(false);
-    }
-  };
+  }, [addresses, selectedAddress, setSelectedAddress]);
 
   return (
     <>
-      <Stack.Screen options={{ title: 'Review Order' }} />
+      <Stack.Screen options={{ title: 'Order Summary' }} />
       <View style={styles.container}>
         <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.content}
+          showsVerticalScrollIndicator={false}
         >
+          {/* Shipping Address Summary */}
           <View style={styles.section}>
-            <AppText variant="h4" weight="bold">
-              Shipping Address
-            </AppText>
+            <View style={styles.sectionHeader}>
+              <AppText variant="h4" weight="bold">
+                Shipping Address
+              </AppText>
+              <Button 
+                title="Change" 
+                variant="text" 
+                size="sm" 
+                onPress={() => router.push({
+                  pathname: '/checkout/address-list',
+                  params: { source: 'checkout' }
+                } as any)}
+              />
+            </View>
             {selectedAddress ? (
               <View style={styles.infoCard}>
                 <AppText weight="semibold">
@@ -75,61 +73,52 @@ export default function OrderReviewScreen() {
             )}
           </View>
 
+          {/* Items Summary */}
           <View style={styles.section}>
-            <AppText variant="h4" weight="bold">
-              Payment Method
+            <AppText variant="h4" weight="bold" style={styles.sectionTitle}>
+              Items ({displayItems.length})
             </AppText>
-            <View style={styles.infoCard}>
-              <AppText weight="semibold">
-                {selectedPaymentMethod === 'cod' ? 'Cash on Delivery' : selectedPaymentMethod?.toUpperCase()}
-              </AppText>
+            <View style={styles.itemsList}>
+              {displayItems.map((item) => (
+                <CartItemCard 
+                  key={item.id} 
+                  item={item} 
+                  showActions={false} 
+                />
+              ))}
             </View>
           </View>
 
-          <View style={styles.section}>
-            <AppText variant="h4" weight="bold">
-              Order Summary
+          {/* Price Details */}
+          <View style={[styles.section, styles.priceSection]}>
+            <AppText variant="h4" weight="bold" style={styles.sectionTitle}>
+              Price Details
             </AppText>
-            <AppText variant="body" color={Colors.textSecondary}>
-              {items.length} items
-            </AppText>
-          </View>
-
-          <View style={styles.section}>
-            <View style={styles.row}>
-              <AppText variant="body" color={Colors.textSecondary}>
-                Subtotal
-              </AppText>
-              <AppText variant="body" weight="semibold">
-                ₹{totalAmount.toLocaleString('en-IN')}
-              </AppText>
+            <View style={styles.priceRow}>
+              <AppText color={Colors.textSecondary}>Price ({displayItems.length} items)</AppText>
+              <AppText>₹{displayTotal.toLocaleString('en-IN')}</AppText>
             </View>
-            <View style={styles.row}>
-              <AppText variant="body" color={Colors.textSecondary}>
-                Shipping
-              </AppText>
-              <AppText variant="body" weight="semibold" color={Colors.success}>
-                FREE
-              </AppText>
+            <View style={styles.priceRow}>
+              <AppText color={Colors.textSecondary}>Delivery Charges</AppText>
+              <AppText color={Colors.success}>FREE</AppText>
             </View>
-            <View style={[styles.row, styles.totalRow]}>
-              <AppText variant="h4" weight="bold">
-                Total
-              </AppText>
-              <AppText variant="h4" weight="bold" color={Colors.primary}>
-                ₹{totalAmount.toLocaleString('en-IN')}
-              </AppText>
+            <View style={[styles.priceRow, styles.totalRow]}>
+              <AppText variant="h4" weight="bold">Total Amount</AppText>
+              <AppText variant="h4" weight="bold">₹{displayTotal.toLocaleString('en-IN')}</AppText>
             </View>
           </View>
         </ScrollView>
 
         <View style={styles.footer}>
+          <View style={styles.totalAmountLabel}>
+            <AppText variant="h4" weight="bold">₹{displayTotal.toLocaleString('en-IN')}</AppText>
+            <AppText variant="caption" color={Colors.primary}>View Price Details</AppText>
+          </View>
           <Button
-            title="Place Order"
-            onPress={handlePlaceOrder}
-            fullWidth
-            loading={isPlacingOrder}
-            disabled={isPlacingOrder || !selectedAddress || !selectedPaymentMethod}
+            title="Continue"
+            onPress={() => router.push('/checkout/payment' as any)}
+            style={styles.continueButton}
+            disabled={!selectedAddress || displayItems.length === 0}
           />
         </View>
       </View>
@@ -140,39 +129,68 @@ export default function OrderReviewScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: '#F1F3F6',
   },
   scrollView: {
     flex: 1,
   },
   content: {
-    padding: Spacing.xl,
-    gap: Spacing.xl,
+    paddingBottom: 100,
   },
   section: {
-    gap: Spacing.md,
-  },
-  infoCard: {
-    backgroundColor: Colors.card,
-    borderRadius: 12,
+    backgroundColor: Colors.white,
+    marginTop: 8,
     padding: Spacing.base,
-    gap: 4,
-    ...Colors.shadow.sm,
   },
-  row: {
+  sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: Spacing.xs,
+  },
+  sectionTitle: {
+    marginBottom: Spacing.md,
+  },
+  infoCard: {
+    gap: 4,
+  },
+  itemsList: {
+    gap: 0,
+  },
+  priceSection: {
+    marginBottom: 8,
+  },
+  priceRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: Spacing.md,
   },
   totalRow: {
-    paddingTop: Spacing.md,
     borderTopWidth: 1,
-    borderTopColor: Colors.border,
+    borderTopColor: '#F0F0F0',
+    paddingTop: Spacing.md,
+    marginTop: Spacing.xs,
   },
   footer: {
-    padding: Spacing.base,
-    backgroundColor: Colors.card,
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: Colors.white,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: Spacing.base,
+    paddingVertical: 12,
     borderTopWidth: 1,
-    borderTopColor: Colors.border,
+    borderTopColor: '#E0E0E0',
+    ...Colors.shadow.lg,
+  },
+  totalAmountLabel: {
+    flex: 1,
+  },
+  continueButton: {
+    flex: 1,
+    marginLeft: 20,
   },
 });
