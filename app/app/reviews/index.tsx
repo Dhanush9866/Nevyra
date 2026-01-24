@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     StyleSheet,
@@ -9,26 +9,48 @@ import {
     StatusBar,
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
-import { ArrowLeft, Search, ShoppingCart, Star } from 'lucide-react-native';
+import { ArrowLeft, ShoppingCart, Star } from 'lucide-react-native';
 import AppText from '@/components/atoms/AppText';
 import Colors from '@/constants/colors';
 import Spacing from '@/constants/spacing';
+import { useCart } from '@/store/CartContext';
+import { apiService } from '@/services/api';
 
 const THEME_PURPLE = Colors.primary;
 const THEME_YELLOW = '#FFC200';
 
 export default function ReviewsScreen() {
     const router = useRouter();
+    const { totalItems } = useCart();
     const [activeTab, setActiveTab] = useState<'pending' | 'published'>('pending');
+    const [pendingReviews, setPendingReviews] = useState<any[]>([]);
+    const [publishedReviews, setPublishedReviews] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
-    const pendingReviews = [
-        {
-            id: '1',
-            title: 'ASHUMAN Men Stylish Ortho |Lightweight|Breathable|Anti-...',
-            image: 'https://m.media-amazon.com/images/I/61N+V+X5oPL._AC_UL320_.jpg',
-            category: 'Rate Product',
-        },
-    ];
+    useEffect(() => {
+        fetchReviews();
+    }, []);
+
+    const fetchReviews = async () => {
+        setIsLoading(true);
+        try {
+            const [pendingRes, publishedRes] = await Promise.all([
+                apiService.getPendingReviews(),
+                apiService.getUserReviews()
+            ]);
+
+            if (pendingRes.success) {
+                setPendingReviews(pendingRes.data);
+            }
+            if (publishedRes.success) {
+                setPublishedReviews(publishedRes.data);
+            }
+        } catch (error) {
+            console.error('Failed to fetch reviews:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <View style={styles.container}>
@@ -49,17 +71,19 @@ export default function ReviewsScreen() {
                     </AppText>
                 </View>
                 <View style={styles.headerRight}>
-                    <TouchableOpacity style={styles.iconButton}>
-                        <Search color={Colors.white} size={22} />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.iconButton}>
+                    <TouchableOpacity
+                        style={styles.iconButton}
+                        onPress={() => router.push('/cart')}
+                    >
                         <View>
                             <ShoppingCart color={Colors.white} size={22} />
-                            <View style={styles.cartBadge}>
-                                <AppText variant="caption" color={Colors.white} style={styles.cartBadgeText}>
-                                    8
-                                </AppText>
-                            </View>
+                            {totalItems > 0 && (
+                                <View style={styles.cartBadge}>
+                                    <AppText variant="caption" color={Colors.white} style={styles.cartBadgeText}>
+                                        {totalItems}
+                                    </AppText>
+                                </View>
+                            )}
                         </View>
                     </TouchableOpacity>
                 </View>
@@ -100,38 +124,90 @@ export default function ReviewsScreen() {
             <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
                 {activeTab === 'pending' ? (
                     <View style={styles.pendingSection}>
-                        <AppText variant="h4" weight="bold" style={styles.sectionTitle}>
-                            Care to review few more purchases?
-                        </AppText>
+                        {pendingReviews.length > 0 ? (
+                            <>
+                                <AppText variant="h4" weight="bold" style={styles.sectionTitle}>
+                                    Care to review few more purchases?
+                                </AppText>
 
-                        {pendingReviews.map((item) => (
-                            <View key={item.id} style={styles.reviewCard}>
-                                <View style={styles.cardTop}>
-                                    <Image source={{ uri: item.image }} style={styles.productImage} />
-                                    <View style={styles.productInfo}>
-                                        <AppText variant="caption" color={Colors.textSecondary} style={styles.rateProductLabel}>
-                                            {item.category}
-                                        </AppText>
-                                        <AppText variant="body" weight="medium" numberOfLines={2} style={styles.productName}>
-                                            {item.title}
-                                        </AppText>
+                                {pendingReviews.map((item) => (
+                                    <View key={item.id} style={styles.reviewCard}>
+                                        <View style={styles.cardTop}>
+                                            <Image source={{ uri: item.images?.[0] }} style={styles.productImage} />
+                                            <View style={styles.productInfo}>
+                                                <AppText variant="caption" color={Colors.textSecondary} style={styles.rateProductLabel}>
+                                                    Rate Product
+                                                </AppText>
+                                                <AppText variant="body" weight="medium" numberOfLines={2} style={styles.productName}>
+                                                    {item.name}
+                                                </AppText>
+                                            </View>
+                                        </View>
+                                        <View style={styles.starContainer}>
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                <TouchableOpacity
+                                                    key={star}
+                                                    onPress={() => router.push({
+                                                        pathname: '/product/reviews',
+                                                        params: { productId: item.id, action: 'create' }
+                                                    })}
+                                                >
+                                                    <Star size={40} color={Colors.textLight} strokeWidth={0.8} />
+                                                </TouchableOpacity>
+                                            ))}
+                                        </View>
                                     </View>
-                                </View>
-                                <View style={styles.starContainer}>
-                                    {[1, 2, 3, 4, 5].map((star) => (
-                                        <TouchableOpacity key={star}>
-                                            <Star size={40} color={Colors.textLight} strokeWidth={0.8} />
-                                        </TouchableOpacity>
-                                    ))}
-                                </View>
+                                ))}
+                            </>
+                        ) : (
+                            <View style={styles.emptyContainer}>
+                                <AppText variant="body" color={Colors.textSecondary}>
+                                    No pending reviews
+                                </AppText>
                             </View>
-                        ))}
+                        )}
                     </View>
                 ) : (
-                    <View style={styles.emptyContainer}>
-                        <AppText variant="body" color={Colors.textSecondary}>
-                            No published reviews yet
-                        </AppText>
+                    <View style={styles.publishedSection}>
+                        {publishedReviews.length > 0 ? (
+                            publishedReviews.map((review) => (
+                                <View key={review._id} style={styles.reviewCard}>
+                                    <View style={styles.cardTop}>
+                                        <Image source={{ uri: review.product?.images?.[0] }} style={styles.productImage} />
+                                        <View style={styles.productInfo}>
+                                            <AppText variant="body" weight="medium" numberOfLines={2} style={styles.productName}>
+                                                {review.product?.name}
+                                            </AppText>
+                                            <View style={styles.publishedStarContainer}>
+                                                {[1, 2, 3, 4, 5].map((star) => (
+                                                    <Star
+                                                        key={star}
+                                                        size={14}
+                                                        fill={star <= review.rating ? THEME_YELLOW : 'transparent'}
+                                                        color={star <= review.rating ? THEME_YELLOW : Colors.textLight}
+                                                    />
+                                                ))}
+                                            </View>
+                                        </View>
+                                    </View>
+                                    <AppText variant="body" weight="bold" style={styles.reviewTitle}>
+                                        {review.title}
+                                    </AppText>
+                                    <AppText variant="body" color={Colors.text} style={styles.reviewComment}>
+                                        {review.comment}
+                                    </AppText>
+                                    <AppText variant="caption" color={Colors.textSecondary} style={styles.reviewDate}>
+                                        Published on {new Date(review.createdAt).toLocaleDateString()}
+                                    </AppText>
+                                </View>
+                            ))
+                        ) : (
+                            <View style={styles.emptyContainer}>
+                                <AppText variant="body" color={Colors.textSecondary}>
+                                    No published reviews yet
+                                </AppText>
+                            </View>
+                        )}
                     </View>
                 )}
             </ScrollView>
@@ -217,6 +293,9 @@ const styles = StyleSheet.create({
     pendingSection: {
         paddingTop: 30,
     },
+    publishedSection: {
+        paddingTop: 10,
+    },
     sectionTitle: {
         textAlign: 'center',
         marginBottom: 20,
@@ -264,6 +343,23 @@ const styles = StyleSheet.create({
         gap: 15,
         marginTop: 10,
         paddingBottom: 10,
+    },
+    publishedStarContainer: {
+        flexDirection: 'row',
+        gap: 2,
+        marginTop: 5,
+    },
+    reviewTitle: {
+        fontSize: 15,
+        marginBottom: 5,
+    },
+    reviewComment: {
+        fontSize: 14,
+        lineHeight: 20,
+        marginBottom: 10,
+    },
+    reviewDate: {
+        fontSize: 12,
     },
     emptyContainer: {
         flex: 1,
