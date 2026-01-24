@@ -18,7 +18,10 @@ interface Category {
 
 interface ProductFormData {
   title: string;
+  description: string;
   price: string;
+  originalPrice: string;
+  discount: string;
   category: string;
   subCategory: string;
   stockQuantity: string;
@@ -39,7 +42,10 @@ interface AddProductFormProps {
   product?: {
     id: string;
     title: string;
+    description?: string;
     price: number;
+    originalPrice?: number;
+    discount?: number;
     category: string;
     subCategory: string;
     stockQuantity: number;
@@ -55,7 +61,10 @@ interface AddProductFormProps {
 const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded, onProductUpdated, token, mode = 'add', product = null }) => {
   const [formData, setFormData] = useState<ProductFormData>({
     title: '',
+    description: '',
     price: '',
+    originalPrice: '',
+    discount: '',
     category: '',
     subCategory: '',
     stockQuantity: '',
@@ -85,7 +94,10 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
       setFormData(prev => ({
         ...prev,
         title: product.title || '',
+        description: product.description || '',
         price: product.price != null ? String(product.price) : '',
+        originalPrice: product.originalPrice != null ? String(product.originalPrice) : '',
+        discount: product.discount != null ? String(product.discount) : '',
         category: '', // will resolve to id after categories load
         subCategory: '',
         stockQuantity: product.stockQuantity != null ? String(product.stockQuantity) : '',
@@ -93,8 +105,8 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
         rating: product.rating != null ? String(product.rating) : '0',
         reviews: product.reviews != null ? String(product.reviews) : '0',
         soldCount: product.soldCount != null ? String(product.soldCount) : '0',
-        additionalSpecifications: typeof product.additionalSpecifications === 'string' 
-          ? product.additionalSpecifications 
+        additionalSpecifications: typeof product.additionalSpecifications === 'string'
+          ? product.additionalSpecifications
           : JSON.stringify(product.additionalSpecifications || {})
       }));
       // show existing image previews
@@ -106,7 +118,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
   useEffect(() => {
     if (formData.category) {
       const parentCategory = categories.find(cat => cat._id === formData.category);
-      
+
       if (parentCategory) {
         const subs = categories.filter(cat => cat.parentId === parentCategory._id);
         setSubCategories(subs);
@@ -155,13 +167,31 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
   };
 
   const handleInputChange = (field: keyof ProductFormData, value: string | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData(prev => {
+      const newState = { ...prev, [field]: value };
+
+      // Auto-calculate logic
+      // If we change originalPrice or discount -> calculate price (Selling Price)
+      // Price = OriginalPrice - (OriginalPrice * Discount / 100)
+      if (field === 'originalPrice' || field === 'discount') {
+        const op = parseFloat(field === 'originalPrice' ? (value as string) : newState.originalPrice);
+        const disc = parseFloat(field === 'discount' ? (value as string) : newState.discount);
+
+        if (!isNaN(op) && !isNaN(disc)) {
+          const sellingPrice = op - (op * disc / 100);
+          newState.price = sellingPrice.toFixed(2);
+        } else if (!isNaN(op) && (isNaN(disc) || disc === 0)) {
+          newState.price = op.toFixed(2);
+        }
+      }
+      return newState;
+    });
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
+    const files = Array.from(e.target.files || []) as File[];
     setFormData(prev => ({ ...prev, images: [...prev.images, ...files] }));
-    
+
     // Create preview URLs
     const newPreviews = files.map(file => URL.createObjectURL(file));
     setImagePreview(prev => [...prev, ...newPreviews]);
@@ -177,7 +207,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
 
   const uploadImages = async (): Promise<string[]> => {
     if (formData.images.length === 0) return [];
-    
+
     setUploadingImages(true);
     try {
       const response = await adminAPI.upload.multipleImages(formData.images, token);
@@ -195,7 +225,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.title || !formData.price || !formData.category || !formData.subCategory) {
       toast({
         title: "Validation Error",
@@ -209,11 +239,14 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
     try {
       // Upload images first
       const imageUrls = await uploadImages();
-      
+
       // Prepare product data
       const productData = {
         title: formData.title,
+        description: formData.description,
         price: parseFloat(formData.price),
+        originalPrice: parseFloat(formData.originalPrice) || 0,
+        discount: parseFloat(formData.discount) || 0,
         category: formData.category,
         subCategory: formData.subCategory,
         stockQuantity: parseInt(formData.stockQuantity) || 0,
@@ -230,7 +263,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
       const response = mode === 'edit' && product
         ? await adminAPI.products.update(product.id, productData, token)
         : await adminAPI.products.create(productData, token);
-      
+
       if (response.success) {
         toast({
           title: "Success",
@@ -281,9 +314,50 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
                   required
                 />
               </div>
-              
+
               <div className="space-y-2">
-                <Label htmlFor="price">Price (₹) *</Label>
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  placeholder="Enter product description"
+                  rows={3}
+                />
+              </div>
+            </div>
+
+            {/* Pricing Information */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="originalPrice">Original Price (₹) *</Label>
+                <Input
+                  id="originalPrice"
+                  type="number"
+                  step="0.01"
+                  value={formData.originalPrice}
+                  onChange={(e) => handleInputChange('originalPrice', e.target.value)}
+                  placeholder="0.00"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="discount">Discount (%)</Label>
+                <Input
+                  id="discount"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  max="100"
+                  value={formData.discount}
+                  onChange={(e) => handleInputChange('discount', e.target.value)}
+                  placeholder="0"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="price">Final Price (₹) *</Label>
                 <Input
                   id="price"
                   type="number"
@@ -292,6 +366,8 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
                   onChange={(e) => handleInputChange('price', e.target.value)}
                   placeholder="0.00"
                   required
+                  readOnly // Make price read-only as it is calculated
+                  className="bg-gray-100"
                 />
               </div>
             </div>
@@ -313,11 +389,11 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="subCategory">Sub Category *</Label>
-                <Select 
-                  value={formData.subCategory} 
+                <Select
+                  value={formData.subCategory}
                   onValueChange={(value) => handleInputChange('subCategory', value)}
                   disabled={!formData.category}
                 >
@@ -347,7 +423,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
                   placeholder="0"
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="rating">Rating</Label>
                 <Input
@@ -361,7 +437,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
                   placeholder="0.0"
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="reviews">Reviews Count</Label>
                 <Input
@@ -406,7 +482,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
                   <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB each</p>
                 </label>
               </div>
-              
+
               {/* Image Previews */}
               {imagePreview.length > 0 && (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
