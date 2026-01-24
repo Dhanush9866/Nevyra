@@ -1,14 +1,14 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 
-const API_BASE_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:8000/api/v1'; // Use local IP instead of localhost for mobile devices
+const API_BASE_URL = Constants.expoConfig?.extra?.apiUrl || 'http://10.227.125.42:8000/api/v1'; // Use local IP instead of localhost for mobile devices
+
 class ApiService {
   private baseURL: string;
 
   constructor(baseURL: string) {
     this.baseURL = baseURL;
   }
-
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
@@ -440,6 +440,16 @@ class ApiService {
       method: "POST",
       body: JSON.stringify(reviewData),
     });
+  }
+
+  async getUserReviews() {
+    return this.request<{ success: boolean; data: any[] }>('/reviews/user');
+  }
+
+  async getPendingReviews() {
+    // This could be a special endpoint or we can filter orders on frontend
+    // For now, let's assume there's an endpoint for it
+    return this.request<{ success: boolean; data: any[] }>('/reviews/pending');
   }
 
   // Payments

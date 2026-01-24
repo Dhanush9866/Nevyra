@@ -1,4 +1,4 @@
-const { Review, Product } = require("../models");
+const { Review, Product, Order } = require("../models");
 
 exports.create = async (req, res, next) => {
   try {
@@ -71,6 +71,74 @@ exports.getByProduct = async (req, res, next) => {
       success: true,
       message: "Reviews fetched successfully",
       data: reviews,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getByUser = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const reviews = await Review.find({ user: userId })
+      .populate("product")
+      .sort("-createdAt");
+
+    res.json({
+      success: true,
+      message: "User reviews fetched successfully",
+      data: reviews,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getPending = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+
+    // 1. Get all delivered orders for the user
+    const orders = await Order.find({
+      userId: userId,
+      status: { $in: ['Delivered', 'delivered'] }
+    }).populate("items.productId");
+
+    // 2. Extract unique product IDs from these orders
+    const purchasedProductIds = [];
+    const productMap = new Map();
+
+    orders.forEach(order => {
+      order.items.forEach(item => {
+        if (item.productId && item.productId._id) {
+          const pid = item.productId._id.toString();
+          if (!productMap.has(pid)) {
+            productMap.set(pid, item.productId);
+            purchasedProductIds.push(item.productId._id);
+          }
+        }
+      });
+    });
+
+    // 3. Get all reviews by this user for these products
+    const existingReviews = await Review.find({
+      user: userId,
+      product: { $in: purchasedProductIds }
+    });
+
+    const reviewedProductIds = new Set(
+      existingReviews.map(r => r.product.toString())
+    );
+
+    // 4. Filter products that haven't been reviewed
+    const pendingProducts = purchasedProductIds
+      .filter(pid => !reviewedProductIds.has(pid.toString()))
+      .map(pid => productMap.get(pid.toString()));
+
+    res.json({
+      success: true,
+      message: "Pending reviews fetched successfully",
+      data: pendingProducts,
     });
   } catch (err) {
     next(err);

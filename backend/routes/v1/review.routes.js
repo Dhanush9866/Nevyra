@@ -6,6 +6,12 @@ const authMiddleware = require("../../middlewares/authMiddleware");
 // Get reviews for a product
 router.get("/product/:productId", reviewController.getByProduct);
 
+// Get reviews for the current user
+router.get("/user", authMiddleware, reviewController.getByUser);
+
+// Get products pending review
+router.get("/pending", authMiddleware, reviewController.getPending);
+
 // Create a review
 router.post("/product/:productId", authMiddleware, reviewController.create);
 
