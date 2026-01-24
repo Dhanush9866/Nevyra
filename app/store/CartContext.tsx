@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import createContextHook from '@nkzw/create-context-hook';
 import { CartItem, Product } from '@/types';
@@ -18,7 +18,7 @@ export const [CartProvider, useCart] = createContextHook(() => {
     }
   }, [isAuthenticated]);
 
-  const fetchCart = async () => {
+  const fetchCart = useCallback(async () => {
     setIsLoading(true);
     try {
       const response = await apiService.getCart();
@@ -36,7 +36,7 @@ export const [CartProvider, useCart] = createContextHook(() => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   const loadLocalCart = async () => {
     try {
@@ -70,7 +70,7 @@ export const [CartProvider, useCart] = createContextHook(() => {
     }
   }, [isAuthenticated]);
 
-  const addToCart = async (product: Product, quantity: number = 1) => {
+  const addToCart = useCallback(async (product: Product, quantity: number = 1) => {
     if (isAuthenticated) {
       try {
         const response = await apiService.addToCart(product.id, quantity);
@@ -101,9 +101,28 @@ export const [CartProvider, useCart] = createContextHook(() => {
       return newItems;
     });
     return { success: true };
-  };
+  }, [isAuthenticated, fetchCart]);
 
-  const updateQuantity = async (id: string, quantity: number) => {
+  const removeFromCart = useCallback(async (id: string) => {
+    if (isAuthenticated) {
+      try {
+        const response = await apiService.removeFromCart(id);
+        if (response.success) {
+          fetchCart();
+        }
+      } catch (error) {
+        console.error('Remove from cart failed:', error);
+      }
+    }
+
+    setItems((prev) => {
+      const newItems = prev.filter((item) => item.id !== id);
+      AsyncStorage.setItem('cart', JSON.stringify(newItems));
+      return newItems;
+    });
+  }, [isAuthenticated, fetchCart]);
+
+  const updateQuantity = useCallback(async (id: string, quantity: number) => {
     if (quantity <= 0) {
       return removeFromCart(id);
     }
@@ -124,32 +143,13 @@ export const [CartProvider, useCart] = createContextHook(() => {
       AsyncStorage.setItem('cart', JSON.stringify(newItems));
       return newItems;
     });
-  };
+  }, [isAuthenticated, fetchCart, removeFromCart]);
 
-  const removeFromCart = async (id: string) => {
-    if (isAuthenticated) {
-      try {
-        const response = await apiService.removeFromCart(id);
-        if (response.success) {
-          fetchCart();
-        }
-      } catch (error) {
-        console.error('Remove from cart failed:', error);
-      }
-    }
-
-    setItems((prev) => {
-      const newItems = prev.filter((item) => item.id !== id);
-      AsyncStorage.setItem('cart', JSON.stringify(newItems));
-      return newItems;
-    });
-  };
-
-  const clearCart = async () => {
+  const clearCart = useCallback(async () => {
     setItems([]);
     await AsyncStorage.removeItem('cart');
     // Note: Backend might need a clear cart endpoint or multiple removals
-  };
+  }, []);
 
   const totalItems = items.reduce((sum: number, item: CartItem) => sum + item.quantity, 0);
   const totalAmount = items.reduce(
@@ -157,7 +157,7 @@ export const [CartProvider, useCart] = createContextHook(() => {
     0
   );
 
-  return {
+  return useMemo(() => ({
     items,
     isLoading,
     addToCart,
@@ -167,5 +167,5 @@ export const [CartProvider, useCart] = createContextHook(() => {
     totalItems,
     totalAmount,
     refreshCart: fetchCart,
-  };
+  }), [items, isLoading, addToCart, updateQuantity, removeFromCart, clearCart, totalItems, totalAmount, fetchCart]);
 });

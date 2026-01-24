@@ -70,7 +70,6 @@ function RootLayoutNav() {
         name="checkout/success"
         options={{ headerShown: false, gestureEnabled: false }}
       />
-      <Stack.Screen name="order/list" options={{ headerShown: false }} />
       <Stack.Screen name="order/[id]" options={{ headerShown: false }} />
       <Stack.Screen name="order/tracking" options={{ title: 'Track Order' }} />
       <Stack.Screen name="notifications" options={{ title: 'Notifications' }} />

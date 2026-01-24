@@ -39,7 +39,7 @@ export default function ProfileScreen() {
   };
 
   const topGridItems = [
-    { icon: Package, label: 'Orders', route: '/order/list' },
+    { icon: Package, label: 'Orders', route: '/(tabs)/orders' },
     { icon: Heart, label: 'Wishlist', route: '/wishlist' }
   ];
 
@@ -50,7 +50,7 @@ export default function ProfileScreen() {
         { icon: User, label: 'Edit Profile', route: '/profile/edit' },
         { icon: Lock, label: 'Change Password', route: '/profile/change-password' },
         { icon: Bell, label: 'Notification Settings', route: '/profile/notifications' },
-        { icon: MapPin, label: 'Saved Addresses', route: '/checkout/address-list' },
+        { icon: MapPin, label: 'Saved Addresses', route: { pathname: '/checkout/address-list', params: { source: 'profile' } } },
       ],
     },
     {
@@ -125,7 +125,10 @@ export default function ProfileScreen() {
           <View style={styles.deliveryInfoContainer}>
             <TouchableOpacity
               style={styles.deliveryInfo}
-              onPress={() => router.push('/checkout/address-list' as any)}
+              onPress={() => router.push({
+                pathname: '/checkout/address-list',
+                params: { source: 'profile' }
+              } as any)}
             >
               <AppText variant="body" color={Colors.textSecondary}>
                 Delivering to: <AppText weight="bold" color={Colors.text}>
@@ -165,8 +168,10 @@ export default function ProfileScreen() {
                 style={styles.menuItem}
                 onPress={() => {
                   if (item.route) {
-                    if (item.route.startsWith('http')) {
+                    if (typeof item.route === 'string' && item.route.startsWith('http')) {
                       Linking.openURL(item.route);
+                    } else if (typeof item.route === 'object') {
+                      router.push(item.route as any);
                     } else {
                       router.push(item.route as any);
                     }

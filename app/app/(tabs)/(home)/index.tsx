@@ -156,7 +156,10 @@ export default function HomeScreen() {
           <TouchableOpacity
             style={styles.addressBar}
             activeOpacity={0.7}
-            onPress={() => router.push('/checkout/address-list' as any)}
+            onPress={() => router.push({
+              pathname: '/checkout/address-list',
+              params: { source: 'home' }
+            } as any)}
           >
             <MapPin size={16} color={Colors.white} />
             <AppText variant="caption" color="rgba(255,255,255,0.9)" style={{ marginLeft: 4 }}>

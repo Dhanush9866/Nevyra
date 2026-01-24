@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Image, ActivityIndicator } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import {
@@ -8,18 +8,16 @@ import {
   Zap,
   Info,
   X,
-  Star,
-  Plus,
-  Minus,
-  ArrowRight
 } from 'lucide-react-native';
 import AppText from '@/components/atoms/AppText';
 import Button from '@/components/atoms/Button';
 import SlideToActButton from '@/components/molecules/SlideToActButton';
+import CartItemCard from '@/components/molecules/CartItemCard';
 import Colors from '@/constants/colors';
 import Spacing from '@/constants/spacing';
 import { useCart } from '@/store/CartContext';
 import { useAuth } from '@/store/AuthContext';
+import { useCheckout } from '@/store/CheckoutContext';
 
 const { width } = Dimensions.get('window');
 
@@ -29,75 +27,18 @@ const SUCCESS_GREEN = '#118D44';
 const ERROR_RED = '#D11243';
 const BACKGROUND_LIGHT = '#F1F3F6';
 
-const MOCK_ITEMS = [
-  {
-    id: '1',
-    title: 'HP Professional 15 (2025) Intel...',
-    specs: '15.6 inch, Turbo Silver, 1.5 kg, With MS Office',
-    rating: 4.0,
-    reviews: 15,
-    mrp: 98990,
-    price: 57490,
-    discount: 41,
-    wowPrice: 54615,
-    protectFee: 156,
-    emi: { amount: 11498, coins: 45992 },
-    offersCount: 12,
-    deliveryDate: 'Jan 12, Mon',
-    stockStatus: 'Only few left',
-    image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop'
-  },
-  {
-    id: '2',
-    title: 'Sony WH-1000XM5 Bluetooth Headphones',
-    specs: 'Active Noise Cancelling, 30hr Battery, Black',
-    rating: 4.8,
-    reviews: 2450,
-    mrp: 34990,
-    price: 26990,
-    discount: 22,
-    wowPrice: 25490,
-    protectFee: 99,
-    emi: { amount: 4498, coins: 10000 },
-    offersCount: 8,
-    deliveryDate: 'Jan 11, Sun',
-    stockStatus: 'In Stock',
-    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=2070&auto=format&fit=crop'
-  },
-  {
-    id: '3',
-    title: 'Apple iPhone 15 (Blue, 128 GB)',
-    specs: '128 GB ROM, 15.49 cm (6.1 inch) Super Retina XDR Display',
-    rating: 4.6,
-    reviews: 12380,
-    mrp: 69900,
-    price: 65999,
-    discount: 5,
-    wowPrice: 63999,
-    protectFee: 499,
-    emi: { amount: 10999, coins: 50000 },
-    offersCount: 5,
-    deliveryDate: 'Jan 10, Sat',
-    stockStatus: 'Only 2 left',
-    image: 'https://images.unsplash.com/photo-1510557880182-3d4d3cba3f21?q=80&w=2070&auto=format&fit=crop'
-  }
-];
 
 export default function CartScreen() {
   const router = useRouter();
   const { items, totalAmount, removeFromCart, updateQuantity, isLoading, refreshCart } = useCart();
   const { addresses } = useAuth();
-  const [focusKey, setFocusKey] = React.useState(0);
-
-  useFocusEffect(
-    React.useCallback(() => {
-      // Reset the slide button state when screen comes into focus
-      setFocusKey(prev => prev + 1);
-    }, [])
-  );
+  const { setCheckoutItems } = useCheckout();
+  const [focusKey, setFocusKey] = useState(0);
 
   useFocusEffect(
     useCallback(() => {
+      // Reset the slide button state when screen comes into focus
+      setFocusKey(prev => prev + 1);
       refreshCart();
     }, [refreshCart])
   );
@@ -126,7 +67,7 @@ export default function CartScreen() {
             // Add a small delay for better UX so user sees the "unlock"
             setTimeout(() => {
               router.push('/(tabs)/(home)' as any);
-            }, 300);
+            }, 50);
           }}
           width={280}
           height={60}
@@ -174,132 +115,16 @@ export default function CartScreen() {
 
         {/* Cart Items */}
         {items.map((item) => (
-          <View key={item.id} style={styles.cartItemCard}>
-            <View style={styles.itemMainInfo}>
-              <View style={styles.itemImageContainer}>
-                <Image
-                  source={{ uri: item.product.images[0] }}
-                  style={styles.itemImage}
-                  resizeMode="contain"
-                />
-                <View style={styles.qtyContainer}>
-                  <TouchableOpacity
-                    onPress={() => updateQuantity(item.id, item.quantity - 1)}
-                    style={styles.qtyButton}
-                  >
-                    <Minus size={14} color={Colors.textSecondary} />
-                  </TouchableOpacity>
-                  <AppText variant="caption" weight="bold" style={styles.qtyText}>
-                    {item.quantity}
-                  </AppText>
-                  <TouchableOpacity
-                    onPress={() => updateQuantity(item.id, item.quantity + 1)}
-                    style={styles.qtyButton}
-                  >
-                    <Plus size={14} color={Colors.textSecondary} />
-                  </TouchableOpacity>
-                </View>
-                {!item.product.inStock && (
-                  <AppText style={styles.stockStatus} weight="medium">Out of Stock</AppText>
-                )}
-              </View>
-
-              <View style={styles.itemDetails}>
-                <AppText variant="body" weight="medium" numberOfLines={1} style={styles.itemTitle}>
-                  {item.product.name}
-                </AppText>
-                <AppText variant="caption" color={Colors.textSecondary} style={styles.itemSpecs}>
-                  {item.product.brand} • {item.product.category}
-                </AppText>
-
-                <View style={styles.ratingRow}>
-                  <View style={styles.starsContainer}>
-                    {[1, 2, 3, 4, 5].map((i) => (
-                      <Star
-                        key={i}
-                        size={12}
-                        color={i <= item.product.rating ? Colors.rating : Colors.textLight}
-                        fill={i <= item.product.rating ? Colors.rating : 'transparent'}
-                        style={{ marginRight: 1 }}
-                      />
-                    ))}
-                  </View>
-                  <AppText variant="caption" color={Colors.textSecondary} style={styles.ratingText}>
-                    {item.product.rating} • ({item.product.reviewCount})
-                  </AppText>
-                </View>
-
-                <View style={styles.priceContainer}>
-                  <View style={styles.priceRow}>
-                    <Zap size={14} color={Colors.success} />
-                    <AppText variant="body" weight="semibold" color={Colors.success} style={styles.discountText}>
-                      {item.product.discount || 0}% OFF
-                    </AppText>
-                    <AppText variant="body" color={Colors.textSecondary} style={styles.mrpText}>
-                      ₹{(item.product.originalPrice || item.product.price * 1.2).toLocaleString('en-IN')}
-                    </AppText>
-                    <AppText variant="h4" weight="semibold" style={styles.currentPrice}>
-                      ₹{item.product.price.toLocaleString('en-IN')}
-                    </AppText>
-                  </View>
-                </View>
-
-                <View style={styles.wowPriceRow}>
-                  <Image
-                    source={{ uri: 'https://static-assets-web.flixcart.com/www/linchpin/fk-cp-zion/img/wow-logo_365955.png' }}
-                    style={styles.wowIcon}
-                  />
-                  <AppText variant="caption" weight="semibold" style={{ color: BRAND_BLUE }}>
-                    Buy at ₹{Math.round(item.product.price * 0.95).toLocaleString('en-IN')}
-                  </AppText>
-                </View>
-
-                <View style={styles.feeRow}>
-                  <AppText variant="caption" color={Colors.textSecondary}>+ ₹150 Protect Promise Fee</AppText>
-                  <Info size={12} color={Colors.textSecondary} style={{ marginLeft: 4 }} />
-                </View>
-
-                <View style={styles.emiRow}>
-                  <AppText variant="caption" weight="medium">Or Pay ₹{Math.round(item.product.price / 6).toLocaleString('en-IN')} + </AppText>
-                  <View style={styles.coinIcon} />
-                  <AppText variant="caption" weight="medium"> 5000</AppText>
-                </View>
-
-                <TouchableOpacity>
-                  <AppText variant="caption" weight="semibold" color={Colors.success} style={styles.offersLink}>
-                    12 Offers Available
-                  </AppText>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            <View style={styles.deliveryDateRow}>
-              <AppText variant="caption" color={Colors.textSecondary}>
-                Delivery by 3-4 days
-              </AppText>
-            </View>
-
-            <View style={styles.itemActions}>
-              <TouchableOpacity
-                style={[styles.actionButton, styles.removeBtn]}
-                onPress={() => removeFromCart(item.id)}
-              >
-                <Trash2 size={16} color={ERROR_RED} />
-                <AppText variant="caption" weight="semibold" style={[styles.actionText, { color: ERROR_RED }]}>Remove</AppText>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.actionButton, styles.saveBtn]}>
-                <FileText size={16} color={BRAND_BLUE} />
-                <AppText variant="caption" weight="semibold" style={[styles.actionText, { color: BRAND_BLUE }]}>Save for later</AppText>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.actionButton, styles.buyBtn]}
-                onPress={() => router.push('/checkout/address-list' as any)}
-              >
-                <Zap size={16} color={Colors.white} />
-                <AppText variant="caption" weight="semibold" style={[styles.actionText, { color: Colors.white }]}>Buy this now</AppText>
-              </TouchableOpacity>
-            </View>
-          </View>
+          <CartItemCard
+            key={item.id}
+            item={item}
+            onUpdateQuantity={updateQuantity}
+            onRemove={removeFromCart}
+            onBuyNow={(id) => {
+              setCheckoutItems([item], 'buy_now');
+              router.push('/checkout/address-list' as any);
+            }}
+          />
         ))}
 
         {/* Protection Teaser */}
@@ -340,7 +165,10 @@ export default function CartScreen() {
           </View>
           <TouchableOpacity 
             style={styles.placeOrderButton}
-            onPress={() => router.push('/checkout/review' as any)}
+            onPress={() => {
+              setCheckoutItems(items, 'cart');
+              router.push('/checkout/review' as any);
+            }}
           >
             <AppText variant="body" weight="semibold" style={styles.placeOrderText}>Place Order</AppText>
           </TouchableOpacity>
