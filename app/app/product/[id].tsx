@@ -1,9 +1,9 @@
-import { useCallback } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, StatusBar } from 'react-native';
+import { useCallback, useState } from 'react';
+import { View, StyleSheet, ScrollView, TouchableOpacity, StatusBar, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack, useFocusEffect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
-import { Heart, Star, Share2, Search, ArrowLeft, ShoppingCart, ChevronRight } from 'lucide-react-native';
+import { Heart, Star, Share2, Search, ArrowLeft, ShoppingCart, ChevronRight, Check } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import AppText from '@/components/atoms/AppText';
 import Button from '@/components/atoms/Button';
@@ -27,9 +27,10 @@ export default function ProductDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { addToCart } = useCart();
+  const { addToCart, totalItems } = useCart();
   const { toggleWishlist, isWishlisted } = useWishlist();
   const { setCheckoutItems } = useCheckout();
+  const [showToast, setShowToast] = useState(false);
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['product', id],
@@ -119,12 +120,21 @@ export default function ProductDetailScreen() {
           </View>
 
           <View style={styles.headerActions}>
-            <IconButton
-              icon={ShoppingCart}
-              onPress={() => router.push('/(tabs)/cart')}
-              color={Colors.white}
-              size={20}
-            />
+            <View>
+              <IconButton
+                icon={ShoppingCart}
+                onPress={() => router.push('/(tabs)/cart')}
+                color={Colors.white}
+                size={20}
+              />
+              {totalItems > 0 && (
+                <View style={styles.headerBadge}>
+                  <AppText variant="caption" color={Colors.white} style={{ fontSize: 10, fontWeight: 'bold' }}>
+                    {totalItems > 99 ? '99+' : totalItems}
+                  </AppText>
+                </View>
+              )}
+            </View>
           </View>
         </View>
       </View>
@@ -160,11 +170,7 @@ export default function ProductDetailScreen() {
             </View>
 
 
-            {product.discount && product.discount > 0 && (
-              <View style={styles.discountBadge}>
-                <Badge text={`${product.discount}% OFF`} variant="error" />
-              </View>
-            )}
+
           </View>
 
           <View style={styles.content}>
@@ -221,21 +227,41 @@ export default function ProductDetailScreen() {
             {/* SPECIFICATIONS SECTION */}
             {product.specifications && Object.keys(product.specifications).length > 0 && (
               <View style={styles.section}>
-                <AppText variant="h4" weight="bold">
-                  Specifications
-                </AppText>
-                <View style={styles.specificationsGrid}>
-                  {Object.entries(product.specifications).map(([key, value]: [string, any]) => (
-                    <View key={key} style={styles.specItem}>
-                      <AppText variant="caption" color={Colors.textSecondary}>{key}</AppText>
-                      <AppText variant="body" weight="medium">{String(value)}</AppText>
+                <View style={styles.sectionHeader}>
+                  <AppText variant="h4" weight="bold" color="#003366">
+                    Product Specifications
+                  </AppText>
+                </View>
+                <View style={styles.specificationsContainer}>
+                  {Object.entries(product.specifications).map(([key, value], index) => (
+                    <View
+                      key={key}
+                      style={[
+                        styles.specRow,
+                        { backgroundColor: index % 2 === 0 ? '#FFFFFF' : '#F0F8FF' }
+                      ]}
+                    >
+                      <View style={styles.specLabelContainer}>
+                        <AppText variant="body" weight="bold" color="#003366">
+                          {key}
+                        </AppText>
+                      </View>
+                      <View style={styles.specValueContainer}>
+                        <AppText variant="body" color={Colors.text}>
+                          {String(value)}
+                        </AppText>
+                      </View>
                     </View>
                   ))}
-                  {/* Fallback if list is short */}
-                  <View style={styles.specItem}>
-                    <AppText variant="caption" color={Colors.textSecondary}>Warranty</AppText>
-                    <AppText variant="body" weight="medium">1 Year Brand Warranty</AppText>
-                  </View>
+                  {/* Fallback if list is short - ensuring it follows the same style if desired, or remove if not needed. Keeping specific item consistent */}
+                  {/* <View style={[styles.specRow, { backgroundColor: Object.keys(product.specifications).length % 2 === 0 ? '#FFFFFF' : '#F0F8FF' }]}> 
+                    <View style={styles.specLabelContainer}>
+                       <AppText variant="body" weight="bold" color="#003366">Warranty</AppText>
+                    </View>
+                     <View style={styles.specValueContainer}>
+                       <AppText variant="body" color={Colors.text}>1 Year Brand Warranty</AppText>
+                    </View>
+                  </View> */}
                 </View>
               </View>
             )}
@@ -314,7 +340,8 @@ export default function ProductDetailScreen() {
               variant="outline"
               onPress={() => {
                 addToCart(product);
-                router.push('/(tabs)/cart' as any);
+                setShowToast(true);
+                setTimeout(() => setShowToast(false), 4000);
               }}
               style={[styles.flexButton, { borderRadius: 8 }]}
             />
@@ -335,6 +362,20 @@ export default function ProductDetailScreen() {
           </View>
         </View>
       </View>
+
+      {/* Toast Notification */}
+      {showToast && (
+        <View style={[styles.toastContainer, { bottom: insets.bottom + 80 }]}>
+          <View style={styles.toastContent}>
+            <View style={styles.toastIconContainer}>
+              <Check size={16} color={Colors.white} strokeWidth={3} />
+            </View>
+            <AppText variant="body" color={Colors.white} weight="medium">
+              Added to cart successfully
+            </AppText>
+          </View>
+        </View>
+      )}
     </>
   );
 }
@@ -479,19 +520,24 @@ const styles = StyleSheet.create({
     padding: Spacing.md,
     borderRadius: 8,
   },
-  specificationsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: Spacing.md,
+  specificationsContainer: {
     marginTop: Spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: '#E0E0E0',
   },
-  specItem: {
-    width: '45%',
-    backgroundColor: '#f8f9fa',
-    padding: Spacing.md,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#eee',
+  specRow: {
+    flexDirection: 'row',
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
+  },
+  specLabelContainer: {
+    flex: 1,
+    paddingRight: Spacing.sm,
+  },
+  specValueContainer: {
+    flex: 1,
   },
   similarProductsContainer: {
     gap: Spacing.md,
@@ -500,5 +546,43 @@ const styles = StyleSheet.create({
   },
   similarProductItem: {
     width: 160,
+  },
+  toastContainer: {
+    position: 'absolute',
+    left: Spacing.lg,
+    right: Spacing.lg,
+    alignItems: 'center',
+    zIndex: 2000,
+  },
+  toastContent: {
+    backgroundColor: '#333333',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    borderRadius: 8,
+    gap: Spacing.sm,
+    ...Colors.shadow.md,
+  },
+  toastIconContainer: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#4CAF50', // Green color (success)
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  headerBadge: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    backgroundColor: Colors.error,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 2,
+    zIndex: 1,
   },
 });

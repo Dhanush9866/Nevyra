@@ -155,7 +155,7 @@ exports.list = async (req, res, next) => {
         .skip(skip)
         .limit(parseInt(limit))
         .select(
-          "title description price category subCategory images inStock rating reviews stockQuantity soldCount attributes"
+          "title description price originalPrice discount category subCategory images inStock rating reviews stockQuantity soldCount attributes"
         ),
       Product.countDocuments(filter),
     ]);
@@ -222,7 +222,7 @@ exports.listByMultipleSubcategories = async (req, res, next) => {
         .skip(skip)
         .limit(parseInt(limit))
         .select(
-          "title description price category subCategory images inStock rating reviews stockQuantity soldCount attributes"
+          "title description price originalPrice discount category subCategory images inStock rating reviews stockQuantity soldCount attributes"
         ),
       Product.countDocuments(filter),
     ]);
@@ -288,6 +288,8 @@ exports.create = async (req, res, next) => {
       title,
       description,
       price,
+      originalPrice,
+      discount,
       category,
       subCategory,
       images,
@@ -353,6 +355,8 @@ exports.create = async (req, res, next) => {
       title,
       description,
       price,
+      originalPrice: originalPrice || 0,
+      discount: discount || 0,
       category: categoryName,
       subCategory: subCategoryName,
       images,
@@ -386,6 +390,8 @@ exports.update = async (req, res, next) => {
       title,
       description,
       price,
+      originalPrice,
+      discount,
       category,
       subCategory,
       images,
@@ -442,6 +448,8 @@ exports.update = async (req, res, next) => {
     if (title !== undefined) product.title = title;
     if (description !== undefined) product.description = description;
     if (price !== undefined) product.price = price;
+    if (originalPrice !== undefined) product.originalPrice = originalPrice;
+    if (discount !== undefined) product.discount = discount;
     if (category !== undefined) product.category = categoryName;
     if (subCategory !== undefined) product.subCategory = subCategoryName;
     if (images !== undefined) product.images = images;
@@ -576,7 +584,7 @@ exports.getTopDeals = async (req, res, next) => {
       .sort({ soldCount: -1 })
       .limit(parseInt(limit))
       .select(
-        "title description price category subCategory images inStock rating reviews stockQuantity soldCount attributes"
+        "title description price originalPrice discount category subCategory images inStock rating reviews stockQuantity soldCount attributes"
       );
 
     const mappedProducts = products.map(mapProductId);
