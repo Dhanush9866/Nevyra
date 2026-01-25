@@ -182,8 +182,8 @@ const ProductListing = () => {
   };
 
   // Get the current category display name
-  const currentCategory = categoryName && categoryName !== 'all' 
-    ? categoryMap[categoryName] || categoryName 
+  const currentCategory = categoryName && categoryName !== 'all'
+    ? categoryMap[categoryName] || categoryName
     : 'Electronics';
 
   // Get subcategories for the current category
@@ -193,7 +193,7 @@ const ProductListing = () => {
     (async () => {
       console.log('========== FRONTEND PRODUCT FETCH ==========');
       const params: any = { limit: 100 };
-      
+
       // Handle Category from URL param
       if (categoryName && categoryName !== 'all') {
         params.category = categoryMap[categoryName] || categoryName;
@@ -214,19 +214,19 @@ const ProductListing = () => {
 
       try {
         console.log('API request params:', params);
-        
+
         // Use the appropriate endpoint based on whether we have multiple subcategories
-        const res = params.subCategories 
+        const res = params.subCategories
           ? await apiService.getProductsByMultipleSubcategories(params)
           : await apiService.getProducts(params);
-          
+
         console.log('API response received:', {
           success: res.success,
           dataLength: res.data?.length,
           pagination: res.pagination,
           message: res.message
         });
-        
+
         if (res.success) {
           const mappedProducts = res.data.map((p: any) => ({
             _id: p.id || p._id,
@@ -255,7 +255,7 @@ const ProductListing = () => {
     })();
     setCurrentPage(1); // Reset to first page when category changes
   }, [categoryName]);
-  
+
   const [sortBy, setSortBy] = useState("popularity");
   const [showFilters, setShowFilters] = useState(false);
 
@@ -299,15 +299,15 @@ const ProductListing = () => {
   const filteredProducts = products.filter((product) => {
     const inPriceRange =
       product.price >= priceRange[0] && product.price <= priceRange[1];
-    
+
     // Filter by selected subcategories (if any are selected)
     const inSelectedSubcategories =
-      selectedSubcategories.length === 0 || 
-      selectedSubcategories.some(subcat => 
+      selectedSubcategories.length === 0 ||
+      selectedSubcategories.some(subcat =>
         product.title?.toLowerCase().includes(subcat.toLowerCase()) ||
         product.brand?.toLowerCase().includes(subcat.toLowerCase())
       );
-    
+
     return inPriceRange && inSelectedSubcategories;
   });
 
@@ -340,7 +340,7 @@ const ProductListing = () => {
   return (
     <div className="min-h-screen bg-background font-roboto">
       <Navbar />
-
+      <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex gap-4">
           {/* Sidebar Filters - Amazon Style */}
           <div className={`w-60 ${showFilters ? "block" : "hidden"} md:block`}>
@@ -526,8 +526,8 @@ const ProductListing = () => {
                 <Pagination>
                   <PaginationContent>
                     <PaginationItem>
-                      <PaginationPrevious 
-                        href="#" 
+                      <PaginationPrevious
+                        href="#"
                         onClick={(e) => {
                           e.preventDefault();
                           if (currentPage > 1) handlePageChange(currentPage - 1);
@@ -535,7 +535,7 @@ const ProductListing = () => {
                         className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
                       />
                     </PaginationItem>
-                    
+
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
                       // Show only first, last, and pages around current
                       if (
@@ -572,8 +572,8 @@ const ProductListing = () => {
                     })}
 
                     <PaginationItem>
-                      <PaginationNext 
-                        href="#" 
+                      <PaginationNext
+                        href="#"
                         onClick={(e) => {
                           e.preventDefault();
                           if (currentPage < totalPages) handlePageChange(currentPage + 1);

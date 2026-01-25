@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Plus, CreditCard, Banknote, Shield, CheckCircle, X } from "lucide-react";
+import { MapPin, Plus, CreditCard, Banknote, Shield, CheckCircle, X, ShoppingCart } from "lucide-react";
 
 // Add Razorpay type definition
 declare global {
@@ -564,36 +564,70 @@ const Checkout = () => {
 
           {/* Order Summary Sidebar */}
           <div>
-            <Card className="sticky top-4">
+            <Card className="sticky top-4 overflow-hidden border-none shadow-xl bg-card/50 backdrop-blur-sm">
+              <div className="bg-primary/5 p-4 border-b border-primary/10">
+                <h3 className="font-bold text-foreground flex items-center gap-2">
+                  <ShoppingCart className="h-5 w-5 text-primary" />
+                  Order Summary
+                </h3>
+              </div>
               <CardContent className="p-6">
-                <h3 className="font-semibold text-foreground mb-4">Order Summary</h3>
+                {/* Product List In Sidebar */}
+                <div className="space-y-4 mb-6 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                  {cartItems.map((item: any) => (
+                    <div key={item.id} className="flex gap-3 group">
+                      <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-muted border border-border group-hover:border-primary/30 transition-colors">
+                        <img
+                          src={item.productId?.images?.[0] || '/placeholder.svg'}
+                          alt={item.productId?.title}
+                          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+                        />
+                        <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-primary text-[10px] border-2 border-background">
+                          {item.quantity}
+                        </Badge>
+                      </div>
+                      <div className="flex flex-1 flex-col justify-center min-w-0">
+                        <h4 className="text-sm font-medium text-foreground line-clamp-2 leading-tight group-hover:text-primary transition-colors">
+                          {item.productId?.title}
+                        </h4>
+                        <div className="flex items-center justify-between mt-1">
+                          <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
+                          <p className="text-sm font-bold text-primary">₹{((item.productId?.price || 0) * (item.quantity || 0)).toLocaleString()}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
 
-                <div className="space-y-3 mb-4">
-                  <div className="flex justify-between">
+                <div className="space-y-3 mb-6 bg-muted/30 p-4 rounded-xl border border-border/50">
+                  <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Subtotal ({cartItems.length} items)</span>
-                    <span>₹{subtotal.toLocaleString()}</span>
+                    <span className="font-medium text-foreground">₹{subtotal.toLocaleString()}</span>
                   </div>
 
-                  <div className="flex justify-between">
+                  <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Shipping</span>
-                    <span className="text-success">FREE</span>
+                    <span className="text-success font-bold text-xs bg-success/10 px-2 py-0.5 rounded-full">FREE</span>
                   </div>
 
-                  <div className="flex justify-between">
+                  <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">GST (18%)</span>
-                    <span>₹{gst.toLocaleString()}</span>
+                    <span className="font-medium text-foreground">₹{gst.toLocaleString()}</span>
                   </div>
                 </div>
 
-                <div className="border-t border-border pt-3">
-                  <div className="flex justify-between text-lg font-bold">
-                    <span>Total</span>
-                    <span>₹{total.toLocaleString()}</span>
+                <div className="border-t border-dashed border-border pt-4">
+                  <div className="flex justify-between items-end">
+                    <div className="flex flex-col">
+                      <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Total Amount</span>
+                      <span className="text-2xl font-black text-primary">₹{total.toLocaleString()}</span>
+                    </div>
+                    <div className="flex flex-col items-end">
+                      <Badge variant="outline" className="text-[10px] text-success border-success/30 bg-success/5 mb-1">
+                        Secure Checkout
+                      </Badge>
+                    </div>
                   </div>
-                </div>
-
-                <div className="mt-4 text-sm text-muted-foreground">
-                  <p>Estimated delivery: 2-3 business days</p>
                 </div>
               </CardContent>
             </Card>
