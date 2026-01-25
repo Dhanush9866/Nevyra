@@ -12,6 +12,7 @@ interface Product {
   id: string;
   title: string;
   price: number;
+  originalPrice?: number;
   category: string;
   subCategory: string;
   images: string[];
@@ -67,6 +68,7 @@ const CategoryCards = () => {
             id: p.id || p._id,
             title: p.title,
             price: p.price,
+            originalPrice: p.originalPrice || p.mrp || p.price,
             category: p.category,
             subCategory: p.subCategory,
             images: p.images || [],
@@ -105,15 +107,15 @@ const CategoryCards = () => {
   };
 
   const renderProductCard = (product: Product, isTopPicks = false) => {
-    const discount = calculateDiscount(product.price);
+    const originalPrice = product.originalPrice || product.price;
+    const discount = calculateDiscount(product.price, originalPrice);
     const displayPrice = product.price;
-    const originalPrice = product.price * 1.5; // Simulate original price for discount display
 
     return (
       <Link key={product.id} to={`/product/${product.id}`}>
         <Card className={`${isMobile ? 'w-full' : 'min-w-[200px] flex-shrink-0'} ${isTopPicks
-            ? 'bg-white border-2 border-primary/20 hover:border-primary hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:-translate-y-1'
-            : 'bg-card border border-border hover:shadow-md transition-shadow cursor-pointer'
+          ? 'bg-white border-2 border-primary/20 hover:border-primary hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:-translate-y-1'
+          : 'bg-card border border-border hover:shadow-md transition-shadow cursor-pointer'
           }`}>
           <CardContent className="p-4">
             <div className="relative mb-3">
@@ -122,12 +124,6 @@ const CategoryCards = () => {
                 alt={product.title}
                 className="w-full h-32 object-cover rounded-lg"
               />
-              {discount > 0 && (
-                <Badge className={`absolute top-2 left-2 ${isTopPicks ? 'bg-discount text-white text-xs font-semibold px-2 py-0.5' : 'bg-discount text-white text-xs'
-                  }`}>
-                  {discount}% OFF
-                </Badge>
-              )}
               {isTopPicks && (
                 <div className="absolute top-2 right-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-1.5 py-0.5 rounded-full">
                   ⭐ TOP
@@ -143,7 +139,12 @@ const CategoryCards = () => {
                 <div className="flex items-center gap-1 mb-2">
                   <span className="text-sm font-bold text-primary">₹{displayPrice.toLocaleString()}</span>
                   {discount > 0 && (
-                    <span className="text-xs text-gray-500 line-through">₹{originalPrice.toLocaleString()}</span>
+                    <>
+                      <span className="text-xs text-gray-500 line-through">₹{originalPrice.toLocaleString()}</span>
+                      <Badge className="bg-discount text-white text-[10px] px-1 py-0 h-4 rounded-none">
+                        {discount}% OFF
+                      </Badge>
+                    </>
                   )}
                 </div>
                 <div className="flex items-center gap-1 mb-2">
@@ -160,9 +161,19 @@ const CategoryCards = () => {
                 </Button>
               </>
             ) : (
-              <p className="text-xs text-muted-foreground">
-                {discount > 0 ? `Up to ${discount}% Off` : 'In Stock'}
-              </p>
+              <div className="space-y-1">
+                <div className="flex items-center gap-1">
+                  <span className="text-sm font-bold text-foreground">₹{displayPrice.toLocaleString()}</span>
+                  {discount > 0 && (
+                    <Badge className="bg-discount text-white text-[10px] px-1 py-0 h-4 rounded-none">
+                      {discount}% OFF
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {discount > 0 ? `Up to ${discount}% Off` : 'In Stock'}
+                </p>
+              </div>
             )}
           </CardContent>
         </Card>

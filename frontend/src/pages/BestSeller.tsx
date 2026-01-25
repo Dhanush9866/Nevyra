@@ -115,8 +115,8 @@ const BestSeller = () => {
   const [wishlistItems, setWishlistItems] = useState<number[]>([]);
 
   const toggleWishlist = (productId: number) => {
-    setWishlistItems(prev => 
-      prev.includes(productId) 
+    setWishlistItems(prev =>
+      prev.includes(productId)
         ? prev.filter(id => id !== productId)
         : [...prev, productId]
     );
@@ -134,7 +134,7 @@ const BestSeller = () => {
   return (
     <div className="min-h-screen bg-background font-roboto">
       <Navbar />
-      
+
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="container mx-auto px-4 py-6">
@@ -147,8 +147,8 @@ const BestSeller = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {bestSellerProducts.map((product) => (
-            <Card 
-              key={product.id} 
+            <Card
+              key={product.id}
               className="group hover:shadow-lg transition-shadow cursor-pointer"
               onClick={() => handleProductClick(product.id)}
             >
@@ -159,12 +159,7 @@ const BestSeller = () => {
                     alt={product.name}
                     className="w-full h-48 object-cover rounded-lg"
                   />
-                  
-                  {/* Discount Badge */}
-                  <Badge className="absolute top-2 left-2 bg-red-500 text-white text-xs">
-                    {product.discount}% OFF
-                  </Badge>
-                  
+
                   {/* Wishlist Button */}
                   <Button
                     variant="ghost"
@@ -175,12 +170,11 @@ const BestSeller = () => {
                       toggleWishlist(product.id);
                     }}
                   >
-                    <Heart 
-                      className={`h-4 w-4 ${
-                        wishlistItems.includes(product.id) 
-                          ? "fill-red-500 text-red-500" 
-                          : ""
-                      }`} 
+                    <Heart
+                      className={`h-4 w-4 ${wishlistItems.includes(product.id)
+                        ? "fill-red-500 text-red-500"
+                        : ""
+                        }`}
                     />
                   </Button>
                 </div>
@@ -190,18 +184,17 @@ const BestSeller = () => {
                   <h3 className="font-medium text-gray-900 line-clamp-2 text-sm">
                     {product.name}
                   </h3>
-                  
+
                   {/* Rating and Reviews */}
                   <div className="flex items-center gap-2">
                     <div className="flex items-center gap-1">
                       {[...Array(5)].map((_, i) => (
                         <Star
                           key={i}
-                          className={`h-3 w-3 ${
-                            i < Math.floor(product.rating)
-                              ? "fill-yellow-400 text-yellow-400"
-                              : "text-gray-300"
-                          }`}
+                          className={`h-3 w-3 ${i < Math.floor(product.rating)
+                            ? "fill-yellow-400 text-yellow-400"
+                            : "text-gray-300"
+                            }`}
                         />
                       ))}
                     </div>
@@ -209,12 +202,12 @@ const BestSeller = () => {
                       ({product.reviews.toLocaleString()})
                     </span>
                   </div>
-                  
+
                   {/* Sold Count */}
                   <p className="text-xs text-green-600 font-medium">
                     {product.sold.toLocaleString()} sold
                   </p>
-                  
+
                   {/* Price */}
                   <div className="flex items-center gap-2">
                     <span className="text-lg font-bold text-gray-900">
@@ -223,10 +216,15 @@ const BestSeller = () => {
                     <span className="text-sm text-gray-500 line-through">
                       ₹{product.originalPrice.toLocaleString()}
                     </span>
+                    {product.discount > 0 && (
+                      <Badge className="bg-discount text-white text-[10px] px-1 py-0 h-4 rounded-none border-none">
+                        {product.discount}% OFF
+                      </Badge>
+                    )}
                   </div>
-                  
+
                   {/* Add to Cart Button */}
-                  <Button 
+                  <Button
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                     onClick={(e) => {
                       e.stopPropagation();
