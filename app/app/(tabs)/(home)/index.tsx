@@ -239,18 +239,15 @@ export default function HomeScreen() {
           {/* Dynamically Render Category Sections - Alternating Horizontal and Vertical */}
           {categories.slice(0, 8).map((category: any, index: number) => {
             // Filter products for this specific category
-            const categoryProducts = allProducts.filter((p: any) =>
+            let categoryProducts = allProducts.filter((p: any) =>
               p.category === category.name ||
               p.category?.name === category.name ||
               // Relaxed matching/fallback logic
               (fallbackMockProducts.some(mp => mp.category === category.name) ? false : true)
-            ).slice(0, 6); // Take first 6 items
+            );
 
             // Use modulo to cycle through themes
             const theme = SECTION_THEMES[index % SECTION_THEMES.length];
-
-            // Fallback products if category is empty to keep UI populated
-            const displayItems = categoryProducts.length > 0 ? categoryProducts : allProducts.slice(index * 2, (index * 2) + 4);
 
             // Alternate between horizontal and vertical sections
             // Even indices (0, 2, 4, 6) = Horizontal
@@ -258,6 +255,10 @@ export default function HomeScreen() {
             const isHorizontal = index % 2 === 0;
 
             if (isHorizontal) {
+              // Low to High Price
+              categoryProducts = [...categoryProducts].sort((a, b) => (a.price || 0) - (b.price || 0));
+              const displayItems = categoryProducts.length > 0 ? categoryProducts.slice(0, 8) : allProducts.slice(index * 2, (index * 2) + 6);
+              
               return (
                 <HorizontalProductSection
                   key={category._id || category.id}
@@ -269,6 +270,10 @@ export default function HomeScreen() {
                 />
               );
             } else {
+              // High Sold Count
+              categoryProducts = [...categoryProducts].sort((a, b) => (b.soldCount || 0) - (a.soldCount || 0));
+              const displayItems = categoryProducts.length > 0 ? categoryProducts.slice(0, 6) : allProducts.slice(index * 2, (index * 2) + 6);
+
               return (
                 <VerticalProductSection
                   key={category._id || category.id}

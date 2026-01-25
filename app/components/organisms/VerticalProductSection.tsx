@@ -68,10 +68,7 @@ export default function VerticalProductSection({
                                     style={styles.label}
                                     numberOfLines={1}
                                 >
-                                    {index === 0 ? 'Best Discounts' :
-                                        index === 1 ? 'Best Brands' :
-                                            index === 2 ? 'Top Rated' :
-                                                'Affordable Options'}
+                                    {item.soldCount && item.soldCount > 500 ? '🔥 Top Seller' : '✨ Recommended'}
                                 </AppText>
                                 <AppText
                                     variant="body"
@@ -79,10 +76,7 @@ export default function VerticalProductSection({
                                     style={styles.subtitle}
                                     numberOfLines={2}
                                 >
-                                    {index === 0 ? 'Min. 50% Off' :
-                                        index === 1 ? 'Best Brands' :
-                                            index === 2 ? 'Top Rated' :
-                                                'Affordable Options'}
+                                    {item.name}
                                 </AppText>
                             </View>
                         </TouchableOpacity>

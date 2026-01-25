@@ -37,6 +37,7 @@ export interface Product {
   brand: string;
   specifications?: { [key: string]: string };
   features?: string[];
+  soldCount?: number;
 }
 
 export interface CartItem {
