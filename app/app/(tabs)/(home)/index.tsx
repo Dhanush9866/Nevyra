@@ -29,6 +29,7 @@ import { apiService } from '@/services/api';
 import { mockBanners, mockProducts as fallbackMockProducts } from '@/services/mockData';
 import { useWishlist } from '@/store/WishlistContext';
 import { useAuth } from '@/store/AuthContext';
+import { useCheckout } from '@/store/CheckoutContext';
 
 // Color themes for sections (Background + Darker Button)
 const SECTION_THEMES = [
@@ -49,10 +50,11 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = React.useState(false);
   const scrollY = useRef(new Animated.Value(0)).current;
   const { addresses } = useAuth();
+  const { selectedAddress } = useCheckout();
 
-  const defaultAddress = addresses.find(a => a.isDefault) || addresses[0];
-  const addressDisplay = defaultAddress
-    ? `${defaultAddress.city}, ${defaultAddress.state} - ${defaultAddress.zipCode}`
+  const currentAddress = selectedAddress || addresses.find(a => a.isDefault) || addresses[0];
+  const addressDisplay = currentAddress
+    ? `${currentAddress.city}, ${currentAddress.state} - ${currentAddress.zipCode}`
     : 'Select a delivery address';
 
   const { data: catData, isLoading: catLoading, refetch: refetchCategories } = useQuery({

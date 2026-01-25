@@ -57,13 +57,13 @@ export default function AddressListScreen() {
 
   return (
     <View style={styles.container}>
-      <Stack.Screen options={{ 
-        headerShown: true, 
+      <Stack.Screen options={{
+        headerShown: true,
         headerTitle: 'Select Address',
         headerTitleAlign: 'center',
         headerLeft: () => (
-          <TouchableOpacity 
-            onPress={() => router.back()} 
+          <TouchableOpacity
+            onPress={() => router.back()}
             style={styles.headerBack}
           >
             <ChevronLeft size={24} color={Colors.text} />
@@ -80,7 +80,7 @@ export default function AddressListScreen() {
         onDelete={handleDelete}
         onAddNew={() => router.push('/checkout/address-form' as any)}
         onContinue={handleContinue}
-        continueButtonText={isFromHome ? 'Save and Continue' : 'Continue'}
+        continueButtonText={isFromHome ? 'Save and Continue' : (source === 'checkout' || source === 'profile' ? 'Save Address' : 'Continue')}
       />
     </View>
   );

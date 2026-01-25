@@ -32,7 +32,7 @@ export default function CartScreen() {
   const router = useRouter();
   const { items, totalAmount, removeFromCart, updateQuantity, isLoading, refreshCart } = useCart();
   const { addresses } = useAuth();
-  const { setCheckoutItems } = useCheckout();
+  const { setCheckoutItems, selectedAddress } = useCheckout();
   const [focusKey, setFocusKey] = useState(0);
 
   useFocusEffect(
@@ -43,7 +43,7 @@ export default function CartScreen() {
     }, [refreshCart])
   );
 
-  const defaultAddress = addresses.find(a => a.isDefault) || addresses[0];
+  const displayAddress = selectedAddress || addresses.find(a => a.isDefault) || addresses[0];
 
   const totalMRP = items.reduce((sum, item) => sum + (item.product.originalPrice || item.product.price * 1.2) * item.quantity, 0);
   const totalDisplayPrice = totalAmount;
@@ -64,10 +64,7 @@ export default function CartScreen() {
         <SlideToActButton
           key={focusKey}
           onComplete={() => {
-            // Add a small delay for better UX so user sees the "unlock"
-            setTimeout(() => {
-              router.push('/(tabs)/(home)' as any);
-            }, 50);
+            router.push('/(tabs)/(home)' as any);
           }}
           width={280}
           height={60}
@@ -91,23 +88,23 @@ export default function CartScreen() {
             <View style={styles.deliveryRow}>
               <AppText variant="body" weight="medium">Deliver to: </AppText>
               <AppText variant="body" weight="bold">
-                {defaultAddress ? `${defaultAddress.firstName} ${defaultAddress.lastName}` : 'Guest User'}
+                {displayAddress ? `${displayAddress.firstName} ${displayAddress.lastName}` : 'Guest User'}
               </AppText>
-              {defaultAddress?.isDefault && (
+              {displayAddress?.isDefault && (
                 <View style={styles.homeBadge}>
                   <AppText style={styles.homeBadgeText}>DEFAULT</AppText>
                 </View>
               )}
             </View>
             <AppText variant="caption" color={Colors.textSecondary} numberOfLines={1}>
-              {defaultAddress
-                ? `${defaultAddress.addressLine1}, ${defaultAddress.city}, ${defaultAddress.state}`
+              {displayAddress
+                ? `${displayAddress.addressLine1}, ${displayAddress.city}, ${displayAddress.state}`
                 : 'Please add a delivery address'}
             </AppText>
           </View>
           <TouchableOpacity
             style={styles.changeButton}
-            onPress={() => router.push('/checkout/address-list' as any)}
+            onPress={() => router.push({ pathname: '/checkout/address-list', params: { source: 'checkout' } } as any)}
           >
             <AppText variant="caption" weight="semibold" style={{ color: BRAND_BLUE }}>Change</AppText>
           </TouchableOpacity>
@@ -122,7 +119,7 @@ export default function CartScreen() {
             onRemove={removeFromCart}
             onBuyNow={(id) => {
               setCheckoutItems([item], 'buy_now');
-              router.push('/checkout/address-list' as any);
+              router.push({ pathname: '/checkout/address-list', params: { source: 'checkout' } } as any);
             }}
           />
         ))}
@@ -163,7 +160,7 @@ export default function CartScreen() {
               <Info size={14} color={Colors.textSecondary} style={{ marginLeft: 4 }} />
             </View>
           </View>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.placeOrderButton}
             onPress={() => {
               setCheckoutItems(items, 'cart');

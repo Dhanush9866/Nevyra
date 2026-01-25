@@ -21,10 +21,12 @@ import AppText from '@/components/atoms/AppText';
 import Colors from '@/constants/colors';
 import Spacing from '@/constants/spacing';
 import { useAuth } from '@/store/AuthContext';
+import { useCheckout } from '@/store/CheckoutContext';
 
 export default function ProfileScreen() {
   const router = useRouter();
   const { user, addresses, logout, refreshUser } = useAuth();
+  const { selectedAddress } = useCheckout();
 
   // Refresh user data when screen comes into focus (e.g., after returning from edit screen)
   useFocusEffect(
@@ -132,7 +134,7 @@ export default function ProfileScreen() {
             >
               <AppText variant="body" color={Colors.textSecondary}>
                 Delivering to: <AppText weight="bold" color={Colors.text}>
-                  {addresses.find(a => a.isDefault)?.city || addresses[0]?.city || 'Select Location'}
+                  {selectedAddress?.city || addresses.find(a => a.isDefault)?.city || addresses[0]?.city || 'Select Location'}
                 </AppText>
               </AppText>
               <ChevronRight size={16} color={Colors.text} style={{ transform: [{ rotate: '90deg' }], marginLeft: 4 }} />
