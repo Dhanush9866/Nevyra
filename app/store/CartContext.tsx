@@ -29,7 +29,8 @@ export const [CartProvider, useCart] = createContextHook(() => {
           quantity: item.quantity,
         }));
         setItems(mappedItems);
-        await AsyncStorage.setItem('cart', JSON.stringify(mappedItems));
+        // Do NOT save backend items to local 'guest' cart storage to avoid duplication loops
+        // await AsyncStorage.setItem('cart', JSON.stringify(mappedItems));
       }
     } catch (error) {
       console.error('Failed to fetch cart:', error);
@@ -58,6 +59,8 @@ export const [CartProvider, useCart] = createContextHook(() => {
       for (const item of items) {
         await apiService.addToCart(item.product.id, item.quantity);
       }
+      // Clear guest cart after syncing to prevent duplicate syncs
+      await AsyncStorage.removeItem('cart');
       fetchCart(); // Refresh with backend data
     } catch (error) {
       console.error('Failed to sync cart:', error);
@@ -109,6 +112,7 @@ export const [CartProvider, useCart] = createContextHook(() => {
         const response = await apiService.removeFromCart(id);
         if (response.success) {
           fetchCart();
+          return;
         }
       } catch (error) {
         console.error('Remove from cart failed:', error);
@@ -132,6 +136,7 @@ export const [CartProvider, useCart] = createContextHook(() => {
         const response = await apiService.updateCartQuantity(id, quantity);
         if (response.success) {
           fetchCart();
+          return;
         }
       } catch (error) {
         console.error('Update quantity failed:', error);

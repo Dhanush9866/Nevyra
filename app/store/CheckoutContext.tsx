@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Address, CartItem } from '@/types';
+import { useAuth } from './AuthContext';
 
 interface CheckoutContextType {
     selectedAddress: Address | null;
@@ -19,6 +20,7 @@ export function CheckoutProvider({ children }: { children: React.ReactNode }) {
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
     const [checkoutItems, setCheckoutItems] = useState<CartItem[]>([]);
     const [checkoutType, setCheckoutType] = useState<'cart' | 'buy_now' | null>(null);
+    const { isAuthenticated } = useAuth();
 
     const setCheckoutItemsWithType = (items: CartItem[], type: 'cart' | 'buy_now') => {
         setCheckoutItems(items);
@@ -31,6 +33,12 @@ export function CheckoutProvider({ children }: { children: React.ReactNode }) {
         setCheckoutItems([]);
         setCheckoutType(null);
     };
+
+    useEffect(() => {
+        if (!isAuthenticated) {
+            resetCheckout();
+        }
+    }, [isAuthenticated]);
 
     return (
         <CheckoutContext.Provider

@@ -65,7 +65,7 @@ const SlideToActButton = ({
 
                     Animated.timing(pan, {
                         toValue: { x: maxDrag, y: 0 },
-                        duration: 200,
+                        duration: 50,
                         useNativeDriver: false,
                     }).start(() => {
                         onComplete();
