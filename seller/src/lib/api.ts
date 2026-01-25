@@ -3,7 +3,7 @@ import axios from "axios";
 
 
 
-//export const API_BASE_URL = "http://localhost:8000/api/v1";
+// export const API_BASE_URL = "http://localhost:8000/api/v1";
 export const API_BASE_URL = "https://api.zythova.com/api/v1";
 
 
@@ -28,6 +28,9 @@ export const sellerAPI = {
         signup: (data: any) => api.post("/auth/register", data), // User registration
         createSellerProfile: (data: any) => api.post("/auth/create-seller", data),
         getSellerProfile: () => api.get("/auth/seller-profile"),
+        getUserProfile: () => api.get("/auth/profile"),
+        updateUserProfile: (data: any) => api.patch("/auth/profile", data),
+        changePassword: (data: any) => api.post("/auth/change-password", data),
         updatePaymentDetails: (data: any) => api.post("/auth/seller-payment-details", data),
         submitKYC: (data: any) => api.post("/auth/seller-kyc", data),
         uploadImage: (file: File) => {

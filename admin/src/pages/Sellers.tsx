@@ -110,6 +110,12 @@ const Sellers = () => {
         }
     };
 
+    const getImageUrl = (path: string | undefined) => {
+        if (!path) return '';
+        if (path.startsWith('http') || path.startsWith('data:')) return path;
+        return `http://localhost:8000${path.startsWith('/') ? '' : '/'}${path}`;
+    };
+
     if (isLoading) {
         return (
             <>
@@ -164,8 +170,8 @@ const Sellers = () => {
                                                 <TableCell><Badge variant="outline">{seller.sellerType}</Badge></TableCell>
                                                 <TableCell>
                                                     <Badge variant={
-                                                        seller.verificationStatus === 'verified' ? 'default' : 
-                                                        seller.verificationStatus === 'rejected' ? 'destructive' : 'secondary'
+                                                        seller.verificationStatus === 'verified' ? 'default' :
+                                                            seller.verificationStatus === 'rejected' ? 'destructive' : 'secondary'
                                                     }>
                                                         {seller.verificationStatus ? seller.verificationStatus.toUpperCase() : 'PENDING'}
                                                     </Badge>
@@ -215,8 +221,12 @@ const Sellers = () => {
                                                                         <div>
                                                                             <p className="text-sm font-medium mb-2">Cancelled Cheque</p>
                                                                             <div className="border rounded bg-gray-50 h-32 flex items-center justify-center relative group overflow-hidden">
-                                                                                <img src={seller.bankDetails.cancelledCheque} alt="Cancelled Cheque" className="w-full h-full object-contain" />
-                                                                                <a href={seller.bankDetails.cancelledCheque} target="_blank" rel="noreferrer" className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white font-medium transition-opacity">
+                                                                                <img
+                                                                                    src={getImageUrl(seller.bankDetails.cancelledCheque)}
+                                                                                    alt="Cancelled Cheque"
+                                                                                    className="w-full h-full object-contain"
+                                                                                />
+                                                                                <a href={getImageUrl(seller.bankDetails.cancelledCheque)} target="_blank" rel="noreferrer" className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white font-medium transition-opacity">
                                                                                     View Full
                                                                                 </a>
                                                                             </div>
@@ -233,8 +243,12 @@ const Sellers = () => {
                                                                         <div className="space-y-2">
                                                                             <p className="text-sm font-medium">PAN Card</p>
                                                                             <div className="border rounded-lg overflow-hidden h-48 bg-gray-50 flex items-center justify-center relative group">
-                                                                                <img src={seller.kycDetails.panCard} alt="PAN Card" className="w-full h-full object-contain" />
-                                                                                <a href={seller.kycDetails.panCard} target="_blank" rel="noreferrer" className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white font-medium transition-opacity">
+                                                                                <img
+                                                                                    src={getImageUrl(seller.kycDetails.panCard)}
+                                                                                    alt="PAN Card"
+                                                                                    className="w-full h-full object-contain"
+                                                                                />
+                                                                                <a href={getImageUrl(seller.kycDetails.panCard)} target="_blank" rel="noreferrer" className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white font-medium transition-opacity">
                                                                                     View Full
                                                                                 </a>
                                                                             </div>
@@ -244,8 +258,12 @@ const Sellers = () => {
                                                                         <div className="space-y-2">
                                                                             <p className="text-sm font-medium">Address Proof</p>
                                                                             <div className="border rounded-lg overflow-hidden h-48 bg-gray-50 flex items-center justify-center relative group">
-                                                                                <img src={seller.kycDetails.addressProof} alt="Address Proof" className="w-full h-full object-contain" />
-                                                                                <a href={seller.kycDetails.addressProof} target="_blank" rel="noreferrer" className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white font-medium transition-opacity">
+                                                                                <img
+                                                                                    src={getImageUrl(seller.kycDetails.addressProof)}
+                                                                                    alt="Address Proof"
+                                                                                    className="w-full h-full object-contain"
+                                                                                />
+                                                                                <a href={getImageUrl(seller.kycDetails.addressProof)} target="_blank" rel="noreferrer" className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white font-medium transition-opacity">
                                                                                     View Full
                                                                                 </a>
                                                                             </div>
@@ -255,8 +273,12 @@ const Sellers = () => {
                                                                         <div className="space-y-2">
                                                                             <p className="text-sm font-medium">Live Photo</p>
                                                                             <div className="border rounded-lg overflow-hidden h-48 bg-gray-50 flex items-center justify-center relative group">
-                                                                                <img src={seller.kycDetails.livePhoto} alt="Live Photo" className="w-full h-full object-contain" />
-                                                                                <a href={seller.kycDetails.livePhoto} target="_blank" rel="noreferrer" className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white font-medium transition-opacity">
+                                                                                <img
+                                                                                    src={getImageUrl(seller.kycDetails.livePhoto)}
+                                                                                    alt="Live Photo"
+                                                                                    className="w-full h-full object-contain"
+                                                                                />
+                                                                                <a href={getImageUrl(seller.kycDetails.livePhoto)} target="_blank" rel="noreferrer" className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white font-medium transition-opacity">
                                                                                     View Full
                                                                                 </a>
                                                                             </div>
