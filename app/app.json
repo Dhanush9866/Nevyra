@@ -41,7 +41,7 @@
       "typedRoutes": true
     },
     "extra": {
-      "apiUrl": "https://10.236.247.2:8000/api/v1",
+      "apiUrl": "http://192.168.1.3:8000/api/v1",
       "razorpayKeyId": "rzp_test_Rbm66o8JPEj0P8",
       "router": {
         "origin": "https://rork.com/"

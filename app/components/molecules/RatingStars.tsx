@@ -33,7 +33,7 @@ export default function RatingStars({
       {showNumber && (
         <AppText variant="caption" color={Colors.textSecondary}>
           {rating.toFixed(1)}
-          {reviewCount && ` (${reviewCount})`}
+          {!!reviewCount && ` (${reviewCount})`}
         </AppText>
       )}
     </View>

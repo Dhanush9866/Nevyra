@@ -52,7 +52,7 @@ export default function VerticalProductSection({
                                     style={styles.image}
                                     resizeMode="cover"
                                 />
-                                {item.rating && item.rating >= 4 && (
+                                {!!(item.rating && item.rating >= 4) && (
                                     <View style={styles.ratingBadge}>
                                         <AppText variant="caption" weight="bold" color={Colors.white} style={{ fontSize: 10 }}>
                                             {item.rating.toFixed(1)}

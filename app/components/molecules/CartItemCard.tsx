@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, Image, Dimensions } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Image, Dimensions, Pressable } from 'react-native';
+import { useRouter } from 'expo-router';
 import { Zap, Trash2, Plus, Minus, Star } from 'lucide-react-native';
 import AppText from '@/components/atoms/AppText';
 import Colors from '@/constants/colors';
@@ -14,6 +15,7 @@ interface CartItemCardProps {
   onUpdateQuantity?: (id: string, quantity: number) => void;
   onRemove?: (id: string) => void;
   onBuyNow?: (id: string) => void;
+  onPress?: () => void;
   showActions?: boolean;
 }
 
@@ -22,11 +24,26 @@ const CartItemCard: React.FC<CartItemCardProps> = ({
   onUpdateQuantity,
   onRemove,
   onBuyNow,
+  onPress,
   showActions = true,
 }) => {
+  const router = useRouter();
+
+  const handlePress = () => {
+    if (onPress) {
+      onPress();
+    } else {
+      router.push(`/product/${item.product.id}` as any);
+    }
+  };
+
   return (
     <View style={styles.cartItemCard}>
-      <View style={styles.itemMainInfo}>
+      <TouchableOpacity 
+        style={styles.itemMainInfo} 
+        onPress={handlePress}
+        activeOpacity={0.7}
+      >
         <View style={styles.itemImageContainer}>
           <Image
             source={{ uri: item.product.images[0] }}
@@ -97,7 +114,7 @@ const CartItemCard: React.FC<CartItemCardProps> = ({
             </View>
           </View>
         </View>
-      </View>
+      </TouchableOpacity>
 
       {showActions && (
         <View style={styles.itemActions}>
