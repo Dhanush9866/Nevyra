@@ -1,4 +1,4 @@
-const { Review, Product, Order } = require("../models");
+const { Review, Product, Order, OrderItem } = require("../models");
 
 exports.create = async (req, res, next) => {
   try {
@@ -144,6 +144,57 @@ exports.getPending = async (req, res, next) => {
       success: true,
       message: "Pending reviews fetched successfully",
       data: pendingProducts,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Update a review
+exports.update = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { rating, title, comment, images } = req.body;
+    const userId = req.user.id;
+
+    const review = await Review.findById(id);
+    if (!review) {
+      return res.status(404).json({
+        success: false,
+        message: "Review not found",
+      });
+    }
+
+    if (review.user.toString() !== userId && !req.user.isAdmin) {
+      return res.status(403).json({
+        success: false,
+        message: "Not authorized to update this review",
+      });
+    }
+
+    // Update fields
+    if (rating) review.rating = rating;
+    if (title !== undefined) review.title = title;
+    if (comment) review.comment = comment;
+    if (images) review.images = images;
+
+    await review.save();
+
+    // Update product rating and review count
+    const productId = review.product;
+    const reviews = await Review.find({ product: productId });
+    const reviewsCount = reviews.length;
+    const averageRating = reviews.reduce((acc, item) => item.rating + acc, 0) / reviewsCount;
+
+    await Product.findByIdAndUpdate(productId, {
+      rating: averageRating.toFixed(1),
+      reviews: reviewsCount,
+    });
+
+    res.json({
+      success: true,
+      message: "Review updated successfully",
+      data: review,
     });
   } catch (err) {
     next(err);

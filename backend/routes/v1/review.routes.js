@@ -15,6 +15,9 @@ router.get("/pending", authMiddleware, reviewController.getPending);
 // Create a review
 router.post("/product/:productId", authMiddleware, reviewController.create);
 
+// Update a review
+router.put("/:id", authMiddleware, reviewController.update);
+
 // Delete a review
 router.delete("/:id", authMiddleware, reviewController.deleteReview);
 

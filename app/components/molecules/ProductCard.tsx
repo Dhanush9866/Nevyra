@@ -17,6 +17,8 @@ interface ProductCardProps {
   isWishlisted?: boolean;
   showAddToCart?: boolean;
   onAddToCart?: () => void;
+  hideBrand?: boolean;
+  hideName?: boolean;
 }
 
 export default function ProductCard({
@@ -26,6 +28,8 @@ export default function ProductCard({
   isWishlisted,
   showAddToCart,
   onAddToCart,
+  hideBrand,
+  hideName,
 }: ProductCardProps) {
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.9} style={styles.card}>
@@ -66,21 +70,25 @@ export default function ProductCard({
         )}
       </View>
       <View style={styles.content}>
-        <AppText
-          variant="caption"
-          color={Colors.textSecondary}
-          numberOfLines={1}
-        >
-          {product.brand}
-        </AppText>
-        <AppText
-          variant="body"
-          weight="medium"
-          numberOfLines={1}
-          style={styles.name}
-        >
-          {product.name}
-        </AppText>
+        {!hideBrand && product.brand && (
+          <AppText
+            variant="caption"
+            color={Colors.textSecondary}
+            numberOfLines={1}
+          >
+            {product.brand}
+          </AppText>
+        )}
+        {!hideName && product.name && (
+          <AppText
+            variant="body"
+            weight="medium"
+            numberOfLines={1}
+            style={styles.name}
+          >
+            {product.name}
+          </AppText>
+        )}
 
         <PriceTag
           price={product.price}
@@ -144,11 +152,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   content: {
-    padding: Spacing.sm,
-    gap: 2,
+    padding: Spacing.xs, // Reduced padding
+    gap: 0, // Removed gap
   },
   name: {
-    minHeight: 20,
+    // minHeight removed to reduce gap
+    marginBottom: 2,
   },
   addToCartDetailButton: {
     backgroundColor: Colors.primary,

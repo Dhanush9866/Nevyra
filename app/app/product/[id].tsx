@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, StatusBar, Alert } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity, StatusBar, Alert, Share } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack, useFocusEffect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
@@ -34,7 +34,29 @@ export default function ProductDetailScreen() {
   const { addresses } = useAuth();
 
   const displayAddress = selectedAddress || addresses?.find(a => a.isDefault) || addresses?.[0];
+  // const displayAddress = selectedAddress || addresses?.find(a => a.isDefault) || addresses?.[0]; // Duplicate removed
   const [showToast, setShowToast] = useState(false);
+
+  const handleShare = async () => {
+    try {
+      const result = await Share.share({
+        message: `Check out this ${product?.name} on Nevyra! Price: $${product?.price}`,
+        url: product?.link || 'https://nevyra.com', // fallback
+        title: product?.name,
+      });
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // shared with activity type of result.activityType
+        } else {
+          // shared
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // dismissed
+      }
+    } catch (error: any) {
+      Alert.alert(error.message);
+    }
+  };
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['product', id],
@@ -155,11 +177,10 @@ export default function ProductDetailScreen() {
               contentFit="cover"
             />
 
-            {/* Image Actions Overlay */}
             <View style={styles.imageActions}>
               <IconButton
                 icon={Share2}
-                onPress={() => { }}
+                onPress={handleShare}
                 color={Colors.white}
                 backgroundColor="rgba(0,0,0,0.4)"
                 size={20}
@@ -286,6 +307,8 @@ export default function ProductDetailScreen() {
                       <ProductCard
                         product={item}
                         onPress={() => router.push(`/product/${item.id}` as any)}
+                        hideBrand
+                        hideName
                       />
                     </View>
                   ))}
@@ -300,7 +323,7 @@ export default function ProductDetailScreen() {
                   Ratings & Reviews
                 </AppText>
                 <TouchableOpacity
-                  onPress={() => router.push('/product/reviews' as any)}
+                  onPress={() => router.push({ pathname: '/product/reviews', params: { id: product.id } } as any)}
                   style={styles.viewAllReviews}
                 >
                   <AppText variant="caption" color={Colors.primary} weight="bold">
@@ -572,7 +595,8 @@ const styles = StyleSheet.create({
     marginTop: Spacing.sm,
   },
   similarProductItem: {
-    width: 160,
+    width: 180,
+    marginRight: Spacing.md,
   },
   toastContainer: {
     position: 'absolute',
