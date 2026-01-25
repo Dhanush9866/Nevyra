@@ -134,27 +134,32 @@ All colors MUST be HSL.
     overflow: hidden;
   }
 
-  /* Custom scrollbar for filter panel */
-  .filter-scroll::-webkit-scrollbar {
+  /* Custom scrollbar for filter panel and summary cards */
+  .filter-scroll::-webkit-scrollbar,
+  .custom-scrollbar::-webkit-scrollbar {
     width: 6px;
   }
 
-  .filter-scroll::-webkit-scrollbar-track {
+  .filter-scroll::-webkit-scrollbar-track,
+  .custom-scrollbar::-webkit-scrollbar-track {
     background: hsl(var(--muted));
     border-radius: 3px;
   }
 
-  .filter-scroll::-webkit-scrollbar-thumb {
+  .filter-scroll::-webkit-scrollbar-thumb,
+  .custom-scrollbar::-webkit-scrollbar-thumb {
     background: hsl(var(--muted-foreground) / 0.3);
     border-radius: 3px;
   }
 
-  .filter-scroll::-webkit-scrollbar-thumb:hover {
+  .filter-scroll::-webkit-scrollbar-thumb:hover,
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: hsl(var(--muted-foreground) / 0.5);
   }
 
   /* Firefox scrollbar */
-  .filter-scroll {
+  .filter-scroll,
+  .custom-scrollbar {
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--muted-foreground) / 0.3) hsl(var(--muted));
   }
