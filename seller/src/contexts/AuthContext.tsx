@@ -57,7 +57,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const sData = res.data.data;
         const mappedSeller: Seller = {
           id: sData._id,
-          email: sData.user?.email || '', 
+          email: sData.user?.email || '',
           name: sData.user ? `${sData.user.firstName} ${sData.user.lastName}` : '',
           storeName: sData.storeName,
           sellerType: sData.sellerType,
@@ -101,41 +101,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const signup = useCallback(async (email: string, password: string, phone: string) => {
     setIsLoading(true);
     try {
-      const payload = {
-        email, password, phone,
-        firstName: 'Seller',
-        lastName: 'User',
-        address: 'N/A'
-      };
-      
-      try {
-        const res = await sellerAPI.auth.signup(payload);
-        if (!res.data.success) {
-          throw new Error(res.data.message);
-        }
-      } catch (error: any) {
-        // If user already exists (409), try to login
-        if (error.response && error.response.status === 409) {
-          console.log("User exists, attempting login...");
-          // Fall through to login
-        } else {
-          throw error;
-        }
+      // 1. Verify existence by attempting to login
+      // NOTE: We do not use the 'phone' here for login, but we ensure the user exists in the main system.
+      const res = await sellerAPI.auth.login({ email, password });
+
+      if (res.data.success) {
+        localStorage.setItem('token', res.data.data.token);
+        await loadSellerProfile();
+      } else {
+        throw new Error(res.data.message || 'Verification failed');
       }
-      
-      // Login (either new user or existing user)
-      await login(email, password);
-      
-      // Check if they are already a seller?
-      // loadSellerProfile is called inside login.
-      
     } catch (error: any) {
-      console.error("Signup/Login error:", error);
-      throw new Error(error.response?.data?.message || error.message || 'Signup failed');
+      console.error("Signup/Verification error:", error);
+
+      // The user specifically requested this message for ANY login failure during signup/verification step.
+      // This is because the intention of this step is to ensure the user is already registered.
+      // Even if it's "Invalid credentials" (401), we assume they need to register or check their account.
+      throw new Error("First register as user in Zythova then only you will become a seller.");
     } finally {
       setIsLoading(false);
     }
-  }, [login]);
+  }, []);
 
   const createSellerProfile = useCallback(async (storeName: string, sellerType: string, gstNumber: string, address: { address: string, city: string, pincode: string }) => {
     setIsLoading(true);
