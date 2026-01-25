@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Image, ActivityIndicator } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import {
@@ -11,8 +11,9 @@ import {
 } from 'lucide-react-native';
 import AppText from '@/components/atoms/AppText';
 import Button from '@/components/atoms/Button';
-import SlideToActButton from '@/components/molecules/SlideToActButton';
+
 import CartItemCard from '@/components/molecules/CartItemCard';
+import SlideToActButton from '@/components/molecules/SlideToActButton';
 import Colors from '@/constants/colors';
 import Spacing from '@/constants/spacing';
 import { useCart } from '@/store/CartContext';
@@ -33,12 +34,10 @@ export default function CartScreen() {
   const { items, totalAmount, removeFromCart, updateQuantity, isLoading, refreshCart } = useCart();
   const { addresses } = useAuth();
   const { setCheckoutItems, selectedAddress } = useCheckout();
-  const [focusKey, setFocusKey] = useState(0);
+
 
   useFocusEffect(
     useCallback(() => {
-      // Reset the slide button state when screen comes into focus
-      setFocusKey(prev => prev + 1);
       refreshCart();
     }, [refreshCart])
   );
@@ -62,14 +61,9 @@ export default function CartScreen() {
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
         <AppText variant="h4" color={Colors.textSecondary}>Your cart is empty</AppText>
         <SlideToActButton
-          key={focusKey}
-          onComplete={() => {
-            router.push('/(tabs)/(home)' as any);
-          }}
-          width={280}
-          height={60}
+          onComplete={() => router.push('/(tabs)/(home)' as any)}
           lockedText="Slide to Shop"
-          unlockedText="Redirecting..."
+          unlockedText="Let's Go!"
         />
       </View>
     );
@@ -119,7 +113,11 @@ export default function CartScreen() {
             onRemove={removeFromCart}
             onBuyNow={(id) => {
               setCheckoutItems([item], 'buy_now');
-              router.push({ pathname: '/checkout/address-list', params: { source: 'checkout' } } as any);
+              if (displayAddress) {
+                router.push('/checkout/review' as any);
+              } else {
+                router.push({ pathname: '/checkout/address-list', params: { source: 'checkout' } } as any);
+              }
             }}
           />
         ))}
@@ -164,7 +162,11 @@ export default function CartScreen() {
             style={styles.placeOrderButton}
             onPress={() => {
               setCheckoutItems(items, 'cart');
-              router.push('/checkout/review' as any);
+              if (displayAddress) {
+                router.push('/checkout/review' as any);
+              } else {
+                router.push({ pathname: '/checkout/address-list', params: { source: 'checkout' } } as any);
+              }
             }}
           >
             <AppText variant="body" weight="semibold" style={styles.placeOrderText}>Place Order</AppText>
