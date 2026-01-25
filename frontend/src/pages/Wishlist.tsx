@@ -107,11 +107,6 @@ const Wishlist = () => {
                     className="w-full h-40 object-cover rounded-lg"
                   />
 
-                  {/* Discount Badge */}
-                  <Badge className="absolute top-2 left-2 bg-green-500 text-white text-xs">
-                    {item.discount}% ₹{item.originalPrice} ₹{item.price}
-                  </Badge>
-
                   {/* Remove Button */}
                   <Button
                     variant="ghost"
@@ -129,9 +124,22 @@ const Wishlist = () => {
                 )}
 
                 {/* Product Name */}
-                <h3 className="font-medium text-foreground mb-2 line-clamp-2 text-sm">
+                <h3 className="font-medium text-foreground mb-1 line-clamp-2 text-sm">
                   {item.name}
                 </h3>
+
+                {/* Price Section */}
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-sm font-bold text-price">₹{item.price.toLocaleString()}</span>
+                  {item.discount > 0 && (
+                    <>
+                      <span className="text-xs text-muted-foreground line-through">₹{item.originalPrice.toLocaleString()}</span>
+                      <Badge className="bg-discount text-white text-[10px] px-1 py-0 h-4 rounded-none border-none">
+                        {item.discount}% OFF
+                      </Badge>
+                    </>
+                  )}
+                </div>
 
                 {/* Rating */}
                 <div className="flex items-center gap-1 mb-2">
@@ -144,6 +152,7 @@ const Wishlist = () => {
                         }`}
                     />
                   ))}
+                  <span className="text-[10px] text-muted-foreground">({item.rating})</span>
                 </div>
 
                 {/* Assured Badge */}

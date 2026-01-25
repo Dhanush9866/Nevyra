@@ -13,14 +13,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { 
-  User, 
-  Package, 
-  Heart, 
-  MapPin, 
-  Settings, 
-  LogOut, 
-  Eye, 
+import {
+  User,
+  Package,
+  Heart,
+  MapPin,
+  Settings,
+  LogOut,
+  Eye,
   Download,
   Star,
   Truck,
@@ -154,8 +154,8 @@ const Profile = () => {
   };
 
   const handleAddAddress = async () => {
-    if (!newAddress.firstName || !newAddress.lastName || !newAddress.email || 
-        !newAddress.phone || !newAddress.address || !newAddress.city || !newAddress.zipCode) {
+    if (!newAddress.firstName || !newAddress.lastName || !newAddress.email ||
+      !newAddress.phone || !newAddress.address || !newAddress.city || !newAddress.zipCode) {
       toast({
         title: "Error",
         description: "Please fill in all address fields",
@@ -215,7 +215,7 @@ const Profile = () => {
     logout();
     navigate("/");
   };
-const isMobile = useIsMobile();
+  const isMobile = useIsMobile();
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case "delivered":
@@ -247,7 +247,7 @@ const isMobile = useIsMobile();
   return (
     <div className="min-h-screen bg-background font-roboto">
       <Navbar />
-      
+
       <div className="container mx-auto px-3 py-4">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
           {/* Sidebar */}
@@ -304,8 +304,8 @@ const isMobile = useIsMobile();
                   </Button>
 
                   <Separator className="my-4" />
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     className="w-full justify-start text-destructive"
                     onClick={handleLogout}
                   >
@@ -340,9 +340,6 @@ const isMobile = useIsMobile();
                             alt={item.name}
                             className="w-full h-32 object-cover rounded-lg"
                           />
-                          <Badge className="absolute top-2 left-2 bg-discount text-white text-xs">
-                            {item.discount}% OFF
-                          </Badge>
                           <Button
                             variant="ghost"
                             size="sm"
@@ -363,7 +360,14 @@ const isMobile = useIsMobile();
 
                         <div className="flex items-center gap-2 mb-3">
                           <span className="text-sm font-bold text-price">₹{item.price.toLocaleString()}</span>
-                          <span className="text-xs text-muted-foreground line-through">₹{item.originalPrice.toLocaleString()}</span>
+                          {item.discount > 0 && (
+                            <>
+                              <span className="text-xs text-muted-foreground line-through">₹{item.originalPrice.toLocaleString()}</span>
+                              <Badge className="bg-discount text-white text-[10px] px-1 py-0 h-4 rounded-none">
+                                {item.discount}% OFF
+                              </Badge>
+                            </>
+                          )}
                         </div>
 
                         <Button className="w-full bg-primary hover:bg-primary-hover text-primary-foreground text-xs py-2">
@@ -392,61 +396,61 @@ const isMobile = useIsMobile();
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <Label htmlFor="addr-firstName">First Name</Label>
-                          <Input 
+                          <Input
                             id="addr-firstName"
                             value={newAddress.firstName}
-                            onChange={(e) => setNewAddress({...newAddress, firstName: e.target.value})}
+                            onChange={(e) => setNewAddress({ ...newAddress, firstName: e.target.value })}
                           />
                         </div>
                         <div>
                           <Label htmlFor="addr-lastName">Last Name</Label>
-                          <Input 
+                          <Input
                             id="addr-lastName"
                             value={newAddress.lastName}
-                            onChange={(e) => setNewAddress({...newAddress, lastName: e.target.value})}
+                            onChange={(e) => setNewAddress({ ...newAddress, lastName: e.target.value })}
                           />
                         </div>
                         <div>
                           <Label htmlFor="addr-email">Email</Label>
-                          <Input 
+                          <Input
                             id="addr-email"
                             type="email"
                             value={newAddress.email}
-                            onChange={(e) => setNewAddress({...newAddress, email: e.target.value})}
+                            onChange={(e) => setNewAddress({ ...newAddress, email: e.target.value })}
                           />
 
                         </div>
                         <div>
                           <Label htmlFor="addr-phone">Phone</Label>
-                          <Input 
+                          <Input
                             id="addr-phone"
                             type="tel"
                             value={newAddress.phone}
-                            onChange={(e) => setNewAddress({...newAddress, phone: e.target.value})}
+                            onChange={(e) => setNewAddress({ ...newAddress, phone: e.target.value })}
                           />
                         </div>
                         <div className="md:col-span-2">
                           <Label htmlFor="addr-address">Address</Label>
-                          <Input 
+                          <Input
                             id="addr-address"
                             value={newAddress.address}
-                            onChange={(e) => setNewAddress({...newAddress, address: e.target.value})}
+                            onChange={(e) => setNewAddress({ ...newAddress, address: e.target.value })}
                           />
                         </div>
                         <div>
                           <Label htmlFor="addr-city">City</Label>
-                          <Input 
+                          <Input
                             id="addr-city"
                             value={newAddress.city}
-                            onChange={(e) => setNewAddress({...newAddress, city: e.target.value})}
+                            onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })}
                           />
                         </div>
                         <div>
                           <Label htmlFor="addr-zipCode">Zip Code</Label>
-                          <Input 
+                          <Input
                             id="addr-zipCode"
                             value={newAddress.zipCode}
-                            onChange={(e) => setNewAddress({...newAddress, zipCode: e.target.value})}
+                            onChange={(e) => setNewAddress({ ...newAddress, zipCode: e.target.value })}
                           />
                         </div>
                       </div>
@@ -487,8 +491,8 @@ const isMobile = useIsMobile();
                               <p className="text-muted-foreground">{address.phone}</p>
                             </div>
                             <div className="flex gap-2">
-                              <Button 
-                                variant="outline" 
+                              <Button
+                                variant="outline"
                                 size="sm"
                                 onClick={() => handleDeleteAddress(index)}
                               >
@@ -510,7 +514,7 @@ const isMobile = useIsMobile();
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <h1 className="text-2xl font-bold text-foreground">Account Settings</h1>
-                  <Button 
+                  <Button
                     variant={isEditing ? "outline" : "default"}
                     onClick={() => setIsEditing(!isEditing)}
                   >
@@ -522,53 +526,53 @@ const isMobile = useIsMobile();
                 <Card>
                   <CardContent className="p-4">
                     <h2 className="text-lg font-semibold text-foreground mb-4">Personal Information</h2>
-                    
+
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="first-name">First Name</Label>
-                        <Input 
-                          id="first-name" 
+                        <Input
+                          id="first-name"
                           value={profileForm.firstName}
-                          onChange={(e) => setProfileForm({...profileForm, firstName: e.target.value})}
+                          onChange={(e) => setProfileForm({ ...profileForm, firstName: e.target.value })}
                           disabled={!isEditing}
                         />
                       </div>
                       <div>
                         <Label htmlFor="last-name">Last Name</Label>
-                        <Input 
-                          id="last-name" 
+                        <Input
+                          id="last-name"
                           value={profileForm.lastName}
-                          onChange={(e) => setProfileForm({...profileForm, lastName: e.target.value})}
+                          onChange={(e) => setProfileForm({ ...profileForm, lastName: e.target.value })}
                           disabled={!isEditing}
                         />
                       </div>
                       <div>
                         <Label htmlFor="email">Email</Label>
-                        <Input 
-                          id="email" 
-                          type="email" 
+                        <Input
+                          id="email"
+                          type="email"
                           value={profileForm.email}
-                          onChange={(e) => setProfileForm({...profileForm, email: e.target.value})}
+                          onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
                           disabled={!isEditing}
                         />
                       </div>
                       <div>
                         <Label htmlFor="phone">Phone Number</Label>
-                        <Input 
-                          id="phone" 
-                          type="tel" 
+                        <Input
+                          id="phone"
+                          type="tel"
                           value={profileForm.phone}
-                          onChange={(e) => setProfileForm({...profileForm, phone: e.target.value})}
+                          onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
                           disabled={!isEditing}
                         />
                       </div>
                       <div className="md:col-span-2">
                         <Label htmlFor="address">Address</Label>
-                        <Input 
-                          id="address" 
+                        <Input
+                          id="address"
                           value={profileForm.address}
-                          onChange={(e) => setProfileForm({...profileForm, address: e.target.value})}
+                          onChange={(e) => setProfileForm({ ...profileForm, address: e.target.value })}
                           disabled={!isEditing}
                         />
                       </div>
@@ -591,7 +595,7 @@ const isMobile = useIsMobile();
                 <Card>
                   <CardContent className="p-4">
                     <h2 className="text-lg font-semibold text-foreground mb-4">Change Password</h2>
-                    
+
                     <div className="space-y-3 max-w-md">
                       <div>
                         <Label htmlFor="current-password" className="text-xs">Current Password</Label>

@@ -914,6 +914,9 @@ const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const [cartCount, setCartCount] = useState(0);
   const [searchValue, setSearchValue] = useState("");
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
 
   const handleSearchCommit = (value: string) => {
     if (value.trim()) {
@@ -935,6 +938,37 @@ const Navbar = () => {
     window.addEventListener("cart-updated", handler as EventListener);
     return () => window.removeEventListener("cart-updated", handler as EventListener);
   }, []);
+
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      if (searchValue.trim().length < 2) {
+        setSuggestions([]);
+        return;
+      }
+
+      setLoadingSuggestions(true);
+      try {
+        const res = await apiService.getProducts({ search: searchValue, limit: 8 });
+        if (res.success) {
+          setSuggestions(res.data);
+        }
+      } catch (err) {
+        console.error("Error fetching suggestions:", err);
+      } finally {
+        setLoadingSuggestions(false);
+      }
+    };
+
+    const timeoutId = setTimeout(() => {
+      if (searchValue) {
+        fetchSuggestions();
+      } else {
+        setSuggestions([]);
+      }
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchValue]);
 
   const toggleCategory = (categoryName: string) => {
     setExpandedCategory(expandedCategory === categoryName ? null : categoryName);
@@ -979,10 +1013,16 @@ const Navbar = () => {
                 placeholder="Search for products, brands and more"
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
+                onFocus={() => setShowSuggestions(true)}
+                onBlur={() => {
+                  // Delay closing to allow clicking on suggestions
+                  setTimeout(() => setShowSuggestions(false), 300);
+                }}
                 className="w-full pl-4 pr-12 py-2 bg-background text-foreground border border-gray-300 rounded-md focus:border-primary"
                 onKeyPress={(e) => {
                   if (e.key === "Enter") {
                     handleSearchCommit(searchValue);
+                    setShowSuggestions(false);
                   }
                 }}
               />
@@ -993,6 +1033,65 @@ const Navbar = () => {
               >
                 <Search className="h-4 w-4" />
               </Button>
+
+              {/* Suggestions Dropdown */}
+              {showSuggestions && (searchValue.trim().length >= 2 || suggestions.length > 0) && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 shadow-lg rounded-md z-[100] max-h-[400px] overflow-y-auto">
+                  {loadingSuggestions ? (
+                    <div className="p-4 text-center text-sm text-gray-500">
+                      <span className="animate-spin inline-block mr-2">⟳</span>
+                      Searching...
+                    </div>
+                  ) : suggestions.length > 0 ? (
+                    <div className="py-2">
+                      {suggestions.map((suggestion) => (
+                        <Link
+                          key={suggestion.id}
+                          to={`/search?q=${encodeURIComponent(suggestion.title)}`}
+                          className="px-4 py-2 hover:bg-gray-50 cursor-pointer flex items-center gap-3 border-b border-gray-50 last:border-0"
+                          onMouseDown={(e) => {
+                            e.preventDefault(); // Prevent input blur from winning
+                            setSearchValue(suggestion.title);
+                            handleSearchCommit(suggestion.title);
+                            setShowSuggestions(false);
+                          }}
+                        >
+                          <img
+                            src={suggestion.images?.[0] || "/placeholder.svg"}
+                            alt=""
+                            className="w-10 h-10 object-cover rounded"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-900 truncate">
+                              {suggestion.title}
+                            </p>
+                            <p className="text-xs text-secondary-foreground/60 italic">
+                              in {suggestion.category}
+                            </p>
+                          </div>
+                          <div className="text-sm font-bold text-primary">
+                            ₹{suggestion.price.toLocaleString()}
+                          </div>
+                        </Link>
+                      ))}
+                      <div
+                        className="px-4 py-2 text-center text-primary text-sm font-medium hover:bg-gray-50 cursor-pointer border-t"
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          handleSearchCommit(searchValue);
+                          setShowSuggestions(false);
+                        }}
+                      >
+                        View all results for "{searchValue}"
+                      </div>
+                    </div>
+                  ) : searchValue.trim().length >= 2 ? (
+                    <div className="p-4 text-center text-sm text-gray-500">
+                      No products found for "{searchValue}"
+                    </div>
+                  ) : null}
+                </div>
+              )}
             </div>
           </div>
 
@@ -1053,10 +1152,15 @@ const Navbar = () => {
               placeholder="Search for products, brands and more"
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
+              onFocus={() => setShowSuggestions(true)}
+              onBlur={() => {
+                setTimeout(() => setShowSuggestions(false), 300);
+              }}
               className="w-full pl-4 pr-12 py-2 bg-background text-foreground border border-gray-300 rounded-md focus:border-primary"
               onKeyPress={(e) => {
                 if (e.key === "Enter") {
                   handleSearchCommit(searchValue);
+                  setShowSuggestions(false);
                 }
               }}
             />
@@ -1067,6 +1171,67 @@ const Navbar = () => {
             >
               <Search className="h-4 w-4" />
             </Button>
+
+            {/* Suggestions Dropdown (Mobile) */}
+            {showSuggestions && (searchValue.trim().length >= 2 || suggestions.length > 0) && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 shadow-lg rounded-md z-[100] max-h-[300px] overflow-y-auto">
+                {loadingSuggestions ? (
+                  <div className="p-4 text-center text-sm text-gray-500">
+                    <span className="animate-spin inline-block mr-2">⟳</span>
+                    Searching...
+                  </div>
+                ) : suggestions.length > 0 ? (
+                  <div className="py-2">
+                    {suggestions.map((suggestion) => (
+                      <Link
+                        key={suggestion.id}
+                        to={`/search?q=${encodeURIComponent(suggestion.title)}`}
+                        className="px-4 py-2 hover:bg-gray-50 cursor-pointer flex items-center gap-3 border-b border-gray-50 last:border-0"
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          setSearchValue(suggestion.title);
+                          handleSearchCommit(suggestion.title);
+                          setShowSuggestions(false);
+                          setIsMobileMenuOpen(false);
+                        }}
+                      >
+                        <img
+                          src={suggestion.images?.[0] || "/placeholder.svg"}
+                          alt=""
+                          className="w-10 h-10 object-cover rounded"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 truncate">
+                            {suggestion.title}
+                          </p>
+                          <p className="text-xs text-secondary-foreground/60 italic">
+                            in {suggestion.category}
+                          </p>
+                        </div>
+                        <div className="text-sm font-bold text-primary">
+                          ₹{suggestion.price.toLocaleString()}
+                        </div>
+                      </Link>
+                    ))}
+                    <div
+                      className="px-4 py-2 text-center text-primary text-sm font-medium hover:bg-gray-50 cursor-pointer border-t"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        handleSearchCommit(searchValue);
+                        setShowSuggestions(false);
+                        setIsMobileMenuOpen(false);
+                      }}
+                    >
+                      View all results
+                    </div>
+                  </div>
+                ) : searchValue.trim().length >= 2 ? (
+                  <div className="p-4 text-center text-sm text-gray-500">
+                    No results for "{searchValue}"
+                  </div>
+                ) : null}
+              </div>
+            )}
           </div>
         </div>
       </div>

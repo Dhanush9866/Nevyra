@@ -472,9 +472,6 @@ const ProductListing = () => {
                           alt={product.title}
                           className="w-full h-32 md:h-48 object-cover"
                         />
-                        <Badge className="absolute top-1 left-1 bg-discount text-white text-xs rounded-none">
-                          {product.mrp && product.mrp > product.price ? Math.round(((product.mrp - product.price) / product.mrp) * 100) : 0}% OFF
-                        </Badge>
                       </div>
 
                       <h3 className="font-semibold text-card-foreground mb-1 font-roboto group-hover:text-primary transition-colors line-clamp-2 text-sm">
@@ -497,9 +494,16 @@ const ProductListing = () => {
                         <span className="text-lg font-bold text-price">
                           ₹{product.price.toLocaleString()}
                         </span>
-                        <span className="text-xs text-muted-foreground line-through">
-                          ₹{(product.mrp || product.price).toLocaleString()}
-                        </span>
+                        {product.mrp && product.mrp > product.price && (
+                          <>
+                            <span className="text-xs text-muted-foreground line-through">
+                              ₹{product.mrp.toLocaleString()}
+                            </span>
+                            <Badge className="bg-discount text-white text-[10px] px-1 py-0 h-4 rounded-none">
+                              {Math.round(((product.mrp - product.price) / product.mrp) * 100)}% OFF
+                            </Badge>
+                          </>
+                        )}
                       </div>
                     </Link>
 
