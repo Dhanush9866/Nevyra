@@ -20,6 +20,7 @@ import Loader from '@/components/atoms/Loader';
 import { useCart } from '@/store/CartContext';
 import { useWishlist } from '@/store/WishlistContext';
 import { useCheckout } from '@/store/CheckoutContext';
+import { useAuth } from '@/store/AuthContext';
 import { mockProducts } from '@/services/mockData';
 import { CartItem } from '@/types';
 
@@ -29,7 +30,10 @@ export default function ProductDetailScreen() {
   const insets = useSafeAreaInsets();
   const { addToCart, totalItems } = useCart();
   const { toggleWishlist, isWishlisted } = useWishlist();
-  const { setCheckoutItems } = useCheckout();
+  const { setCheckoutItems, selectedAddress } = useCheckout();
+  const { addresses } = useAuth();
+
+  const displayAddress = selectedAddress || addresses?.find(a => a.isDefault) || addresses?.[0];
   const [showToast, setShowToast] = useState(false);
 
   const { data, isLoading, error, refetch } = useQuery({
@@ -307,22 +311,56 @@ export default function ProductDetailScreen() {
               </View>
 
               <View style={styles.ratingOverview}>
-                <View style={styles.ratingBigCount}>
-                  <AppText variant="h1" weight="bold">{product.rating}</AppText>
-                  <RatingStars rating={product.rating} />
-                  <AppText variant="caption" color={Colors.textSecondary}>
-                    {product.reviewCount} reviews
+                <View style={styles.ratingSummary}>
+                  <AppText variant="h1" weight="bold" style={{ fontSize: 48, lineHeight: 56 }}>{product.rating}</AppText>
+                  <RatingStars rating={product.rating} size={20} />
+                  <AppText variant="body" color={Colors.textSecondary} style={{ marginTop: 4 }}>
+                    Based on {product.reviewCount} reviews
                   </AppText>
                 </View>
-                <View style={styles.reviewSnippet}>
-                  {latestReview ? (
-                    <AppText variant="body" color={Colors.textSecondary} style={{ fontStyle: 'italic' }}>
-                      "{latestReview.comment}"
-                    </AppText>
+
+                <View style={styles.reviewsList}>
+                  {reviews.length > 0 ? (
+                    reviews.slice(0, 3).map((review: any) => (
+                      <View key={review.id} style={styles.reviewItem}>
+                        <View style={styles.reviewHeader}>
+                          <View style={styles.reviewerInfo}>
+                            {review.userAvatar ? (
+                              <Image source={{ uri: review.userAvatar }} style={styles.avatar} />
+                            ) : (
+                              <View style={[styles.avatar, styles.avatarPlaceholder]}>
+                                <AppText variant="caption" weight="bold" color={Colors.primary}>
+                                  {review.userName ? review.userName.charAt(0).toUpperCase() : 'U'}
+                                </AppText>
+                              </View>
+                            )}
+                            <View>
+                              <AppText variant="body" weight="bold" style={{ fontSize: 13 }}>{review.userName || 'Anonymous'}</AppText>
+                              <View style={styles.reviewRatingRow}>
+                                <AppText variant="caption" color={Colors.textSecondary} style={{ fontSize: 11 }}>
+                                  {new Date(review.createdAt).toLocaleDateString()}
+                                </AppText>
+                              </View>
+                            </View>
+                          </View>
+                          <RatingStars rating={review.rating} size={14} />
+                        </View>
+                        {review.title && (
+                          <AppText variant="body" weight="bold" style={{ marginTop: 8, fontSize: 13 }}>
+                            {review.title}
+                          </AppText>
+                        )}
+                        <AppText variant="body" color={Colors.textSecondary} style={{ marginTop: 4, lineHeight: 20 }}>
+                          {review.comment}
+                        </AppText>
+                      </View>
+                    ))
                   ) : (
-                    <AppText variant="body" color={Colors.textLight} style={{ fontStyle: 'italic' }}>
-                      No reviews yet. Be the first to review this product!
-                    </AppText>
+                    <View style={styles.noReviewsContainer}>
+                      <AppText variant="body" color={Colors.textLight} style={{ fontStyle: 'italic', textAlign: 'center' }}>
+                        No reviews yet. Be the first to review this product!
+                      </AppText>
+                    </View>
                   )}
                 </View>
               </View>
@@ -506,20 +544,9 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   ratingOverview: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.xl,
+    gap: Spacing.lg,
   },
-  ratingBigCount: {
-    alignItems: 'center',
-    gap: 4,
-  },
-  reviewSnippet: {
-    flex: 1,
-    backgroundColor: '#f9f9f9',
-    padding: Spacing.md,
-    borderRadius: 8,
-  },
+
   specificationsContainer: {
     marginTop: Spacing.sm,
     borderTopWidth: 1,
@@ -584,5 +611,49 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 2,
     zIndex: 1,
+  },
+  ratingSummary: {
+    alignItems: 'center',
+    marginBottom: Spacing.md,
+  },
+  reviewsList: {
+    gap: Spacing.md,
+  },
+  reviewItem: {
+    backgroundColor: '#f9f9f9',
+    padding: Spacing.md,
+    borderRadius: 12,
+  },
+  reviewHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  reviewerInfo: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    alignItems: 'center',
+  },
+  avatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#e0e0e0',
+  },
+  avatarPlaceholder: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#E3F2FD',
+  },
+  reviewRatingRow: {
+    flexDirection: 'row',
+    gap: 6,
+    marginTop: 2,
+  },
+  noReviewsContainer: {
+    padding: Spacing.lg,
+    backgroundColor: '#f9f9f9',
+    borderRadius: 12,
+    alignItems: 'center',
   },
 });

@@ -48,7 +48,7 @@ export default function AddressListScreen() {
   };
 
   const handleContinue = () => {
-    if (isFromHome || source === 'profile' || source === 'checkout') {
+    if (isFromHome || source === 'profile') {
       router.back();
     } else {
       router.push('/checkout/review' as any);
