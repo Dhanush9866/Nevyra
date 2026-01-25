@@ -17,7 +17,9 @@ interface Category {
 
 interface ProductFormData {
   title: string;
-  price: string;
+  price: string; // Selling Price (calculated)
+  originalPrice: string; // MRP
+  discount: string; // Percentage
   category: string;
   subCategory: string;
   stockQuantity: string;
@@ -46,6 +48,8 @@ export const ProductDialog: React.FC<ProductDialogProps> = ({
   const [formData, setFormData] = useState<ProductFormData>({
     title: '',
     price: '',
+    originalPrice: '',
+    discount: '',
     category: '',
     subCategory: '',
     stockQuantity: '',
@@ -80,7 +84,7 @@ export const ProductDialog: React.FC<ProductDialogProps> = ({
   useEffect(() => {
     if (formData.category) {
       const parentCategory = categories.find(cat => cat._id === formData.category);
-      
+
       if (parentCategory) {
         const subs = categories.filter(cat => cat.parentId === parentCategory._id);
         setSubCategories(subs);
@@ -93,10 +97,25 @@ export const ProductDialog: React.FC<ProductDialogProps> = ({
     setFormData(prev => ({ ...prev, subCategory: '' }));
   }, [formData.category, categories]);
 
+  // Auto-calculate Selling Price
+  useEffect(() => {
+    if (formData.originalPrice) {
+      const mrp = parseFloat(formData.originalPrice);
+      const disc = parseFloat(formData.discount) || 0;
+
+      if (!isNaN(mrp)) {
+        const sellingPrice = mrp - (mrp * disc / 100);
+        setFormData(prev => ({ ...prev, price: sellingPrice.toFixed(2) }));
+      }
+    }
+  }, [formData.originalPrice, formData.discount]);
+
   const resetForm = () => {
     setFormData({
       title: '',
       price: '',
+      originalPrice: '',
+      discount: '',
       category: '',
       subCategory: '',
       stockQuantity: '',
@@ -132,6 +151,8 @@ export const ProductDialog: React.FC<ProductDialogProps> = ({
         setFormData({
           title: product.title || '',
           price: product.price != null ? String(product.price) : '',
+          originalPrice: product.originalPrice != null ? String(product.originalPrice) : (product.price != null ? String(product.price) : ''),
+          discount: product.discount != null ? String(product.discount) : '0',
           category: '', // will resolve to id after categories load
           subCategory: '',
           stockQuantity: product.stockQuantity != null ? String(product.stockQuantity) : '',
@@ -140,8 +161,8 @@ export const ProductDialog: React.FC<ProductDialogProps> = ({
           rating: product.rating != null ? String(product.rating) : '0',
           reviews: product.reviews != null ? String(product.reviews) : '0',
           soldCount: product.soldCount != null ? String(product.soldCount) : '0',
-          additionalSpecifications: typeof product.additionalSpecifications === 'string' 
-            ? product.additionalSpecifications 
+          additionalSpecifications: typeof product.additionalSpecifications === 'string'
+            ? product.additionalSpecifications
             : JSON.stringify(product.additionalSpecifications || {}),
           images: []
         });
@@ -178,7 +199,7 @@ export const ProductDialog: React.FC<ProductDialogProps> = ({
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     setFormData(prev => ({ ...prev, images: [...prev.images, ...files] }));
-    
+
     // Create preview URLs
     const newPreviews = files.map(file => URL.createObjectURL(file));
     setImagePreview(prev => [...prev, ...newPreviews]);
@@ -194,11 +215,11 @@ export const ProductDialog: React.FC<ProductDialogProps> = ({
 
   const uploadImages = async (): Promise<string[]> => {
     if (formData.images.length === 0) return [];
-    
+
     setUploadingImages(true);
     try {
       const response = await sellerAPI.auth.uploadImages(formData.images);
-      
+
       if (response.data.success) {
         return response.data.data.urls;
       } else {
@@ -214,7 +235,8 @@ export const ProductDialog: React.FC<ProductDialogProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
+    // MRP and Discount validation if needed
     if (!formData.title || !formData.price || !formData.category || !formData.subCategory) {
       toast.error('Please fill in all required fields');
       return;
@@ -224,11 +246,13 @@ export const ProductDialog: React.FC<ProductDialogProps> = ({
     try {
       // Upload images first
       const imageUrls = await uploadImages();
-      
+
       // Prepare product data
       const productData = {
         title: formData.title,
         price: parseFloat(formData.price),
+        originalPrice: parseFloat(formData.originalPrice) || parseFloat(formData.price),
+        discount: parseFloat(formData.discount) || 0,
         category: formData.category,
         subCategory: formData.subCategory,
         stockQuantity: parseInt(formData.stockQuantity) || 0,
@@ -237,7 +261,6 @@ export const ProductDialog: React.FC<ProductDialogProps> = ({
         rating: parseFloat(formData.rating) || 0,
         reviews: parseInt(formData.reviews) || 0,
         soldCount: parseInt(formData.soldCount) || 0,
-        // If editing and no new images uploaded, keep existing ones
         images: imageUrls.length > 0 ? imageUrls : imagePreview,
         additionalSpecifications: formData.additionalSpecifications
       };
@@ -249,7 +272,7 @@ export const ProductDialog: React.FC<ProductDialogProps> = ({
         await sellerAPI.products.create(productData);
         toast.success('Product created successfully');
       }
-      
+
       onOpenChange(false);
       onSuccess?.();
     } catch (error: any) {
@@ -290,18 +313,46 @@ export const ProductDialog: React.FC<ProductDialogProps> = ({
                   required
                 />
               </div>
-              
+
               <div className="space-y-2">
-                <Label htmlFor="price">Price (₹) *</Label>
+                <Label htmlFor="originalPrice">Original Price (MRP) *</Label>
+                <Input
+                  id="originalPrice"
+                  type="number"
+                  step="0.01"
+                  value={formData.originalPrice}
+                  onChange={(e) => handleInputChange('originalPrice', e.target.value)}
+                  placeholder="0.00"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="discount">Discount (%)</Label>
+                <Input
+                  id="discount"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  max="100"
+                  value={formData.discount}
+                  onChange={(e) => handleInputChange('discount', e.target.value)}
+                  placeholder="0"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="price">Selling Price (Calculated)</Label>
                 <Input
                   id="price"
                   type="number"
                   step="0.01"
                   value={formData.price}
-                  onChange={(e) => handleInputChange('price', e.target.value)}
+                  readOnly
+                  className="bg-muted cursor-not-allowed font-semibold text-green-700"
                   placeholder="0.00"
-                  required
                 />
+                <p className="text-xs text-muted-foreground">MRP - Discount</p>
               </div>
             </div>
 
@@ -322,11 +373,11 @@ export const ProductDialog: React.FC<ProductDialogProps> = ({
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="subCategory">Sub Category *</Label>
-                <Select 
-                  value={formData.subCategory} 
+                <Select
+                  value={formData.subCategory}
                   onValueChange={(value) => handleInputChange('subCategory', value)}
                   disabled={!formData.category}
                 >
@@ -400,7 +451,7 @@ export const ProductDialog: React.FC<ProductDialogProps> = ({
                   <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB each</p>
                 </label>
               </div>
-              
+
               {/* Image Previews */}
               {imagePreview.length > 0 && (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">

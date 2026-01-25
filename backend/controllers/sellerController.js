@@ -56,10 +56,10 @@ exports.createProduct = async (req, res, next) => {
     try {
         const {
             title, price, category, subCategory, images, inStock,
-            rating, reviews, stockQuantity, soldCount, attributes, additionalSpecifications, lowStockThreshold
+            rating, reviews, stockQuantity, soldCount, attributes, additionalSpecifications, lowStockThreshold,
+            originalPrice, discount
         } = req.body;
 
-        // ... seller check ...
         const seller = await Seller.findOne({ user: req.user.id });
         if (!seller) {
             return res.status(404).json({ success: false, message: "Seller profile not found. Please create a seller profile first." });
@@ -68,12 +68,8 @@ exports.createProduct = async (req, res, next) => {
         if (!title || !price || !category || !images || !subCategory)
             return res.status(400).json({ success: false, message: "Missing required fields" });
 
-        // ... category resolution ...
         let categoryName = category;
         let subCategoryName = subCategory;
-
-        // ... (omitted regex checks for brevity in tool call if context matches, but here I must be careful)
-        // Actually, I can just replace the definition and instantiation
 
         if (category.match(/^[0-9a-fA-F]{24}$/)) {
             const categoryDoc = await Category.findById(category);
@@ -99,7 +95,9 @@ exports.createProduct = async (req, res, next) => {
             stockQuantity: stockQuantity || 0, soldCount: soldCount || 0,
             attributes, additionalSpecifications: parsedSpecs,
             seller: seller._id,
-            lowStockThreshold: lowStockThreshold || 5
+            lowStockThreshold: lowStockThreshold || 5,
+            originalPrice: originalPrice || 0,
+            discount: discount || 0
         });
 
         await product.save();
@@ -134,7 +132,8 @@ exports.updateMyProduct = async (req, res, next) => {
 
         const {
             title, price, category, subCategory, images, inStock,
-            rating, reviews, stockQuantity, soldCount, attributes, additionalSpecifications, lowStockThreshold
+            rating, reviews, stockQuantity, soldCount, attributes, additionalSpecifications, lowStockThreshold,
+            originalPrice, discount
         } = req.body;
 
         let categoryName = category;
@@ -161,6 +160,8 @@ exports.updateMyProduct = async (req, res, next) => {
         if (additionalSpecifications !== undefined) {
             product.additionalSpecifications = additionalSpecifications ? parseAdditionalSpecifications(additionalSpecifications) : {};
         }
+        if (originalPrice !== undefined) product.originalPrice = originalPrice;
+        if (discount !== undefined) product.discount = discount;
 
         await product.save();
         res.json({ success: true, message: "Product updated", data: mapProductId(product) });

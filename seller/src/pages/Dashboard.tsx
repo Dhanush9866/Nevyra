@@ -1,39 +1,32 @@
 
 import React, { useState, useEffect } from 'react';
-import { 
-  DollarSign, 
-  ShoppingCart, 
-  Package, 
-  Clock, 
-  RotateCcw, 
+import {
+  DollarSign,
+  ShoppingCart,
+  Package,
+  Clock,
   Wallet,
   AlertTriangle,
-  TrendingUp,
   ArrowRight
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { KPICard } from '@/components/ui/KPICard';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { 
-  mockSalesData, 
-  mockOrders, 
-  mockInventory,
-  mockProductPerformance 
-} from '@/services/mockData';
-import { 
-  AreaChart, 
-  Area, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
   ResponsiveContainer,
   BarChart,
   Bar
 } from 'recharts';
 import { format } from 'date-fns';
 import { sellerAPI } from '@/lib/api';
-import { toast } from 'sonner';
+import { mockSalesData } from '@/services/mockData'; // Keeping for charts
+import { Loader2 } from 'lucide-react';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -44,28 +37,46 @@ const Dashboard: React.FC = () => {
     pendingOrders: 0,
     walletBalance: 0
   });
+
+  const [recentOrders, setRecentOrders] = useState<any[]>([]);
+  const [lowStockItems, setLowStockItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Mocks for charts/tables until real APIs exist
-  const recentOrders = mockOrders.slice(0, 5);
-  const lowStockItems = mockInventory.filter(item => item.stock <= item.lowStockThreshold);
-  const topProducts = mockProductPerformance.slice(0, 5);
-
   useEffect(() => {
-    fetchDashboardStats();
+    fetchAllData();
   }, []);
 
-  const fetchDashboardStats = async () => {
+  const fetchAllData = async () => {
     try {
-        const res = await sellerAPI.dashboard.stats();
-        if (res.data.success) {
-            setStats(res.data.data);
-        }
+      setLoading(true);
+      // 1. Dashboard Stats
+      const statsRes = await sellerAPI.dashboard.stats();
+      if (statsRes.data.success) {
+        setStats(statsRes.data.data);
+      }
+
+      // 2. Recent Orders
+      const ordersRes = await sellerAPI.orders.list();
+      if (ordersRes.data.success) {
+        // Sort by date desc and take 5
+        const orders = ordersRes.data.data || [];
+        // Backend should theoretically sort, but let's ensure
+        const sorted = orders.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        setRecentOrders(sorted.slice(0, 5));
+      }
+
+      // 3. Low Stock Items (Fetch all products and filter)
+      const productsRes = await sellerAPI.products.list();
+      if (productsRes.data.success) {
+        const products = productsRes.data.data || [];
+        const lowStock = products.filter((p: any) => p.stockQuantity <= (p.lowStockThreshold || 5));
+        setLowStockItems(lowStock.slice(0, 5)); // Show max 5
+      }
+
     } catch (error) {
-        console.error("Failed to fetch dashboard stats", error);
-        // toast.error("Failed to load dashboard stats"); // Optional, maybe silent fail
+      console.error("Failed to fetch dashboard data", error);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -73,8 +84,28 @@ const Dashboard: React.FC = () => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
+      maximumFractionDigits: 0
     }).format(value);
   };
+
+  const getCustomerName = (order: any) => {
+    if (order.userId) {
+      return `${order.userId.firstName} ${order.userId.lastName}`;
+    }
+    // Fallback if userId is populated, or check shipping address
+    if (order.shippingAddress) {
+      return `${order.shippingAddress.firstName} ${order.shippingAddress.lastName}`;
+    }
+    return 'Guest';
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 animate-fade-in p-6">
@@ -89,52 +120,48 @@ const Dashboard: React.FC = () => {
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
         <div onClick={() => navigate('/orders')} className="cursor-pointer hover:opacity-90 transition-opacity">
-            <KPICard
+          <KPICard
             title="Total Sales"
             value={formatCurrency(stats.totalSales)}
-            // change={12.5}
-            // changeLabel="vs last month"
             icon={DollarSign}
             variant="success"
-            />
+          />
         </div>
 
         <div onClick={() => navigate('/orders')} className="cursor-pointer hover:opacity-90 transition-opacity">
-            <KPICard
+          <KPICard
             title="Total Orders"
             value={stats.totalOrders}
-            // change={8.2}
-            // changeLabel="vs last month"
             icon={ShoppingCart}
             variant="primary"
-            />
+          />
         </div>
 
         <div onClick={() => navigate('/products')} className="cursor-pointer hover:opacity-90 transition-opacity">
-            <KPICard
+          <KPICard
             title="Total Products"
             value={stats.totalProducts}
             icon={Package}
             variant="default"
-            />
+          />
         </div>
 
         <div onClick={() => navigate('/orders')} className="cursor-pointer hover:opacity-90 transition-opacity">
-            <KPICard
+          <KPICard
             title="Pending Orders"
             value={stats.pendingOrders}
             icon={Clock}
             variant="warning"
-            />
+          />
         </div>
 
         <div onClick={() => navigate('/payouts')} className="cursor-pointer hover:opacity-90 transition-opacity">
-            <KPICard
+          <KPICard
             title="Wallet Balance"
             value={formatCurrency(stats.walletBalance)}
             icon={Wallet}
             variant="success"
-            />
+          />
         </div>
       </div>
 
@@ -146,7 +173,6 @@ const Dashboard: React.FC = () => {
             <h3 className="font-semibold text-lg">Sales Overview</h3>
             <select className="text-sm border border-input rounded-lg px-3 py-1.5 bg-background">
               <option>Last 7 days</option>
-              {/* <option>Last 30 days</option> */}
             </select>
           </div>
           <div className="h-72">
@@ -154,23 +180,23 @@ const Dashboard: React.FC = () => {
               <AreaChart data={mockSalesData}>
                 <defs>
                   <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(234 89% 54%)" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="hsl(234 89% 54%)" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="hsl(234 89% 54%)" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="hsl(234 89% 54%)" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis 
-                  dataKey="date" 
+                <XAxis
+                  dataKey="date"
                   tickFormatter={(value) => format(new Date(value), 'MMM d')}
                   stroke="hsl(var(--muted-foreground))"
                   fontSize={12}
                 />
-                <YAxis 
+                <YAxis
                   tickFormatter={(value) => `₹${value}`}
                   stroke="hsl(var(--muted-foreground))"
                   fontSize={12}
                 />
-                <Tooltip 
+                <Tooltip
                   contentStyle={{
                     backgroundColor: 'hsl(var(--card))',
                     border: '1px solid hsl(var(--border))',
@@ -179,13 +205,13 @@ const Dashboard: React.FC = () => {
                   formatter={(value: number) => [formatCurrency(value), 'Revenue']}
                   labelFormatter={(label) => format(new Date(label), 'MMMM d, yyyy')}
                 />
-                <Area 
-                  type="monotone" 
-                  dataKey="revenue" 
-                  stroke="hsl(234 89% 54%)" 
+                <Area
+                  type="monotone"
+                  dataKey="revenue"
+                  stroke="hsl(234 89% 54%)"
                   strokeWidth={2}
-                  fillOpacity={1} 
-                  fill="url(#colorRevenue)" 
+                  fillOpacity={1}
+                  fill="url(#colorRevenue)"
                 />
               </AreaChart>
             </ResponsiveContainer>
@@ -204,17 +230,17 @@ const Dashboard: React.FC = () => {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={mockSalesData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis 
-                  dataKey="date" 
+                <XAxis
+                  dataKey="date"
                   tickFormatter={(value) => format(new Date(value), 'MMM d')}
                   stroke="hsl(var(--muted-foreground))"
                   fontSize={12}
                 />
-                <YAxis 
+                <YAxis
                   stroke="hsl(var(--muted-foreground))"
                   fontSize={12}
                 />
-                <Tooltip 
+                <Tooltip
                   contentStyle={{
                     backgroundColor: 'hsl(var(--card))',
                     border: '1px solid hsl(var(--border))',
@@ -222,9 +248,9 @@ const Dashboard: React.FC = () => {
                   }}
                   labelFormatter={(label) => format(new Date(label), 'MMMM d, yyyy')}
                 />
-                <Bar 
-                  dataKey="orders" 
-                  fill="hsl(160 84% 39%)" 
+                <Bar
+                  dataKey="orders"
+                  fill="hsl(160 84% 39%)"
                   radius={[4, 4, 0, 0]}
                 />
               </BarChart>
@@ -239,8 +265,8 @@ const Dashboard: React.FC = () => {
         <div className="bg-card rounded-xl border border-border shadow-sm">
           <div className="p-6 border-b border-border flex items-center justify-between">
             <h3 className="font-semibold text-lg">Recent Orders</h3>
-            <Link 
-              to="/orders" 
+            <Link
+              to="/orders"
               className="text-sm text-primary hover:underline flex items-center gap-1"
             >
               View all <ArrowRight className="w-4 h-4" />
@@ -257,22 +283,30 @@ const Dashboard: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {recentOrders.map((order) => (
-                  <tr key={order.id} className="hover:bg-muted/30">
-                    <td className="px-4 py-3 font-medium text-foreground">
-                      {order.orderNumber}
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      {order.customerName}
-                    </td>
-                    <td className="px-4 py-3 font-medium text-foreground">
-                      {formatCurrency(order.total)}
-                    </td>
-                    <td className="px-4 py-3">
-                      <StatusBadge status={order.status} />
+                {recentOrders.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="px-4 py-8 text-center text-muted-foreground">
+                      No recent orders.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  recentOrders.map((order) => (
+                    <tr key={order.id} className="hover:bg-muted/30">
+                      <td className="px-4 py-3 font-medium text-foreground">
+                        {order.orderNumber || order.id.slice(-6).toUpperCase()}
+                      </td>
+                      <td className="px-4 py-3 text-muted-foreground">
+                        {getCustomerName(order)}
+                      </td>
+                      <td className="px-4 py-3 font-medium text-foreground">
+                        {formatCurrency(order.totalAmount || 0)}
+                      </td>
+                      <td className="px-4 py-3">
+                        <StatusBadge status={order.status} />
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -285,15 +319,16 @@ const Dashboard: React.FC = () => {
               <AlertTriangle className="w-5 h-5 text-warning" />
               <h3 className="font-semibold text-lg">Low Stock Alerts</h3>
             </div>
-            <Link 
-              to="/inventory" 
+            <Link
+              to="/inventory"
               className="text-sm text-primary hover:underline flex items-center gap-1"
             >
               Manage <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
           {lowStockItems.length === 0 ? (
-            <div className="p-12 text-center">
+            <div className="p-12 text-center items-center justify-center flex flex-col">
+              <Package className="w-10 h-10 text-muted-foreground/30 mb-2" />
               <p className="text-muted-foreground">All products are well stocked!</p>
             </div>
           ) : (
@@ -302,7 +337,7 @@ const Dashboard: React.FC = () => {
                 <thead className="bg-muted/50 border-b border-border text-muted-foreground font-medium">
                   <tr>
                     <th className="px-4 py-3">Product</th>
-                    <th className="px-4 py-3">SKU</th>
+                    {/* <th className="px-4 py-3">SKU</th> */}
                     <th className="px-4 py-3">Stock</th>
                     <th className="px-4 py-3">Status</th>
                   </tr>
@@ -312,22 +347,24 @@ const Dashboard: React.FC = () => {
                     <tr key={item.id} className="hover:bg-muted/30">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
-                          <img 
-                            src={item.productImage} 
-                            alt={item.productName}
-                            className="w-10 h-10 rounded-lg object-cover"
-                          />
+                          {item.images && item.images[0] && (
+                            <img
+                              src={item.images[0]}
+                              alt={item.title}
+                              className="w-8 h-8 rounded object-cover"
+                            />
+                          )}
                           <span className="font-medium text-foreground truncate max-w-[150px]">
-                            {item.productName}
+                            {item.title}
                           </span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-muted-foreground">{item.sku}</td>
-                      <td className="px-4 py-3 font-medium text-foreground">{item.stock}</td>
+                      {/* <td className="px-4 py-3 text-muted-foreground">{item.sku || '-'}</td> */}
+                      <td className="px-4 py-3 font-medium text-foreground">{item.stockQuantity}</td>
                       <td className="px-4 py-3">
-                        <StatusBadge 
-                          status={item.stock === 0 ? 'Out of Stock' : 'Low Stock'} 
-                          variant={item.stock === 0 ? 'destructive' : 'warning'}
+                        <StatusBadge
+                          status={item.stockQuantity === 0 ? 'Out of Stock' : 'Low Stock'}
+                          variant={item.stockQuantity === 0 ? 'destructive' : 'warning'}
                         />
                       </td>
                     </tr>

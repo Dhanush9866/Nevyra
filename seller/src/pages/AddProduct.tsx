@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, Upload, X, Loader2 } from 'lucide-react';
@@ -11,12 +12,14 @@ const AddProduct: React.FC = () => {
 
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  
+
   const [categories, setCategories] = useState<any[]>([]);
-  
+
   const [formData, setFormData] = useState({
     title: '',
-    price: '',
+    originalPrice: '', // MRP
+    discount: '', // Percentage
+    price: '', // Selling Price (calculated)
     category: '',
     subCategory: '',
     stockQuantity: '',
@@ -30,6 +33,23 @@ const AddProduct: React.FC = () => {
       fetchProductDetails();
     }
   }, [id]);
+
+  // Effect to calculate Selling Price based on MRP and Discount
+  useEffect(() => {
+    if (formData.originalPrice) {
+      const mrp = parseFloat(formData.originalPrice);
+      const disc = parseFloat(formData.discount) || 0;
+
+      if (!isNaN(mrp)) {
+        const sellingPrice = mrp - (mrp * disc / 100);
+        // Update selling price if it differs significantly (avoid loops if bidirectional)
+        setFormData(prev => ({ ...prev, price: sellingPrice.toFixed(2) }));
+      }
+    } else {
+      // If MRP is empty, price is empty or user enters manually? 
+      // For strictly "Discount" flow, MRP is required.
+    }
+  }, [formData.originalPrice, formData.discount]);
 
   const fetchCategories = async () => {
     try {
@@ -50,8 +70,10 @@ const AddProduct: React.FC = () => {
         const product = res.data.data;
         setFormData({
           title: product.title,
+          originalPrice: product.originalPrice ? product.originalPrice.toString() : product.price.toString(),
+          discount: product.discount ? product.discount.toString() : '0',
           price: product.price.toString(),
-          category: product.category, // Assuming ID or Name match. If ID, might need logic
+          category: product.category,
           subCategory: product.subCategory,
           stockQuantity: product.stockQuantity.toString(),
           images: product.images || [],
@@ -96,13 +118,14 @@ const AddProduct: React.FC = () => {
     try {
       const payload = {
         title: formData.title,
-        price: parseFloat(formData.price),
+        price: parseFloat(formData.price), // Sending calculated selling price
+        originalPrice: parseFloat(formData.originalPrice),
+        discount: parseFloat(formData.discount),
         category: formData.category,
-        subCategory: formData.subCategory, // Usually dependent on category, simplified here
+        subCategory: formData.subCategory,
         stockQuantity: parseInt(formData.stockQuantity),
         images: formData.images,
         inStock: parseInt(formData.stockQuantity) > 0,
-        // Default values for required fields
         reviews: 0,
         rating: 0,
         soldCount: 0
@@ -131,7 +154,7 @@ const AddProduct: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-6 animate-fade-in pb-10">
       <div className="flex items-center gap-4 mb-6">
-        <button 
+        <button
           onClick={() => navigate('/products')}
           className="p-2 rounded-full hover:bg-muted transition-colors"
         >
@@ -147,31 +170,58 @@ const AddProduct: React.FC = () => {
         {/* Basic Info */}
         <div className="bg-card rounded-xl border border-border p-6 space-y-4">
           <h2 className="text-lg font-semibold">Basic Information</h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Product Title</label>
-              <input 
+              <input
                 name="title"
                 value={formData.title}
                 onChange={handleInputChange}
-                className="input-field" 
-                placeholder="e.g. Cotton T-Shirt" 
-                required 
+                className="input-field"
+                placeholder="e.g. Cotton T-Shirt"
+                required
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Price</label>
-              <input 
+              <label className="text-sm font-medium">Original Price (MRP)</label>
+              <input
+                name="originalPrice"
+                type="number"
+                value={formData.originalPrice}
+                onChange={handleInputChange}
+                className="input-field"
+                placeholder="0.00"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Discount (%)</label>
+              <input
+                name="discount"
+                type="number"
+                value={formData.discount}
+                onChange={handleInputChange}
+                className="input-field"
+                placeholder="0"
+                min="0"
+                max="100"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Selling Price (Calculated)</label>
+              <input
                 name="price"
                 type="number"
                 value={formData.price}
-                onChange={handleInputChange}
-                className="input-field" 
-                placeholder="0.00" 
-                required 
+                readOnly
+                className="input-field bg-muted cursor-not-allowed font-bold text-green-600"
+                placeholder="0.00"
               />
+              <p className="text-xs text-muted-foreground">Automatically calculated from MRP - Discount</p>
             </div>
 
             <div className="space-y-2">
@@ -194,7 +244,7 @@ const AddProduct: React.FC = () => {
 
             <div className="space-y-2">
               <label className="text-sm font-medium">Sub Category</label>
-              <input 
+              <input
                 name="subCategory"
                 value={formData.subCategory}
                 onChange={handleInputChange}
@@ -203,17 +253,17 @@ const AddProduct: React.FC = () => {
                 required
               />
             </div>
-            
+
             <div className="space-y-2">
               <label className="text-sm font-medium">Stock Quantity</label>
-              <input 
+              <input
                 name="stockQuantity"
                 type="number"
                 value={formData.stockQuantity}
                 onChange={handleInputChange}
-                className="input-field" 
-                placeholder="0" 
-                required 
+                className="input-field"
+                placeholder="0"
+                required
               />
             </div>
           </div>
@@ -223,21 +273,21 @@ const AddProduct: React.FC = () => {
         <div className="bg-card rounded-xl border border-border p-6 space-y-4">
           <h2 className="text-lg font-semibold">Product Images</h2>
           <div className="flex gap-2">
-            <input 
+            <input
               name="newImage"
               value={formData.newImage}
               onChange={handleInputChange}
               className="input-field flex-1"
-              placeholder="Paste image URL here" 
+              placeholder="Paste image URL here"
             />
             <button type="button" onClick={handleAddImage} className="btn-secondary">Add</button>
           </div>
-          
+
           <div className="grid grid-cols-4 gap-4 mt-4">
             {formData.images.map((img, idx) => (
               <div key={idx} className="relative group aspect-square rounded-lg overflow-hidden border border-border">
                 <img src={img} alt={`Product ${idx}`} className="w-full h-full object-cover" />
-                <button 
+                <button
                   type="button"
                   onClick={() => handleRemoveImage(idx)}
                   className="absolute top-2 right-2 p-1 bg-destructive text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"

@@ -1,39 +1,117 @@
-import React, { useState } from 'react';
-import { 
-  User, 
-  Store, 
-  Building, 
-  CreditCard, 
-  Lock, 
+import React, { useState, useEffect } from 'react';
+import {
+  User,
+  Store,
+  Building,
+  CreditCard,
+  Lock,
   Camera,
-  Save
+  Save,
+  Loader2
 } from 'lucide-react';
-import { mockSeller } from '@/services/mockData';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { sellerAPI } from '@/lib/api';
 
 const Settings: React.FC = () => {
-  const [seller, setSeller] = useState(mockSeller);
+  const [loading, setLoading] = useState(true);
+  const [profileData, setProfileData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    avatar: ''
+  });
+
+  const [sellerData, setSellerData] = useState({
+    storeName: '',
+    storeDescription: '', // Frontend placeholder if backend lacks it
+    gstNumber: '',
+    panNumber: '', // If backend has it
+    bankName: '',
+    bankAccountNumber: '',
+    ifscCode: ''
+  });
+
+  const [contactSupport, setContactSupport] = useState(false);
+
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [passLoading, setPassLoading] = useState(false);
+
   const { toast } = useToast();
 
-  const handleSaveProfile = () => {
-    toast({
-      title: 'Profile updated',
-      description: 'Your profile information has been saved.',
-    });
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      // Fetch User Profile
+      const userRes = await sellerAPI.auth.getUserProfile();
+      if (userRes.data.success) {
+        setProfileData(userRes.data.data);
+      }
+
+      // Fetch Seller Profile
+      const sellerRes = await sellerAPI.auth.getSellerProfile();
+      if (sellerRes.data.success && sellerRes.data.data) {
+        const s = sellerRes.data.data;
+        setSellerData({
+          storeName: s.storeName,
+          storeDescription: s.storeDescription || '',
+          gstNumber: s.gstNumber || '',
+          panNumber: s.kycDetails?.panCard || '', // Assuming PAN is in KYC
+          bankName: s.bankDetails?.bankName || '', // If backend provides bank name
+          bankAccountNumber: s.bankDetails?.accountNumber || '',
+          ifscCode: s.bankDetails?.ifscCode || ''
+        });
+      }
+    } catch (error) {
+      console.error("Failed to load settings", error);
+      toast({
+        title: "Error",
+        description: "Failed to load profile data",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveProfile = async () => {
+    try {
+      await sellerAPI.auth.updateUserProfile({
+        firstName: profileData.firstName,
+        lastName: profileData.lastName,
+        phone: profileData.phone
+      });
+      toast({
+        title: 'Profile updated',
+        description: 'Your profile information has been saved.',
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to update profile',
+        variant: 'destructive'
+      });
+    }
   };
 
   const handleSaveStore = () => {
+    // Currently backend might not support store name update, 
+    // or we use sellerAPI.auth.updatePaymentDetails for bank
+    // For now, assuming Store Name is immutable or requires specific API.
     toast({
       title: 'Store settings updated',
       description: 'Your store information has been saved.',
     });
   };
 
-  const handleChangePassword = () => {
+  const handleChangePassword = async () => {
     if (newPassword !== confirmPassword) {
       toast({
         title: 'Password mismatch',
@@ -42,14 +120,35 @@ const Settings: React.FC = () => {
       });
       return;
     }
-    toast({
-      title: 'Password changed',
-      description: 'Your password has been updated successfully.',
-    });
-    setCurrentPassword('');
-    setNewPassword('');
-    setConfirmPassword('');
+
+    try {
+      setPassLoading(true);
+      await sellerAPI.auth.changePassword({
+        oldPassword: currentPassword,
+        newPassword: newPassword
+      });
+
+      toast({
+        title: 'Password changed',
+        description: 'Your password has been updated successfully.',
+      });
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.response?.data?.message || 'Failed to change password',
+        variant: 'destructive'
+      });
+    } finally {
+      setPassLoading(false);
+    }
   };
+
+  if (loading) {
+    return <div className="flex h-screen items-center justify-center"><Loader2 className="w-8 h-8 animate-spin" /></div>;
+  }
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -85,47 +184,53 @@ const Settings: React.FC = () => {
         <TabsContent value="profile" className="space-y-6">
           <div className="bg-card rounded-xl border border-border p-6">
             <h3 className="card-title mb-6">Personal Information</h3>
-            
+
             <div className="flex items-center gap-6 mb-6">
               <div className="relative">
                 <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center">
                   <span className="text-3xl font-bold text-primary">
-                    {seller.name.charAt(0)}
+                    {profileData.firstName ? profileData.firstName.charAt(0) : 'U'}
                   </span>
                 </div>
-                <button className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
-                  <Camera className="w-4 h-4" />
-                </button>
+                {/* Image upload could be added here */}
               </div>
               <div>
-                <p className="font-medium text-foreground">{seller.name}</p>
-                <p className="text-sm text-muted-foreground">{seller.email}</p>
+                <p className="font-medium text-foreground">{profileData.firstName} {profileData.lastName}</p>
+                <p className="text-sm text-muted-foreground">{profileData.email}</p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Full Name</label>
+                <label className="text-sm font-medium text-foreground">First Name</label>
                 <input
-                  value={seller.name}
-                  onChange={(e) => setSeller(prev => ({ ...prev, name: e.target.value }))}
+                  value={profileData.firstName}
+                  onChange={(e) => setProfileData(prev => ({ ...prev, firstName: e.target.value }))}
+                  className="input-field"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">Last Name</label>
+                <input
+                  value={profileData.lastName}
+                  onChange={(e) => setProfileData(prev => ({ ...prev, lastName: e.target.value }))}
                   className="input-field"
                 />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">Email</label>
                 <input
-                  value={seller.email}
-                  onChange={(e) => setSeller(prev => ({ ...prev, email: e.target.value }))}
+                  value={profileData.email}
+                  disabled
                   type="email"
-                  className="input-field"
+                  className="input-field bg-muted cursor-not-allowed"
                 />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">Phone</label>
                 <input
-                  value={seller.phone || ''}
-                  onChange={(e) => setSeller(prev => ({ ...prev, phone: e.target.value }))}
+                  value={profileData.phone || ''}
+                  onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
                   className="input-field"
                 />
               </div>
@@ -144,43 +249,37 @@ const Settings: React.FC = () => {
         <TabsContent value="store" className="space-y-6">
           <div className="bg-card rounded-xl border border-border p-6">
             <h3 className="card-title mb-6">Store Information</h3>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">Store Name</label>
                 <input
-                  value={seller.storeName}
-                  onChange={(e) => setSeller(prev => ({ ...prev, storeName: e.target.value }))}
-                  className="input-field"
+                  value={sellerData.storeName}
+                  disabled // Disabled as we don't have direct update endpoint yet
+                  className="input-field bg-muted"
                 />
+                <p className="text-xs text-muted-foreground">Contact support to change store name</p>
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Store Logo URL</label>
-                <input
-                  value={seller.storeLogo || ''}
-                  onChange={(e) => setSeller(prev => ({ ...prev, storeLogo: e.target.value }))}
-                  className="input-field"
-                  placeholder="https://..."
-                />
-              </div>
+
               <div className="space-y-2 md:col-span-2">
                 <label className="text-sm font-medium text-foreground">Store Description</label>
                 <textarea
-                  value={seller.storeDescription || ''}
-                  onChange={(e) => setSeller(prev => ({ ...prev, storeDescription: e.target.value }))}
+                  value={sellerData.storeDescription || ''}
+                  onChange={(e) => setSellerData(prev => ({ ...prev, storeDescription: e.target.value }))}
                   rows={4}
                   className="input-field resize-none"
                   placeholder="Tell customers about your store..."
                 />
               </div>
             </div>
-
+            {/* 
             <div className="flex justify-end mt-6">
               <button onClick={handleSaveStore} className="btn-primary">
                 <Save className="w-4 h-4" />
                 Save Changes
               </button>
             </div>
+            */}
           </div>
         </TabsContent>
 
@@ -188,26 +287,26 @@ const Settings: React.FC = () => {
         <TabsContent value="business" className="space-y-6">
           <div className="bg-card rounded-xl border border-border p-6">
             <h3 className="card-title mb-6">Business Details</h3>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">GST Number</label>
                 <input
-                  value={seller.gstNumber || ''}
+                  value={sellerData.gstNumber}
                   disabled
                   className="input-field bg-muted"
                 />
-                <p className="text-xs text-muted-foreground">Contact support to update</p>
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">PAN Number</label>
-                <input
-                  value={seller.panNumber || ''}
-                  disabled
-                  className="input-field bg-muted"
-                />
-                <p className="text-xs text-muted-foreground">Contact support to update</p>
-              </div>
+              {sellerData.panNumber && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">PAN Number</label>
+                  <input
+                    value={sellerData.panNumber}
+                    disabled
+                    className="input-field bg-muted"
+                  />
+                </div>
+              )}
             </div>
           </div>
 
@@ -216,12 +315,12 @@ const Settings: React.FC = () => {
               <CreditCard className="w-5 h-5 text-primary" />
               <h3 className="card-title">Bank Account Details</h3>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">Bank Name</label>
                 <input
-                  value={seller.bankName || ''}
+                  value={sellerData.bankName}
                   disabled
                   className="input-field bg-muted"
                 />
@@ -229,7 +328,7 @@ const Settings: React.FC = () => {
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">Account Number</label>
                 <input
-                  value={seller.bankAccountNumber || ''}
+                  value={sellerData.bankAccountNumber}
                   disabled
                   className="input-field bg-muted"
                 />
@@ -237,14 +336,14 @@ const Settings: React.FC = () => {
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">IFSC Code</label>
                 <input
-                  value={seller.ifscCode || ''}
+                  value={sellerData.ifscCode}
                   disabled
                   className="input-field bg-muted"
                 />
               </div>
             </div>
             <p className="text-sm text-muted-foreground mt-4">
-              Bank details are read-only. Contact support to make changes.
+              Bank details are read-only to ensure payout security. Contact verification team to update.
             </p>
           </div>
         </TabsContent>
@@ -253,7 +352,7 @@ const Settings: React.FC = () => {
         <TabsContent value="security" className="space-y-6">
           <div className="bg-card rounded-xl border border-border p-6">
             <h3 className="card-title mb-6">Change Password</h3>
-            
+
             <div className="max-w-md space-y-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">Current Password</label>
@@ -283,12 +382,12 @@ const Settings: React.FC = () => {
                 />
               </div>
 
-              <button 
+              <button
                 onClick={handleChangePassword}
-                disabled={!currentPassword || !newPassword || !confirmPassword}
+                disabled={!currentPassword || !newPassword || !confirmPassword || passLoading}
                 className="btn-primary"
               >
-                Update Password
+                {passLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Update Password'}
               </button>
             </div>
           </div>
