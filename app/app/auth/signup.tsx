@@ -10,6 +10,7 @@ import {
   Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 import { User, Mail, Lock, Phone } from 'lucide-react-native';
 import AppText from '@/components/atoms/AppText';
 import Button from '@/components/atoms/Button';
@@ -58,18 +59,25 @@ export default function SignupScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.header}>
-          <AppText variant="h2" weight="bold">
+        <LinearGradient
+          colors={[Colors.gradient.primary[0], Colors.gradient.primary[1]]}
+          style={styles.header}
+        >
+          <AppText
+            variant="h1"
+            color={Colors.white}
+            weight="bold"
+            style={styles.logo}
+          >
+            Z
+          </AppText>
+          <AppText variant="h2" color={Colors.white} weight="semibold">
             Create Account
           </AppText>
-          <AppText
-            variant="body"
-            color={Colors.textSecondary}
-            style={styles.subtitle}
-          >
+          <AppText variant="body" color={Colors.white} style={styles.subtitle}>
             Sign up to start shopping
           </AppText>
-        </View>
+        </LinearGradient>
 
         <View style={styles.form}>
           <View style={styles.inputContainer}>
@@ -169,11 +177,20 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   header: {
-    padding: Spacing.xl,
-    paddingTop: Spacing['2xl'],
+    padding: Spacing['2xl'],
+    paddingTop: Spacing['5xl'],
+    paddingBottom: Spacing['3xl'],
+    alignItems: 'center',
+    borderBottomLeftRadius: 32,
+    borderBottomRightRadius: 32,
+  },
+  logo: {
+    fontSize: 80,
+    lineHeight: 80,
   },
   subtitle: {
-    marginTop: Spacing.xs,
+    marginTop: Spacing.sm,
+    opacity: 0.9,
   },
   form: {
     padding: Spacing.xl,

@@ -453,6 +453,19 @@ class ApiService {
     return this.request<{ success: boolean; data: any[] }>('/reviews/pending');
   }
 
+  async updateReview(reviewId: string, reviewData: { rating?: number; title?: string; comment?: string; images?: string[] }) {
+    return this.request<{ success: boolean; message: string; data: any }>(`/reviews/${reviewId}`, {
+      method: 'PUT',
+      body: JSON.stringify(reviewData),
+    });
+  }
+
+  async deleteReview(reviewId: string) {
+    return this.request<{ success: boolean; message: string }>(`/reviews/${reviewId}`, {
+      method: "DELETE",
+    });
+  }
+
   // Payments
   async createPaymentOrder(amount: number) {
     return this.request<{ success: boolean; data: { orderId: string; amount: number; currency: string } }>(
