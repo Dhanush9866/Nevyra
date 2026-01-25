@@ -65,6 +65,7 @@ class ApiService {
       inStock: p.inStock !== undefined ? p.inStock : true,
       brand: p.brand || 'Zythova',
       specifications: p.attributes || p.specifications || {},
+      soldCount: p.soldCount || 0,
     };
   }
 
