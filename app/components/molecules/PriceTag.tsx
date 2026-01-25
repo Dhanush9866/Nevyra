@@ -27,7 +27,7 @@ export default function PriceTag({
       >
         ₹{price.toLocaleString('en-IN')}
       </AppText>
-      {hasDiscount && (
+      {!!hasDiscount && (
         <>
           <AppText
             variant={size === 'lg' ? 'body' : 'caption'}
@@ -36,7 +36,7 @@ export default function PriceTag({
           >
             ₹{originalPrice.toLocaleString('en-IN')}
           </AppText>
-          {discount && (
+          {!!discount && (
             <AppText
               variant={size === 'lg' ? 'body' : 'caption'}
               color={Colors.success}

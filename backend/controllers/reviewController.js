@@ -102,22 +102,27 @@ exports.getPending = async (req, res, next) => {
     const orders = await Order.find({
       userId: userId,
       status: { $in: ['Delivered', 'delivered'] }
-    }).populate("items.productId");
+    });
 
-    // 2. Extract unique product IDs from these orders
+    const orderIds = orders.map(o => o._id);
+
+    // 2. Get all OrderItems for these orders
+    const orderItems = await OrderItem.find({
+      orderId: { $in: orderIds }
+    }).populate("productId");
+
+    // 3. Extract unique product IDs from these items
     const purchasedProductIds = [];
     const productMap = new Map();
 
-    orders.forEach(order => {
-      order.items.forEach(item => {
-        if (item.productId && item.productId._id) {
-          const pid = item.productId._id.toString();
-          if (!productMap.has(pid)) {
-            productMap.set(pid, item.productId);
-            purchasedProductIds.push(item.productId._id);
-          }
+    orderItems.forEach(item => {
+      if (item.productId && item.productId._id) {
+        const pid = item.productId._id.toString();
+        if (!productMap.has(pid)) {
+          productMap.set(pid, item.productId);
+          purchasedProductIds.push(item.productId._id);
         }
-      });
+      }
     });
 
     // 3. Get all reviews by this user for these products

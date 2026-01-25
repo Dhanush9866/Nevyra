@@ -20,7 +20,7 @@ export default function Loader({
   const content = (
     <>
       <ActivityIndicator size={size} color={color} />
-      {text && (
+      {!!text && (
         <AppText
           variant="body"
           color={Colors.textSecondary}
