@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Store, Loader2, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { motion } from 'framer-motion';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -32,14 +33,19 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-background flex overflow-hidden">
       {/* Left Panel - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-sidebar p-12 flex-col justify-between">
+      <motion.div
+        initial={{ x: -50, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ duration: 0.6, type: "spring", stiffness: 100 }}
+        className="hidden lg:flex lg:w-1/2 bg-sidebar p-12 flex-col justify-between"
+      >
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg bg-sidebar-primary flex items-center justify-center">
             <Store className="w-5 h-5 text-sidebar-primary-foreground" />
           </div>
-          <span className="text-xl font-bold text-sidebar-foreground">SellerHub</span>
+          <span className="text-xl font-bold text-sidebar-foreground">Zythova</span>
         </div>
 
         <div className="space-y-6">
@@ -53,19 +59,24 @@ const Login: React.FC = () => {
         </div>
 
         <p className="text-sidebar-muted text-sm">
-          © 2024 SellerHub. All rights reserved.
+          © 2024 Zythova. All rights reserved.
         </p>
-      </div>
+      </motion.div>
 
       {/* Right Panel - Login Form */}
-      <div className="flex-1 flex items-center justify-center p-6 lg:p-12">
+      <motion.div
+        initial={{ x: 50, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ duration: 0.6, type: "spring", stiffness: 100 }}
+        className="flex-1 flex items-center justify-center p-6 lg:p-12"
+      >
         <div className="w-full max-w-md space-y-8 animate-fade-in">
           {/* Mobile Logo */}
           <div className="lg:hidden flex items-center justify-center gap-3 mb-8">
             <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
               <Store className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold text-foreground">SellerHub</span>
+            <span className="text-xl font-bold text-foreground">Zythova</span>
           </div>
 
           <div className="text-center lg:text-left">
@@ -143,14 +154,9 @@ const Login: React.FC = () => {
             </Link>
           </p>
 
-          {/* Demo Credentials */}
-          <div className="mt-8 p-4 bg-muted rounded-lg">
-            <p className="text-xs text-muted-foreground text-center">
-              <strong>Demo:</strong> Enter any email and password to login
-            </p>
-          </div>
+
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };
