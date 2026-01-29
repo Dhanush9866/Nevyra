@@ -243,8 +243,8 @@ export default function ProductReviewsScreen() {
         </ScrollView>
       )}
 
-      {/* Write a Review FAB (Only if not reviewed yet) */}
-      {!hasReviewed && !isLoading && (
+      {/* Write a Review FAB (Always visible to allow multiple reviews) */}
+      {!isLoading && (
         <TouchableOpacity
           style={styles.fab}
           onPress={() => setModalVisible(true)}
@@ -398,13 +398,13 @@ const styles = StyleSheet.create({
   },
   fab: {
     position: 'absolute',
-    bottom: Spacing.xl,
+    bottom: Spacing.xl + 30, // Moved up to avoid navigation gestures
     right: Spacing.xl,
     backgroundColor: Colors.primary,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
+    paddingVertical: 8, // Reduced size
+    paddingHorizontal: 16, // Reduced size
     borderRadius: 30,
     elevation: 5,
     shadowColor: '#000',

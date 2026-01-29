@@ -1,13 +1,13 @@
 export default {
   fontSizes: {
-    xs: 12,
-    sm: 14,
-    base: 16,
-    lg: 18,
-    xl: 20,
-    '2xl': 24,
-    '3xl': 30,
-    '4xl': 36,
+    xs: 10,
+    sm: 11,
+    base: 13,
+    lg: 15, // Reduced slightly or kept similar
+    xl: 16, // Reduced
+    '2xl': 18, // Reduced from 20
+    '3xl': 21, // Reduced from 24
+    '4xl': 24, // Reduced from 28
   },
   fontWeights: {
     regular: '400' as const,

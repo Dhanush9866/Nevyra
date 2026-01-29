@@ -39,6 +39,6 @@ const reviewSchema = new mongoose.Schema(
 );
 
 // Prevent user from submitting more than one review per product
-reviewSchema.index({ user: 1, product: 1 }, { unique: true });
+// reviewSchema.index({ user: 1, product: 1 }, { unique: true }); // Removed to allow multiple reviews
 
 module.exports = mongoose.model("Review", reviewSchema);
