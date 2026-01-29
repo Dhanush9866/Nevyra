@@ -41,7 +41,7 @@
       "typedRoutes": true
     },
     "extra": {
-      "apiUrl": "http://10.227.125.42:8000/api/v1",
+      "apiUrl": "http://www.zythova.com/api/v1",
       "razorpayKeyId": "rzp_test_Rbm66o8JPEj0P8",
       "router": {
         "origin": "https://rork.com/"

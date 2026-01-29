@@ -21,7 +21,8 @@ exports.create = async (req, res, next) => {
       });
     }
 
-    // Check if user already reviewed this product
+    // Check removed to allow multiple reviews
+    /*
     const existingReview = await Review.findOne({ user: userId, product: productId });
     if (existingReview) {
       return res.status(400).json({
@@ -29,6 +30,7 @@ exports.create = async (req, res, next) => {
         message: "You have already reviewed this product",
       });
     }
+    */
 
     const review = new Review({
       user: userId,
