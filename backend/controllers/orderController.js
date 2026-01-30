@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const { Order, OrderItem, CartItem, Product } = require("../models");
 
 exports.create = async (req, res, next) => {
@@ -16,6 +17,9 @@ exports.create = async (req, res, next) => {
     if (items && Array.isArray(items) && items.length > 0) {
       // Direct checkout (Buy Now)
       for (const item of items) {
+        if (!mongoose.Types.ObjectId.isValid(item.productId)) {
+          throw new Error(`Invalid Product ID: ${item.productId}`);
+        }
         const product = await Product.findById(item.productId);
         if (!product) throw new Error(`Product not found: ${item.productId}`);
         
@@ -116,6 +120,9 @@ exports.list = async (req, res, next) => {
 
 exports.details = async (req, res, next) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(404).json({ success: false, message: "Order not found (Invalid ID)", data: null });
+    }
     const order = await Order.findOne({
       _id: req.params.id,
       userId: req.user.id,
@@ -138,6 +145,9 @@ exports.details = async (req, res, next) => {
 exports.updateStatus = async (req, res, next) => {
   try {
     const { status } = req.body;
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(404).json({ success: false, message: "Order not found (Invalid ID)", data: null });
+    }
     let query = { _id: req.params.id };
     // If not admin, restrict to own orders
     if (!req.user.isAdmin) {
@@ -168,6 +178,9 @@ exports.adminList = async (req, res, next) => {
 exports.requestReturn = async (req, res, next) => {
   try {
     const { reason } = req.body;
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(404).json({ success: false, message: "Order not found (Invalid ID)" });
+    }
     const order = await Order.findOne({
       _id: req.params.id,
       userId: req.user.id,
@@ -202,6 +215,10 @@ exports.updateReturnStatus = async (req, res, next) => {
 
     if (!allowedStatuses.includes(status)) {
       return res.status(400).json({ success: false, message: "Invalid return status" });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(404).json({ success: false, message: "Order not found (Invalid ID)" });
     }
 
     // Since this is called by admin/seller, we don't restrict by userId

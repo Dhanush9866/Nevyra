@@ -83,6 +83,7 @@ const DEFAULT_IMAGE = 'https://cdn-icons-png.flaticon.com/512/263/263115.png'; /
 import { useQuery } from '@tanstack/react-query';
 import { apiService } from '@/services/api';
 import Loader from '@/components/atoms/Loader';
+import { CategoriesScreenSkeleton } from '@/components/skeletons';
 
 export default function CategoriesScreen() {
   const router = useRouter();
@@ -151,6 +152,10 @@ export default function CategoriesScreen() {
     );
   };
 
+  if (isLoadingRoots) {
+    return <CategoriesScreenSkeleton />;
+  }
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
@@ -210,7 +215,7 @@ export default function CategoriesScreen() {
               <FlatList
                 data={rootCategories}
                 renderItem={renderSidebarItem}
-                keyExtractor={item => item._id || item.id}
+                keyExtractor={item => (item as any)._id || item.id}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.sidebarContent}
               />

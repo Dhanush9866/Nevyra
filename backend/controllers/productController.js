@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const { Product, Category, SearchLog } = require("../models");
 const { validateAttributes } = require("../utils/validateAttributes");
 
@@ -263,6 +264,13 @@ exports.listByMultipleSubcategories = async (req, res, next) => {
 
 exports.details = async (req, res, next) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found (Invalid ID)",
+        data: null
+      });
+    }
     const product = await Product.findById(req.params.id);
 
     const sendData = mapProductId(product);
@@ -381,6 +389,13 @@ exports.create = async (req, res, next) => {
 
 exports.update = async (req, res, next) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found (Invalid ID)",
+        data: null
+      });
+    }
     const product = await Product.findById(req.params.id);
     if (!product)
       return res
@@ -476,6 +491,13 @@ exports.update = async (req, res, next) => {
 
 exports.remove = async (req, res, next) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found (Invalid ID)",
+        data: null
+      });
+    }
     const product = await Product.findById(req.params.id);
     if (!product)
       return res
@@ -541,6 +563,13 @@ exports.getPopularSearches = async (req, res, next) => {
 
 exports.getSimilarProducts = async (req, res, next) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found (Invalid ID)",
+        data: null
+      });
+    }
     const product = await Product.findById(req.params.id);
     if (!product) {
       return res.status(404).json({

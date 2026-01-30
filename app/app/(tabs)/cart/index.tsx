@@ -14,6 +14,7 @@ import Button from '@/components/atoms/Button';
 
 import CartItemCard from '@/components/molecules/CartItemCard';
 import SlideToActButton from '@/components/molecules/SlideToActButton';
+import { CartScreenSkeleton } from '@/components/skeletons';
 import Colors from '@/constants/colors';
 import Spacing from '@/constants/spacing';
 import { useCart } from '@/store/CartContext';
@@ -49,11 +50,7 @@ export default function CartScreen() {
   const totalSavings = totalMRP - totalDisplayPrice;
 
   if (isLoading) {
-    return (
-      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-        <ActivityIndicator size="large" color={Colors.primary} />
-      </View>
-    );
+    return <CartScreenSkeleton />;
   }
 
   if (items.length === 0) {

@@ -19,6 +19,8 @@ import { Search as SearchIcon } from 'lucide-react-native';
 
 import { useCart } from '@/store/CartContext';
 
+import { SearchScreenSkeleton } from '@/components/skeletons';
+
 export default function SearchScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -28,15 +30,17 @@ export default function SearchScreen() {
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
 
-  const { data: popularData } = useQuery({
+  const { data: popularData, isLoading: isLoadingPopular } = useQuery({
     queryKey: ['popular-searches'],
     queryFn: () => apiService.getPopularSearches(),
   });
 
-  const { data: categoriesData } = useQuery({
+  const { data: categoriesData, isLoading: isLoadingCategories } = useQuery({
     queryKey: ['categories'],
     queryFn: () => apiService.getCategories(),
   });
+
+
 
   const popularSearches = popularData?.data || [
     'Smart Watch',
@@ -81,6 +85,10 @@ export default function SearchScreen() {
 
     return () => clearTimeout(handler);
   }, [query, activeFilters]);
+
+  if (isLoadingPopular || isLoadingCategories) {
+    return <SearchScreenSkeleton />;
+  }
 
   const saveSearch = async (term: string) => {
     const newHistory = [term, ...recentSearches.filter(i => i !== term)].slice(0, 5);

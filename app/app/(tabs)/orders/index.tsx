@@ -15,6 +15,7 @@ import { Search, X, Package, RotateCcw, ChevronRight } from 'lucide-react-native
 import { Alert } from 'react-native';
 import AppText from '@/components/atoms/AppText';
 import OrderListItem from '@/components/organisms/OrderListItem';
+import { OrderListScreenSkeleton } from '@/components/skeletons';
 import Colors from '@/constants/colors';
 import Spacing from '@/constants/spacing';
 import { apiService } from '@/services/api';
@@ -121,11 +122,7 @@ export default function OrdersScreen() {
     ];
 
     if (loading && !refreshing) {
-        return (
-            <View style={styles.centerContainer}>
-                <ActivityIndicator size="large" color={Colors.primary} />
-            </View>
-        );
+        return <OrderListScreenSkeleton />;
     }
 
     return (

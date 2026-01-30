@@ -13,6 +13,7 @@ import Spacing from '@/constants/spacing';
 import { apiService } from '@/services/api';
 import { useCart } from '@/store/CartContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ProductListScreenSkeleton } from '@/components/skeletons';
 
 export default function ProductListScreen() {
   const router = useRouter();
@@ -56,6 +57,11 @@ export default function ProductListScreen() {
     const cats = products.map((p: any) => p.category);
     return [...new Set(cats)];
   }, [products]);
+
+  if (isLoading) {
+    return <ProductListScreenSkeleton />;
+  }
+
 
   return (
     <>
@@ -120,11 +126,7 @@ export default function ProductListScreen() {
           contentContainerStyle={styles.results}
           showsVerticalScrollIndicator={false}
         >
-          {isLoading ? (
-            <View style={styles.center}>
-              <Loader />
-            </View>
-          ) : error ? (
+          {error ? (
             <View style={styles.center}>
               <AppText color={Colors.error}>Failed to load products</AppText>
             </View>
