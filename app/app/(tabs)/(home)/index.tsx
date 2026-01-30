@@ -22,6 +22,7 @@ import ProductCard from '@/components/molecules/ProductCard';
 import HorizontalProductSection from '@/components/organisms/HorizontalProductSection';
 import VerticalProductSection from '@/components/organisms/VerticalProductSection';
 import HomeBannerCarousel from '@/components/organisms/HomeBannerCarousel';
+import { HomeScreenSkeleton } from '@/components/skeletons';
 import Colors from '@/constants/colors';
 import Spacing from '@/constants/spacing';
 import { useQuery } from '@tanstack/react-query';
@@ -128,6 +129,10 @@ export default function HomeScreen() {
     outputRange: [0, -20],
     extrapolate: 'clamp',
   });
+
+  if (catLoading || prodLoading) {
+    return <HomeScreenSkeleton />;
+  }
 
   return (
     <View style={styles.container}>

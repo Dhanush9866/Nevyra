@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const { Product, Category, Seller, Order, OrderItem, Payout } = require("../models");
 const { validateAttributes } = require("../utils/validateAttributes");
 
@@ -123,6 +124,9 @@ exports.updateMyProduct = async (req, res, next) => {
         const seller = await Seller.findOne({ user: req.user.id });
         if (!seller) return res.status(404).json({ success: false, message: "Seller not found" });
 
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(404).json({ success: false, message: "Product not found (Invalid ID)" });
+        }
         const product = await Product.findById(req.params.id);
         if (!product) return res.status(404).json({ success: false, message: "Product not found" });
 
@@ -173,6 +177,9 @@ exports.deleteMyProduct = async (req, res, next) => {
         const seller = await Seller.findOne({ user: req.user.id });
         if (!seller) return res.status(404).json({ success: false, message: "Seller not found" });
 
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(404).json({ success: false, message: "Product not found (Invalid ID)" });
+        }
         const product = await Product.findById(req.params.id);
         if (!product) return res.status(404).json({ success: false, message: "Product not found" });
 
@@ -242,6 +249,9 @@ exports.updateOrderStatus = async (req, res, next) => {
 
         if (!orderItemToCheck) return res.status(403).json({ success: false, message: "You are not authorized" });
 
+        if (!mongoose.Types.ObjectId.isValid(orderId)) {
+            return res.status(404).json({ success: false, message: "Order not found (Invalid ID)" });
+        }
         const order = await Order.findById(orderId);
         if (!order) return res.status(404).json({ success: false, message: "Order not found" });
 
@@ -300,6 +310,9 @@ exports.updateReturnStatus = async (req, res, next) => {
 
         if (!orderItemToCheck) return res.status(403).json({ success: false, message: "You are not authorized" });
 
+        if (!mongoose.Types.ObjectId.isValid(orderId)) {
+            return res.status(404).json({ success: false, message: "Order not found (Invalid ID)" });
+        }
         const order = await Order.findById(orderId);
         if (!order) return res.status(404).json({ success: false, message: "Order not found" });
 

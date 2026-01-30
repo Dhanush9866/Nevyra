@@ -1,5 +1,5 @@
-import { useCallback, useState } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, StatusBar, Alert, Share } from 'react-native';
+import { useCallback, useState, useRef } from 'react';
+import { View, StyleSheet, ScrollView, TouchableOpacity, StatusBar, Alert, Share, FlatList, Dimensions, NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack, useFocusEffect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
@@ -17,6 +17,7 @@ import Spacing from '@/constants/spacing';
 import { useQuery } from '@tanstack/react-query';
 import { apiService } from '@/services/api';
 import Loader from '@/components/atoms/Loader';
+import { ProductDetailScreenSkeleton } from '@/components/skeletons';
 import { useCart } from '@/store/CartContext';
 import { useWishlist } from '@/store/WishlistContext';
 import { useCheckout } from '@/store/CheckoutContext';
@@ -34,8 +35,18 @@ export default function ProductDetailScreen() {
   const { addresses } = useAuth();
 
   const displayAddress = selectedAddress || addresses?.find(a => a.isDefault) || addresses?.[0];
-  // const displayAddress = selectedAddress || addresses?.find(a => a.isDefault) || addresses?.[0]; // Duplicate removed
   const [showToast, setShowToast] = useState(false);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const screenWidth = Dimensions.get('window').width;
+
+  const onImageScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const slideSize = event.nativeEvent.layoutMeasurement.width;
+    const index = event.nativeEvent.contentOffset.x / slideSize;
+    const roundIndex = Math.round(index);
+    if (activeImageIndex !== roundIndex) {
+      setActiveImageIndex(roundIndex);
+    }
+  }, [activeImageIndex]);
 
   const handleShare = async () => {
     try {
@@ -88,11 +99,7 @@ export default function ProductDetailScreen() {
   const latestReview = reviews.length > 0 ? reviews[0] : null;
 
   if (isLoading) {
-    return (
-      <View style={styles.center}>
-        <Loader />
-      </View>
-    );
+    return <ProductDetailScreenSkeleton />;
   }
 
   if (error || !product) {
@@ -171,11 +178,42 @@ export default function ProductDetailScreen() {
           contentContainerStyle={{ paddingTop: insets.top + 60 }}
         >
           <View style={styles.imageContainer}>
-            <Image
-              source={{ uri: product.images[0] }}
-              style={styles.image}
-              contentFit="cover"
+            <FlatList
+              data={product.images && product.images.length > 0 ? product.images : [null]} // Fallback for no images
+              keyExtractor={(_, index) => index.toString()}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              onScroll={onImageScroll}
+              style={{ width: screenWidth, height: screenWidth }}
+              renderItem={({ item }) => (
+                <View style={{ width: screenWidth, height: screenWidth }}>
+                  <Image
+                    source={item ? { uri: item } : require('@/assets/images/icon.png')} // Replace with placeholder if null
+                    style={styles.image}
+                    contentFit="cover" // 'contain' might be better for full carousel but cover is requested style often
+                  />
+                </View>
+              )}
             />
+
+            {/* Pagination Dots */}
+            {product.images && product.images.length > 1 && (
+              <View style={styles.paginationContainer}>
+                {product.images.map((_: any, index: number) => (
+                  <View
+                    key={index}
+                    style={[
+                      styles.paginationDot,
+                      {
+                        backgroundColor: index === activeImageIndex ? Colors.primary : 'rgba(0,0,0,0.2)',
+                        width: index === activeImageIndex ? 20 : 8,
+                      },
+                    ]}
+                  />
+                ))}
+              </View>
+            )}
 
             <View style={styles.imageActions}>
               <IconButton
@@ -193,9 +231,6 @@ export default function ProductDetailScreen() {
                 size={20}
               />
             </View>
-
-
-
           </View>
 
           <View style={styles.content}>
@@ -344,8 +379,8 @@ export default function ProductDetailScreen() {
 
                 <View style={styles.reviewsList}>
                   {reviews.length > 0 ? (
-                    reviews.slice(0, 3).map((review: any) => (
-                      <View key={review.id} style={styles.reviewItem}>
+                    reviews.slice(0, 3).map((review: any, index: number) => (
+                      <View key={review._id || review.id || index} style={styles.reviewItem}>
                         <View style={styles.reviewHeader}>
                           <View style={styles.reviewerInfo}>
                             {review.userAvatar ? (
@@ -679,5 +714,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
     borderRadius: 12,
     alignItems: 'center',
+  },
+  paginationContainer: {
+    position: 'absolute',
+    bottom: Spacing.md,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 4,
+  },
+  paginationDot: {
+    height: 8,
+    borderRadius: 4,
   },
 });

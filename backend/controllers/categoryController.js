@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const { Category } = require("../models");
 
 exports.list = async (req, res, next) => {
@@ -39,6 +40,9 @@ exports.create = async (req, res, next) => {
 
 exports.update = async (req, res, next) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(404).json({ success: false, message: "Category not found (Invalid ID)", data: null });
+    }
     const category = await Category.findById(req.params.id);
     if (!category)
       return res
@@ -55,6 +59,9 @@ exports.update = async (req, res, next) => {
 
 exports.remove = async (req, res, next) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(404).json({ success: false, message: "Category not found (Invalid ID)", data: null });
+    }
     const category = await Category.findById(req.params.id);
     if (!category)
       return res

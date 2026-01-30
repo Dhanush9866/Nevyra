@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const { Review, Product, Order, OrderItem } = require("../models");
 
 exports.create = async (req, res, next) => {
@@ -10,6 +11,13 @@ exports.create = async (req, res, next) => {
       return res.status(400).json({
         success: false,
         message: "Rating and comment are required",
+      });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found (Invalid ID)",
       });
     }
 
@@ -65,6 +73,15 @@ exports.create = async (req, res, next) => {
 exports.getByProduct = async (req, res, next) => {
   try {
     const { productId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return res.json({
+        success: true,
+        message: "Reviews fetched successfully (No reviews for invalid ID)",
+        data: [],
+      });
+    }
+
     const reviews = await Review.find({ product: productId })
       .populate("user", "firstName lastName")
       .sort("-createdAt");
@@ -159,6 +176,13 @@ exports.update = async (req, res, next) => {
     const { rating, title, comment, images } = req.body;
     const userId = req.user.id;
 
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(404).json({
+        success: false,
+        message: "Review not found (Invalid ID)",
+      });
+    }
+
     const review = await Review.findById(id);
     if (!review) {
       return res.status(404).json({
@@ -207,6 +231,13 @@ exports.deleteReview = async (req, res, next) => {
   try {
     const { id } = req.params;
     const userId = req.user.id;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(404).json({
+        success: false,
+        message: "Review not found (Invalid ID)",
+      });
+    }
 
     const review = await Review.findById(id);
     if (!review) {

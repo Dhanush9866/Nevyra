@@ -11,10 +11,11 @@ import Spacing from '@/constants/spacing';
 import { useWishlist } from '@/store/WishlistContext';
 import { useCart } from '@/store/CartContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { WishlistScreenSkeleton } from '@/components/skeletons';
 
 export default function WishlistScreen() {
   const router = useRouter();
-  const { items, toggleWishlist, refreshWishlist } = useWishlist();
+  const { items, toggleWishlist, refreshWishlist, isLoading } = useWishlist();
   const { addToCart } = useCart();
   const insets = useSafeAreaInsets();
 
@@ -23,6 +24,10 @@ export default function WishlistScreen() {
       refreshWishlist();
     }, [refreshWishlist])
   );
+
+  if (isLoading) {
+    return <WishlistScreenSkeleton />;
+  }
 
   // Mock data for the top lists
   const lists = [

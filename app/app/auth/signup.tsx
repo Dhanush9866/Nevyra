@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { User, Mail, Lock, Phone } from 'lucide-react-native';
+import { User, Mail, Lock, Phone, Eye, EyeOff } from 'lucide-react-native';
 import AppText from '@/components/atoms/AppText';
 import Button from '@/components/atoms/Button';
 import Colors from '@/constants/colors';
@@ -26,6 +26,7 @@ export default function SignupScreen() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleSignup = async () => {
@@ -139,9 +140,16 @@ export default function SignupScreen() {
               placeholder="Password"
               value={password}
               onChangeText={setPassword}
-              secureTextEntry
+              secureTextEntry={!showPassword}
               placeholderTextColor={Colors.textLight}
             />
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+              {showPassword ? (
+                <EyeOff size={20} color={Colors.textSecondary} />
+              ) : (
+                <Eye size={20} color={Colors.textSecondary} />
+              )}
+            </TouchableOpacity>
           </View>
 
           <Button

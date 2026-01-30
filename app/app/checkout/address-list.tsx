@@ -7,12 +7,17 @@ import { useAuth } from '@/store/AuthContext';
 import { useCheckout } from '@/store/CheckoutContext';
 import { Address } from '@/types';
 import AddressSelector from '@/components/organisms/AddressSelector';
+import { AddressListSkeleton } from '@/components/skeletons';
 
 export default function AddressListScreen() {
   const router = useRouter();
   const { source } = useLocalSearchParams<{ source: string }>();
-  const { addresses, deleteAddress } = useAuth();
+  const { addresses, deleteAddress, isLoading } = useAuth();
   const { selectedAddress, setSelectedAddress } = useCheckout();
+
+  if (isLoading) {
+    return <AddressListSkeleton />;
+  }
 
   const isFromHome = source === 'home';
 

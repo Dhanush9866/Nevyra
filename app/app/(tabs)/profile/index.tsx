@@ -22,10 +22,11 @@ import Colors from '@/constants/colors';
 import Spacing from '@/constants/spacing';
 import { useAuth } from '@/store/AuthContext';
 import { useCheckout } from '@/store/CheckoutContext';
+import { ProfileScreenSkeleton } from '@/components/skeletons';
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { user, addresses, logout, refreshUser } = useAuth();
+  const { user, addresses, logout, refreshUser, isLoading } = useAuth();
   const { selectedAddress } = useCheckout();
 
   // Refresh user data when screen comes into focus (e.g., after returning from edit screen)
@@ -34,6 +35,10 @@ export default function ProfileScreen() {
       refreshUser();
     }, [refreshUser])
   );
+
+  if (isLoading) {
+    return <ProfileScreenSkeleton />;
+  }
 
   const handleLogout = async () => {
     await logout();

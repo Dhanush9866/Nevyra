@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const { CartItem, Product } = require("../models");
 
 exports.list = async (req, res, next) => {
@@ -23,6 +24,14 @@ exports.add = async (req, res, next) => {
           data: null,
         });
     
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found (Invalid ID)",
+        data: null,
+      });
+    }
+
     // Check if item with same product and features already exists
     let item = await CartItem.findOne({ 
       userId: req.user.id, 
@@ -53,6 +62,9 @@ exports.add = async (req, res, next) => {
 exports.update = async (req, res, next) => {
   try {
     const { quantity } = req.body;
+    if (!mongoose.Types.ObjectId.isValid(req.params.itemId)) {
+      return res.status(404).json({ success: false, message: "Cart item not found (Invalid ID)", data: null });
+    }
     const item = await CartItem.findOne({
       _id: req.params.itemId,
       userId: req.user.id,
@@ -71,6 +83,9 @@ exports.update = async (req, res, next) => {
 
 exports.remove = async (req, res, next) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.itemId)) {
+      return res.status(404).json({ success: false, message: "Cart item not found (Invalid ID)", data: null });
+    }
     const item = await CartItem.findOne({
       _id: req.params.itemId,
       userId: req.user.id,
