@@ -39,8 +39,21 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
             setUser(freshUser);
             await fetchAddresses();
           }
-        } catch (err) {
+        } catch (err: any) {
           console.error('Failed to refresh profile:', err);
+          // If the token was invalid, apiService.request would have removed it from AsyncStorage
+          // We need to sync our state to reflect this
+          const currentToken = await AsyncStorage.getItem('token');
+          if (!currentToken) {
+            console.log('Token expired or invalid in loadUser, logging out user state');
+            setUser(null);
+            setIsAuthenticated(false);
+            try {
+              await AsyncStorage.removeItem('user');
+            } catch (removeErr) {
+              console.error('Failed to clear user data:', removeErr);
+            }
+          }
         }
       }
     } catch (error) {

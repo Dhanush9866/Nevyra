@@ -33,6 +33,11 @@ interface ProductFormData {
   images: File[];
 }
 
+interface Specification {
+  key: string;
+  value: string;
+}
+
 interface AddProductFormProps {
   onClose: () => void;
   onProductAdded?: () => void;
@@ -76,6 +81,8 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
     images: []
   });
 
+  const [specifications, setSpecifications] = useState<Specification[]>([]);
+
   const [categories, setCategories] = useState<Category[]>([]);
   const [subCategories, setSubCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
@@ -111,6 +118,46 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
       }));
       // show existing image previews
       setImagePreview(product.images || []);
+
+      // Parse additional specifications
+      if (product.additionalSpecifications) {
+        let specsObj = product.additionalSpecifications;
+
+        // Handle if it comes as a string (JSON) or actual object
+        if (typeof specsObj === 'string') {
+          try {
+            // First try JSON parse
+            specsObj = JSON.parse(specsObj);
+          } catch (e) {
+            // If not valid JSON, check for old semicolon format "KEY:VAL;"
+            if (typeof specsObj === 'string' && specsObj.includes(':')) {
+              const oldFormatSpecs = specsObj.split(';').reduce((acc: any, curr: string) => {
+                const part = curr.trim();
+                if (part) {
+                  const [k, v] = part.split(':');
+                  if (k && v) acc[k.trim()] = v.trim();
+                }
+                return acc;
+              }, {});
+              specsObj = oldFormatSpecs;
+            } else {
+              // Fallback to empty if neither JSON nor formatted string
+              specsObj = {};
+            }
+          }
+        }
+
+        // Now specsObj should be an object. Convert to array for state.
+        const loadedSpecs = Object.entries(specsObj).map(([key, value]) => ({
+          key,
+          value: Array.isArray(value) ? value.join(',') : String(value)
+        }));
+        setSpecifications(loadedSpecs);
+      } else {
+        setSpecifications([]);
+      }
+    } else {
+      setSpecifications([]);
     }
   }, [mode, product]);
 
@@ -256,7 +303,25 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
         soldCount: parseInt(formData.soldCount) || 0,
         // If editing and no new images uploaded, keep existing ones
         images: imageUrls.length > 0 ? imageUrls : (mode === 'edit' && product ? product.images : []),
-        additionalSpecifications: formData.additionalSpecifications
+        additionalSpecifications: specifications
+          .filter(s => s.key.trim() && s.value.trim())
+          .map(s => {
+            const formatSentenceCase = (str: string) => {
+              const trimmed = str.trim();
+              if (!trimmed) return '';
+              return trimmed.charAt(0).toUpperCase() + trimmed.slice(1).toLowerCase();
+            };
+
+            const formatValue = (val: string) => {
+              if (val.includes(',')) {
+                return val.split(',').map(part => formatSentenceCase(part)).filter(p => p).join(',');
+              }
+              return formatSentenceCase(val);
+            };
+
+            return `${formatSentenceCase(s.key)}:${formatValue(s.value)}`;
+          })
+          .join(';')
       };
 
       // Create or Update product
@@ -509,17 +574,66 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
             </div>
 
             {/* Additional Specifications */}
-            <div className="space-y-2">
-              <Label htmlFor="additionalSpecifications">Additional Specifications</Label>
-              <Textarea
-                id="additionalSpecifications"
-                value={formData.additionalSpecifications}
-                onChange={(e) => handleInputChange('additionalSpecifications', e.target.value)}
-                placeholder='Enter specifications in format: "BATTERY:20 mah";"COLORS:green,yellow,black";'
-                rows={4}
-              />
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label>Additional Specifications</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSpecifications([...specifications, { key: '', value: '' }])}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Field
+                </Button>
+              </div>
+
+              {specifications.length === 0 && (
+                <p className="text-sm text-gray-500 italic">No specifications added yet.</p>
+              )}
+
+              <div className="space-y-3">
+                {specifications.map((spec, index) => (
+                  <div key={index} className="flex gap-3 items-start">
+                    <div className="flex-1">
+                      <Input
+                        placeholder="Key (e.g. Battery)"
+                        value={spec.key}
+                        onChange={(e) => {
+                          const newSpecs = [...specifications];
+                          newSpecs[index].key = e.target.value;
+                          setSpecifications(newSpecs);
+                        }}
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <Input
+                        placeholder="Value (e.g. 5000mAh)"
+                        value={spec.value}
+                        onChange={(e) => {
+                          const newSpecs = [...specifications];
+                          newSpecs[index].value = e.target.value;
+                          setSpecifications(newSpecs);
+                        }}
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                      onClick={() => {
+                        const newSpecs = specifications.filter((_, i) => i !== index);
+                        setSpecifications(newSpecs);
+                      }}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
               <p className="text-xs text-gray-500">
-                Format: "KEY:value";"KEY2:value1,value2"; Use semicolons to separate specifications, commas for multiple values.
+                Values can be comma-separated for multiple options (e.g. "Red, Blue, Green").
               </p>
             </div>
 

@@ -18,8 +18,8 @@ function parseAdditionalSpecifications(specsString) {
     const [key, value] = spec.split(':').map(s => s.trim());
 
     if (key && value) {
-      // Convert key to uppercase and clean it
-      const cleanKey = key.toUpperCase().replace(/[^A-Z0-9]/g, '');
+      // Use the key as is (trimmed), without forcing uppercase or removing special chars
+      const cleanKey = key;
 
       // Handle multiple values separated by commas
       if (value.includes(',')) {
@@ -156,7 +156,7 @@ exports.list = async (req, res, next) => {
         .skip(skip)
         .limit(parseInt(limit))
         .select(
-          "title description price originalPrice discount category subCategory images inStock rating reviews stockQuantity soldCount attributes"
+          "title description price originalPrice discount category subCategory images inStock rating reviews stockQuantity soldCount attributes additionalSpecifications"
         ),
       Product.countDocuments(filter),
     ]);
@@ -223,7 +223,7 @@ exports.listByMultipleSubcategories = async (req, res, next) => {
         .skip(skip)
         .limit(parseInt(limit))
         .select(
-          "title description price originalPrice discount category subCategory images inStock rating reviews stockQuantity soldCount attributes"
+          "title description price originalPrice discount category subCategory images inStock rating reviews stockQuantity soldCount attributes additionalSpecifications"
         ),
       Product.countDocuments(filter),
     ]);
@@ -613,7 +613,7 @@ exports.getTopDeals = async (req, res, next) => {
       .sort({ soldCount: -1 })
       .limit(parseInt(limit))
       .select(
-        "title description price originalPrice discount category subCategory images inStock rating reviews stockQuantity soldCount attributes"
+        "title description price originalPrice discount category subCategory images inStock rating reviews stockQuantity soldCount attributes additionalSpecifications"
       );
 
     const mappedProducts = products.map(mapProductId);

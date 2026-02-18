@@ -153,10 +153,10 @@ const Products: React.FC = () => {
 
   // Filter products based on search and category
   const filteredProducts = products.filter(product => {
-    const matchesSearch = 
-      product.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    const matchesSearch =
+      product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.id.includes(searchTerm);
-    
+
     const matchesCategory = categoryFilter === "all" || product.category === categoryFilter;
 
     return matchesSearch && matchesCategory;
@@ -306,9 +306,7 @@ const Products: React.FC = () => {
           mode="edit"
           product={{
             ...selectedProduct,
-            additionalSpecifications: typeof selectedProduct.additionalSpecifications === 'string'
-              ? (selectedProduct.additionalSpecifications as unknown as string)
-              : JSON.stringify(selectedProduct.additionalSpecifications || {})
+            additionalSpecifications: selectedProduct.additionalSpecifications || {}
           }}
         />
       )}
