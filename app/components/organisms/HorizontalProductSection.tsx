@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
-import { Star } from 'lucide-react-native';
+import { Star, ChevronRight } from 'lucide-react-native';
 import AppText from '@/components/atoms/AppText';
 import Colors from '@/constants/colors';
 import Spacing from '@/constants/spacing';
@@ -12,6 +12,7 @@ interface HorizontalProductCardProps {
     backgroundColor?: string;
     buttonColor?: string; // New prop for the darker button color
     onPress: (id: string) => void;
+    onViewAll?: () => void;
 }
 
 export default function HorizontalProductSection({
@@ -19,7 +20,8 @@ export default function HorizontalProductSection({
     items,
     backgroundColor = '#FFD8B0',
     buttonColor,
-    onPress
+    onPress,
+    onViewAll
 }: HorizontalProductCardProps) {
     // Fallback if buttonColor is not provided (though we should provide it)
     const activeBtnColor = buttonColor || backgroundColor;
@@ -28,6 +30,11 @@ export default function HorizontalProductSection({
         <View style={[styles.container, { backgroundColor }]}>
             <View style={styles.header}>
                 <AppText variant="h3" weight="bold" style={styles.title}>{title}</AppText>
+                {onViewAll && (
+                    <TouchableOpacity style={styles.viewAllButton} onPress={onViewAll}>
+                        <ChevronRight size={24} color="#000" />
+                    </TouchableOpacity>
+                )}
             </View>
 
             <ScrollView
@@ -96,6 +103,9 @@ const styles = StyleSheet.create({
         fontSize: 20,
         color: '#000',
         fontFamily: 'PlusJakartaSans-Bold',
+    },
+    viewAllButton: {
+        padding: 4,
     },
     scrollContent: {
         paddingHorizontal: Spacing.md,
