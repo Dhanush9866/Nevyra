@@ -1,4 +1,4 @@
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useEffect, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -7,6 +7,8 @@ import {
   RefreshControl,
   StatusBar,
   Animated,
+  FlatList,
+  ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, Stack, useFocusEffect } from 'expo-router';
@@ -19,6 +21,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import AppText from '@/components/atoms/AppText';
 import CategoryItem from '@/components/molecules/CategoryItem';
 import ProductCard from '@/components/molecules/ProductCard';
+import ProductListItem from '@/components/molecules/ProductListItem';
 import HorizontalProductSection from '@/components/organisms/HorizontalProductSection';
 import VerticalProductSection from '@/components/organisms/VerticalProductSection';
 import HomeBannerCarousel from '@/components/organisms/HomeBannerCarousel';
@@ -44,14 +47,22 @@ const SECTION_THEMES = [
   { bg: '#F0F4C3', btn: '#AFB42B' }, // Lime (Lime 700)
 ];
 
+const LOAD_LIMIT = 10;
+
 export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { toggleWishlist, isWishlisted } = useWishlist();
-  const [refreshing, setRefreshing] = React.useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const scrollY = useRef(new Animated.Value(0)).current;
   const { addresses } = useAuth();
   const { selectedAddress } = useCheckout();
+
+  // Infinite Scroll States
+  const [exploreProducts, setExploreProducts] = useState<any[]>([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
 
   const currentAddress = selectedAddress || addresses.find(a => a.isDefault) || addresses[0];
   const addressDisplay = currentAddress
@@ -84,8 +95,40 @@ export default function HomeScreen() {
   // Fetch larger set of products to categorize
   const { data: prodData, isLoading: prodLoading, refetch: refetchProducts } = useQuery({
     queryKey: ['all-products-home'],
-    queryFn: () => apiService.getProducts({ limit: 100 }),
+    queryFn: () => apiService.getProducts({ limit: 40 }),
   });
+
+  const fetchExploreProducts = async (pageNum: number, isRefresh: boolean = false) => {
+    if (isFetchingMore || (!hasMore && !isRefresh)) return;
+
+    setIsFetchingMore(true);
+    try {
+      const response = await apiService.getProducts({ page: pageNum, limit: LOAD_LIMIT });
+      if (response.success) {
+        const newProducts = (response.data || []).sort(() => Math.random() - 0.5);
+        if (isRefresh) {
+          setExploreProducts(newProducts);
+        } else {
+          // Filter out duplicates
+          setExploreProducts(prev => {
+            const existingIds = new Set(prev.map(p => p.id));
+            const uniqueNew = newProducts.filter(p => !existingIds.has(p.id));
+            return [...prev, ...uniqueNew];
+          });
+        }
+        setHasMore(newProducts.length === LOAD_LIMIT);
+        setPage(pageNum);
+      }
+    } catch (error) {
+      console.error('Error fetching explore products:', error);
+    } finally {
+      setIsFetchingMore(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchExploreProducts(1, true);
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
@@ -95,20 +138,34 @@ export default function HomeScreen() {
     }, [refetchCategories, refetchSettings, refetchProducts])
   );
 
-  const categories = catData?.data?.filter((c: any) => !c.parentId && c.image) || [];
-  const fetchedProducts = prodData?.data || [];
+  const categories = React.useMemo(() => {
+    const raw = catData?.data?.filter((c: any) => !c.parentId && c.image) || [];
+    return [...raw].sort(() => Math.random() - 0.5);
+  }, [catData]);
 
-  // Merge fetched products with fallback mock data to ensure we have content for demo
-  // We prioritize fetched products but use mock to fill gaps per category
-  const allProducts = [...fetchedProducts, ...fallbackMockProducts];
+  const fetchedProducts = prodData?.data || [];
+  const allProducts = React.useMemo(() => {
+    const combined = [...fetchedProducts, ...fallbackMockProducts];
+    return [...combined].sort(() => Math.random() - 0.5);
+  }, [fetchedProducts]);
 
   const onRefresh = () => {
     setRefreshing(true);
+    setHasMore(true);
     Promise.all([
       refetchCategories(),
       refetchSettings(),
-      refetchProducts()
-    ]).finally(() => setRefreshing(false));
+      refetchProducts(),
+      fetchExploreProducts(1, true)
+    ]).finally(() => {
+      setRefreshing(false);
+    });
+  };
+
+  const handleEndReached = () => {
+    if (!isFetchingMore && hasMore) {
+      fetchExploreProducts(page + 1);
+    }
   };
 
   // 1. Address Bar Animations
@@ -130,9 +187,135 @@ export default function HomeScreen() {
     extrapolate: 'clamp',
   });
 
+  // Mixed Layout Logic: Convert exploreProducts into rows
+  const productRows = React.useMemo(() => {
+    // REMOVED Shuffle from here to prevent re-render jumps
+    const rows = [];
+    let i = 0;
+    let patternIndex = 0; // 0, 1 = Grid, 2 = List
+
+    while (i < exploreProducts.length) {
+      if (patternIndex % 3 === 2) {
+        // List style Uniqueness
+        rows.push({ type: 'list', data: exploreProducts[i] });
+        i += 1;
+      } else {
+        // Grid style (2 cards)
+        const pair = exploreProducts.slice(i, i + 2);
+        rows.push({ type: 'grid', data: pair });
+        i += 2;
+      }
+      patternIndex++;
+    }
+    return rows;
+  }, [exploreProducts]);
+
   if (catLoading || prodLoading) {
     return <HomeScreenSkeleton />;
   }
+
+  const renderHeader = () => (
+    <View style={styles.header}>
+      <View style={styles.heroSection}>
+        <HomeBannerCarousel banners={heroBanners} />
+      </View>
+
+      <View style={styles.mainContent}>
+        {/* Dynamically Render Category Sections - Alternating Horizontal and Vertical */}
+        {categories.slice(0, 8).map((category: any, index: number) => {
+          let categoryProducts = allProducts.filter((p: any) =>
+            p.category === category.name ||
+            p.category?.name === category.name ||
+            (fallbackMockProducts.some(mp => mp.category === category.name) ? false : true)
+          );
+
+          const theme = SECTION_THEMES[index % SECTION_THEMES.length];
+          const isHorizontal = index % 2 === 0;
+
+          if (isHorizontal) {
+            categoryProducts = [...categoryProducts].sort((a, b) => (a.price || 0) - (b.price || 0));
+            const displayItems = categoryProducts.length > 0 ? categoryProducts.slice(0, 8) : allProducts.slice(index * 2, (index * 2) + 6);
+
+            return (
+              <HorizontalProductSection
+                key={category._id || category.id}
+                title={`Deals on ${category.name}`}
+                backgroundColor={theme.bg}
+                buttonColor={theme.btn}
+                onPress={(id) => router.push(`/product/${id}` as any)}
+                onViewAll={() => router.push({
+                  pathname: '/categories',
+                  params: { categoryId: category._id || category.id }
+                } as any)}
+                items={displayItems}
+              />
+            );
+          } else {
+            categoryProducts = [...categoryProducts].sort((a, b) => (b.soldCount || 0) - (a.soldCount || 0));
+            const displayItems = categoryProducts.length > 0 ? categoryProducts.slice(0, 6) : allProducts.slice(index * 2, (index * 2) + 6);
+
+            return (
+              <VerticalProductSection
+                key={category._id || category.id}
+                title={`Shop for ${category.name}`}
+                backgroundColor={theme.bg}
+                buttonColor={theme.btn}
+                onPress={(id) => router.push(`/product/${id}` as any)}
+                onViewAll={() => router.push({
+                  pathname: '/categories',
+                  params: { categoryId: category._id || category.id }
+                } as any)}
+                items={displayItems}
+              />
+            );
+          }
+        })}
+      </View>
+
+      <View style={styles.exploreHeader}>
+        <AppText variant="h3" weight="bold">More to Explore</AppText>
+      </View>
+    </View>
+  );
+
+  const renderRow = ({ item }: { item: any }) => {
+    if (item.type === 'list') {
+      return (
+        <View style={styles.listRow}>
+          <ProductListItem
+            product={item.data}
+            onPress={() => router.push(`/product/${item.data.id}` as any)}
+          />
+        </View>
+      );
+    }
+
+    return (
+      <View style={styles.gridRow}>
+        {item.data.map((product: any) => (
+          <View key={product.id} style={styles.gridItem}>
+            <ProductCard
+              product={product}
+              onPress={() => router.push(`/product/${product.id}` as any)}
+              onWishlistPress={() => toggleWishlist(product)}
+              isWishlisted={isWishlisted(product.id)}
+            />
+          </View>
+        ))}
+        {item.data.length === 1 && <View style={styles.gridItem} />}
+      </View>
+    );
+  };
+
+  const renderFooter = () => (
+    <View style={styles.loaderContainer}>
+      {isFetchingMore ? (
+        <ActivityIndicator size="small" color={Colors.primary} />
+      ) : !hasMore && exploreProducts.length > 0 ? (
+        <AppText variant="caption" color={Colors.textLight}>Reached the end of items</AppText>
+      ) : null}
+    </View>
+  );
 
   return (
     <View style={styles.container}>
@@ -220,14 +403,26 @@ export default function HomeScreen() {
         </View>
       </Animated.View>
 
-      <Animated.ScrollView
+      <Animated.FlatList
+        data={productRows}
+        renderItem={renderRow}
+        keyExtractor={(item, index) => {
+          if (item.type === 'list') {
+            return `list-${item.data.id}-${index}`;
+          }
+          return `grid-${item.data[0]?.id}-${index}`;
+        }}
+        ListHeaderComponent={renderHeader}
+        ListFooterComponent={renderFooter}
+        onEndReached={handleEndReached}
+        onEndReachedThreshold={0.5}
         showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           { useNativeDriver: false }
         )}
-        contentContainerStyle={{ paddingTop: insets.top + 230 }}
+        contentContainerStyle={{ paddingTop: insets.top + 230, paddingBottom: 20 }}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -235,83 +430,7 @@ export default function HomeScreen() {
             tintColor={Colors.primary}
           />
         }
-      >
-        <View style={styles.heroSection}>
-          <HomeBannerCarousel banners={heroBanners} />
-        </View>
-
-        <View style={styles.mainContent}>
-          {/* Dynamically Render Category Sections - Alternating Horizontal and Vertical */}
-          {categories.slice(0, 8).map((category: any, index: number) => {
-            // Filter products for this specific category
-            let categoryProducts = allProducts.filter((p: any) =>
-              p.category === category.name ||
-              p.category?.name === category.name ||
-              // Relaxed matching/fallback logic
-              (fallbackMockProducts.some(mp => mp.category === category.name) ? false : true)
-            );
-
-            // Use modulo to cycle through themes
-            const theme = SECTION_THEMES[index % SECTION_THEMES.length];
-
-            // Alternate between horizontal and vertical sections
-            // Even indices (0, 2, 4, 6) = Horizontal
-            // Odd indices (1, 3, 5, 7) = Vertical
-            const isHorizontal = index % 2 === 0;
-
-            if (isHorizontal) {
-              // Low to High Price
-              categoryProducts = [...categoryProducts].sort((a, b) => (a.price || 0) - (b.price || 0));
-              const displayItems = categoryProducts.length > 0 ? categoryProducts.slice(0, 8) : allProducts.slice(index * 2, (index * 2) + 6);
-              
-              return (
-                <HorizontalProductSection
-                  key={category._id || category.id}
-                  title={`Deals on ${category.name}`}
-                  backgroundColor={theme.bg}
-                  buttonColor={theme.btn}
-                  onPress={(id) => router.push(`/product/${id}` as any)}
-                  items={displayItems}
-                />
-              );
-            } else {
-              // High Sold Count
-              categoryProducts = [...categoryProducts].sort((a, b) => (b.soldCount || 0) - (a.soldCount || 0));
-              const displayItems = categoryProducts.length > 0 ? categoryProducts.slice(0, 6) : allProducts.slice(index * 2, (index * 2) + 6);
-
-              return (
-                <VerticalProductSection
-                  key={category._id || category.id}
-                  title={`Shop for ${category.name}`}
-                  backgroundColor={theme.bg}
-                  buttonColor={theme.btn}
-                  onPress={(id) => router.push(`/product/${id}` as any)}
-                  items={displayItems}
-                />
-              );
-            }
-          })}
-
-          {/* Fallback Grid if needed */}
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <AppText variant="h4" weight="bold">More to Explore</AppText>
-            </View>
-            <View style={styles.productsGrid}>
-              {allProducts.slice(0, 4).map((product: any) => (
-                <View key={product.id} style={styles.productCard}>
-                  <ProductCard
-                    product={product}
-                    onPress={() => router.push(`/product/${product.id}` as any)}
-                    onWishlistPress={() => toggleWishlist(product)}
-                    isWishlisted={isWishlisted(product.id)}
-                  />
-                </View>
-              ))}
-            </View>
-          </View>
-        </View>
-      </Animated.ScrollView>
+      />
     </View>
   );
 }
@@ -360,6 +479,9 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
     alignItems: 'center',
   },
+  header: {
+    // Wrapper for header components
+  },
   heroSection: {
     marginTop: Spacing.md,
     marginBottom: Spacing.sm,
@@ -367,21 +489,27 @@ const styles = StyleSheet.create({
   mainContent: {
     gap: Spacing.sm,
   },
-  section: {
-    backgroundColor: Colors.white,
-    paddingVertical: Spacing.lg,
-  },
-  sectionHeader: {
+  exploreHeader: {
     paddingHorizontal: Spacing.base,
-    marginBottom: Spacing.md,
+    paddingVertical: Spacing.lg,
+    backgroundColor: Colors.white,
+    marginTop: Spacing.sm,
   },
-  productsGrid: {
+  gridRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     paddingHorizontal: Spacing.xs,
+    backgroundColor: Colors.white,
   },
-  productCard: {
+  gridItem: {
     width: '50%',
     paddingHorizontal: Spacing.xs,
+  },
+  listRow: {
+    marginVertical: Spacing.xs,
+  },
+  loaderContainer: {
+    padding: Spacing.md,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

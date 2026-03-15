@@ -13,6 +13,7 @@ interface VerticalProductSectionProps {
     backgroundColor?: string;
     buttonColor?: string;
     onPress: (id: string) => void;
+    onViewAll?: () => void;
 }
 
 export default function VerticalProductSection({
@@ -20,7 +21,8 @@ export default function VerticalProductSection({
     items,
     backgroundColor = '#FFD8B0',
     buttonColor,
-    onPress
+    onPress,
+    onViewAll
 }: VerticalProductSectionProps) {
     const activeBtnColor = buttonColor || backgroundColor;
 
@@ -31,9 +33,11 @@ export default function VerticalProductSection({
         <View style={[styles.container, { backgroundColor }]}>
             <View style={styles.header}>
                 <AppText variant="h3" weight="bold" style={styles.title}>{title}</AppText>
-                <TouchableOpacity style={styles.viewAllButton}>
-                    <ChevronRight size={24} color="#000" />
-                </TouchableOpacity>
+                {onViewAll && (
+                    <TouchableOpacity style={styles.viewAllButton} onPress={onViewAll}>
+                        <ChevronRight size={24} color="#000" />
+                    </TouchableOpacity>
+                )}
             </View>
 
             {/* White background container */}
