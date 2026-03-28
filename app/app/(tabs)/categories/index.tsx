@@ -84,12 +84,15 @@ import { useQuery } from '@tanstack/react-query';
 import { apiService } from '@/services/api';
 import Loader from '@/components/atoms/Loader';
 import { CategoriesScreenSkeleton } from '@/components/skeletons';
+import { useLocalSearchParams } from 'expo-router';
 
 export default function CategoriesScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { addresses } = useAuth();
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+  const params = useLocalSearchParams();
+  const categoryIdFromParams = params.categoryId as string | undefined;
 
   const defaultAddress = addresses.find(a => a.isDefault) || addresses[0];
   const addressDisplay = defaultAddress
@@ -104,12 +107,16 @@ export default function CategoriesScreen() {
 
   const rootCategories = rootData?.data || [];
   
-  // Set default selected category once data is loaded
+  // Set default selected category once data is loaded or when params change
   React.useEffect(() => {
-    if (rootCategories.length > 0 && !selectedCategoryId) {
-      setSelectedCategoryId(rootCategories[0]._id || rootCategories[0].id);
+    if (rootCategories.length > 0) {
+      if (categoryIdFromParams) {
+        setSelectedCategoryId(categoryIdFromParams);
+      } else if (!selectedCategoryId) {
+        setSelectedCategoryId(rootCategories[0]._id || rootCategories[0].id);
+      }
     }
-  }, [rootCategories]);
+  }, [rootCategories, categoryIdFromParams]);
 
   // Fetch Subcategories for selected root
   const { data: subData, isLoading: isLoadingSubs, error: subError } = useQuery({
