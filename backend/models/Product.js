@@ -70,6 +70,23 @@ const productSchema = new mongoose.Schema(
       type: Map,
       of: mongoose.Schema.Types.Mixed,
     },
+    variantOptions: [
+      {
+        name: { type: String, required: true },
+        values: [{ type: String, required: true }],
+      },
+    ],
+    variantCombinations: [
+      {
+        attributes: { type: Map, of: String }, // e.g., { "Color": "Red", "Size": "M" }
+        price: { type: Number, required: true },
+        originalPrice: { type: Number, default: 0 },
+        stockQuantity: { type: Number, default: 0 },
+        inStock: { type: Boolean, default: true },
+        images: [{ type: String }],
+        sku: { type: String },
+      },
+    ],
   },
   {
     timestamps: true,

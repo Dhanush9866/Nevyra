@@ -54,6 +54,15 @@ function mapProductId(product) {
       obj.additionalSpecifications = obj.additionalSpecifications.toObject();
     }
   }
+  // Ensure variantCombinations attributes are plain objects
+  if (obj.variantCombinations && Array.isArray(obj.variantCombinations)) {
+    obj.variantCombinations = obj.variantCombinations.map(combo => {
+      if (combo.attributes && combo.attributes instanceof Map) {
+        combo.attributes = Object.fromEntries(combo.attributes);
+      }
+      return combo;
+    });
+  }
   return obj;
 }
 
@@ -156,7 +165,7 @@ exports.list = async (req, res, next) => {
         .skip(skip)
         .limit(parseInt(limit))
         .select(
-          "title description price originalPrice discount category subCategory images inStock rating reviews stockQuantity soldCount attributes additionalSpecifications"
+          "title description price originalPrice discount category subCategory images inStock rating reviews stockQuantity soldCount attributes additionalSpecifications variantOptions variantCombinations"
         ),
       Product.countDocuments(filter),
     ]);
@@ -223,7 +232,7 @@ exports.listByMultipleSubcategories = async (req, res, next) => {
         .skip(skip)
         .limit(parseInt(limit))
         .select(
-          "title description price originalPrice discount category subCategory images inStock rating reviews stockQuantity soldCount attributes additionalSpecifications"
+          "title description price originalPrice discount category subCategory images inStock rating reviews stockQuantity soldCount attributes additionalSpecifications variantOptions variantCombinations"
         ),
       Product.countDocuments(filter),
     ]);
@@ -308,6 +317,8 @@ exports.create = async (req, res, next) => {
       soldCount,
       attributes,
       additionalSpecifications,
+      variantOptions,
+      variantCombinations,
     } = req.body;
 
     if (!title || !price || !category || !images || !subCategory)
@@ -375,6 +386,8 @@ exports.create = async (req, res, next) => {
       soldCount,
       attributes,
       additionalSpecifications: parsedSpecs,
+      variantOptions,
+      variantCombinations,
     });
     await product.save();
     res.status(201).json({
@@ -417,6 +430,8 @@ exports.update = async (req, res, next) => {
       soldCount,
       attributes,
       additionalSpecifications,
+      variantOptions,
+      variantCombinations,
     } = req.body;
 
     // Resolve category and subcategory names from IDs if provided
@@ -474,6 +489,8 @@ exports.update = async (req, res, next) => {
     if (stockQuantity !== undefined) product.stockQuantity = stockQuantity;
     if (soldCount !== undefined) product.soldCount = soldCount;
     if (attributes !== undefined) product.attributes = attributes;
+    if (variantOptions !== undefined) product.variantOptions = variantOptions;
+    if (variantCombinations !== undefined) product.variantCombinations = variantCombinations;
     if (additionalSpecifications !== undefined) {
       product.additionalSpecifications = additionalSpecifications ?
         parseAdditionalSpecifications(additionalSpecifications) : {};
@@ -613,7 +630,7 @@ exports.getTopDeals = async (req, res, next) => {
       .sort({ soldCount: -1 })
       .limit(parseInt(limit))
       .select(
-        "title description price originalPrice discount category subCategory images inStock rating reviews stockQuantity soldCount attributes additionalSpecifications"
+        "title description price originalPrice discount category subCategory images inStock rating reviews stockQuantity soldCount attributes additionalSpecifications variantOptions variantCombinations"
       );
 
     const mappedProducts = products.map(mapProductId);

@@ -376,7 +376,7 @@ const Orders = () => {
                       {/* Order Item */}
                       <div className="flex gap-4">
                         <img
-                          src={order.items?.[0]?.productId?.images?.[0] || '/placeholder.svg'}
+                          src={order.items?.[0]?.variantImage || order.items?.[0]?.productId?.images?.[0] || '/placeholder.svg'}
                           alt={order.items?.[0]?.productId?.title || 'Product'}
                           className="w-20 h-20 object-cover rounded"
                         />

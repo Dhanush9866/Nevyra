@@ -1,5 +1,5 @@
-// const API_BASE_URL = 'http://localhost:8000/api/v1';
-const API_BASE_URL = 'https://api.zythova.com/api/v1';
+const API_BASE_URL = 'http://localhost:8000/api/v1';
+// const API_BASE_URL = 'https://api.zythova.com/api/v1';
 
 export interface LoginRequest {
   email: string;
@@ -289,7 +289,11 @@ class ApiService {
   }): Promise<{ success: boolean; message: string; data: any[] }> {
     return this.request<{ success: boolean; message: string; data: any[] }>('/auth/addresses', {
       method: 'POST',
-      body: JSON.stringify(addressData),
+      body: JSON.stringify({
+        ...addressData,
+        addressLine1: addressData.address,
+        state: "N/A"
+      }),
     });
   }
 
@@ -304,7 +308,11 @@ class ApiService {
   }): Promise<{ success: boolean; message: string; data: any[] }> {
     return this.request<{ success: boolean; message: string; data: any[] }>(`/auth/addresses/${index}`, {
       method: 'PATCH',
-      body: JSON.stringify(addressData),
+      body: JSON.stringify({
+        ...addressData,
+        addressLine1: addressData.address,
+        state: "N/A"
+      }),
     });
   }
 
