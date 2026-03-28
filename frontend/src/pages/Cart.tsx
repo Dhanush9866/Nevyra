@@ -19,7 +19,7 @@ const Cart = () => {
       try {
         const res = await apiService.getCart();
         if (res.success) setCartItems(res.data);
-      } catch {}
+      } catch { }
     })();
   }, []);
 
@@ -35,18 +35,18 @@ const Cart = () => {
           item._id === id ? { ...item, quantity: newQuantity } : item
         )
       );
-    } catch {}
+    } catch { }
   };
 
   const removeItem = async (id: string) => {
     try {
       await apiService.removeCartItem(id);
       setCartItems((items) => items.filter((item: any) => item._id !== id));
-    } catch {}
+    } catch { }
   };
 
   const subtotal = cartItems.reduce(
-    (sum, item) => sum + ((item.productId?.price || 0) * (item.quantity || 0)),
+    (sum, item) => sum + ((item.resolvedPrice || item.productId?.price || 0) * (item.quantity || 0)),
     0
   );
   const originalTotal = cartItems.reduce(
@@ -103,7 +103,7 @@ const Cart = () => {
                 <CardContent className="p-0">
                   <div className="flex flex-col md:flex-row gap-4">
                     <img
-                      src={item.productId?.images?.[0] || '/placeholder.svg'}
+                      src={item.resolvedImage || item.variantImage || item.productId?.images?.[0] || '/placeholder.svg'}
                       alt={item.productId?.title}
                       className="w-full md:w-32 h-32 object-cover rounded-lg"
                     />
@@ -124,7 +124,7 @@ const Cart = () => {
                           <div className="flex flex-wrap gap-2">
                             {Object.entries(item.selectedFeatures).map(([key, value]) => (
                               <span key={key} className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
-                                {key}: {value}
+                                {key}: {String(value)}
                               </span>
                             ))}
                           </div>
@@ -133,10 +133,10 @@ const Cart = () => {
 
                       <div className="flex items-center gap-2">
                         <span className="text-xl font-bold text-price">
-                          ₹{(item.productId?.price || 0).toLocaleString()}
+                          ₹{(item.resolvedPrice || item.productId?.price || 0).toLocaleString()}
                         </span>
                         <span className="text-sm text-muted-foreground line-through">
-                          ₹{(item.productId?.mrp || item.productId?.price || 0).toLocaleString()}
+                          ₹{(item.productId?.mrp || (item.resolvedPrice || item.productId?.price || 0) * 1.5).toLocaleString()}
                         </span>
                       </div>
 

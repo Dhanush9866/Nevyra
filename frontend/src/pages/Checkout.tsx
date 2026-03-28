@@ -124,7 +124,7 @@ const Checkout = () => {
     }
   };
 
-  const subtotal = cartItems.reduce((sum, item) => sum + ((item.productId?.price || 0) * (item.quantity || 0)), 0);
+  const subtotal = cartItems.reduce((sum, item) => sum + ((item.resolvedPrice || item.productId?.price || 0) * (item.quantity || 0)), 0);
   const shippingFee = 0;
   const gst = Math.round(subtotal * 0.18);
   const total = subtotal + shippingFee + gst;
@@ -307,7 +307,7 @@ const Checkout = () => {
                                       <Badge variant="secondary">Default</Badge>
                                     )}
                                   </div>
-                                  <p className="text-muted-foreground text-sm mb-1">{address.address}</p>
+                                  <p className="text-muted-foreground text-sm mb-1">{address.address || address.addressLine1}</p>
                                   <p className="text-muted-foreground text-sm mb-1">{address.city}, {address.zipCode}</p>
                                   <p className="text-muted-foreground text-sm">{address.phone}</p>
                                 </div>
@@ -437,7 +437,7 @@ const Checkout = () => {
                       {selectedAddressData ? (
                         <div>
                           <p className="font-medium">{selectedAddressData.firstName} {selectedAddressData.lastName}</p>
-                          <p>{selectedAddressData.address}</p>
+                          <p>{selectedAddressData.address || selectedAddressData.addressLine1}</p>
                           <p>{selectedAddressData.city}, {selectedAddressData.zipCode}</p>
                           <p>{selectedAddressData.phone}</p>
                         </div>
@@ -531,7 +531,7 @@ const Checkout = () => {
                     {cartItems.map((item: any) => (
                       <div key={item.id} className="flex gap-4 border-b border-border pb-4 last:border-b-0">
                         <img
-                          src={item.productId?.images?.[0] || '/placeholder.svg'}
+                          src={item.resolvedImage || item.variantImage || item.productId?.images?.[0] || '/placeholder.svg'}
                           alt={item.productId?.title}
                           className="w-16 h-16 object-cover rounded"
                         />
@@ -544,7 +544,7 @@ const Checkout = () => {
                           </div>
                           <div className="flex justify-between items-center mt-1">
                             <span className="text-sm">Qty: {item.quantity}</span>
-                            <span className="font-medium">₹{((item.productId?.price || 0) * (item.quantity || 0)).toLocaleString()}</span>
+                            <span className="font-medium">₹{((item.resolvedPrice || item.productId?.price || 0) * (item.quantity || 0)).toLocaleString()}</span>
                           </div>
                         </div>
                       </div>
@@ -578,7 +578,7 @@ const Checkout = () => {
                     <div key={item.id} className="flex gap-3 group">
                       <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-muted border border-border group-hover:border-primary/30 transition-colors">
                         <img
-                          src={item.productId?.images?.[0] || '/placeholder.svg'}
+                          src={item.resolvedImage || item.variantImage || item.productId?.images?.[0] || '/placeholder.svg'}
                           alt={item.productId?.title}
                           className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
                         />
@@ -592,7 +592,7 @@ const Checkout = () => {
                         </h4>
                         <div className="flex items-center justify-between mt-1">
                           <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
-                          <p className="text-sm font-bold text-primary">₹{((item.productId?.price || 0) * (item.quantity || 0)).toLocaleString()}</p>
+                          <p className="text-sm font-bold text-primary">₹{((item.resolvedPrice || item.productId?.price || 0) * (item.quantity || 0)).toLocaleString()}</p>
                         </div>
                       </div>
                     </div>

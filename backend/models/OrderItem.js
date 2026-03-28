@@ -19,6 +19,7 @@ const orderItemSchema = new mongoose.Schema(
       of: String,
       default: new Map()
     },
+    variantImage: { type: String },
     isPayoutProcessed: { type: Boolean, default: false }
   },
   { timestamps: true }

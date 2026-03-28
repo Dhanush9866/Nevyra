@@ -30,6 +30,8 @@ interface Product {
   soldCount: number;
   images: string[];
   additionalSpecifications?: Record<string, any>;
+  variantOptions?: any[];
+  variantCombinations?: any[];
   createdAt: string;
   updatedAt: string;
 }
@@ -304,10 +306,7 @@ const Products: React.FC = () => {
           onProductUpdated={handleProductUpdated}
           token={token}
           mode="edit"
-          product={{
-            ...selectedProduct,
-            additionalSpecifications: selectedProduct.additionalSpecifications || {}
-          }}
+          product={selectedProduct}
         />
       )}
     </>

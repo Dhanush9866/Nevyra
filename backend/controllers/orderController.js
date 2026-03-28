@@ -1,6 +1,32 @@
 const mongoose = require("mongoose");
 const { Order, OrderItem, CartItem, Product } = require("../models");
 
+const getProductPrice = (product, selectedFeatures) => {
+  const featuresObj = selectedFeatures instanceof Map ? Object.fromEntries(selectedFeatures) : selectedFeatures || {};
+  if (product.variantCombinations && Array.isArray(product.variantCombinations) && Object.keys(featuresObj).length > 0) {
+    const combo = product.variantCombinations.find(c => {
+      const comboAttrs = c.attributes instanceof Map ? Object.fromEntries(c.attributes) : c.attributes;
+      if (!comboAttrs) return false;
+      return Object.entries(comboAttrs).every(([k, v]) => String(featuresObj[k]) === String(v));
+    });
+    if (combo) return combo.price;
+  }
+  return product.price;
+};
+
+const getVariantImage = (product, selectedFeatures) => {
+  const featuresObj = selectedFeatures instanceof Map ? Object.fromEntries(selectedFeatures) : selectedFeatures || {};
+  if (product.variantCombinations && Array.isArray(product.variantCombinations) && Object.keys(featuresObj).length > 0) {
+    const combo = product.variantCombinations.find(c => {
+      const comboAttrs = c.attributes instanceof Map ? Object.fromEntries(c.attributes) : c.attributes;
+      if (!comboAttrs) return false;
+      return Object.entries(comboAttrs).every(([k, v]) => String(featuresObj[k]) === String(v));
+    });
+    if (combo && combo.images && combo.images.length > 0) return combo.images[0];
+  }
+  return product.images && product.images.length > 0 ? product.images[0] : null;
+};
+
 exports.create = async (req, res, next) => {
   try {
     const { paymentMethod, paymentDetails, shippingAddress, items, totalAmount: providedTotal } = req.body;
@@ -22,14 +48,17 @@ exports.create = async (req, res, next) => {
         }
         const product = await Product.findById(item.productId);
         if (!product) throw new Error(`Product not found: ${item.productId}`);
-        
+
+        const itemPrice = getProductPrice(product, item.selectedFeatures);
+        const itemImage = getVariantImage(product, item.selectedFeatures);
         orderItemsData.push({
           productId: product._id,
           quantity: item.quantity || 1,
-          price: product.price,
-          selectedFeatures: item.selectedFeatures || {}
+          price: itemPrice,
+          selectedFeatures: item.selectedFeatures || {},
+          variantImage: itemImage
         });
-        finalTotalAmount += (item.quantity || 1) * product.price;
+        finalTotalAmount += (item.quantity || 1) * itemPrice;
       }
     } else {
       // Cart checkout
@@ -37,16 +66,19 @@ exports.create = async (req, res, next) => {
       if (!cartItems || cartItems.length === 0) {
         return res.status(400).json({ success: false, message: "Cart is empty" });
       }
-      
+
       isCartOrder = true;
       cartItems.forEach((item) => {
+        const itemPrice = getProductPrice(item.productId, item.selectedFeatures);
+        const itemImage = item.variantImage || getVariantImage(item.productId, item.selectedFeatures);
         orderItemsData.push({
           productId: item.productId._id,
           quantity: item.quantity,
-          price: item.productId.price,
-          selectedFeatures: item.selectedFeatures || {}
+          price: itemPrice,
+          selectedFeatures: item.selectedFeatures || {},
+          variantImage: itemImage
         });
-        finalTotalAmount += item.quantity * (item.productId.price || 0);
+        finalTotalAmount += item.quantity * (itemPrice || 0);
       });
     }
 
@@ -63,7 +95,7 @@ exports.create = async (req, res, next) => {
       paymentStatus: (paymentMethod === "razorpay" && paymentDetails?.razorpayPaymentId) ? "Paid" : "Pending",
       paymentDetails: paymentDetails || {},
     });
-    
+
     await order.save();
 
     // 3. Create OrderItems
@@ -75,6 +107,7 @@ exports.create = async (req, res, next) => {
           quantity: item.quantity,
           price: item.price,
           selectedFeatures: item.selectedFeatures,
+          variantImage: item.variantImage
         });
         return orderItem.save();
       })

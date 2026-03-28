@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { X, Upload, Plus, Loader2 } from 'lucide-react';
 import { adminAPI } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 interface Category {
   _id: string;
@@ -30,12 +31,138 @@ interface ProductFormData {
   reviews: string;
   soldCount: string;
   additionalSpecifications: string;
-  images: File[];
+  images: string[];
 }
+
+interface ImageUploadProps {
+  images: string[];
+  onChange: (urls: string[]) => void;
+  token: string;
+  multiple?: boolean;
+  label?: string;
+  className?: string;
+}
+
+const ImageUpload: React.FC<ImageUploadProps> = ({
+  images,
+  onChange,
+  token,
+  multiple = true,
+  label = "Click to upload or drag and drop",
+  className
+}) => {
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
+
+  const handleUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    try {
+      const filesArray = Array.from(files);
+      const response = multiple
+        ? await adminAPI.upload.multipleImages(filesArray, token)
+        : await adminAPI.upload.singleImage(filesArray[0], token);
+
+      if (response.success) {
+        const newUrls = multiple ? response.data.urls : [response.data.url];
+        onChange(multiple ? [...images, ...newUrls] : newUrls);
+        toast({ title: "Success", description: "Images uploaded successfully" });
+      } else {
+        throw new Error(response.message || "Upload failed");
+      }
+    } catch (err: any) {
+      toast({
+        title: "Upload Error",
+        description: err.message || "Failed to upload images",
+        variant: "destructive"
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <div className={cn("space-y-2", className)}>
+      <div
+        className={cn(
+          "border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-all",
+          uploading && "opacity-50 pointer-events-none border-primary animate-pulse"
+        )}
+        onClick={() => fileInputRef.current?.click()}
+        onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+        onDrop={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          handleUpload(e.dataTransfer.files);
+        }}
+      >
+        <input
+          type="file"
+          multiple={multiple}
+          className="hidden"
+          ref={fileInputRef}
+          onChange={(e) => handleUpload(e.target.files)}
+          accept="image/*"
+        />
+        {uploading ? (
+          <div className="flex flex-col items-center gap-2">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-sm font-medium text-primary">Uploading to cloud...</p>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center">
+            <Upload className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+            <p className="text-sm text-gray-600">{label}</p>
+            <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB each</p>
+          </div>
+        )}
+      </div>
+
+      {images.length > 0 && (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-4">
+          {images.map((url, index) => (
+            <div key={index} className="relative group aspect-square rounded-lg overflow-hidden border bg-muted">
+              <img
+                src={url}
+                alt={`Uploaded ${index + 1}`}
+                className="w-full h-full object-cover transition-transform group-hover:scale-110"
+              />
+              <button
+                type="button"
+                className="absolute top-1 right-1 h-6 w-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onChange(images.filter((_, i) => i !== index));
+                }}
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 interface Specification {
   key: string;
   value: string;
+}
+
+interface VariantOption {
+  name: string;
+  values: string;
+}
+
+interface VariantCombination {
+  attributes: Record<string, string>;
+  price: string;
+  originalPrice: string;
+  stockQuantity: string;
+  sku: string;
+  images: string[];
 }
 
 interface AddProductFormProps {
@@ -60,6 +187,8 @@ interface AddProductFormProps {
     soldCount: number;
     images: string[];
     additionalSpecifications?: any;
+    variantOptions?: any[];
+    variantCombinations?: any[];
   } | null;
 }
 
@@ -82,12 +211,12 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
   });
 
   const [specifications, setSpecifications] = useState<Specification[]>([]);
+  const [variantOptions, setVariantOptions] = useState<VariantOption[]>([]);
+  const [variantCombinations, setVariantCombinations] = useState<VariantCombination[]>([]);
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [subCategories, setSubCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
-  const [uploadingImages, setUploadingImages] = useState(false);
-  const [imagePreview, setImagePreview] = useState<string[]>([]);
   const { toast } = useToast();
 
   // Load categories on component mount
@@ -112,14 +241,19 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
         rating: product.rating != null ? String(product.rating) : '0',
         reviews: product.reviews != null ? String(product.reviews) : '0',
         soldCount: product.soldCount != null ? String(product.soldCount) : '0',
+        images: product.images || [],
         additionalSpecifications: typeof product.additionalSpecifications === 'string'
           ? product.additionalSpecifications
           : JSON.stringify(product.additionalSpecifications || {})
       }));
-      // show existing image previews
-      setImagePreview(product.images || []);
+    } else {
+      setSpecifications([]);
+      setVariantOptions([]);
+      setVariantCombinations([]);
+    }
 
-      // Parse additional specifications
+    // This block should only run if product exists, regardless of mode, for initial setup
+    if (product) {
       if (product.additionalSpecifications) {
         let specsObj = product.additionalSpecifications;
 
@@ -150,16 +284,86 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
         // Now specsObj should be an object. Convert to array for state.
         const loadedSpecs = Object.entries(specsObj).map(([key, value]) => ({
           key,
-          value: Array.isArray(value) ? value.join(',') : String(value)
+          value: Array.isArray(value)
+            ? value.join(',')
+            : String(value).replace(/^"(.*)"$/, '$1').replace(/"/g, '')
         }));
         setSpecifications(loadedSpecs);
       } else {
         setSpecifications([]);
       }
+
+      // Handle variantOptions
+      if (product.variantOptions && Array.isArray(product.variantOptions)) {
+        setVariantOptions(product.variantOptions.map(opt => ({
+          name: opt.name,
+          values: opt.values.join(', ')
+        })));
+      } else {
+        setVariantOptions([]);
+      }
+
+      // Handle variantCombinations
+      if (product.variantCombinations && Array.isArray(product.variantCombinations)) {
+        setVariantCombinations(product.variantCombinations.map(combo => ({
+          attributes: combo.attributes || {},
+          price: String(combo.price || ''),
+          originalPrice: String(combo.originalPrice || ''),
+          stockQuantity: String(combo.stockQuantity || ''),
+          sku: combo.sku || '',
+          images: combo.images || []
+        })));
+      } else {
+        setVariantCombinations([]);
+      }
     } else {
       setSpecifications([]);
+      setVariantOptions([]);
+      setVariantCombinations([]);
     }
-  }, [mode, product]);
+  }, [mode, product?.id]);
+
+  const generateCombinations = () => {
+    const activeOptions = variantOptions.filter(opt => opt.name.trim() && opt.values.trim());
+    if (activeOptions.length === 0) return;
+
+    const valuesArray = activeOptions.map(opt =>
+      opt.values.split(',').map(v => v.trim()).filter(v => v)
+    );
+
+    const getCartesian = (arrays: string[][]) => {
+      return arrays.reduce((a, b) => a.flatMap(d => b.map(e => [d, e].flat())), [[]] as string[][]);
+    };
+
+    const combinations = getCartesian(valuesArray);
+
+    const newCombinations = combinations.map(combo => {
+      const attributes: Record<string, string> = {};
+      activeOptions.forEach((opt, index) => {
+        attributes[opt.name] = combo[index];
+      });
+
+      // Try to find existing combo to preserve values
+      const existing = variantCombinations.find(c =>
+        Object.entries(attributes).every(([k, v]) => c.attributes[k] === v)
+      );
+
+      return existing || {
+        attributes,
+        price: formData.price,
+        originalPrice: formData.originalPrice,
+        stockQuantity: formData.stockQuantity,
+        sku: '',
+        images: []
+      };
+    });
+
+    setVariantCombinations(newCombinations);
+    toast({
+      title: "Generated",
+      description: `Generated ${newCombinations.length} combinations based on options.`,
+    });
+  };
 
   // Update subcategories when category changes
   useEffect(() => {
@@ -213,13 +417,10 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
     }
   };
 
-  const handleInputChange = (field: keyof ProductFormData, value: string | boolean) => {
+  const handleInputChange = (field: keyof Omit<ProductFormData, 'images'>, value: string | boolean) => {
     setFormData(prev => {
       const newState = { ...prev, [field]: value };
 
-      // Auto-calculate logic
-      // If we change originalPrice or discount -> calculate price (Selling Price)
-      // Price = OriginalPrice - (OriginalPrice * Discount / 100)
       if (field === 'originalPrice' || field === 'discount') {
         const op = parseFloat(field === 'originalPrice' ? (value as string) : newState.originalPrice);
         const disc = parseFloat(field === 'discount' ? (value as string) : newState.discount);
@@ -231,49 +432,16 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
           newState.price = op.toFixed(2);
         }
       }
-      return newState;
+      return newState as ProductFormData;
     });
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []) as File[];
-    setFormData(prev => ({ ...prev, images: [...prev.images, ...files] }));
 
-    // Create preview URLs
-    const newPreviews = files.map(file => URL.createObjectURL(file));
-    setImagePreview(prev => [...prev, ...newPreviews]);
-  };
-
-  const removeImage = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index)
-    }));
-    setImagePreview(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const uploadImages = async (): Promise<string[]> => {
-    if (formData.images.length === 0) return [];
-
-    setUploadingImages(true);
-    try {
-      const response = await adminAPI.upload.multipleImages(formData.images, token);
-      if (response.success) {
-        return response.data.urls;
-      } else {
-        throw new Error(response.message || 'Upload failed');
-      }
-    } catch (error) {
-      throw error;
-    } finally {
-      setUploadingImages(false);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.title || !formData.price || !formData.category || !formData.subCategory) {
+    if (!formData.title || !formData.category || !formData.subCategory) {
       toast({
         title: "Validation Error",
         description: "Please fill in all required fields",
@@ -284,25 +452,32 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
 
     setLoading(true);
     try {
-      // Upload images first
-      const imageUrls = await uploadImages();
+      const validPrices = variantCombinations.map(c => parseFloat(c.price)).filter(p => !isNaN(p) && p > 0);
+      const lowestComboPrice = validPrices.length > 0 ? Math.min(...validPrices) : 0;
+      
+      const validOrigPrices = variantCombinations.map(c => parseFloat(c.originalPrice)).filter(p => !isNaN(p) && p > 0);
+      const lowestComboOrigPrice = validOrigPrices.length > 0 ? Math.min(...validOrigPrices) : 0;
+
+      const firstComboImages = variantCombinations.length > 0 && variantCombinations[0].images?.length > 0 ? variantCombinations[0].images : [];
+
+      const totalStock = variantCombinations.reduce((sum, c) => sum + (parseInt(c.stockQuantity) || 0), 0);
+      const isOverallInStock = totalStock > 0;
 
       // Prepare product data
       const productData = {
         title: formData.title,
         description: formData.description,
-        price: parseFloat(formData.price),
-        originalPrice: parseFloat(formData.originalPrice) || 0,
-        discount: parseFloat(formData.discount) || 0,
+        price: lowestComboPrice,
+        originalPrice: lowestComboOrigPrice,
+        discount: 0,
         category: formData.category,
         subCategory: formData.subCategory,
-        stockQuantity: parseInt(formData.stockQuantity) || 0,
-        inStock: formData.inStock,
+        stockQuantity: totalStock,
+        inStock: isOverallInStock,
         rating: parseFloat(formData.rating) || 0,
         reviews: parseInt(formData.reviews) || 0,
         soldCount: parseInt(formData.soldCount) || 0,
-        // If editing and no new images uploaded, keep existing ones
-        images: imageUrls.length > 0 ? imageUrls : (mode === 'edit' && product ? product.images : []),
+        images: firstComboImages,
         additionalSpecifications: specifications
           .filter(s => s.key.trim() && s.value.trim())
           .map(s => {
@@ -321,7 +496,21 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
 
             return `${formatSentenceCase(s.key)}:${formatValue(s.value)}`;
           })
-          .join(';')
+          .join(';'),
+        variantOptions: variantOptions
+          .filter(v => v.name.trim() && v.values.trim())
+          .map(v => ({
+            name: v.name.trim(),
+            values: v.values.split(',').map(opt => opt.trim()).filter(opt => opt)
+          })),
+        variantCombinations: variantCombinations.map(combo => ({
+          attributes: combo.attributes,
+          price: parseFloat(combo.price) || 0,
+          originalPrice: parseFloat(combo.originalPrice) || 0,
+          stockQuantity: parseInt(combo.stockQuantity) || 0,
+          sku: combo.sku,
+          images: combo.images
+        }))
       };
 
       // Create or Update product
@@ -392,51 +581,6 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
               </div>
             </div>
 
-            {/* Pricing Information */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="originalPrice">Original Price (₹) *</Label>
-                <Input
-                  id="originalPrice"
-                  type="number"
-                  step="0.01"
-                  value={formData.originalPrice}
-                  onChange={(e) => handleInputChange('originalPrice', e.target.value)}
-                  placeholder="0.00"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="discount">Discount (%)</Label>
-                <Input
-                  id="discount"
-                  type="number"
-                  step="0.1"
-                  min="0"
-                  max="100"
-                  value={formData.discount}
-                  onChange={(e) => handleInputChange('discount', e.target.value)}
-                  placeholder="0"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="price">Final Price (₹) *</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  step="0.01"
-                  value={formData.price}
-                  onChange={(e) => handleInputChange('price', e.target.value)}
-                  placeholder="0.00"
-                  required
-                  readOnly // Make price read-only as it is calculated
-                  className="bg-gray-100"
-                />
-              </div>
-            </div>
-
             {/* Category Selection */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -476,102 +620,6 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
               </div>
             </div>
 
-            {/* Stock Information */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="stockQuantity">Stock Quantity</Label>
-                <Input
-                  id="stockQuantity"
-                  type="number"
-                  value={formData.stockQuantity}
-                  onChange={(e) => handleInputChange('stockQuantity', e.target.value)}
-                  placeholder="0"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="rating">Rating</Label>
-                <Input
-                  id="rating"
-                  type="number"
-                  step="0.1"
-                  min="0"
-                  max="5"
-                  value={formData.rating}
-                  onChange={(e) => handleInputChange('rating', e.target.value)}
-                  placeholder="0.0"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="reviews">Reviews Count</Label>
-                <Input
-                  id="reviews"
-                  type="number"
-                  value={formData.reviews}
-                  onChange={(e) => handleInputChange('reviews', e.target.value)}
-                  placeholder="0"
-                />
-              </div>
-            </div>
-
-            {/* In Stock Toggle */}
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id="inStock"
-                checked={formData.inStock}
-                onChange={(e) => handleInputChange('inStock', e.target.checked)}
-                className="rounded"
-              />
-              <Label htmlFor="inStock">Product is in stock</Label>
-            </div>
-
-            {/* Image Upload */}
-            <div className="space-y-2">
-              <Label>Product Images</Label>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="hidden"
-                  id="image-upload"
-                />
-                <label htmlFor="image-upload" className="cursor-pointer">
-                  <Upload className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                  <p className="text-sm text-gray-600">
-                    Click to upload images or drag and drop
-                  </p>
-                  <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB each</p>
-                </label>
-              </div>
-
-              {/* Image Previews */}
-              {imagePreview.length > 0 && (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-                  {imagePreview.map((preview, index) => (
-                    <div key={index} className="relative">
-                      <img
-                        src={preview}
-                        alt={`Preview ${index + 1}`}
-                        className="w-full h-24 object-cover rounded-lg"
-                      />
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="sm"
-                        className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
-                        onClick={() => removeImage(index)}
-                      >
-                        <X className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
 
             {/* Additional Specifications */}
             <div className="space-y-4">
@@ -637,16 +685,211 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
               </p>
             </div>
 
+            {/* Product Variants Section */}
+            <div className="space-y-6 pt-6 border-t">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <Label className="text-base font-semibold">Variant Options</Label>
+                  <p className="text-sm text-muted-foreground">Define your variant types (e.g. Color, Size)</p>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setVariantOptions([...variantOptions, { name: '', values: '' }])}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Option
+                </Button>
+              </div>
+
+              <div className="space-y-3">
+                {variantOptions.map((opt, index) => (
+                  <div key={index} className="flex gap-3 items-start">
+                    <div className="w-1/3">
+                      <Input
+                        placeholder="Option Name (e.g. Color)"
+                        value={opt.name}
+                        onChange={(e) => {
+                          const newOpts = [...variantOptions];
+                          newOpts[index].name = e.target.value;
+                          setVariantOptions(newOpts);
+                        }}
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <Input
+                        placeholder="Values (comma separated: Red, Blue)"
+                        value={opt.values}
+                        onChange={(e) => {
+                          const newOpts = [...variantOptions];
+                          newOpts[index].values = e.target.value;
+                          setVariantOptions(newOpts);
+                        }}
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="text-red-500 hover:text-red-700 h-10 w-10"
+                      onClick={() => {
+                        setVariantOptions(variantOptions.filter((_, i) => i !== index));
+                      }}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+
+              {variantOptions.some(o => o.name && o.values) && (
+                <div className="flex justify-center py-2">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="w-full md:w-auto"
+                    onClick={generateCombinations}
+                  >
+                    Generate Specific Combinations
+                  </Button>
+                </div>
+              )}
+
+              {variantCombinations.length > 0 && (
+                <div className="space-y-4">
+                  <Label className="text-sm font-semibold">Combinations Data</Label>
+                  <div className="overflow-x-auto border rounded-lg">
+                    <table className="min-w-full divide-y divide-border">
+                      <thead className="bg-muted">
+                        <tr>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Variant</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Orig. Price (₹)</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Discount (%)</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Final Price (₹)</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Stock</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">SKU</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Images</th>
+                          <th className="px-4 py-2"></th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-card divide-y divide-border">
+                        {variantCombinations.map((combo, index) => (
+                          <tr key={index}>
+                            <td className="px-4 py-2 text-sm font-medium">
+                              {Object.entries(combo.attributes).map(([k, v]) => `${k}: ${v}`).join(', ')}
+                            </td>
+                            <td className="px-4 py-2">
+                              <Input
+                                type="number"
+                                className="h-8 w-24"
+                                placeholder="Orig. Price"
+                                value={combo.originalPrice}
+                                onChange={(e) => {
+                                  const newCombos = [...variantCombinations];
+                                  newCombos[index].originalPrice = e.target.value;
+                                  setVariantCombinations(newCombos);
+                                }}
+                              />
+                            </td>
+                            <td className="px-4 py-2">
+                              <Input
+                                type="number"
+                                className="h-8 w-20"
+                                placeholder="Discount %"
+                                onChange={(e) => {
+                                  const disc = parseFloat(e.target.value);
+                                  const op = parseFloat(combo.originalPrice);
+                                  const newCombos = [...variantCombinations];
+                                  if (!isNaN(disc) && !isNaN(op)) {
+                                     newCombos[index].price = (op - (op * disc / 100)).toFixed(2);
+                                  }
+                                  setVariantCombinations(newCombos);
+                                }}
+                              />
+                            </td>
+                            <td className="px-4 py-2">
+                              <Input
+                                type="number"
+                                className="h-8 w-24"
+                                placeholder="Final Price"
+                                value={combo.price}
+                                onChange={(e) => {
+                                  const newCombos = [...variantCombinations];
+                                  newCombos[index].price = e.target.value;
+                                  setVariantCombinations(newCombos);
+                                }}
+                              />
+                            </td>
+                            <td className="px-4 py-2">
+                              <Input
+                                type="number"
+                                className="h-8 w-20"
+                                value={combo.stockQuantity}
+                                onChange={(e) => {
+                                  const newCombos = [...variantCombinations];
+                                  newCombos[index].stockQuantity = e.target.value;
+                                  setVariantCombinations(newCombos);
+                                }}
+                              />
+                            </td>
+                            <td className="px-4 py-2">
+                              <Input
+                                className="h-8 w-24"
+                                value={combo.sku}
+                                onChange={(e) => {
+                                  const newCombos = [...variantCombinations];
+                                  newCombos[index].sku = e.target.value;
+                                  setVariantCombinations(newCombos);
+                                }}
+                              />
+                            </td>
+                            <td className="px-4 py-2">
+                              <div className="min-w-[150px]">
+                                <ImageUpload
+                                  images={combo.images}
+                                  onChange={(urls) => {
+                                    const newCombos = [...variantCombinations];
+                                    newCombos[index].images = urls;
+                                    setVariantCombinations(newCombos);
+                                  }}
+                                  token={token}
+                                  label="Drop images"
+                                />
+                              </div>
+                            </td>
+                            <td className="px-4 py-2 text-right">
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-red-500"
+                                onClick={() => {
+                                  setVariantCombinations(variantCombinations.filter((_, i) => i !== index));
+                                }}
+                              >
+                                <X className="h-3 w-3" />
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Submit Buttons */}
             <div className="flex justify-end space-x-4">
               <Button type="button" variant="outline" onClick={onClose}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={loading || uploadingImages}>
-                {loading || uploadingImages ? (
+              <Button type="submit" disabled={loading}>
+                {loading ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    {uploadingImages ? 'Uploading Images...' : (mode === 'edit' ? 'Updating Product...' : 'Creating Product...')}
+                    {mode === 'edit' ? 'Updating...' : 'Creating...'}
                   </>
                 ) : (
                   mode === 'edit' ? 'Update Product' : 'Create Product'

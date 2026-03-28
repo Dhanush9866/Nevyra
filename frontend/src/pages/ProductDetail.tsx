@@ -22,13 +22,22 @@ interface Product {
   category: string;
   subCategory: string;
   images: string[];
+  attributes?: Record<string, any>;
   inStock: boolean;
   rating: number;
   reviews: number;
   stockQuantity: number;
   soldCount: number;
-  attributes?: Record<string, any>;
   additionalSpecifications?: Record<string, any>;
+  variantOptions?: { name: string; values: string[] }[];
+  variantCombinations?: {
+    attributes: Record<string, string>;
+    price: number;
+    originalPrice?: number;
+    stockQuantity: number;
+    images?: string[];
+    sku?: string;
+  }[];
 }
 
 interface SelectedFeatures {
@@ -62,6 +71,7 @@ const ProductDetail = () => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [selectedFeatures, setSelectedFeatures] = useState<SelectedFeatures>({});
   const [addingToCart, setAddingToCart] = useState(false);
+  const [selectedCombination, setSelectedCombination] = useState<any>(null);
 
   // Reviews state
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -102,12 +112,11 @@ const ProductDetail = () => {
       const response = await apiService.getProductById(productId!);
       if (response.success) {
         setProduct(response.data);
-        // Initialize selected features with first available option for each feature
         const initialFeatures: SelectedFeatures = {};
-        if (response.data.additionalSpecifications) {
-          Object.entries(response.data.additionalSpecifications).forEach(([key, value]) => {
-            if (Array.isArray(value) && value.length > 0) {
-              initialFeatures[key] = value[0];
+        if (response.data.variantOptions && Array.isArray(response.data.variantOptions)) {
+          response.data.variantOptions.forEach((opt: any) => {
+            if (opt.values && opt.values.length > 0) {
+              initialFeatures[opt.name] = opt.values[0];
             }
           });
         }
@@ -133,6 +142,45 @@ const ProductDetail = () => {
     }
   };
 
+  useEffect(() => {
+    if (product?.variantCombinations && Object.keys(selectedFeatures).length > 0) {
+      const combo = product.variantCombinations.find(c =>
+        Object.entries(selectedFeatures).every(([k, v]) => c.attributes[k] === v)
+      );
+      setSelectedCombination(combo || null);
+      if (combo?.images?.length) {
+        setSelectedImage(0);
+      }
+    } else {
+      setSelectedCombination(null);
+    }
+  }, [selectedFeatures, product]);
+
+  const isOptionAvailable = (optionName: string, value: string) => {
+    if (!product?.variantCombinations) return true;
+
+    // Check if there is ANY combination with current selections + this specific value that is in stock
+    return product.variantCombinations.some(combo => {
+      // Must match THIS value
+      if (combo.attributes[optionName] !== value) return false;
+
+      // Must match OTHER currently selected attributes (if they exist)
+      const matchesOtherSelections = Object.entries(selectedFeatures).every(([k, v]) => {
+        if (k === optionName) return true;
+        // If the other option isn't in this combination, we can't really judge, but usually they are all there
+        return combo.attributes[k] === v;
+      });
+
+      return matchesOtherSelections && combo.stockQuantity > 0;
+    });
+  };
+
+  const getVariantOptionImage = (optionName: string, value: string) => {
+    if (!product?.variantCombinations) return null;
+    const combo = product.variantCombinations.find(c => c.attributes[optionName] === value && c.images && c.images.length > 0);
+    return combo ? (combo.images as string[])[0] : null;
+  };
+
   const handleQuantityChange = (change: number) => {
     const newQuantity = quantity + change;
     if (newQuantity >= 1 && newQuantity <= 10) {
@@ -148,6 +196,11 @@ const ProductDetail = () => {
   };
 
   const handleAddToCart = async () => {
+    if (!isAuthenticated) {
+      toast({ title: "Authentication required", description: "Please login to add items to your cart", variant: "destructive" });
+      navigate("/login");
+      return;
+    }
     if (!product) return;
 
     try {
@@ -177,6 +230,11 @@ const ProductDetail = () => {
   };
 
   const handleBuyNow = async () => {
+    if (!isAuthenticated) {
+      toast({ title: "Authentication required", description: "Please login to proceed to checkout", variant: "destructive" });
+      navigate("/login");
+      return;
+    }
     if (!product) return;
 
     try {
@@ -343,8 +401,22 @@ const ProductDetail = () => {
     );
   }
 
-  const discount = calculateDiscount(product.price);
-  const originalPrice = product.price * 1.5;
+  const discount = selectedCombination ?
+    calculateDiscount(selectedCombination.price) :
+    calculateDiscount(product.price);
+
+  const currentPrice = selectedCombination ? selectedCombination.price : product.price;
+  const currentOriginalPrice = selectedCombination && selectedCombination.originalPrice ?
+    selectedCombination.originalPrice :
+    (selectedCombination ? selectedCombination.price * 1.5 : product.price * 1.5);
+
+  const inventoryStatus = selectedCombination ?
+    (selectedCombination.stockQuantity > 0 ? "In Stock" : "Out of Stock") :
+    (product.inStock ? "In Stock" : "Out of Stock");
+
+  const currentImages = selectedCombination?.images?.length > 0 ?
+    selectedCombination.images :
+    product.images;
 
   return (
     <div className="min-h-screen bg-background font-roboto">
@@ -361,14 +433,14 @@ const ProductDetail = () => {
           <div className="space-y-4">
             <div className="relative">
               <img
-                src={(product.images && product.images[selectedImage]) || getProductImage(product.images)}
+                src={(currentImages && currentImages[selectedImage]) || getProductImage(currentImages)}
                 alt={product.title}
                 className="w-full h-96 object-cover rounded-lg border border-border"
               />
             </div>
-            {product.images && product.images.length > 1 && (
+            {currentImages && currentImages.length > 1 && (
               <div className="flex gap-2 overflow-x-auto">
-                {product.images.map((image, index) => (
+                {currentImages.map((image, index) => (
                   <img
                     key={index}
                     src={image}
@@ -398,8 +470,8 @@ const ProductDetail = () => {
                     {product.reviews.toLocaleString()} reviews
                   </span>
                 </div>
-                <Badge variant={product.inStock ? "default" : "destructive"} className={product.inStock ? "text-success border-success" : ""}>
-                  {product.inStock ? "In Stock" : "Out of Stock"}
+                <Badge variant={inventoryStatus === "In Stock" ? "default" : "destructive"} className={inventoryStatus === "In Stock" ? "text-success border-success" : ""}>
+                  {inventoryStatus}
                 </Badge>
               </div>
             </div>
@@ -407,63 +479,63 @@ const ProductDetail = () => {
             {/* Pricing */}
             <div className="space-y-2">
               <div className="flex items-center gap-3">
-                <span className="text-3xl font-bold text-price">₹{product.price.toLocaleString()}</span>
+                <span className="text-3xl font-bold text-price">₹{currentPrice.toLocaleString()}</span>
                 {discount > 0 && (
-                  <span className="text-xl text-muted-foreground line-through">₹{originalPrice.toLocaleString()}</span>
+                  <span className="text-xl text-muted-foreground line-through">₹{currentOriginalPrice.toLocaleString()}</span>
                 )}
               </div>
               <p className="text-sm text-muted-foreground">Inclusive of all taxes</p>
             </div>
 
-            {/* Additional Features Selection */}
-            {product.additionalSpecifications && Object.keys(product.additionalSpecifications).length > 0 && (
+            {/* Product Variants Selection */}
+            {product.variantOptions && product.variantOptions.length > 0 && (
               <Card>
                 <CardContent className="p-4">
-                  <h3 className="font-semibold text-foreground mb-4">Select Options</h3>
+                  <h3 className="font-semibold text-foreground mb-4">Select Variants</h3>
                   <div className="space-y-4">
-                    {Object.entries(product.additionalSpecifications).map(([key, value]) => {
-                      // If value is an array -> render selectable chips
-                      if (Array.isArray(value) && value.length > 0) {
-                        return (
-                          <div key={key} className="space-y-2">
-                            <label className="text-sm font-medium text-foreground capitalize">
-                              {key.replace(/([A-Z])/g, ' $1').trim()}
-                            </label>
-                            <div className="flex flex-wrap gap-2">
-                              {value.map((option: string) => {
-                                const isActive = (selectedFeatures[key] || value[0]) === option;
-                                return (
-                                  <button
-                                    type="button"
-                                    key={option}
-                                    onClick={() => handleFeatureChange(key, option)}
-                                    className={`px-3 py-1.5 rounded-md border text-sm transition-colors ${isActive
-                                      ? 'border-primary bg-primary/10 text-primary'
-                                      : 'border-border hover:border-primary/50'
-                                      }`}
-                                  >
-                                    {option}
-                                  </button>
-                                );
-                              })}
-                            </div>
-                          </div>
-                        );
-                      }
-                      // Non-array -> show as a badge in a Special Features row
-                      return (
-                        <div key={key} className="space-y-2">
+                    {product.variantOptions.map((option) => (
+                      <div key={option.name} className="space-y-2">
+                        <div className="flex justify-between items-center">
                           <label className="text-sm font-medium text-foreground capitalize">
-                            {key.replace(/([A-Z])/g, ' $1').trim()}
+                            {option.name}
                           </label>
-                          <div className="flex flex-wrap gap-2">
-                            <Badge variant="secondary" className="capitalize">
-                              {String(value)}
-                            </Badge>
-                          </div>
+                          {selectedFeatures[option.name] && (
+                            <span className="text-xs text-muted-foreground">
+                              Selected: <span className="text-primary font-medium">{selectedFeatures[option.name]}</span>
+                            </span>
+                          )}
                         </div>
-                      );
-                    })}
+                        <div className="flex flex-wrap gap-2">
+                          {option.values.map((value) => {
+                            const isActive = selectedFeatures[option.name] === value;
+                            const isAvailable = isOptionAvailable(option.name, value);
+                            const optImage = getVariantOptionImage(option.name, value);
+                            return (
+                              <button
+                                type="button"
+                                key={value}
+                                onClick={() => handleFeatureChange(option.name, value)}
+                                className={`flex items-center overflow-hidden rounded-md border text-sm transition-all relative ${isActive
+                                  ? 'border-primary bg-primary/10 text-primary ring-1 ring-primary'
+                                  : isAvailable
+                                    ? 'border-border hover:border-primary/50 text-foreground'
+                                    : 'border-border opacity-50 bg-muted cursor-not-allowed text-muted-foreground line-through'
+                                  }`}
+                              >
+                                {optImage ? (
+                                  <>
+                                    <img src={optImage} alt={value} className="w-10 h-10 object-cover border-r border-border shrink-0" />
+                                    <span className="px-3 py-2 font-medium">{value}</span>
+                                  </>
+                                ) : (
+                                  <span className="px-3 py-2">{value}</span>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </CardContent>
               </Card>
@@ -778,7 +850,7 @@ const ProductDetail = () => {
       </div>
 
       <Footer />
-    </div>
+    </div >
   );
 };
 
