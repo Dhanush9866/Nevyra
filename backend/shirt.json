@@ -1,0 +1,109 @@
+{
+  "_id": "69ba139c24046561fde918f3",
+  "seller": null,
+  "title": "Trending Shirt",
+  "description": "Shirts ",
+  "price": 405,
+  "originalPrice": 500,
+  "discount": 0,
+  "category": "Fashion & Beauty",
+  "subCategory": "Men's wear",
+  "images": [
+    "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773802205/nevyra/products/emb2rpszxcsecnv1nxb5.jpg"
+  ],
+  "inStock": true,
+  "rating": 0,
+  "reviews": 0,
+  "stockQuantity": 987,
+  "lowStockThreshold": 5,
+  "soldCount": 0,
+  "additionalSpecifications": {},
+  "variantOptions": [
+    {
+      "name": "Colour",
+      "values": [
+        "Red",
+        "White",
+        "Black",
+        "Green",
+        "Blue"
+      ],
+      "_id": "69ba13fe24046561fde91985"
+    }
+  ],
+  "variantCombinations": [
+    {
+      "attributes": {
+        "Colour": "Red"
+      },
+      "price": 480,
+      "originalPrice": 500,
+      "stockQuantity": 100,
+      "inStock": true,
+      "images": [
+        "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773802205/nevyra/products/emb2rpszxcsecnv1nxb5.jpg"
+      ],
+      "sku": "",
+      "_id": "69ba13fe24046561fde91986"
+    },
+    {
+      "attributes": {
+        "Colour": "White"
+      },
+      "price": 405,
+      "originalPrice": 500,
+      "stockQuantity": 189,
+      "inStock": true,
+      "images": [
+        "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773802223/nevyra/products/ko4jbic9bhweovsl7wwr.jpg"
+      ],
+      "sku": "",
+      "_id": "69ba13fe24046561fde91987"
+    },
+    {
+      "attributes": {
+        "Colour": "Black"
+      },
+      "price": 425,
+      "originalPrice": 500,
+      "stockQuantity": 198,
+      "inStock": true,
+      "images": [
+        "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773802244/nevyra/products/c1pw0ajsjdwa8vqhnzzp.jpg"
+      ],
+      "sku": "",
+      "_id": "69ba13fe24046561fde91988"
+    },
+    {
+      "attributes": {
+        "Colour": "Green"
+      },
+      "price": 405,
+      "originalPrice": 500,
+      "stockQuantity": 500,
+      "inStock": true,
+      "images": [
+        "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773802261/nevyra/products/wu5jcga4rosrs3qbnxdv.jpg"
+      ],
+      "sku": "",
+      "_id": "69ba13fe24046561fde91989"
+    },
+    {
+      "attributes": {
+        "Colour": "Blue"
+      },
+      "price": 430,
+      "originalPrice": 500,
+      "stockQuantity": 0,
+      "inStock": true,
+      "images": [
+        "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773802281/nevyra/products/xtykl0zduycr1nisgioa.jpg"
+      ],
+      "sku": "",
+      "_id": "69ba13fe24046561fde9198a"
+    }
+  ],
+  "createdAt": "2026-03-18T02:53:16.828Z",
+  "updatedAt": "2026-03-18T02:54:54.493Z",
+  "__v": 1
+}
