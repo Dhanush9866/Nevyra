@@ -234,8 +234,8 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
         price: product.price != null ? String(product.price) : '',
         originalPrice: product.originalPrice != null ? String(product.originalPrice) : '',
         discount: product.discount != null ? String(product.discount) : '',
-        category: '', // will resolve to id after categories load
-        subCategory: '',
+        category: product.category || '',
+        subCategory: product.subCategory || '',
         stockQuantity: product.stockQuantity != null ? String(product.stockQuantity) : '',
         inStock: product.inStock ?? true,
         rating: product.rating != null ? String(product.rating) : '0',
@@ -368,7 +368,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
   // Update subcategories when category changes
   useEffect(() => {
     if (formData.category) {
-      const parentCategory = categories.find(cat => cat._id === formData.category);
+      const parentCategory = categories.find(cat => cat.name === formData.category || cat._id === formData.category);
 
       if (parentCategory) {
         const subs = categories.filter(cat => cat.parentId === parentCategory._id);
@@ -379,7 +379,6 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
     } else {
       setSubCategories([]);
     }
-    setFormData(prev => ({ ...prev, subCategory: '' }));
   }, [formData.category, categories]);
 
   const loadCategories = async () => {
@@ -387,15 +386,20 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
       const response = await adminAPI.categories.getAll();
       if (response.success) {
         setCategories(response.data);
-        // If editing, map existing category/subCategory names to IDs
         if (mode === 'edit' && product) {
-          const parent = response.data.find((c: Category) => !c.parentId && c.name === product.category);
-          const sub = response.data.find((c: Category) => c.parentId && c.name === product.subCategory);
+          const matchString = (a?: string, b?: string) => {
+            if (!a || !b) return false;
+            return a.trim().toLowerCase() === b.trim().toLowerCase() || a === b;
+          };
+          const parent = response.data.find((c: Category) => !c.parentId && (matchString(c.name, product.category) || c._id === product.category));
+          const sub = response.data.find((c: Category) => c.parentId === parent?._id && (matchString(c.name, product.subCategory) || c._id === product.subCategory));
+          
           setFormData(prev => ({
             ...prev,
-            category: parent?._id || '',
-            subCategory: sub?._id || ''
+            category: parent?.name || product.category || '',
+            subCategory: sub?.name || product.subCategory || ''
           }));
+          
           if (parent) {
             const subs = response.data.filter((cat: Category) => cat.parentId === parent._id);
             setSubCategories(subs);
@@ -420,6 +424,10 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
   const handleInputChange = (field: keyof Omit<ProductFormData, 'images'>, value: string | boolean) => {
     setFormData(prev => {
       const newState = { ...prev, [field]: value };
+
+      if (field === 'category') {
+        newState.subCategory = '';
+      }
 
       if (field === 'originalPrice' || field === 'discount') {
         const op = parseFloat(field === 'originalPrice' ? (value as string) : newState.originalPrice);
@@ -585,13 +593,13 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="category">Category *</Label>
-                <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
+                <Select key={`cat-${categories.length}`} value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
                     {categories.filter(cat => !cat.parentId).map(category => (
-                      <SelectItem key={category._id} value={category._id}>
+                      <SelectItem key={category._id} value={category.name}>
                         {category.name}
                       </SelectItem>
                     ))}
@@ -602,6 +610,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
               <div className="space-y-2">
                 <Label htmlFor="subCategory">Sub Category *</Label>
                 <Select
+                  key={`subcat-${subCategories.length}`}
                   value={formData.subCategory}
                   onValueChange={(value) => handleInputChange('subCategory', value)}
                   disabled={!formData.category}
@@ -611,7 +620,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onClose, onProductAdded
                   </SelectTrigger>
                   <SelectContent>
                     {subCategories.map(subCategory => (
-                      <SelectItem key={subCategory._id} value={subCategory._id}>
+                      <SelectItem key={subCategory._id} value={subCategory.name}>
                         {subCategory.name}
                       </SelectItem>
                     ))}

@@ -1,0 +1,5087 @@
+[
+  {
+    "_id": "694e19846427cdce58640916",
+    "name": "Medical & Pharmacy",
+    "parentId": null,
+    "createdAt": "2025-12-26T05:13:40.135Z",
+    "updatedAt": "2025-12-26T05:13:40.135Z",
+    "__v": 0,
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1769086983/WhatsApp_Image_2026-01-21_at_6.14.38_AM_tomxsr.jpg"
+  },
+  {
+    "_id": "694e19846427cdce58640931",
+    "name": "Groceries",
+    "parentId": null,
+    "createdAt": "2025-12-26T05:13:40.856Z",
+    "updatedAt": "2025-12-26T05:13:40.856Z",
+    "__v": 0,
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1769086983/WhatsApp_Image_2026-01-21_at_6.14.51_AM_lyzjyx.jpg"
+  },
+  {
+    "_id": "694e19856427cdce5864093a",
+    "name": "Fashion & Beauty",
+    "parentId": null,
+    "createdAt": "2025-12-26T05:13:41.090Z",
+    "updatedAt": "2025-12-26T05:13:41.090Z",
+    "__v": 0,
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1769086982/WhatsApp_Image_2026-01-21_at_6.15.08_AM_wjaxrg.jpg"
+  },
+  {
+    "_id": "694e19856427cdce58640955",
+    "name": "Devices",
+    "parentId": null,
+    "createdAt": "2025-12-26T05:13:41.788Z",
+    "updatedAt": "2025-12-26T05:13:41.788Z",
+    "__v": 0,
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1769086982/WhatsApp_Image_2026-01-21_at_6.20.05_AM_tvfuot.jpg"
+  },
+  {
+    "_id": "694e19876427cdce58640994",
+    "name": "Sports",
+    "parentId": null,
+    "createdAt": "2025-12-26T05:13:43.408Z",
+    "updatedAt": "2025-12-26T05:13:43.408Z",
+    "__v": 0,
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1769086988/WhatsApp_Image_2026-01-21_at_6.17.54_AM_jcmdit.jpg"
+  },
+  {
+    "_id": "6950c2a57c3d82ae424ecc44",
+    "name": "Electrical & Electronics",
+    "parentId": null,
+    "createdAt": "2025-12-28T05:39:49.682Z",
+    "updatedAt": "2025-12-28T05:39:49.682Z",
+    "__v": 0,
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1769086984/WhatsApp_Image_2026-01-21_at_6.16.08_AM_xn5sfy.jpg"
+  },
+  {
+    "_id": "6950c3794ac0989e7808cd24",
+    "name": "Automotive & Automobile",
+    "parentId": null,
+    "createdAt": "2025-12-28T05:43:21.795Z",
+    "updatedAt": "2025-12-28T05:43:21.795Z",
+    "__v": 0,
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1769086984/WhatsApp_Image_2026-01-21_at_6.15.54_AM_v1d0cs.jpg"
+  },
+  {
+    "_id": "6950c49f0873823fd059be98",
+    "name": "Home Interior & Decor",
+    "parentId": null,
+    "createdAt": "2025-12-28T05:48:15.502Z",
+    "updatedAt": "2025-12-28T05:48:15.502Z",
+    "__v": 0,
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1769086982/WhatsApp_Image_2026-01-21_at_6.16.18_AM_ghcg62.jpg"
+  },
+  {
+    "_id": "6972615582d6f72c047749a3",
+    "name": "Personal Care",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151298/nevyra/Categories/medical-pharmacy/mm9fnrqdeotedu8cvd2c.jpg",
+    "parentId": "694e19846427cdce58640916",
+    "createdAt": "2026-01-22T17:41:41.802Z",
+    "updatedAt": "2026-03-10T14:01:42.060Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615582d6f72c047749a5",
+    "name": "Oral Care",
+    "image": null,
+    "parentId": "6972615582d6f72c047749a3",
+    "createdAt": "2026-01-22T17:41:41.842Z",
+    "updatedAt": "2026-01-22T17:41:41.842Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615582d6f72c047749a7",
+    "name": "Body Care",
+    "image": null,
+    "parentId": "6972615582d6f72c047749a3",
+    "createdAt": "2026-01-22T17:41:41.880Z",
+    "updatedAt": "2026-01-22T17:41:41.880Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615582d6f72c047749a9",
+    "name": "Intimate Care",
+    "image": null,
+    "parentId": "6972615582d6f72c047749a3",
+    "createdAt": "2026-01-22T17:41:41.918Z",
+    "updatedAt": "2026-01-22T17:41:41.918Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615582d6f72c047749ab",
+    "name": "Hand Wash & Sanitizers",
+    "image": null,
+    "parentId": "6972615582d6f72c047749a3",
+    "createdAt": "2026-01-22T17:41:41.955Z",
+    "updatedAt": "2026-01-22T17:41:41.955Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615582d6f72c047749ad",
+    "name": "Skin Care",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151303/nevyra/Categories/medical-pharmacy/q51xffvx8otgzutqwjjm.jpg",
+    "parentId": "694e19846427cdce58640916",
+    "createdAt": "2026-01-22T17:41:41.993Z",
+    "updatedAt": "2026-03-10T14:01:46.072Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615682d6f72c047749af",
+    "name": "Face Wash & Cleansers",
+    "image": null,
+    "parentId": "6972615582d6f72c047749ad",
+    "createdAt": "2026-01-22T17:41:42.031Z",
+    "updatedAt": "2026-01-22T17:41:42.031Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615682d6f72c047749b1",
+    "name": "Moisturizers & Creams",
+    "image": null,
+    "parentId": "6972615582d6f72c047749ad",
+    "createdAt": "2026-01-22T17:41:42.069Z",
+    "updatedAt": "2026-01-22T17:41:42.069Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615682d6f72c047749b3",
+    "name": "Sunscreen",
+    "image": null,
+    "parentId": "6972615582d6f72c047749ad",
+    "createdAt": "2026-01-22T17:41:42.108Z",
+    "updatedAt": "2026-01-22T17:41:42.108Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615682d6f72c047749b5",
+    "name": "Acne & Pimple Care",
+    "image": null,
+    "parentId": "6972615582d6f72c047749ad",
+    "createdAt": "2026-01-22T17:41:42.145Z",
+    "updatedAt": "2026-01-22T17:41:42.145Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615682d6f72c047749b7",
+    "name": "Anti-Aging",
+    "image": null,
+    "parentId": "6972615582d6f72c047749ad",
+    "createdAt": "2026-01-22T17:41:42.185Z",
+    "updatedAt": "2026-01-22T17:41:42.185Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615682d6f72c047749b9",
+    "name": "Serums & Toners",
+    "image": null,
+    "parentId": "6972615582d6f72c047749ad",
+    "createdAt": "2026-01-22T17:41:42.234Z",
+    "updatedAt": "2026-01-22T17:41:42.234Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615682d6f72c047749bb",
+    "name": "Hair Care",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151291/nevyra/Categories/medical-pharmacy/cj2bgxld5ewiabrjf2e6.jpg",
+    "parentId": "694e19846427cdce58640916",
+    "createdAt": "2026-01-22T17:41:42.275Z",
+    "updatedAt": "2026-03-10T14:01:33.601Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615682d6f72c047749bd",
+    "name": "Shampoo",
+    "image": null,
+    "parentId": "6972615682d6f72c047749bb",
+    "createdAt": "2026-01-22T17:41:42.312Z",
+    "updatedAt": "2026-01-22T17:41:42.312Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615682d6f72c047749bf",
+    "name": "Conditioner",
+    "image": null,
+    "parentId": "6972615682d6f72c047749bb",
+    "createdAt": "2026-01-22T17:41:42.349Z",
+    "updatedAt": "2026-01-22T17:41:42.349Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615682d6f72c047749c1",
+    "name": "Hair Oil",
+    "image": null,
+    "parentId": "6972615682d6f72c047749bb",
+    "createdAt": "2026-01-22T17:41:42.386Z",
+    "updatedAt": "2026-01-22T17:41:42.386Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615682d6f72c047749c3",
+    "name": "Hair Serum",
+    "image": null,
+    "parentId": "6972615682d6f72c047749bb",
+    "createdAt": "2026-01-22T17:41:42.423Z",
+    "updatedAt": "2026-01-22T17:41:42.423Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615682d6f72c047749c5",
+    "name": "Hair Fall Treatment",
+    "image": null,
+    "parentId": "6972615682d6f72c047749bb",
+    "createdAt": "2026-01-22T17:41:42.458Z",
+    "updatedAt": "2026-01-22T17:41:42.458Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615682d6f72c047749c7",
+    "name": "Dandruff Care",
+    "image": null,
+    "parentId": "6972615682d6f72c047749bb",
+    "createdAt": "2026-01-22T17:41:42.494Z",
+    "updatedAt": "2026-01-22T17:41:42.494Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615682d6f72c047749c9",
+    "name": "Makeup",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151294/nevyra/Categories/medical-pharmacy/lsm3au3h1nfhe5l3penz.jpg",
+    "parentId": "694e19846427cdce58640916",
+    "createdAt": "2026-01-22T17:41:42.530Z",
+    "updatedAt": "2026-03-10T14:01:36.823Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615682d6f72c047749cb",
+    "name": "Face Makeup",
+    "image": null,
+    "parentId": "6972615682d6f72c047749c9",
+    "createdAt": "2026-01-22T17:41:42.567Z",
+    "updatedAt": "2026-01-22T17:41:42.567Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615682d6f72c047749cd",
+    "name": "Eye Makeup",
+    "image": null,
+    "parentId": "6972615682d6f72c047749c9",
+    "createdAt": "2026-01-22T17:41:42.604Z",
+    "updatedAt": "2026-01-22T17:41:42.604Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615682d6f72c047749cf",
+    "name": "Lip Makeup",
+    "image": null,
+    "parentId": "6972615682d6f72c047749c9",
+    "createdAt": "2026-01-22T17:41:42.640Z",
+    "updatedAt": "2026-01-22T17:41:42.640Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615682d6f72c047749d1",
+    "name": "Makeup Kits",
+    "image": null,
+    "parentId": "6972615682d6f72c047749c9",
+    "createdAt": "2026-01-22T17:41:42.675Z",
+    "updatedAt": "2026-01-22T17:41:42.675Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615682d6f72c047749d3",
+    "name": "Makeup Tools & Brushes",
+    "image": null,
+    "parentId": "6972615682d6f72c047749c9",
+    "createdAt": "2026-01-22T17:41:42.711Z",
+    "updatedAt": "2026-01-22T17:41:42.711Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615682d6f72c047749d5",
+    "name": "Foot, Hand & Nail Care",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151253/nevyra/Categories/medical-pharmacy/ltjjb5xjseayo6fizt0n.jpg",
+    "parentId": "694e19846427cdce58640916",
+    "createdAt": "2026-01-22T17:41:42.746Z",
+    "updatedAt": "2026-03-10T14:00:55.378Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615682d6f72c047749d7",
+    "name": "Foot Creams",
+    "image": null,
+    "parentId": "6972615682d6f72c047749d5",
+    "createdAt": "2026-01-22T17:41:42.781Z",
+    "updatedAt": "2026-01-22T17:41:42.781Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615682d6f72c047749d9",
+    "name": "Hand Creams",
+    "image": null,
+    "parentId": "6972615682d6f72c047749d5",
+    "createdAt": "2026-01-22T17:41:42.818Z",
+    "updatedAt": "2026-01-22T17:41:42.818Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615682d6f72c047749db",
+    "name": "Nail Care",
+    "image": null,
+    "parentId": "6972615682d6f72c047749d5",
+    "createdAt": "2026-01-22T17:41:42.854Z",
+    "updatedAt": "2026-01-22T17:41:42.854Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615682d6f72c047749dd",
+    "name": "Manicure & Pedicure Kits",
+    "image": null,
+    "parentId": "6972615682d6f72c047749d5",
+    "createdAt": "2026-01-22T17:41:42.889Z",
+    "updatedAt": "2026-01-22T17:41:42.889Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615682d6f72c047749df",
+    "name": "Salon Equipment",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151277/nevyra/Categories/medical-pharmacy/we8qifuvzoncehlsgoyi.jpg",
+    "parentId": "694e19846427cdce58640916",
+    "createdAt": "2026-01-22T17:41:42.924Z",
+    "updatedAt": "2026-03-10T14:01:24.434Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615682d6f72c047749e1",
+    "name": "Hair Dryers",
+    "image": null,
+    "parentId": "6972615682d6f72c047749df",
+    "createdAt": "2026-01-22T17:41:42.960Z",
+    "updatedAt": "2026-01-22T17:41:42.960Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615682d6f72c047749e3",
+    "name": "Hair Straighteners",
+    "image": null,
+    "parentId": "6972615682d6f72c047749df",
+    "createdAt": "2026-01-22T17:41:42.997Z",
+    "updatedAt": "2026-01-22T17:41:42.997Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615782d6f72c047749e5",
+    "name": "Trimmers & Clippers",
+    "image": null,
+    "parentId": "6972615682d6f72c047749df",
+    "createdAt": "2026-01-22T17:41:43.034Z",
+    "updatedAt": "2026-01-22T17:41:43.034Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615782d6f72c047749e7",
+    "name": "Facial Machines",
+    "image": null,
+    "parentId": "6972615682d6f72c047749df",
+    "createdAt": "2026-01-22T17:41:43.069Z",
+    "updatedAt": "2026-01-22T17:41:43.069Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615782d6f72c047749e9",
+    "name": "Salon Chairs & Accessories",
+    "image": null,
+    "parentId": "6972615682d6f72c047749df",
+    "createdAt": "2026-01-22T17:41:43.105Z",
+    "updatedAt": "2026-01-22T17:41:43.105Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615782d6f72c047749eb",
+    "name": "Shave & Hair Removal",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151285/nevyra/Categories/medical-pharmacy/a2wzz2v1s8trv2syf4kh.jpg",
+    "parentId": "694e19846427cdce58640916",
+    "createdAt": "2026-01-22T17:41:43.141Z",
+    "updatedAt": "2026-03-10T14:01:27.432Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615782d6f72c047749ed",
+    "name": "Razors",
+    "image": null,
+    "parentId": "6972615782d6f72c047749eb",
+    "createdAt": "2026-01-22T17:41:43.176Z",
+    "updatedAt": "2026-01-22T17:41:43.176Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615782d6f72c047749ef",
+    "name": "Shaving Cream & Foam",
+    "image": null,
+    "parentId": "6972615782d6f72c047749eb",
+    "createdAt": "2026-01-22T17:41:43.211Z",
+    "updatedAt": "2026-01-22T17:41:43.211Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615782d6f72c047749f1",
+    "name": "After Shave",
+    "image": null,
+    "parentId": "6972615782d6f72c047749eb",
+    "createdAt": "2026-01-22T17:41:43.247Z",
+    "updatedAt": "2026-01-22T17:41:43.247Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615782d6f72c047749f3",
+    "name": "Hair Removal Creams",
+    "image": null,
+    "parentId": "6972615782d6f72c047749eb",
+    "createdAt": "2026-01-22T17:41:43.283Z",
+    "updatedAt": "2026-01-22T17:41:43.283Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615782d6f72c047749f5",
+    "name": "Waxing Products",
+    "image": null,
+    "parentId": "6972615782d6f72c047749eb",
+    "createdAt": "2026-01-22T17:41:43.318Z",
+    "updatedAt": "2026-01-22T17:41:43.318Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615782d6f72c047749f7",
+    "name": "Bleach Crems",
+    "image": null,
+    "parentId": "6972615782d6f72c047749eb",
+    "createdAt": "2026-01-22T17:41:43.353Z",
+    "updatedAt": "2026-01-22T17:41:43.353Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615782d6f72c047749f9",
+    "name": "Epilator Devices",
+    "image": null,
+    "parentId": "6972615782d6f72c047749eb",
+    "createdAt": "2026-01-22T17:41:43.388Z",
+    "updatedAt": "2026-01-22T17:41:43.388Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615782d6f72c047749fb",
+    "name": "Threading Tools",
+    "image": null,
+    "parentId": "6972615782d6f72c047749eb",
+    "createdAt": "2026-01-22T17:41:43.424Z",
+    "updatedAt": "2026-01-22T17:41:43.424Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615782d6f72c047749fd",
+    "name": "Fragrance",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151260/nevyra/Categories/medical-pharmacy/xx3zaxcxgk4be4jo4frr.jpg",
+    "parentId": "694e19846427cdce58640916",
+    "createdAt": "2026-01-22T17:41:43.459Z",
+    "updatedAt": "2026-03-10T14:01:05.475Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615782d6f72c047749ff",
+    "name": "Perfumes",
+    "image": null,
+    "parentId": "6972615782d6f72c047749fd",
+    "createdAt": "2026-01-22T17:41:43.494Z",
+    "updatedAt": "2026-01-22T17:41:43.494Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615782d6f72c04774a01",
+    "name": "Deodorants",
+    "image": null,
+    "parentId": "6972615782d6f72c047749fd",
+    "createdAt": "2026-01-22T17:41:43.530Z",
+    "updatedAt": "2026-01-22T17:41:43.530Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615782d6f72c04774a03",
+    "name": "Body Mists",
+    "image": null,
+    "parentId": "6972615782d6f72c047749fd",
+    "createdAt": "2026-01-22T17:41:43.565Z",
+    "updatedAt": "2026-01-22T17:41:43.565Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615782d6f72c04774a05",
+    "name": "Roll-On",
+    "image": null,
+    "parentId": "6972615782d6f72c047749fd",
+    "createdAt": "2026-01-22T17:41:43.602Z",
+    "updatedAt": "2026-01-22T17:41:43.602Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615782d6f72c04774a07",
+    "name": "Health & Wellness",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151266/nevyra/Categories/medical-pharmacy/ifiscms6eiusmvq4nplk.jpg",
+    "parentId": "694e19846427cdce58640916",
+    "createdAt": "2026-01-22T17:41:43.638Z",
+    "updatedAt": "2026-03-10T14:01:08.554Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615782d6f72c04774a09",
+    "name": "Health Supplements",
+    "image": null,
+    "parentId": "6972615782d6f72c04774a07",
+    "createdAt": "2026-01-22T17:41:43.674Z",
+    "updatedAt": "2026-01-22T17:41:43.674Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615782d6f72c04774a0b",
+    "name": "Vitamins & Minerals",
+    "image": null,
+    "parentId": "6972615782d6f72c04774a07",
+    "createdAt": "2026-01-22T17:41:43.709Z",
+    "updatedAt": "2026-01-22T17:41:43.709Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615782d6f72c04774a0d",
+    "name": "Protein & Nutrition",
+    "image": null,
+    "parentId": "6972615782d6f72c04774a07",
+    "createdAt": "2026-01-22T17:41:43.745Z",
+    "updatedAt": "2026-01-22T17:41:43.745Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615782d6f72c04774a0f",
+    "name": "Immunity Boosters",
+    "image": null,
+    "parentId": "6972615782d6f72c04774a07",
+    "createdAt": "2026-01-22T17:41:43.781Z",
+    "updatedAt": "2026-01-22T17:41:43.781Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615782d6f72c04774a11",
+    "name": "Herbal Supplements",
+    "image": null,
+    "parentId": "6972615782d6f72c04774a07",
+    "createdAt": "2026-01-22T17:41:43.816Z",
+    "updatedAt": "2026-01-22T17:41:43.816Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615782d6f72c04774a13",
+    "name": "Medical Devices",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151269/nevyra/Categories/medical-pharmacy/j9pixqwmznzs82nczdcb.jpg",
+    "parentId": "694e19846427cdce58640916",
+    "createdAt": "2026-01-22T17:41:43.852Z",
+    "updatedAt": "2026-03-10T14:01:11.106Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615782d6f72c04774a15",
+    "name": "Bp Monitors",
+    "image": null,
+    "parentId": "6972615782d6f72c04774a13",
+    "createdAt": "2026-01-22T17:41:43.888Z",
+    "updatedAt": "2026-01-22T17:41:43.888Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615782d6f72c04774a17",
+    "name": "Glucometers",
+    "image": null,
+    "parentId": "6972615782d6f72c04774a13",
+    "createdAt": "2026-01-22T17:41:43.924Z",
+    "updatedAt": "2026-01-22T17:41:43.924Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615782d6f72c04774a19",
+    "name": "Thermometers",
+    "image": null,
+    "parentId": "6972615782d6f72c04774a13",
+    "createdAt": "2026-01-22T17:41:43.960Z",
+    "updatedAt": "2026-01-22T17:41:43.960Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615782d6f72c04774a1b",
+    "name": "Nebulizers",
+    "image": null,
+    "parentId": "6972615782d6f72c04774a13",
+    "createdAt": "2026-01-22T17:41:43.997Z",
+    "updatedAt": "2026-01-22T17:41:43.997Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615882d6f72c04774a1d",
+    "name": "Pulse Oximeters",
+    "image": null,
+    "parentId": "6972615782d6f72c04774a13",
+    "createdAt": "2026-01-22T17:41:44.032Z",
+    "updatedAt": "2026-01-22T17:41:44.032Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615882d6f72c04774a1f",
+    "name": "Weighing Scales",
+    "image": null,
+    "parentId": "6972615782d6f72c04774a13",
+    "createdAt": "2026-01-22T17:41:44.068Z",
+    "updatedAt": "2026-01-22T17:41:44.068Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615882d6f72c04774a21",
+    "name": "Fitness & Rehab",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151249/nevyra/Categories/medical-pharmacy/n9byx8pcdmibrxm9gqtb.jpg",
+    "parentId": "694e19846427cdce58640916",
+    "createdAt": "2026-01-22T17:41:44.104Z",
+    "updatedAt": "2026-03-10T14:00:52.810Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615882d6f72c04774a23",
+    "name": "Orthopedic Supports",
+    "image": null,
+    "parentId": "6972615882d6f72c04774a21",
+    "createdAt": "2026-01-22T17:41:44.140Z",
+    "updatedAt": "2026-01-22T17:41:44.140Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615882d6f72c04774a25",
+    "name": "Knee/Back/Wrist Supports",
+    "image": null,
+    "parentId": "6972615882d6f72c04774a21",
+    "createdAt": "2026-01-22T17:41:44.176Z",
+    "updatedAt": "2026-01-22T17:41:44.176Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615882d6f72c04774a27",
+    "name": "Hot & Cold Packs",
+    "image": null,
+    "parentId": "6972615882d6f72c04774a21",
+    "createdAt": "2026-01-22T17:41:44.212Z",
+    "updatedAt": "2026-01-22T17:41:44.212Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615882d6f72c04774a29",
+    "name": "Posture Correctors",
+    "image": null,
+    "parentId": "6972615882d6f72c04774a21",
+    "createdAt": "2026-01-22T17:41:44.247Z",
+    "updatedAt": "2026-01-22T17:41:44.247Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615882d6f72c04774a2b",
+    "name": "Physiotherapy Equipment",
+    "image": null,
+    "parentId": "6972615882d6f72c04774a21",
+    "createdAt": "2026-01-22T17:41:44.282Z",
+    "updatedAt": "2026-01-22T17:41:44.282Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615882d6f72c04774a2d",
+    "name": "First Aid & Emergency",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151244/nevyra/Categories/medical-pharmacy/wzuitzv1obmyy2w2ayjp.jpg",
+    "parentId": "694e19846427cdce58640916",
+    "createdAt": "2026-01-22T17:41:44.319Z",
+    "updatedAt": "2026-03-10T14:00:47.502Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615882d6f72c04774a2f",
+    "name": "First Aid Kits",
+    "image": null,
+    "parentId": "6972615882d6f72c04774a2d",
+    "createdAt": "2026-01-22T17:41:44.354Z",
+    "updatedAt": "2026-01-22T17:41:44.354Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615882d6f72c04774a31",
+    "name": "Bandages & Gauze",
+    "image": null,
+    "parentId": "6972615882d6f72c04774a2d",
+    "createdAt": "2026-01-22T17:41:44.390Z",
+    "updatedAt": "2026-01-22T17:41:44.390Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615882d6f72c04774a33",
+    "name": "Antiseptic Liquids",
+    "image": null,
+    "parentId": "6972615882d6f72c04774a2d",
+    "createdAt": "2026-01-22T17:41:44.426Z",
+    "updatedAt": "2026-01-22T17:41:44.426Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615882d6f72c04774a35",
+    "name": "Cotton & Medical Tapes",
+    "image": null,
+    "parentId": "6972615882d6f72c04774a2d",
+    "createdAt": "2026-01-22T17:41:44.462Z",
+    "updatedAt": "2026-01-22T17:41:44.462Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615882d6f72c04774a37",
+    "name": "Burn Care",
+    "image": null,
+    "parentId": "6972615882d6f72c04774a2d",
+    "createdAt": "2026-01-22T17:41:44.497Z",
+    "updatedAt": "2026-01-22T17:41:44.497Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615882d6f72c04774a39",
+    "name": "Women's Health",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151287/nevyra/Categories/medical-pharmacy/byqrhzcznksh7iiukyxe.jpg",
+    "parentId": "694e19846427cdce58640916",
+    "createdAt": "2026-01-22T17:41:44.533Z",
+    "updatedAt": "2026-03-10T14:01:30.201Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615882d6f72c04774a3b",
+    "name": "Sanitary Napkins",
+    "image": null,
+    "parentId": "6972615882d6f72c04774a39",
+    "createdAt": "2026-01-22T17:41:44.568Z",
+    "updatedAt": "2026-01-22T17:41:44.568Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615882d6f72c04774a3d",
+    "name": "Menstrual Cups",
+    "image": null,
+    "parentId": "6972615882d6f72c04774a39",
+    "createdAt": "2026-01-22T17:41:44.604Z",
+    "updatedAt": "2026-01-22T17:41:44.604Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615882d6f72c04774a3f",
+    "name": "Intimate Wash",
+    "image": null,
+    "parentId": "6972615882d6f72c04774a39",
+    "createdAt": "2026-01-22T17:41:44.641Z",
+    "updatedAt": "2026-01-22T17:41:44.641Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615882d6f72c04774a41",
+    "name": "Maternity Care",
+    "image": null,
+    "parentId": "6972615882d6f72c04774a39",
+    "createdAt": "2026-01-22T17:41:44.676Z",
+    "updatedAt": "2026-01-22T17:41:44.676Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615882d6f72c04774a43",
+    "name": "Pregnancy Test Kits",
+    "image": null,
+    "parentId": "6972615882d6f72c04774a39",
+    "createdAt": "2026-01-22T17:41:44.711Z",
+    "updatedAt": "2026-01-22T17:41:44.711Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615882d6f72c04774a45",
+    "name": "Men's Health",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151272/nevyra/Categories/medical-pharmacy/qgp7a3xckp3mk2tehh3u.jpg",
+    "parentId": "694e19846427cdce58640916",
+    "createdAt": "2026-01-22T17:41:44.746Z",
+    "updatedAt": "2026-03-10T14:01:14.398Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615882d6f72c04774a47",
+    "name": "Men's Grooming",
+    "image": null,
+    "parentId": "6972615882d6f72c04774a45",
+    "createdAt": "2026-01-22T17:41:44.781Z",
+    "updatedAt": "2026-01-22T17:41:44.781Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615882d6f72c04774a49",
+    "name": "Hair Loss Solutions",
+    "image": null,
+    "parentId": "6972615882d6f72c04774a45",
+    "createdAt": "2026-01-22T17:41:44.817Z",
+    "updatedAt": "2026-01-22T17:41:44.817Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615882d6f72c04774a4b",
+    "name": "Sexual Wellness",
+    "image": null,
+    "parentId": "6972615882d6f72c04774a45",
+    "createdAt": "2026-01-22T17:41:44.852Z",
+    "updatedAt": "2026-01-22T17:41:44.852Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615882d6f72c04774a4d",
+    "name": "Ayurvedic & Herbal",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151235/nevyra/Categories/medical-pharmacy/rcjxo0rmkd4lm8arhhxw.jpg",
+    "parentId": "694e19846427cdce58640916",
+    "createdAt": "2026-01-22T17:41:44.887Z",
+    "updatedAt": "2026-03-10T14:00:38.186Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615882d6f72c04774a4f",
+    "name": "Ayurvedic Medicines",
+    "image": null,
+    "parentId": "6972615882d6f72c04774a4d",
+    "createdAt": "2026-01-22T17:41:44.924Z",
+    "updatedAt": "2026-01-22T17:41:44.924Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615882d6f72c04774a51",
+    "name": "Herbal Oils",
+    "image": null,
+    "parentId": "6972615882d6f72c04774a4d",
+    "createdAt": "2026-01-22T17:41:44.960Z",
+    "updatedAt": "2026-01-22T17:41:44.960Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615882d6f72c04774a53",
+    "name": "Herbal Powders",
+    "image": null,
+    "parentId": "6972615882d6f72c04774a4d",
+    "createdAt": "2026-01-22T17:41:44.996Z",
+    "updatedAt": "2026-01-22T17:41:44.996Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615982d6f72c04774a55",
+    "name": "Traditional Remedies",
+    "image": null,
+    "parentId": "6972615882d6f72c04774a4d",
+    "createdAt": "2026-01-22T17:41:45.031Z",
+    "updatedAt": "2026-01-22T17:41:45.031Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615982d6f72c04774a57",
+    "name": "Elder Care",
+    "image": "https://placehold.co/600x400?text=Mock+Upload",
+    "parentId": "694e19846427cdce58640916",
+    "createdAt": "2026-01-22T17:41:45.067Z",
+    "updatedAt": "2026-03-10T14:00:43.584Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615982d6f72c04774a59",
+    "name": "Adult Diapers",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a57",
+    "createdAt": "2026-01-22T17:41:45.103Z",
+    "updatedAt": "2026-01-22T17:41:45.103Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615982d6f72c04774a5b",
+    "name": "Walking Sticks",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a57",
+    "createdAt": "2026-01-22T17:41:45.138Z",
+    "updatedAt": "2026-01-22T17:41:45.138Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615982d6f72c04774a5d",
+    "name": "Hearing Aids",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a57",
+    "createdAt": "2026-01-22T17:41:45.173Z",
+    "updatedAt": "2026-01-22T17:41:45.173Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615982d6f72c04774a5f",
+    "name": "Wheelchairs",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a57",
+    "createdAt": "2026-01-22T17:41:45.210Z",
+    "updatedAt": "2026-01-22T17:41:45.210Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615982d6f72c04774a61",
+    "name": "Pill Organizers",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a57",
+    "createdAt": "2026-01-22T17:41:45.245Z",
+    "updatedAt": "2026-01-22T17:41:45.245Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615982d6f72c04774a63",
+    "name": "Nutrition & Special Care",
+    "image": null,
+    "parentId": "694e19846427cdce58640916",
+    "createdAt": "2026-01-22T17:41:45.281Z",
+    "updatedAt": "2026-01-22T17:41:45.281Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615982d6f72c04774a65",
+    "name": "Diabetic Care",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a63",
+    "createdAt": "2026-01-22T17:41:45.317Z",
+    "updatedAt": "2026-01-22T17:41:45.317Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615982d6f72c04774a67",
+    "name": "Sugar Free Products",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a63",
+    "createdAt": "2026-01-22T17:41:45.353Z",
+    "updatedAt": "2026-01-22T17:41:45.353Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615982d6f72c04774a69",
+    "name": "Heart Care",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a63",
+    "createdAt": "2026-01-22T17:41:45.388Z",
+    "updatedAt": "2026-01-22T17:41:45.388Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615982d6f72c04774a6b",
+    "name": "Weight Management",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a63",
+    "createdAt": "2026-01-22T17:41:45.424Z",
+    "updatedAt": "2026-01-22T17:41:45.424Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615982d6f72c04774a6e",
+    "name": "General food items",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151200/nevyra/Categories/groceries/iroxudkpwqotgkfgroiu.jpg",
+    "parentId": "694e19846427cdce58640931",
+    "createdAt": "2026-01-22T17:41:45.493Z",
+    "updatedAt": "2026-03-10T14:00:03.817Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615982d6f72c04774a70",
+    "name": "Rice & Rice Products",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a6e",
+    "createdAt": "2026-01-22T17:41:45.529Z",
+    "updatedAt": "2026-01-22T17:41:45.529Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615982d6f72c04774a72",
+    "name": "Atta, Flours & Sooji",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a6e",
+    "createdAt": "2026-01-22T17:41:45.565Z",
+    "updatedAt": "2026-01-22T17:41:45.565Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615982d6f72c04774a74",
+    "name": "Pulses & Dals",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a6e",
+    "createdAt": "2026-01-22T17:41:45.601Z",
+    "updatedAt": "2026-01-22T17:41:45.601Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615982d6f72c04774a76",
+    "name": "Cooking Oils & Ghee",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a6e",
+    "createdAt": "2026-01-22T17:41:45.637Z",
+    "updatedAt": "2026-01-22T17:41:45.637Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615982d6f72c04774a78",
+    "name": "Sugar, Jaggery & Salt",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a6e",
+    "createdAt": "2026-01-22T17:41:45.673Z",
+    "updatedAt": "2026-01-22T17:41:45.673Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615982d6f72c04774a7a",
+    "name": "Snacks & Namkeen",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a6e",
+    "createdAt": "2026-01-22T17:41:45.708Z",
+    "updatedAt": "2026-01-22T17:41:45.708Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615982d6f72c04774a7c",
+    "name": "Biscuits & Cookies",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a6e",
+    "createdAt": "2026-01-22T17:41:45.744Z",
+    "updatedAt": "2026-01-22T17:41:45.744Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615982d6f72c04774a7e",
+    "name": "Breakfast Cereals",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a6e",
+    "createdAt": "2026-01-22T17:41:45.780Z",
+    "updatedAt": "2026-01-22T17:41:45.780Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615982d6f72c04774a80",
+    "name": "Noodles, Pasta & Vermicelli",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a6e",
+    "createdAt": "2026-01-22T17:41:45.816Z",
+    "updatedAt": "2026-01-22T17:41:45.816Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615982d6f72c04774a82",
+    "name": "Ready to Eat/ Ready to Cook",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a6e",
+    "createdAt": "2026-01-22T17:41:45.852Z",
+    "updatedAt": "2026-01-22T17:41:45.852Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615982d6f72c04774a84",
+    "name": "Whole Spices",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a6e",
+    "createdAt": "2026-01-22T17:41:45.887Z",
+    "updatedAt": "2026-01-22T17:41:45.887Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615982d6f72c04774a86",
+    "name": "Powdered Spices",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a6e",
+    "createdAt": "2026-01-22T17:41:45.923Z",
+    "updatedAt": "2026-01-22T17:41:45.923Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615982d6f72c04774a88",
+    "name": "Masala Mixes",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a6e",
+    "createdAt": "2026-01-22T17:41:45.959Z",
+    "updatedAt": "2026-01-22T17:41:45.959Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615982d6f72c04774a8a",
+    "name": "Milk",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a6e",
+    "createdAt": "2026-01-22T17:41:45.994Z",
+    "updatedAt": "2026-01-22T17:41:45.994Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615a82d6f72c04774a8c",
+    "name": "Curd & Yogurt",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a6e",
+    "createdAt": "2026-01-22T17:41:46.029Z",
+    "updatedAt": "2026-01-22T17:41:46.029Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615a82d6f72c04774a8e",
+    "name": "Butter & Cheese",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a6e",
+    "createdAt": "2026-01-22T17:41:46.064Z",
+    "updatedAt": "2026-01-22T17:41:46.064Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615a82d6f72c04774a90",
+    "name": "Eggs",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a6e",
+    "createdAt": "2026-01-22T17:41:46.552Z",
+    "updatedAt": "2026-01-22T17:41:46.552Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615a82d6f72c04774a92",
+    "name": "Health Drinks",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a6e",
+    "createdAt": "2026-01-22T17:41:46.589Z",
+    "updatedAt": "2026-01-22T17:41:46.589Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615a82d6f72c04774a94",
+    "name": "Soft Drinks & Juices",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a6e",
+    "createdAt": "2026-01-22T17:41:46.625Z",
+    "updatedAt": "2026-01-22T17:41:46.625Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615a82d6f72c04774a96",
+    "name": "Chocolates",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a6e",
+    "createdAt": "2026-01-22T17:41:46.661Z",
+    "updatedAt": "2026-01-22T17:41:46.661Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615a82d6f72c04774a98",
+    "name": "Candies & Toffees",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a6e",
+    "createdAt": "2026-01-22T17:41:46.696Z",
+    "updatedAt": "2026-01-22T17:41:46.696Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615a82d6f72c04774a9a",
+    "name": "Indian Sweets",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a6e",
+    "createdAt": "2026-01-22T17:41:46.732Z",
+    "updatedAt": "2026-01-22T17:41:46.732Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615a82d6f72c04774a9c",
+    "name": "Pickles",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a6e",
+    "createdAt": "2026-01-22T17:41:46.768Z",
+    "updatedAt": "2026-01-22T17:41:46.768Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615a82d6f72c04774a9e",
+    "name": "Sauces & Ketchup",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a6e",
+    "createdAt": "2026-01-22T17:41:46.803Z",
+    "updatedAt": "2026-01-22T17:41:46.803Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615a82d6f72c04774aa0",
+    "name": "Jams & Spreads",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a6e",
+    "createdAt": "2026-01-22T17:41:46.839Z",
+    "updatedAt": "2026-01-22T17:41:46.839Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615a82d6f72c04774aa2",
+    "name": "Dishwash & Cleaners",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a6e",
+    "createdAt": "2026-01-22T17:41:46.875Z",
+    "updatedAt": "2026-01-22T17:41:46.875Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615a82d6f72c04774aa4",
+    "name": "Laundry Detergents",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a6e",
+    "createdAt": "2026-01-22T17:41:46.911Z",
+    "updatedAt": "2026-01-22T17:41:46.911Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615a82d6f72c04774aa6",
+    "name": "Floor & Toilet Cleaners",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a6e",
+    "createdAt": "2026-01-22T17:41:46.946Z",
+    "updatedAt": "2026-01-22T17:41:46.946Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615a82d6f72c04774aa8",
+    "name": "Garbage Bags",
+    "image": null,
+    "parentId": "6972615982d6f72c04774a6e",
+    "createdAt": "2026-01-22T17:41:46.981Z",
+    "updatedAt": "2026-01-22T17:41:46.981Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615b82d6f72c04774aaa",
+    "name": "Daily essentials",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151197/nevyra/Categories/groceries/zradtknsqtcouaudsplz.jpg",
+    "parentId": "694e19846427cdce58640931",
+    "createdAt": "2026-01-22T17:41:47.017Z",
+    "updatedAt": "2026-03-10T13:59:59.847Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615b82d6f72c04774aac",
+    "name": "Tissues & Paper Towels",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774aaa",
+    "createdAt": "2026-01-22T17:41:47.053Z",
+    "updatedAt": "2026-01-22T17:41:47.053Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615b82d6f72c04774aae",
+    "name": "Napkins",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774aaa",
+    "createdAt": "2026-01-22T17:41:47.089Z",
+    "updatedAt": "2026-01-22T17:41:47.089Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615b82d6f72c04774ab0",
+    "name": "Foils & Cling Wraps",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774aaa",
+    "createdAt": "2026-01-22T17:41:47.127Z",
+    "updatedAt": "2026-01-22T17:41:47.127Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615b82d6f72c04774ab2",
+    "name": "Organic Staples",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774aaa",
+    "createdAt": "2026-01-22T17:41:47.164Z",
+    "updatedAt": "2026-01-22T17:41:47.164Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615b82d6f72c04774ab4",
+    "name": "Dry Fruits & Nuts",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774aaa",
+    "createdAt": "2026-01-22T17:41:47.199Z",
+    "updatedAt": "2026-01-22T17:41:47.199Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615b82d6f72c04774ab6",
+    "name": "Seeds & Superfoods",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774aaa",
+    "createdAt": "2026-01-22T17:41:47.234Z",
+    "updatedAt": "2026-01-22T17:41:47.234Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615b82d6f72c04774ab8",
+    "name": "Vegetables",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774aaa",
+    "createdAt": "2026-01-22T17:41:47.269Z",
+    "updatedAt": "2026-01-22T17:41:47.269Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615b82d6f72c04774aba",
+    "name": "Fruits",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774aaa",
+    "createdAt": "2026-01-22T17:41:47.305Z",
+    "updatedAt": "2026-01-22T17:41:47.305Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615b82d6f72c04774abc",
+    "name": "Leafy Vegetables",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774aaa",
+    "createdAt": "2026-01-22T17:41:47.340Z",
+    "updatedAt": "2026-01-22T17:41:47.340Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615b82d6f72c04774abe",
+    "name": "Herbs & Seasonings",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774aaa",
+    "createdAt": "2026-01-22T17:41:47.374Z",
+    "updatedAt": "2026-01-22T17:41:47.374Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615b82d6f72c04774ac0",
+    "name": "Chips",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774aaa",
+    "createdAt": "2026-01-22T17:41:47.409Z",
+    "updatedAt": "2026-01-22T17:41:47.409Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615b82d6f72c04774ac2",
+    "name": "Cookies",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774aaa",
+    "createdAt": "2026-01-22T17:41:47.444Z",
+    "updatedAt": "2026-01-22T17:41:47.444Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615b82d6f72c04774ac4",
+    "name": "Popcorn",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774aaa",
+    "createdAt": "2026-01-22T17:41:47.479Z",
+    "updatedAt": "2026-01-22T17:41:47.479Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615b82d6f72c04774ac6",
+    "name": "Instant Snacks",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774aaa",
+    "createdAt": "2026-01-22T17:41:47.514Z",
+    "updatedAt": "2026-01-22T17:41:47.514Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615b82d6f72c04774ac8",
+    "name": "Bread & Bakery",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774aaa",
+    "createdAt": "2026-01-22T17:41:47.550Z",
+    "updatedAt": "2026-01-22T17:41:47.550Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615b82d6f72c04774acb",
+    "name": "Men's wear",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151193/nevyra/Categories/fashion-beauty/zxhfiq2gcsdjyi6dhuqq.jpg",
+    "parentId": "694e19856427cdce5864093a",
+    "createdAt": "2026-01-22T17:41:47.618Z",
+    "updatedAt": "2026-03-10T13:59:55.276Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615b82d6f72c04774acd",
+    "name": "T-shirts",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:47.654Z",
+    "updatedAt": "2026-01-22T17:41:47.654Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615b82d6f72c04774acf",
+    "name": "Polo T-Shirts",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:47.689Z",
+    "updatedAt": "2026-01-22T17:41:47.689Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615b82d6f72c04774ad1",
+    "name": "Hoodies",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:47.727Z",
+    "updatedAt": "2026-01-22T17:41:47.727Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615b82d6f72c04774ad3",
+    "name": "Blazers",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:47.762Z",
+    "updatedAt": "2026-01-22T17:41:47.762Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615b82d6f72c04774ad5",
+    "name": "Casual Shirts",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:47.798Z",
+    "updatedAt": "2026-01-22T17:41:47.798Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615b82d6f72c04774ad7",
+    "name": "Formal Shirts",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:47.834Z",
+    "updatedAt": "2026-01-22T17:41:47.834Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615b82d6f72c04774ad9",
+    "name": "Jeans",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:47.870Z",
+    "updatedAt": "2026-01-22T17:41:47.870Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615b82d6f72c04774adb",
+    "name": "Casual Trousers",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:47.906Z",
+    "updatedAt": "2026-01-22T17:41:47.906Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615b82d6f72c04774add",
+    "name": "Formal Trousers",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:47.942Z",
+    "updatedAt": "2026-01-22T17:41:47.942Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615b82d6f72c04774adf",
+    "name": "Shorts",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:47.977Z",
+    "updatedAt": "2026-01-22T17:41:47.977Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615c82d6f72c04774ae1",
+    "name": "Cargos",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:48.013Z",
+    "updatedAt": "2026-01-22T17:41:48.013Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615c82d6f72c04774ae3",
+    "name": "Suits",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:48.049Z",
+    "updatedAt": "2026-01-22T17:41:48.049Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615c82d6f72c04774ae5",
+    "name": "Ties, Socks",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:48.085Z",
+    "updatedAt": "2026-01-22T17:41:48.085Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615c82d6f72c04774ae7",
+    "name": "Sweatshirts",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:48.119Z",
+    "updatedAt": "2026-01-22T17:41:48.119Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615c82d6f72c04774ae9",
+    "name": "Jackets",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:48.156Z",
+    "updatedAt": "2026-01-22T17:41:48.156Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615c82d6f72c04774aeb",
+    "name": "Sweater",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:48.192Z",
+    "updatedAt": "2026-01-22T17:41:48.192Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615c82d6f72c04774aed",
+    "name": "Track pants",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:48.228Z",
+    "updatedAt": "2026-01-22T17:41:48.228Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615c82d6f72c04774aef",
+    "name": "Joggers",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:48.262Z",
+    "updatedAt": "2026-01-22T17:41:48.262Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615c82d6f72c04774af1",
+    "name": "Pathani Suits",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:48.298Z",
+    "updatedAt": "2026-01-22T17:41:48.298Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615c82d6f72c04774af3",
+    "name": "Tracksuits",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:48.333Z",
+    "updatedAt": "2026-01-22T17:41:48.333Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615c82d6f72c04774af5",
+    "name": "Sherwanis",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:48.369Z",
+    "updatedAt": "2026-01-22T17:41:48.369Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615c82d6f72c04774af7",
+    "name": "Three Fourths",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:48.405Z",
+    "updatedAt": "2026-01-22T17:41:48.405Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615c82d6f72c04774af9",
+    "name": "Kurta",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:48.440Z",
+    "updatedAt": "2026-01-22T17:41:48.440Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615c82d6f72c04774afb",
+    "name": "Dhoti",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:48.477Z",
+    "updatedAt": "2026-01-22T17:41:48.477Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615c82d6f72c04774afd",
+    "name": "Lungi",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:48.512Z",
+    "updatedAt": "2026-01-22T17:41:48.512Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615c82d6f72c04774aff",
+    "name": "Vests",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:48.548Z",
+    "updatedAt": "2026-01-22T17:41:48.548Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615c82d6f72c04774b01",
+    "name": "Boxers",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:48.583Z",
+    "updatedAt": "2026-01-22T17:41:48.583Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615c82d6f72c04774b03",
+    "name": "Thermals",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:48.618Z",
+    "updatedAt": "2026-01-22T17:41:48.618Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615c82d6f72c04774b05",
+    "name": "Night Suits",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:48.654Z",
+    "updatedAt": "2026-01-22T17:41:48.654Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615c82d6f72c04774b07",
+    "name": "Briefs",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:48.689Z",
+    "updatedAt": "2026-01-22T17:41:48.689Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615c82d6f72c04774b09",
+    "name": "Trunks",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:48.726Z",
+    "updatedAt": "2026-01-22T17:41:48.726Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615c82d6f72c04774b0b",
+    "name": "Gym wear",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:48.762Z",
+    "updatedAt": "2026-01-22T17:41:48.762Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615c82d6f72c04774b0d",
+    "name": "Winter wear",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:48.797Z",
+    "updatedAt": "2026-01-22T17:41:48.797Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615c82d6f72c04774b0f",
+    "name": "Rain wear",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:48.833Z",
+    "updatedAt": "2026-01-22T17:41:48.833Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615c82d6f72c04774b11",
+    "name": "Waistcoats",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:48.869Z",
+    "updatedAt": "2026-01-22T17:41:48.869Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615c82d6f72c04774b13",
+    "name": "Women's wear",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151189/nevyra/Categories/fashion-beauty/b01dhpdzzuzapoa8af89.jpg",
+    "parentId": "694e19856427cdce5864093a",
+    "createdAt": "2026-01-22T17:41:48.905Z",
+    "updatedAt": "2026-03-10T13:59:52.691Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615c82d6f72c04774b15",
+    "name": "Dresses",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:48.941Z",
+    "updatedAt": "2026-01-22T17:41:48.941Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615c82d6f72c04774b17",
+    "name": "Topwear",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:48.977Z",
+    "updatedAt": "2026-01-22T17:41:48.977Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615d82d6f72c04774b19",
+    "name": "Jeans",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:49.012Z",
+    "updatedAt": "2026-01-22T17:41:49.012Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615d82d6f72c04774b1b",
+    "name": "Jumpsuits",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:49.048Z",
+    "updatedAt": "2026-01-22T17:41:49.048Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615d82d6f72c04774b1d",
+    "name": "Shorts",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:49.084Z",
+    "updatedAt": "2026-01-22T17:41:49.084Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615d82d6f72c04774b1f",
+    "name": "T-shirts",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:49.119Z",
+    "updatedAt": "2026-01-22T17:41:49.119Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615d82d6f72c04774b21",
+    "name": "Salwar Suits",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:49.155Z",
+    "updatedAt": "2026-01-22T17:41:49.155Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615d82d6f72c04774b23",
+    "name": "Anarkali",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:49.190Z",
+    "updatedAt": "2026-01-22T17:41:49.190Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615d82d6f72c04774b25",
+    "name": "Dupattas",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:49.226Z",
+    "updatedAt": "2026-01-22T17:41:49.226Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615d82d6f72c04774b27",
+    "name": "Petticoats",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:49.261Z",
+    "updatedAt": "2026-01-22T17:41:49.261Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615d82d6f72c04774b29",
+    "name": "Palazzos",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:49.296Z",
+    "updatedAt": "2026-01-22T17:41:49.296Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615d82d6f72c04774b2b",
+    "name": "Camisoles",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:49.332Z",
+    "updatedAt": "2026-01-22T17:41:49.332Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615d82d6f72c04774b2d",
+    "name": "Skirts",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:49.367Z",
+    "updatedAt": "2026-01-22T17:41:49.367Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615d82d6f72c04774b2f",
+    "name": "Jeggings & Tights",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:49.403Z",
+    "updatedAt": "2026-01-22T17:41:49.403Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615d82d6f72c04774b31",
+    "name": "Trousers",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:49.439Z",
+    "updatedAt": "2026-01-22T17:41:49.439Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615d82d6f72c04774b33",
+    "name": "Bras",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:49.474Z",
+    "updatedAt": "2026-01-22T17:41:49.474Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615d82d6f72c04774b35",
+    "name": "Panties",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:49.509Z",
+    "updatedAt": "2026-01-22T17:41:49.509Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615d82d6f72c04774b37",
+    "name": "Night Dresses & Nighties",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:49.546Z",
+    "updatedAt": "2026-01-22T17:41:49.546Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615d82d6f72c04774b39",
+    "name": "Shapewear",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:49.582Z",
+    "updatedAt": "2026-01-22T17:41:49.582Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615d82d6f72c04774b3b",
+    "name": "Swim & Beachwear",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:49.617Z",
+    "updatedAt": "2026-01-22T17:41:49.617Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615d82d6f72c04774b3d",
+    "name": "Party Dresses",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:49.653Z",
+    "updatedAt": "2026-01-22T17:41:49.653Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615d82d6f72c04774b3f",
+    "name": "Sports Wear",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:49.688Z",
+    "updatedAt": "2026-01-22T17:41:49.688Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615d82d6f72c04774b41",
+    "name": "Winter Wear",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:49.724Z",
+    "updatedAt": "2026-01-22T17:41:49.724Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615d82d6f72c04774b43",
+    "name": "Sarees",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:49.760Z",
+    "updatedAt": "2026-01-22T17:41:49.760Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615d82d6f72c04774b45",
+    "name": "Blouse",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:49.795Z",
+    "updatedAt": "2026-01-22T17:41:49.795Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615d82d6f72c04774b47",
+    "name": "Kurtis",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:49.830Z",
+    "updatedAt": "2026-01-22T17:41:49.830Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615d82d6f72c04774b49",
+    "name": "Kurtas",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:49.867Z",
+    "updatedAt": "2026-01-22T17:41:49.867Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615d82d6f72c04774b4b",
+    "name": "Dress Material",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:49.902Z",
+    "updatedAt": "2026-01-22T17:41:49.902Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615d82d6f72c04774b4d",
+    "name": "Lehenga",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:49.938Z",
+    "updatedAt": "2026-01-22T17:41:49.938Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615d82d6f72c04774b4f",
+    "name": "Leggings",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:49.973Z",
+    "updatedAt": "2026-01-22T17:41:49.973Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615e82d6f72c04774b51",
+    "name": "Churidars",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:50.008Z",
+    "updatedAt": "2026-01-22T17:41:50.008Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615e82d6f72c04774b53",
+    "name": "Dhoti Pants",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:50.044Z",
+    "updatedAt": "2026-01-22T17:41:50.044Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615e82d6f72c04774b55",
+    "name": "Saree Shapewear",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:50.079Z",
+    "updatedAt": "2026-01-22T17:41:50.079Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615e82d6f72c04774b57",
+    "name": "Baby Care & Kids",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151152/nevyra/Categories/fashion-beauty/cxq0lv2zsykysrw1zjp4.jpg",
+    "parentId": "694e19856427cdce5864093a",
+    "createdAt": "2026-01-22T17:41:50.114Z",
+    "updatedAt": "2026-03-10T13:59:14.007Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615e82d6f72c04774b59",
+    "name": "Outdoor Toys",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:50.150Z",
+    "updatedAt": "2026-01-22T17:41:50.150Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615e82d6f72c04774b5b",
+    "name": "Board Games",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:50.187Z",
+    "updatedAt": "2026-01-22T17:41:50.187Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615e82d6f72c04774b5d",
+    "name": "Musical Toys",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:50.221Z",
+    "updatedAt": "2026-01-22T17:41:50.221Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615e82d6f72c04774b5f",
+    "name": "Dolls",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:50.256Z",
+    "updatedAt": "2026-01-22T17:41:50.256Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615e82d6f72c04774b61",
+    "name": "Doll Houses",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:50.291Z",
+    "updatedAt": "2026-01-22T17:41:50.291Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615e82d6f72c04774b63",
+    "name": "Building Blocks & LEGO-type Toys",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:50.325Z",
+    "updatedAt": "2026-01-22T17:41:50.325Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615e82d6f72c04774b65",
+    "name": "STEM Toys",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:50.362Z",
+    "updatedAt": "2026-01-22T17:41:50.362Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615e82d6f72c04774b67",
+    "name": "Pretend Play",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:50.397Z",
+    "updatedAt": "2026-01-22T17:41:50.397Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615e82d6f72c04774b69",
+    "name": "Action Figures",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:50.433Z",
+    "updatedAt": "2026-01-22T17:41:50.433Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615e82d6f72c04774b6b",
+    "name": "Art & Craft kits",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:50.466Z",
+    "updatedAt": "2026-01-22T17:41:50.466Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615e82d6f72c04774b6d",
+    "name": "Ride-on Toys",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:50.501Z",
+    "updatedAt": "2026-01-22T17:41:50.501Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615e82d6f72c04774b6f",
+    "name": "Puzzles",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:50.536Z",
+    "updatedAt": "2026-01-22T17:41:50.536Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615e82d6f72c04774b71",
+    "name": "Toy Guns",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:50.571Z",
+    "updatedAt": "2026-01-22T17:41:50.571Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615e82d6f72c04774b73",
+    "name": "Vehicles",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:50.610Z",
+    "updatedAt": "2026-01-22T17:41:50.610Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615e82d6f72c04774b75",
+    "name": "Soft Toys",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:50.644Z",
+    "updatedAt": "2026-01-22T17:41:50.644Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615e82d6f72c04774b77",
+    "name": "Remote Control Toys",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:50.678Z",
+    "updatedAt": "2026-01-22T17:41:50.678Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615e82d6f72c04774b79",
+    "name": "Educational Toys",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:50.713Z",
+    "updatedAt": "2026-01-22T17:41:50.713Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615e82d6f72c04774b7b",
+    "name": "Helicopter",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:50.748Z",
+    "updatedAt": "2026-01-22T17:41:50.748Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615e82d6f72c04774b7d",
+    "name": "Drones",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:50.783Z",
+    "updatedAt": "2026-01-22T17:41:50.783Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615e82d6f72c04774b7f",
+    "name": "School Bags",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:50.818Z",
+    "updatedAt": "2026-01-22T17:41:50.818Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615e82d6f72c04774b81",
+    "name": "Pencil Boxes",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:50.852Z",
+    "updatedAt": "2026-01-22T17:41:50.852Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615e82d6f72c04774b83",
+    "name": "Stationery Sets",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:50.887Z",
+    "updatedAt": "2026-01-22T17:41:50.887Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615e82d6f72c04774b85",
+    "name": "Tiffin Bags",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:50.922Z",
+    "updatedAt": "2026-01-22T17:41:50.922Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615e82d6f72c04774b87",
+    "name": "Rain Covers for Bags",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:50.957Z",
+    "updatedAt": "2026-01-22T17:41:50.957Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615e82d6f72c04774b89",
+    "name": "Lunch box",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:50.993Z",
+    "updatedAt": "2026-01-22T17:41:50.993Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615f82d6f72c04774b8b",
+    "name": "Bottle",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:51.027Z",
+    "updatedAt": "2026-01-22T17:41:51.027Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615f82d6f72c04774b8d",
+    "name": "School Combo Sets",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:51.062Z",
+    "updatedAt": "2026-01-22T17:41:51.062Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615f82d6f72c04774b8f",
+    "name": "Diapers",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:51.098Z",
+    "updatedAt": "2026-01-22T17:41:51.098Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615f82d6f72c04774b91",
+    "name": "Wipes",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:51.133Z",
+    "updatedAt": "2026-01-22T17:41:51.133Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615f82d6f72c04774b93",
+    "name": "Baby Rattles & Teethers",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:51.170Z",
+    "updatedAt": "2026-01-22T17:41:51.170Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615f82d6f72c04774b95",
+    "name": "Baby Medical & Health Care",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:51.206Z",
+    "updatedAt": "2026-01-22T17:41:51.206Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615f82d6f72c04774b97",
+    "name": "Baby Cleaners & Detergents",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:51.241Z",
+    "updatedAt": "2026-01-22T17:41:51.241Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615f82d6f72c04774b99",
+    "name": "Baby Food & Formula",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:51.278Z",
+    "updatedAt": "2026-01-22T17:41:51.278Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615f82d6f72c04774b9b",
+    "name": "Baby Bibs",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:51.313Z",
+    "updatedAt": "2026-01-22T17:41:51.313Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615f82d6f72c04774b9d",
+    "name": "Pacifiers & Soothers",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:51.348Z",
+    "updatedAt": "2026-01-22T17:41:51.348Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615f82d6f72c04774b9f",
+    "name": "Baby Towels & Bedding",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:51.383Z",
+    "updatedAt": "2026-01-22T17:41:51.383Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615f82d6f72c04774ba1",
+    "name": "Baby Clothes & Blankets",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:51.417Z",
+    "updatedAt": "2026-01-22T17:41:51.417Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615f82d6f72c04774ba3",
+    "name": "Diper Bags",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:51.452Z",
+    "updatedAt": "2026-01-22T17:41:51.452Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615f82d6f72c04774ba5",
+    "name": "Baby Grooming",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:51.486Z",
+    "updatedAt": "2026-01-22T17:41:51.486Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615f82d6f72c04774ba7",
+    "name": "Baby Hair & Skin Care",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:51.522Z",
+    "updatedAt": "2026-01-22T17:41:51.522Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615f82d6f72c04774ba9",
+    "name": "Baby Bathing",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:51.557Z",
+    "updatedAt": "2026-01-22T17:41:51.557Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615f82d6f72c04774bab",
+    "name": "Baby Feeding Bottle & Accessories",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:51.592Z",
+    "updatedAt": "2026-01-22T17:41:51.592Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615f82d6f72c04774bad",
+    "name": "Baby Safety Accessories",
+    "image": null,
+    "parentId": "6972615e82d6f72c04774b57",
+    "createdAt": "2026-01-22T17:41:51.626Z",
+    "updatedAt": "2026-01-22T17:41:51.626Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615f82d6f72c04774baf",
+    "name": "Watches",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151180/nevyra/Categories/fashion-beauty/f9j9kffai2ziumwfzjc6.jpg",
+    "parentId": "694e19856427cdce5864093a",
+    "createdAt": "2026-01-22T17:41:51.660Z",
+    "updatedAt": "2026-03-10T13:59:42.345Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615f82d6f72c04774bb1",
+    "name": "Titan",
+    "image": null,
+    "parentId": "6972615f82d6f72c04774baf",
+    "createdAt": "2026-01-22T17:41:51.695Z",
+    "updatedAt": "2026-01-22T17:41:51.695Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615f82d6f72c04774bb3",
+    "name": "Fastrack",
+    "image": null,
+    "parentId": "6972615f82d6f72c04774baf",
+    "createdAt": "2026-01-22T17:41:51.732Z",
+    "updatedAt": "2026-01-22T17:41:51.732Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615f82d6f72c04774bb5",
+    "name": "Sonata",
+    "image": null,
+    "parentId": "6972615f82d6f72c04774baf",
+    "createdAt": "2026-01-22T17:41:51.767Z",
+    "updatedAt": "2026-01-22T17:41:51.767Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615f82d6f72c04774bb7",
+    "name": "Casio",
+    "image": null,
+    "parentId": "6972615f82d6f72c04774baf",
+    "createdAt": "2026-01-22T17:41:51.803Z",
+    "updatedAt": "2026-01-22T17:41:51.803Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615f82d6f72c04774bb9",
+    "name": "Timex",
+    "image": null,
+    "parentId": "6972615f82d6f72c04774baf",
+    "createdAt": "2026-01-22T17:41:51.838Z",
+    "updatedAt": "2026-01-22T17:41:51.838Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615f82d6f72c04774bbb",
+    "name": "boAt",
+    "image": null,
+    "parentId": "6972615f82d6f72c04774baf",
+    "createdAt": "2026-01-22T17:41:51.873Z",
+    "updatedAt": "2026-01-22T17:41:51.873Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615f82d6f72c04774bbd",
+    "name": "Noise",
+    "image": null,
+    "parentId": "6972615f82d6f72c04774baf",
+    "createdAt": "2026-01-22T17:41:51.907Z",
+    "updatedAt": "2026-01-22T17:41:51.907Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615f82d6f72c04774bbf",
+    "name": "Fire-Boltt",
+    "image": null,
+    "parentId": "6972615f82d6f72c04774baf",
+    "createdAt": "2026-01-22T17:41:51.941Z",
+    "updatedAt": "2026-01-22T17:41:51.941Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615f82d6f72c04774bc1",
+    "name": "Amazfit",
+    "image": null,
+    "parentId": "6972615f82d6f72c04774baf",
+    "createdAt": "2026-01-22T17:41:51.976Z",
+    "updatedAt": "2026-01-22T17:41:51.976Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616082d6f72c04774bc3",
+    "name": "Fossil",
+    "image": null,
+    "parentId": "6972615f82d6f72c04774baf",
+    "createdAt": "2026-01-22T17:41:52.016Z",
+    "updatedAt": "2026-01-22T17:41:52.016Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616082d6f72c04774bc5",
+    "name": "Daniel Wellington",
+    "image": null,
+    "parentId": "6972615f82d6f72c04774baf",
+    "createdAt": "2026-01-22T17:41:52.059Z",
+    "updatedAt": "2026-01-22T17:41:52.059Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616082d6f72c04774bc7",
+    "name": "Armani Exchange",
+    "image": null,
+    "parentId": "6972615f82d6f72c04774baf",
+    "createdAt": "2026-01-22T17:41:52.095Z",
+    "updatedAt": "2026-01-22T17:41:52.095Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616082d6f72c04774bc9",
+    "name": "Tommy Hilfiger",
+    "image": null,
+    "parentId": "6972615f82d6f72c04774baf",
+    "createdAt": "2026-01-22T17:41:52.130Z",
+    "updatedAt": "2026-01-22T17:41:52.130Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616082d6f72c04774bcb",
+    "name": "Michael Kors",
+    "image": null,
+    "parentId": "6972615f82d6f72c04774baf",
+    "createdAt": "2026-01-22T17:41:52.165Z",
+    "updatedAt": "2026-01-22T17:41:52.165Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616082d6f72c04774bcd",
+    "name": "Woman’s Bags",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151184/nevyra/Categories/fashion-beauty/xotazqutmr2sguhuuwe8.jpg",
+    "parentId": "694e19856427cdce5864093a",
+    "createdAt": "2026-01-22T17:41:52.200Z",
+    "updatedAt": "2026-03-10T13:59:47.412Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616082d6f72c04774bcf",
+    "name": "Handbags",
+    "image": null,
+    "parentId": "6972616082d6f72c04774bcd",
+    "createdAt": "2026-01-22T17:41:52.234Z",
+    "updatedAt": "2026-01-22T17:41:52.234Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616082d6f72c04774bd1",
+    "name": "Shoulder Bags",
+    "image": null,
+    "parentId": "6972616082d6f72c04774bcd",
+    "createdAt": "2026-01-22T17:41:52.268Z",
+    "updatedAt": "2026-01-22T17:41:52.268Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616082d6f72c04774bd3",
+    "name": "Sling Bags",
+    "image": null,
+    "parentId": "6972616082d6f72c04774bcd",
+    "createdAt": "2026-01-22T17:41:52.303Z",
+    "updatedAt": "2026-01-22T17:41:52.303Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616082d6f72c04774bd5",
+    "name": "Tote Bags",
+    "image": null,
+    "parentId": "6972616082d6f72c04774bcd",
+    "createdAt": "2026-01-22T17:41:52.338Z",
+    "updatedAt": "2026-01-22T17:41:52.338Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616082d6f72c04774bd7",
+    "name": "Clutches",
+    "image": null,
+    "parentId": "6972616082d6f72c04774bcd",
+    "createdAt": "2026-01-22T17:41:52.373Z",
+    "updatedAt": "2026-01-22T17:41:52.373Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616082d6f72c04774bd9",
+    "name": "Hobo bags",
+    "image": null,
+    "parentId": "6972616082d6f72c04774bcd",
+    "createdAt": "2026-01-22T17:41:52.408Z",
+    "updatedAt": "2026-01-22T17:41:52.408Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616082d6f72c04774bdb",
+    "name": "Utility & Travel",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151175/nevyra/Categories/fashion-beauty/damsj4iu7jqdl66osebg.jpg",
+    "parentId": "694e19856427cdce5864093a",
+    "createdAt": "2026-01-22T17:41:52.443Z",
+    "updatedAt": "2026-03-10T13:59:38.637Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616082d6f72c04774bdd",
+    "name": "Backpacks",
+    "image": null,
+    "parentId": "6972616082d6f72c04774bdb",
+    "createdAt": "2026-01-22T17:41:52.478Z",
+    "updatedAt": "2026-01-22T17:41:52.478Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616082d6f72c04774bdf",
+    "name": "Laptop Bags",
+    "image": null,
+    "parentId": "6972616082d6f72c04774bdb",
+    "createdAt": "2026-01-22T17:41:52.513Z",
+    "updatedAt": "2026-01-22T17:41:52.513Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616082d6f72c04774be1",
+    "name": "Office Bags",
+    "image": null,
+    "parentId": "6972616082d6f72c04774bdb",
+    "createdAt": "2026-01-22T17:41:52.547Z",
+    "updatedAt": "2026-01-22T17:41:52.547Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616082d6f72c04774be3",
+    "name": "Travel Bags",
+    "image": null,
+    "parentId": "6972616082d6f72c04774bdb",
+    "createdAt": "2026-01-22T17:41:52.582Z",
+    "updatedAt": "2026-01-22T17:41:52.582Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616082d6f72c04774be5",
+    "name": "Duffel Bags",
+    "image": null,
+    "parentId": "6972616082d6f72c04774bdb",
+    "createdAt": "2026-01-22T17:41:52.617Z",
+    "updatedAt": "2026-01-22T17:41:52.617Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616082d6f72c04774be7",
+    "name": "Small Accessories",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151164/nevyra/Categories/fashion-beauty/vcbjipyvholol881ji8e.jpg",
+    "parentId": "694e19856427cdce5864093a",
+    "createdAt": "2026-01-22T17:41:52.653Z",
+    "updatedAt": "2026-03-10T13:59:26.339Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616082d6f72c04774be9",
+    "name": "Wallets & Belts",
+    "image": null,
+    "parentId": "6972616082d6f72c04774be7",
+    "createdAt": "2026-01-22T17:41:52.688Z",
+    "updatedAt": "2026-01-22T17:41:52.688Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616082d6f72c04774beb",
+    "name": "Pouches",
+    "image": null,
+    "parentId": "6972616082d6f72c04774be7",
+    "createdAt": "2026-01-22T17:41:52.722Z",
+    "updatedAt": "2026-01-22T17:41:52.722Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616082d6f72c04774bed",
+    "name": "Coin purses",
+    "image": null,
+    "parentId": "6972616082d6f72c04774be7",
+    "createdAt": "2026-01-22T17:41:52.757Z",
+    "updatedAt": "2026-01-22T17:41:52.757Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616082d6f72c04774bef",
+    "name": "Sunglasses",
+    "image": null,
+    "parentId": "6972616082d6f72c04774be7",
+    "createdAt": "2026-01-22T17:41:52.792Z",
+    "updatedAt": "2026-01-22T17:41:52.792Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616082d6f72c04774bf1",
+    "name": "Jewellery",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151155/nevyra/Categories/fashion-beauty/facmjz8oc9qln0up4xm1.jpg",
+    "parentId": "694e19856427cdce5864093a",
+    "createdAt": "2026-01-22T17:41:52.826Z",
+    "updatedAt": "2026-03-10T13:59:19.740Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616082d6f72c04774bf3",
+    "name": "Earrings",
+    "image": null,
+    "parentId": "6972616082d6f72c04774bf1",
+    "createdAt": "2026-01-22T17:41:52.861Z",
+    "updatedAt": "2026-01-22T17:41:52.861Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616082d6f72c04774bf5",
+    "name": "Necklaces",
+    "image": null,
+    "parentId": "6972616082d6f72c04774bf1",
+    "createdAt": "2026-01-22T17:41:52.896Z",
+    "updatedAt": "2026-01-22T17:41:52.896Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616082d6f72c04774bf7",
+    "name": "Rings",
+    "image": null,
+    "parentId": "6972616082d6f72c04774bf1",
+    "createdAt": "2026-01-22T17:41:52.931Z",
+    "updatedAt": "2026-01-22T17:41:52.931Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616082d6f72c04774bf9",
+    "name": "Bangles & Bracelets",
+    "image": null,
+    "parentId": "6972616082d6f72c04774bf1",
+    "createdAt": "2026-01-22T17:41:52.965Z",
+    "updatedAt": "2026-01-22T17:41:52.965Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616182d6f72c04774bfb",
+    "name": "Anklets",
+    "image": null,
+    "parentId": "6972616082d6f72c04774bf1",
+    "createdAt": "2026-01-22T17:41:53.001Z",
+    "updatedAt": "2026-01-22T17:41:53.001Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616182d6f72c04774bfd",
+    "name": "Noise Pins",
+    "image": null,
+    "parentId": "6972616082d6f72c04774bf1",
+    "createdAt": "2026-01-22T17:41:53.036Z",
+    "updatedAt": "2026-01-22T17:41:53.036Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616182d6f72c04774bff",
+    "name": "Bridal Jewelry",
+    "image": null,
+    "parentId": "6972616082d6f72c04774bf1",
+    "createdAt": "2026-01-22T17:41:53.070Z",
+    "updatedAt": "2026-01-22T17:41:53.070Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616182d6f72c04774c01",
+    "name": "Men’s Jewelry",
+    "image": null,
+    "parentId": "6972616082d6f72c04774bf1",
+    "createdAt": "2026-01-22T17:41:53.105Z",
+    "updatedAt": "2026-01-22T17:41:53.105Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616182d6f72c04774c03",
+    "name": "Kids Jewelry",
+    "image": null,
+    "parentId": "6972616082d6f72c04774bf1",
+    "createdAt": "2026-01-22T17:41:53.140Z",
+    "updatedAt": "2026-01-22T17:41:53.140Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616182d6f72c04774c05",
+    "name": "Luggage",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151161/nevyra/Categories/fashion-beauty/x4ykg0agkv3s7eha1zxc.jpg",
+    "parentId": "694e19856427cdce5864093a",
+    "createdAt": "2026-01-22T17:41:53.175Z",
+    "updatedAt": "2026-03-10T13:59:23.806Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616182d6f72c04774c07",
+    "name": "Trolley Bags",
+    "image": null,
+    "parentId": "6972616182d6f72c04774c05",
+    "createdAt": "2026-01-22T17:41:53.211Z",
+    "updatedAt": "2026-01-22T17:41:53.211Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616182d6f72c04774c09",
+    "name": "Suitcases",
+    "image": null,
+    "parentId": "6972616182d6f72c04774c05",
+    "createdAt": "2026-01-22T17:41:53.245Z",
+    "updatedAt": "2026-01-22T17:41:53.245Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616182d6f72c04774c0b",
+    "name": "Cabin Luggage",
+    "image": null,
+    "parentId": "6972616182d6f72c04774c05",
+    "createdAt": "2026-01-22T17:41:53.280Z",
+    "updatedAt": "2026-01-22T17:41:53.280Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616182d6f72c04774c0d",
+    "name": "Check-in Luggage",
+    "image": null,
+    "parentId": "6972616182d6f72c04774c05",
+    "createdAt": "2026-01-22T17:41:53.315Z",
+    "updatedAt": "2026-01-22T17:41:53.315Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616182d6f72c04774c0f",
+    "name": "Travel Bags",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151166/nevyra/Categories/fashion-beauty/bvy4qwmv3a9mntmdcvsg.jpg",
+    "parentId": "694e19856427cdce5864093a",
+    "createdAt": "2026-01-22T17:41:53.350Z",
+    "updatedAt": "2026-03-10T13:59:28.752Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616182d6f72c04774c11",
+    "name": "Duffle Bags",
+    "image": null,
+    "parentId": "6972616182d6f72c04774c0f",
+    "createdAt": "2026-01-22T17:41:53.385Z",
+    "updatedAt": "2026-01-22T17:41:53.385Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616182d6f72c04774c13",
+    "name": "Travel Backpacks",
+    "image": null,
+    "parentId": "6972616182d6f72c04774c0f",
+    "createdAt": "2026-01-22T17:41:53.420Z",
+    "updatedAt": "2026-01-22T17:41:53.420Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616182d6f72c04774c15",
+    "name": "Weekender Bags",
+    "image": null,
+    "parentId": "6972616182d6f72c04774c0f",
+    "createdAt": "2026-01-22T17:41:53.455Z",
+    "updatedAt": "2026-01-22T17:41:53.455Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616182d6f72c04774c17",
+    "name": "Utility Travel",
+    "image": null,
+    "parentId": "694e19856427cdce5864093a",
+    "createdAt": "2026-01-22T17:41:53.491Z",
+    "updatedAt": "2026-01-22T17:41:53.491Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616182d6f72c04774c19",
+    "name": "Laptop Trolleys",
+    "image": null,
+    "parentId": "6972616182d6f72c04774c17",
+    "createdAt": "2026-01-22T17:41:53.526Z",
+    "updatedAt": "2026-01-22T17:41:53.526Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616182d6f72c04774c1b",
+    "name": "Office Travel Bags",
+    "image": null,
+    "parentId": "6972616182d6f72c04774c17",
+    "createdAt": "2026-01-22T17:41:53.562Z",
+    "updatedAt": "2026-01-22T17:41:53.562Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616182d6f72c04774c1d",
+    "name": "Garment Bags",
+    "image": null,
+    "parentId": "6972616182d6f72c04774c17",
+    "createdAt": "2026-01-22T17:41:53.597Z",
+    "updatedAt": "2026-01-22T17:41:53.597Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616182d6f72c04774c20",
+    "name": "Cell Phones & Accessories",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151207/nevyra/Categories/devices/emu5upwtvgznjkk9myxh.jpg",
+    "parentId": "694e19856427cdce58640955",
+    "createdAt": "2026-01-22T17:41:53.665Z",
+    "updatedAt": "2026-03-10T14:00:09.375Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616182d6f72c04774c22",
+    "name": "Mobile Phones",
+    "image": null,
+    "parentId": "6972616182d6f72c04774c20",
+    "createdAt": "2026-01-22T17:41:53.700Z",
+    "updatedAt": "2026-01-22T17:41:53.700Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616182d6f72c04774c24",
+    "name": "Mobile Covers & Cases",
+    "image": null,
+    "parentId": "6972616182d6f72c04774c20",
+    "createdAt": "2026-01-22T17:41:53.735Z",
+    "updatedAt": "2026-01-22T17:41:53.735Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616182d6f72c04774c26",
+    "name": "Chargers & Cables",
+    "image": null,
+    "parentId": "6972616182d6f72c04774c20",
+    "createdAt": "2026-01-22T17:41:53.770Z",
+    "updatedAt": "2026-01-22T17:41:53.770Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616182d6f72c04774c28",
+    "name": "Power Banks",
+    "image": null,
+    "parentId": "6972616182d6f72c04774c20",
+    "createdAt": "2026-01-22T17:41:53.805Z",
+    "updatedAt": "2026-01-22T17:41:53.805Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616182d6f72c04774c2a",
+    "name": "Screen Protectors",
+    "image": null,
+    "parentId": "6972616182d6f72c04774c20",
+    "createdAt": "2026-01-22T17:41:53.840Z",
+    "updatedAt": "2026-01-22T17:41:53.840Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616182d6f72c04774c2c",
+    "name": "Earphones & Headphones",
+    "image": null,
+    "parentId": "6972616182d6f72c04774c20",
+    "createdAt": "2026-01-22T17:41:53.875Z",
+    "updatedAt": "2026-01-22T17:41:53.875Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616182d6f72c04774c2e",
+    "name": "Bluetooth Speakers",
+    "image": null,
+    "parentId": "6972616182d6f72c04774c20",
+    "createdAt": "2026-01-22T17:41:53.910Z",
+    "updatedAt": "2026-01-22T17:41:53.910Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616182d6f72c04774c30",
+    "name": "Laptops & Computers",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151216/nevyra/Categories/devices/lwlycxjgn5duti6knogy.jpg",
+    "parentId": "694e19856427cdce58640955",
+    "createdAt": "2026-01-22T17:41:53.945Z",
+    "updatedAt": "2026-03-10T14:00:18.929Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616182d6f72c04774c32",
+    "name": "Laptops",
+    "image": null,
+    "parentId": "6972616182d6f72c04774c30",
+    "createdAt": "2026-01-22T17:41:53.981Z",
+    "updatedAt": "2026-01-22T17:41:53.981Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616282d6f72c04774c34",
+    "name": "Desktops",
+    "image": null,
+    "parentId": "6972616182d6f72c04774c30",
+    "createdAt": "2026-01-22T17:41:54.015Z",
+    "updatedAt": "2026-01-22T17:41:54.015Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616282d6f72c04774c36",
+    "name": "Tablets",
+    "image": null,
+    "parentId": "6972616182d6f72c04774c30",
+    "createdAt": "2026-01-22T17:41:54.051Z",
+    "updatedAt": "2026-01-22T17:41:54.051Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616282d6f72c04774c38",
+    "name": "Keyboards & Mouse",
+    "image": null,
+    "parentId": "6972616182d6f72c04774c30",
+    "createdAt": "2026-01-22T17:41:54.085Z",
+    "updatedAt": "2026-01-22T17:41:54.085Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616282d6f72c04774c3a",
+    "name": "Monitors",
+    "image": null,
+    "parentId": "6972616182d6f72c04774c30",
+    "createdAt": "2026-01-22T17:41:54.121Z",
+    "updatedAt": "2026-01-22T17:41:54.121Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616282d6f72c04774c3c",
+    "name": "Printers & Scanners",
+    "image": null,
+    "parentId": "6972616182d6f72c04774c30",
+    "createdAt": "2026-01-22T17:41:54.157Z",
+    "updatedAt": "2026-01-22T17:41:54.157Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616282d6f72c04774c3e",
+    "name": "Televisions & Audio",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151229/nevyra/Categories/devices/hypodxsnndoktzaojx4s.jpg",
+    "parentId": "694e19856427cdce58640955",
+    "createdAt": "2026-01-22T17:41:54.192Z",
+    "updatedAt": "2026-03-10T14:00:31.489Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616282d6f72c04774c40",
+    "name": "Smart TVs",
+    "image": null,
+    "parentId": "6972616282d6f72c04774c3e",
+    "createdAt": "2026-01-22T17:41:54.227Z",
+    "updatedAt": "2026-01-22T17:41:54.227Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616282d6f72c04774c42",
+    "name": "Streaming Devices",
+    "image": null,
+    "parentId": "6972616282d6f72c04774c3e",
+    "createdAt": "2026-01-22T17:41:54.261Z",
+    "updatedAt": "2026-01-22T17:41:54.261Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616282d6f72c04774c44",
+    "name": "Soundbars",
+    "image": null,
+    "parentId": "6972616282d6f72c04774c3e",
+    "createdAt": "2026-01-22T17:41:54.295Z",
+    "updatedAt": "2026-01-22T17:41:54.295Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616282d6f72c04774c46",
+    "name": "Home Theaters",
+    "image": null,
+    "parentId": "6972616282d6f72c04774c3e",
+    "createdAt": "2026-01-22T17:41:54.331Z",
+    "updatedAt": "2026-01-22T17:41:54.331Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616282d6f72c04774c48",
+    "name": "Projectors",
+    "image": null,
+    "parentId": "6972616282d6f72c04774c3e",
+    "createdAt": "2026-01-22T17:41:54.366Z",
+    "updatedAt": "2026-01-22T17:41:54.366Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616282d6f72c04774c4a",
+    "name": "Home Appliances",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151213/nevyra/Categories/devices/sirivwfq2oxgggru9dyu.jpg",
+    "parentId": "694e19856427cdce58640955",
+    "createdAt": "2026-01-22T17:41:54.401Z",
+    "updatedAt": "2026-03-10T14:00:15.960Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616282d6f72c04774c4c",
+    "name": "Refrigerators",
+    "image": null,
+    "parentId": "6972616282d6f72c04774c4a",
+    "createdAt": "2026-01-22T17:41:54.437Z",
+    "updatedAt": "2026-01-22T17:41:54.437Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616282d6f72c04774c4e",
+    "name": "Washing Machines",
+    "image": null,
+    "parentId": "6972616282d6f72c04774c4a",
+    "createdAt": "2026-01-22T17:41:54.473Z",
+    "updatedAt": "2026-01-22T17:41:54.473Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616282d6f72c04774c50",
+    "name": "Air conditioners",
+    "image": null,
+    "parentId": "6972616282d6f72c04774c4a",
+    "createdAt": "2026-01-22T17:41:54.508Z",
+    "updatedAt": "2026-01-22T17:41:54.508Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616282d6f72c04774c52",
+    "name": "Microwave Ovens",
+    "image": null,
+    "parentId": "6972616282d6f72c04774c4a",
+    "createdAt": "2026-01-22T17:41:54.543Z",
+    "updatedAt": "2026-01-22T17:41:54.543Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616282d6f72c04774c54",
+    "name": "Dishwashers",
+    "image": null,
+    "parentId": "6972616282d6f72c04774c4a",
+    "createdAt": "2026-01-22T17:41:54.578Z",
+    "updatedAt": "2026-01-22T17:41:54.578Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616282d6f72c04774c56",
+    "name": "Water Purifiers",
+    "image": null,
+    "parentId": "6972616282d6f72c04774c4a",
+    "createdAt": "2026-01-22T17:41:54.613Z",
+    "updatedAt": "2026-01-22T17:41:54.613Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616282d6f72c04774c58",
+    "name": "Smart Watches & Wearables",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151225/nevyra/Categories/devices/ntwbo2zhfwzysgrujfey.jpg",
+    "parentId": "694e19856427cdce58640955",
+    "createdAt": "2026-01-22T17:41:54.648Z",
+    "updatedAt": "2026-03-10T14:00:27.839Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616282d6f72c04774c5a",
+    "name": "Smart Watches",
+    "image": null,
+    "parentId": "6972616282d6f72c04774c58",
+    "createdAt": "2026-01-22T17:41:54.684Z",
+    "updatedAt": "2026-01-22T17:41:54.684Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616282d6f72c04774c5c",
+    "name": "Fitness Bands",
+    "image": null,
+    "parentId": "6972616282d6f72c04774c58",
+    "createdAt": "2026-01-22T17:41:54.720Z",
+    "updatedAt": "2026-01-22T17:41:54.720Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616282d6f72c04774c5e",
+    "name": "VR Headsets",
+    "image": null,
+    "parentId": "6972616282d6f72c04774c58",
+    "createdAt": "2026-01-22T17:41:54.756Z",
+    "updatedAt": "2026-01-22T17:41:54.756Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616282d6f72c04774c60",
+    "name": "Smart Glasses",
+    "image": null,
+    "parentId": "6972616282d6f72c04774c58",
+    "createdAt": "2026-01-22T17:41:54.792Z",
+    "updatedAt": "2026-01-22T17:41:54.792Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616282d6f72c04774c62",
+    "name": "Cameras & Accessories",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151204/nevyra/Categories/devices/opasqq2zvsqpp2cujdgn.jpg",
+    "parentId": "694e19856427cdce58640955",
+    "createdAt": "2026-01-22T17:41:54.828Z",
+    "updatedAt": "2026-03-10T14:00:06.830Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616282d6f72c04774c64",
+    "name": "Digital Cameras",
+    "image": null,
+    "parentId": "6972616282d6f72c04774c62",
+    "createdAt": "2026-01-22T17:41:54.864Z",
+    "updatedAt": "2026-01-22T17:41:54.864Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616282d6f72c04774c66",
+    "name": "DSLR Cameras",
+    "image": null,
+    "parentId": "6972616282d6f72c04774c62",
+    "createdAt": "2026-01-22T17:41:54.899Z",
+    "updatedAt": "2026-01-22T17:41:54.899Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616282d6f72c04774c68",
+    "name": "Action Cameras",
+    "image": null,
+    "parentId": "6972616282d6f72c04774c62",
+    "createdAt": "2026-01-22T17:41:54.934Z",
+    "updatedAt": "2026-01-22T17:41:54.934Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616282d6f72c04774c6a",
+    "name": "Camera Lenses",
+    "image": null,
+    "parentId": "6972616282d6f72c04774c62",
+    "createdAt": "2026-01-22T17:41:54.969Z",
+    "updatedAt": "2026-01-22T17:41:54.969Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616382d6f72c04774c6c",
+    "name": "Tripods",
+    "image": null,
+    "parentId": "6972616282d6f72c04774c62",
+    "createdAt": "2026-01-22T17:41:55.005Z",
+    "updatedAt": "2026-01-22T17:41:55.005Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616382d6f72c04774c6e",
+    "name": "Memory Cards",
+    "image": null,
+    "parentId": "6972616282d6f72c04774c62",
+    "createdAt": "2026-01-22T17:41:55.039Z",
+    "updatedAt": "2026-01-22T17:41:55.039Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616382d6f72c04774c70",
+    "name": "Gaming Devices",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151210/nevyra/Categories/devices/ot3ywpgtlx4uykdqxbhx.jpg",
+    "parentId": "694e19856427cdce58640955",
+    "createdAt": "2026-01-22T17:41:55.075Z",
+    "updatedAt": "2026-03-10T14:00:12.993Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616382d6f72c04774c72",
+    "name": "Gaming Consoles",
+    "image": null,
+    "parentId": "6972616382d6f72c04774c70",
+    "createdAt": "2026-01-22T17:41:55.110Z",
+    "updatedAt": "2026-01-22T17:41:55.110Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616382d6f72c04774c74",
+    "name": "Game Controllers",
+    "image": null,
+    "parentId": "6972616382d6f72c04774c70",
+    "createdAt": "2026-01-22T17:41:55.145Z",
+    "updatedAt": "2026-01-22T17:41:55.145Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616382d6f72c04774c76",
+    "name": "Gaming Headsets",
+    "image": null,
+    "parentId": "6972616382d6f72c04774c70",
+    "createdAt": "2026-01-22T17:41:55.180Z",
+    "updatedAt": "2026-01-22T17:41:55.180Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616382d6f72c04774c78",
+    "name": "Gaming Accessories",
+    "image": null,
+    "parentId": "6972616382d6f72c04774c70",
+    "createdAt": "2026-01-22T17:41:55.215Z",
+    "updatedAt": "2026-01-22T17:41:55.215Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616382d6f72c04774c7a",
+    "name": "Smart Devices",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151220/nevyra/Categories/devices/d0ivy7pfpcggijsiagvo.jpg",
+    "parentId": "694e19856427cdce58640955",
+    "createdAt": "2026-01-22T17:41:55.250Z",
+    "updatedAt": "2026-03-10T14:00:23.858Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616382d6f72c04774c7c",
+    "name": "Smart Lights",
+    "image": null,
+    "parentId": "6972616382d6f72c04774c7a",
+    "createdAt": "2026-01-22T17:41:55.286Z",
+    "updatedAt": "2026-01-22T17:41:55.286Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616382d6f72c04774c7e",
+    "name": "Smart Plugs",
+    "image": null,
+    "parentId": "6972616382d6f72c04774c7a",
+    "createdAt": "2026-01-22T17:41:55.322Z",
+    "updatedAt": "2026-01-22T17:41:55.322Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616382d6f72c04774c80",
+    "name": "Smart Door Locks",
+    "image": null,
+    "parentId": "6972616382d6f72c04774c7a",
+    "createdAt": "2026-01-22T17:41:55.358Z",
+    "updatedAt": "2026-01-22T17:41:55.358Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616382d6f72c04774c82",
+    "name": "Security Cameras",
+    "image": null,
+    "parentId": "6972616382d6f72c04774c7a",
+    "createdAt": "2026-01-22T17:41:55.394Z",
+    "updatedAt": "2026-01-22T17:41:55.394Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616382d6f72c04774c84",
+    "name": "WiFi- Routers",
+    "image": null,
+    "parentId": "6972616382d6f72c04774c7a",
+    "createdAt": "2026-01-22T17:41:55.429Z",
+    "updatedAt": "2026-01-22T17:41:55.429Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616382d6f72c04774c86",
+    "name": "Smart Sensors",
+    "image": null,
+    "parentId": "6972616382d6f72c04774c7a",
+    "createdAt": "2026-01-22T17:41:55.463Z",
+    "updatedAt": "2026-01-22T17:41:55.463Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616382d6f72c04774c89",
+    "name": "Power & Backup",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151134/nevyra/Categories/electrical-electronics/vi5zjy0ckd4riq4toe3d.jpg",
+    "parentId": "6950c2a57c3d82ae424ecc44",
+    "createdAt": "2026-01-22T17:41:55.531Z",
+    "updatedAt": "2026-03-10T13:58:58.789Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616382d6f72c04774c8b",
+    "name": "Inverters & UPS",
+    "image": null,
+    "parentId": "6972616382d6f72c04774c89",
+    "createdAt": "2026-01-22T17:41:55.568Z",
+    "updatedAt": "2026-01-22T17:41:55.568Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616382d6f72c04774c8d",
+    "name": "Batteries",
+    "image": null,
+    "parentId": "6972616382d6f72c04774c89",
+    "createdAt": "2026-01-22T17:41:55.604Z",
+    "updatedAt": "2026-01-22T17:41:55.604Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616382d6f72c04774c8f",
+    "name": "Transformers",
+    "image": null,
+    "parentId": "6972616382d6f72c04774c89",
+    "createdAt": "2026-01-22T17:41:55.639Z",
+    "updatedAt": "2026-01-22T17:41:55.639Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616382d6f72c04774c91",
+    "name": "Stabilizers",
+    "image": null,
+    "parentId": "6972616382d6f72c04774c89",
+    "createdAt": "2026-01-22T17:41:55.673Z",
+    "updatedAt": "2026-01-22T17:41:55.673Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616382d6f72c04774c93",
+    "name": "UPS Systems",
+    "image": null,
+    "parentId": "6972616382d6f72c04774c89",
+    "createdAt": "2026-01-22T17:41:55.708Z",
+    "updatedAt": "2026-01-22T17:41:55.708Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616382d6f72c04774c95",
+    "name": "Solar Inverters",
+    "image": null,
+    "parentId": "6972616382d6f72c04774c89",
+    "createdAt": "2026-01-22T17:41:55.743Z",
+    "updatedAt": "2026-01-22T17:41:55.743Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616382d6f72c04774c97",
+    "name": "Battery Accessories",
+    "image": null,
+    "parentId": "6972616382d6f72c04774c89",
+    "createdAt": "2026-01-22T17:41:55.778Z",
+    "updatedAt": "2026-01-22T17:41:55.778Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616382d6f72c04774c99",
+    "name": "Wiring & Protection",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151148/nevyra/Categories/electrical-electronics/dzkaj00icly8xkcwpjuu.jpg",
+    "parentId": "6950c2a57c3d82ae424ecc44",
+    "createdAt": "2026-01-22T17:41:55.813Z",
+    "updatedAt": "2026-03-10T13:59:11.550Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616382d6f72c04774c9b",
+    "name": "Wiring Cables & Wires",
+    "image": null,
+    "parentId": "6972616382d6f72c04774c99",
+    "createdAt": "2026-01-22T17:41:55.849Z",
+    "updatedAt": "2026-01-22T17:41:55.849Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616382d6f72c04774c9d",
+    "name": "Switches & Sockets",
+    "image": null,
+    "parentId": "6972616382d6f72c04774c99",
+    "createdAt": "2026-01-22T17:41:55.883Z",
+    "updatedAt": "2026-01-22T17:41:55.883Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616382d6f72c04774c9f",
+    "name": "MCBs, RCCBs & DB Boxes",
+    "image": null,
+    "parentId": "6972616382d6f72c04774c99",
+    "createdAt": "2026-01-22T17:41:55.918Z",
+    "updatedAt": "2026-01-22T17:41:55.918Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616382d6f72c04774ca1",
+    "name": "Extension Boards",
+    "image": null,
+    "parentId": "6972616382d6f72c04774c99",
+    "createdAt": "2026-01-22T17:41:55.953Z",
+    "updatedAt": "2026-01-22T17:41:55.953Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616382d6f72c04774ca3",
+    "name": "Plug Tops & Adaptors",
+    "image": null,
+    "parentId": "6972616382d6f72c04774c99",
+    "createdAt": "2026-01-22T17:41:55.989Z",
+    "updatedAt": "2026-01-22T17:41:55.989Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616482d6f72c04774ca5",
+    "name": "Control Switches",
+    "image": null,
+    "parentId": "6972616382d6f72c04774c99",
+    "createdAt": "2026-01-22T17:41:56.024Z",
+    "updatedAt": "2026-01-22T17:41:56.024Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616482d6f72c04774ca7",
+    "name": "Relays & Contractors",
+    "image": null,
+    "parentId": "6972616382d6f72c04774c99",
+    "createdAt": "2026-01-22T17:41:56.059Z",
+    "updatedAt": "2026-01-22T17:41:56.059Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616482d6f72c04774ca9",
+    "name": "Lighting",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151131/nevyra/Categories/electrical-electronics/txsuon55khmyfx2nlukm.jpg",
+    "parentId": "6950c2a57c3d82ae424ecc44",
+    "createdAt": "2026-01-22T17:41:56.095Z",
+    "updatedAt": "2026-03-10T13:58:53.732Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616482d6f72c04774cab",
+    "name": "Ceiling Lights",
+    "image": null,
+    "parentId": "6972616482d6f72c04774ca9",
+    "createdAt": "2026-01-22T17:41:56.130Z",
+    "updatedAt": "2026-01-22T17:41:56.130Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616482d6f72c04774cad",
+    "name": "CFL Bulbs",
+    "image": null,
+    "parentId": "6972616482d6f72c04774ca9",
+    "createdAt": "2026-01-22T17:41:56.165Z",
+    "updatedAt": "2026-01-22T17:41:56.165Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616482d6f72c04774caf",
+    "name": "Wall Lights",
+    "image": null,
+    "parentId": "6972616482d6f72c04774ca9",
+    "createdAt": "2026-01-22T17:41:56.215Z",
+    "updatedAt": "2026-01-22T17:41:56.215Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616482d6f72c04774cb1",
+    "name": "Outdoor Lights",
+    "image": null,
+    "parentId": "6972616482d6f72c04774ca9",
+    "createdAt": "2026-01-22T17:41:56.261Z",
+    "updatedAt": "2026-01-22T17:41:56.261Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616482d6f72c04774cb3",
+    "name": "Street Lights",
+    "image": null,
+    "parentId": "6972616482d6f72c04774ca9",
+    "createdAt": "2026-01-22T17:41:56.296Z",
+    "updatedAt": "2026-01-22T17:41:56.296Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616482d6f72c04774cb5",
+    "name": "Emergency Lights",
+    "image": null,
+    "parentId": "6972616482d6f72c04774ca9",
+    "createdAt": "2026-01-22T17:41:56.331Z",
+    "updatedAt": "2026-01-22T17:41:56.331Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616482d6f72c04774cb7",
+    "name": "Fans & Appliances",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151128/nevyra/Categories/electrical-electronics/xvflyfm6f0m27lo6chot.jpg",
+    "parentId": "6950c2a57c3d82ae424ecc44",
+    "createdAt": "2026-01-22T17:41:56.365Z",
+    "updatedAt": "2026-03-10T13:58:51.161Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616482d6f72c04774cb9",
+    "name": "Table Fans",
+    "image": null,
+    "parentId": "6972616482d6f72c04774cb7",
+    "createdAt": "2026-01-22T17:41:56.401Z",
+    "updatedAt": "2026-01-22T17:41:56.401Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616482d6f72c04774cbb",
+    "name": "Pedestal Fans",
+    "image": null,
+    "parentId": "6972616482d6f72c04774cb7",
+    "createdAt": "2026-01-22T17:41:56.437Z",
+    "updatedAt": "2026-01-22T17:41:56.437Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616482d6f72c04774cbd",
+    "name": "Exhaust Fans",
+    "image": null,
+    "parentId": "6972616482d6f72c04774cb7",
+    "createdAt": "2026-01-22T17:41:56.477Z",
+    "updatedAt": "2026-01-22T17:41:56.477Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616482d6f72c04774cbf",
+    "name": "Ventilation Fans",
+    "image": null,
+    "parentId": "6972616482d6f72c04774cb7",
+    "createdAt": "2026-01-22T17:41:56.513Z",
+    "updatedAt": "2026-01-22T17:41:56.513Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616482d6f72c04774cc1",
+    "name": "Water Heaters",
+    "image": null,
+    "parentId": "6972616482d6f72c04774cb7",
+    "createdAt": "2026-01-22T17:41:56.548Z",
+    "updatedAt": "2026-01-22T17:41:56.548Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616482d6f72c04774cc3",
+    "name": "Room Heaters",
+    "image": null,
+    "parentId": "6972616482d6f72c04774cb7",
+    "createdAt": "2026-01-22T17:41:56.584Z",
+    "updatedAt": "2026-01-22T17:41:56.584Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616482d6f72c04774cc5",
+    "name": "Irons",
+    "image": null,
+    "parentId": "6972616482d6f72c04774cb7",
+    "createdAt": "2026-01-22T17:41:56.619Z",
+    "updatedAt": "2026-01-22T17:41:56.619Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616482d6f72c04774cc7",
+    "name": "Mixers & Grinders",
+    "image": null,
+    "parentId": "6972616482d6f72c04774cb7",
+    "createdAt": "2026-01-22T17:41:56.654Z",
+    "updatedAt": "2026-01-22T17:41:56.654Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616482d6f72c04774cc9",
+    "name": "Electric Kettles",
+    "image": null,
+    "parentId": "6972616482d6f72c04774cb7",
+    "createdAt": "2026-01-22T17:41:56.690Z",
+    "updatedAt": "2026-01-22T17:41:56.690Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616482d6f72c04774ccb",
+    "name": "Induction Cooktops",
+    "image": null,
+    "parentId": "6972616482d6f72c04774cb7",
+    "createdAt": "2026-01-22T17:41:56.726Z",
+    "updatedAt": "2026-01-22T17:41:56.726Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616482d6f72c04774ccd",
+    "name": "Smart Home & Automation",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151140/nevyra/Categories/electrical-electronics/jdcwob6wrpdmeadp2mg2.jpg",
+    "parentId": "6950c2a57c3d82ae424ecc44",
+    "createdAt": "2026-01-22T17:41:56.761Z",
+    "updatedAt": "2026-03-10T13:59:02.895Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616482d6f72c04774ccf",
+    "name": "Smart Switches",
+    "image": null,
+    "parentId": "6972616482d6f72c04774ccd",
+    "createdAt": "2026-01-22T17:41:56.797Z",
+    "updatedAt": "2026-01-22T17:41:56.797Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616482d6f72c04774cd1",
+    "name": "Smart Plugs",
+    "image": null,
+    "parentId": "6972616482d6f72c04774ccd",
+    "createdAt": "2026-01-22T17:41:56.832Z",
+    "updatedAt": "2026-01-22T17:41:56.832Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616482d6f72c04774cd3",
+    "name": "Smart Lights",
+    "image": null,
+    "parentId": "6972616482d6f72c04774ccd",
+    "createdAt": "2026-01-22T17:41:56.867Z",
+    "updatedAt": "2026-01-22T17:41:56.867Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616482d6f72c04774cd5",
+    "name": "Smart Doorbells",
+    "image": null,
+    "parentId": "6972616482d6f72c04774ccd",
+    "createdAt": "2026-01-22T17:41:56.902Z",
+    "updatedAt": "2026-01-22T17:41:56.902Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616482d6f72c04774cd7",
+    "name": "Home Automation Kits",
+    "image": null,
+    "parentId": "6972616482d6f72c04774ccd",
+    "createdAt": "2026-01-22T17:41:56.938Z",
+    "updatedAt": "2026-01-22T17:41:56.938Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616482d6f72c04774cd9",
+    "name": "Tools & Industrial",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151145/nevyra/Categories/electrical-electronics/jhcqtd3dm68fllfoi4qn.jpg",
+    "parentId": "6950c2a57c3d82ae424ecc44",
+    "createdAt": "2026-01-22T17:41:56.974Z",
+    "updatedAt": "2026-03-10T13:59:08.119Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616582d6f72c04774cdb",
+    "name": "Electrical Tools",
+    "image": null,
+    "parentId": "6972616482d6f72c04774cd9",
+    "createdAt": "2026-01-22T17:41:57.010Z",
+    "updatedAt": "2026-01-22T17:41:57.010Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616582d6f72c04774cdd",
+    "name": "Testing Devices",
+    "image": null,
+    "parentId": "6972616482d6f72c04774cd9",
+    "createdAt": "2026-01-22T17:41:57.045Z",
+    "updatedAt": "2026-01-22T17:41:57.045Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616582d6f72c04774cdf",
+    "name": "Tool kits",
+    "image": null,
+    "parentId": "6972616482d6f72c04774cd9",
+    "createdAt": "2026-01-22T17:41:57.080Z",
+    "updatedAt": "2026-01-22T17:41:57.080Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616582d6f72c04774ce1",
+    "name": "Safety Gloves & Gear",
+    "image": null,
+    "parentId": "6972616482d6f72c04774cd9",
+    "createdAt": "2026-01-22T17:41:57.116Z",
+    "updatedAt": "2026-01-22T17:41:57.116Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616582d6f72c04774ce3",
+    "name": "Industrial panels",
+    "image": null,
+    "parentId": "6972616482d6f72c04774cd9",
+    "createdAt": "2026-01-22T17:41:57.151Z",
+    "updatedAt": "2026-01-22T17:41:57.151Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616582d6f72c04774ce5",
+    "name": "Heavy Duty Cables",
+    "image": null,
+    "parentId": "6972616482d6f72c04774cd9",
+    "createdAt": "2026-01-22T17:41:57.186Z",
+    "updatedAt": "2026-01-22T17:41:57.186Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616582d6f72c04774ce8",
+    "name": "Bike Accessories",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151097/nevyra/Categories/automotive-automobile/u3nsbmh0vfzhmmlohjfv.jpg",
+    "parentId": "6950c3794ac0989e7808cd24",
+    "createdAt": "2026-01-22T17:41:57.253Z",
+    "updatedAt": "2026-03-10T13:58:20.837Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616582d6f72c04774cea",
+    "name": "Helmets",
+    "image": null,
+    "parentId": "6972616582d6f72c04774ce8",
+    "createdAt": "2026-01-22T17:41:57.289Z",
+    "updatedAt": "2026-01-22T17:41:57.289Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616582d6f72c04774cec",
+    "name": "Bike covers",
+    "image": null,
+    "parentId": "6972616582d6f72c04774ce8",
+    "createdAt": "2026-01-22T17:41:57.326Z",
+    "updatedAt": "2026-01-22T17:41:57.326Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616582d6f72c04774cee",
+    "name": "Bike Lights",
+    "image": null,
+    "parentId": "6972616582d6f72c04774ce8",
+    "createdAt": "2026-01-22T17:41:57.361Z",
+    "updatedAt": "2026-01-22T17:41:57.361Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616582d6f72c04774cf0",
+    "name": "Bike Batteries",
+    "image": null,
+    "parentId": "6972616582d6f72c04774ce8",
+    "createdAt": "2026-01-22T17:41:57.396Z",
+    "updatedAt": "2026-01-22T17:41:57.396Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616582d6f72c04774cf2",
+    "name": "Bike Engine Oil",
+    "image": null,
+    "parentId": "6972616582d6f72c04774ce8",
+    "createdAt": "2026-01-22T17:41:57.431Z",
+    "updatedAt": "2026-01-22T17:41:57.431Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616582d6f72c04774cf4",
+    "name": "Bike Brake Oil",
+    "image": null,
+    "parentId": "6972616582d6f72c04774ce8",
+    "createdAt": "2026-01-22T17:41:57.467Z",
+    "updatedAt": "2026-01-22T17:41:57.467Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616582d6f72c04774cf6",
+    "name": "Bike Air Filters",
+    "image": null,
+    "parentId": "6972616582d6f72c04774ce8",
+    "createdAt": "2026-01-22T17:41:57.501Z",
+    "updatedAt": "2026-01-22T17:41:57.501Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616582d6f72c04774cf8",
+    "name": "Bike Cleaning & Care",
+    "image": null,
+    "parentId": "6972616582d6f72c04774ce8",
+    "createdAt": "2026-01-22T17:41:57.537Z",
+    "updatedAt": "2026-01-22T17:41:57.537Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616582d6f72c04774cfa",
+    "name": "Car Accessories",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151104/nevyra/Categories/automotive-automobile/qejrwozm5sc5wi8b6dr9.jpg",
+    "parentId": "6950c3794ac0989e7808cd24",
+    "createdAt": "2026-01-22T17:41:57.572Z",
+    "updatedAt": "2026-03-10T13:58:27.464Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616582d6f72c04774cfc",
+    "name": "Car Covers",
+    "image": null,
+    "parentId": "6972616582d6f72c04774cfa",
+    "createdAt": "2026-01-22T17:41:57.606Z",
+    "updatedAt": "2026-01-22T17:41:57.606Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616582d6f72c04774cfe",
+    "name": "Car Seat Covers",
+    "image": null,
+    "parentId": "6972616582d6f72c04774cfa",
+    "createdAt": "2026-01-22T17:41:57.641Z",
+    "updatedAt": "2026-01-22T17:41:57.641Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616582d6f72c04774d00",
+    "name": "Car Mats",
+    "image": null,
+    "parentId": "6972616582d6f72c04774cfa",
+    "createdAt": "2026-01-22T17:41:57.676Z",
+    "updatedAt": "2026-01-22T17:41:57.676Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616582d6f72c04774d02",
+    "name": "Car Chargers & Holders",
+    "image": null,
+    "parentId": "6972616582d6f72c04774cfa",
+    "createdAt": "2026-01-22T17:41:57.712Z",
+    "updatedAt": "2026-01-22T17:41:57.712Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616582d6f72c04774d04",
+    "name": "Car Lights & Fog Lamps",
+    "image": null,
+    "parentId": "6972616582d6f72c04774cfa",
+    "createdAt": "2026-01-22T17:41:57.747Z",
+    "updatedAt": "2026-01-22T17:41:57.747Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616582d6f72c04774d06",
+    "name": "Lubricants & Fluids",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151112/nevyra/Categories/automotive-automobile/olr9d0tzcycnzyqkcvzg.jpg",
+    "parentId": "6950c3794ac0989e7808cd24",
+    "createdAt": "2026-01-22T17:41:57.783Z",
+    "updatedAt": "2026-03-10T13:58:36.220Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616582d6f72c04774d08",
+    "name": "Engine Oil",
+    "image": null,
+    "parentId": "6972616582d6f72c04774d06",
+    "createdAt": "2026-01-22T17:41:57.820Z",
+    "updatedAt": "2026-01-22T17:41:57.820Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616582d6f72c04774d0a",
+    "name": "Brake Fluid",
+    "image": null,
+    "parentId": "6972616582d6f72c04774d06",
+    "createdAt": "2026-01-22T17:41:57.855Z",
+    "updatedAt": "2026-01-22T17:41:57.855Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616582d6f72c04774d0c",
+    "name": "Coolant",
+    "image": null,
+    "parentId": "6972616582d6f72c04774d06",
+    "createdAt": "2026-01-22T17:41:57.890Z",
+    "updatedAt": "2026-01-22T17:41:57.890Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616582d6f72c04774d0e",
+    "name": "Gear Oil",
+    "image": null,
+    "parentId": "6972616582d6f72c04774d06",
+    "createdAt": "2026-01-22T17:41:57.926Z",
+    "updatedAt": "2026-01-22T17:41:57.926Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616582d6f72c04774d10",
+    "name": "Power Steering Oil",
+    "image": null,
+    "parentId": "6972616582d6f72c04774d06",
+    "createdAt": "2026-01-22T17:41:57.961Z",
+    "updatedAt": "2026-01-22T17:41:57.961Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616582d6f72c04774d12",
+    "name": "Spares & Parts",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151118/nevyra/Categories/automotive-automobile/q5iwszsifjztmfy0hd5y.jpg",
+    "parentId": "6950c3794ac0989e7808cd24",
+    "createdAt": "2026-01-22T17:41:57.998Z",
+    "updatedAt": "2026-03-10T13:58:40.574Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616682d6f72c04774d14",
+    "name": "Air Filters",
+    "image": null,
+    "parentId": "6972616582d6f72c04774d12",
+    "createdAt": "2026-01-22T17:41:58.034Z",
+    "updatedAt": "2026-01-22T17:41:58.034Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616682d6f72c04774d16",
+    "name": "Oil Filters",
+    "image": null,
+    "parentId": "6972616582d6f72c04774d12",
+    "createdAt": "2026-01-22T17:41:58.081Z",
+    "updatedAt": "2026-01-22T17:41:58.081Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616682d6f72c04774d18",
+    "name": "Fuel Filters",
+    "image": null,
+    "parentId": "6972616582d6f72c04774d12",
+    "createdAt": "2026-01-22T17:41:58.116Z",
+    "updatedAt": "2026-01-22T17:41:58.116Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616682d6f72c04774d1a",
+    "name": "Spark Plugs",
+    "image": null,
+    "parentId": "6972616582d6f72c04774d12",
+    "createdAt": "2026-01-22T17:41:58.151Z",
+    "updatedAt": "2026-01-22T17:41:58.151Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616682d6f72c04774d1c",
+    "name": "Brake Pads",
+    "image": null,
+    "parentId": "6972616582d6f72c04774d12",
+    "createdAt": "2026-01-22T17:41:58.188Z",
+    "updatedAt": "2026-01-22T17:41:58.188Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616682d6f72c04774d1e",
+    "name": "Clutch Parts",
+    "image": null,
+    "parentId": "6972616582d6f72c04774d12",
+    "createdAt": "2026-01-22T17:41:58.223Z",
+    "updatedAt": "2026-01-22T17:41:58.223Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616682d6f72c04774d20",
+    "name": "Horns",
+    "image": null,
+    "parentId": "6972616582d6f72c04774d12",
+    "createdAt": "2026-01-22T17:41:58.258Z",
+    "updatedAt": "2026-01-22T17:41:58.258Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616682d6f72c04774d22",
+    "name": "Wipers",
+    "image": null,
+    "parentId": "6972616582d6f72c04774d12",
+    "createdAt": "2026-01-22T17:41:58.293Z",
+    "updatedAt": "2026-01-22T17:41:58.293Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616682d6f72c04774d24",
+    "name": "Fuse & Relays",
+    "image": null,
+    "parentId": "6972616582d6f72c04774d12",
+    "createdAt": "2026-01-22T17:41:58.328Z",
+    "updatedAt": "2026-01-22T17:41:58.328Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616682d6f72c04774d26",
+    "name": "Care & Cleaning",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151108/nevyra/Categories/automotive-automobile/yicorcdvhyh8qjtrue4u.jpg",
+    "parentId": "6950c3794ac0989e7808cd24",
+    "createdAt": "2026-01-22T17:41:58.363Z",
+    "updatedAt": "2026-03-10T13:58:31.508Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616682d6f72c04774d28",
+    "name": "Car Wash & Shampoo",
+    "image": null,
+    "parentId": "6972616682d6f72c04774d26",
+    "createdAt": "2026-01-22T17:41:58.398Z",
+    "updatedAt": "2026-01-22T17:41:58.398Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616682d6f72c04774d2a",
+    "name": "Polish & Wax",
+    "image": null,
+    "parentId": "6972616682d6f72c04774d26",
+    "createdAt": "2026-01-22T17:41:58.433Z",
+    "updatedAt": "2026-01-22T17:41:58.433Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616682d6f72c04774d2c",
+    "name": "Interior Cleaners",
+    "image": null,
+    "parentId": "6972616682d6f72c04774d26",
+    "createdAt": "2026-01-22T17:41:58.469Z",
+    "updatedAt": "2026-01-22T17:41:58.469Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616682d6f72c04774d2e",
+    "name": "Tyre Cleaners",
+    "image": null,
+    "parentId": "6972616682d6f72c04774d26",
+    "createdAt": "2026-01-22T17:41:58.503Z",
+    "updatedAt": "2026-01-22T17:41:58.503Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616682d6f72c04774d30",
+    "name": "Chain Lubes",
+    "image": null,
+    "parentId": "6972616682d6f72c04774d26",
+    "createdAt": "2026-01-22T17:41:58.538Z",
+    "updatedAt": "2026-01-22T17:41:58.538Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616682d6f72c04774d32",
+    "name": "Tyres & Wheels",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151124/nevyra/Categories/automotive-automobile/kbtqgglcl4cl9qtefpr1.jpg",
+    "parentId": "6950c3794ac0989e7808cd24",
+    "createdAt": "2026-01-22T17:41:58.574Z",
+    "updatedAt": "2026-03-10T13:58:48.036Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616682d6f72c04774d34",
+    "name": "Car Tyres",
+    "image": null,
+    "parentId": "6972616682d6f72c04774d32",
+    "createdAt": "2026-01-22T17:41:58.611Z",
+    "updatedAt": "2026-01-22T17:41:58.611Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616682d6f72c04774d36",
+    "name": "Bike Tyres",
+    "image": null,
+    "parentId": "6972616682d6f72c04774d32",
+    "createdAt": "2026-01-22T17:41:58.646Z",
+    "updatedAt": "2026-01-22T17:41:58.646Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616682d6f72c04774d38",
+    "name": "Alloy Wheels",
+    "image": null,
+    "parentId": "6972616682d6f72c04774d32",
+    "createdAt": "2026-01-22T17:41:58.681Z",
+    "updatedAt": "2026-01-22T17:41:58.681Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616682d6f72c04774d3a",
+    "name": "Tyre Inflators",
+    "image": null,
+    "parentId": "6972616682d6f72c04774d32",
+    "createdAt": "2026-01-22T17:41:58.716Z",
+    "updatedAt": "2026-01-22T17:41:58.716Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616682d6f72c04774d3c",
+    "name": "Tools & Safety",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151121/nevyra/Categories/automotive-automobile/flofupy0f7i2qfuz2wl5.jpg",
+    "parentId": "6950c3794ac0989e7808cd24",
+    "createdAt": "2026-01-22T17:41:58.752Z",
+    "updatedAt": "2026-03-10T13:58:43.357Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616682d6f72c04774d3e",
+    "name": "Tool Kits",
+    "image": null,
+    "parentId": "6972616682d6f72c04774d3c",
+    "createdAt": "2026-01-22T17:41:58.787Z",
+    "updatedAt": "2026-01-22T17:41:58.787Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616682d6f72c04774d40",
+    "name": "Hydraulic Jacks",
+    "image": null,
+    "parentId": "6972616682d6f72c04774d3c",
+    "createdAt": "2026-01-22T17:41:58.823Z",
+    "updatedAt": "2026-01-22T17:41:58.823Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616682d6f72c04774d42",
+    "name": "First Aid Kits",
+    "image": null,
+    "parentId": "6972616682d6f72c04774d3c",
+    "createdAt": "2026-01-22T17:41:58.859Z",
+    "updatedAt": "2026-01-22T17:41:58.859Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616682d6f72c04774d44",
+    "name": "Warning Traingles",
+    "image": null,
+    "parentId": "6972616682d6f72c04774d3c",
+    "createdAt": "2026-01-22T17:41:58.895Z",
+    "updatedAt": "2026-01-22T17:41:58.895Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616682d6f72c04774d47",
+    "name": "Cricket",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151314/nevyra/Categories/sports/baqy8wvwvujx8hos9zke.jpg",
+    "parentId": "694e19876427cdce58640994",
+    "createdAt": "2026-01-22T17:41:58.972Z",
+    "updatedAt": "2026-03-10T14:01:57.212Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616782d6f72c04774d49",
+    "name": "Batting Gloves",
+    "image": null,
+    "parentId": "6972616682d6f72c04774d47",
+    "createdAt": "2026-01-22T17:41:59.009Z",
+    "updatedAt": "2026-01-22T17:41:59.009Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616782d6f72c04774d4b",
+    "name": "Batting Pads",
+    "image": null,
+    "parentId": "6972616682d6f72c04774d47",
+    "createdAt": "2026-01-22T17:41:59.045Z",
+    "updatedAt": "2026-01-22T17:41:59.045Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616782d6f72c04774d4d",
+    "name": "Helmets",
+    "image": null,
+    "parentId": "6972616682d6f72c04774d47",
+    "createdAt": "2026-01-22T17:41:59.080Z",
+    "updatedAt": "2026-01-22T17:41:59.080Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616782d6f72c04774d4f",
+    "name": "Wicket Keeping Gloves",
+    "image": null,
+    "parentId": "6972616682d6f72c04774d47",
+    "createdAt": "2026-01-22T17:41:59.115Z",
+    "updatedAt": "2026-01-22T17:41:59.115Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616782d6f72c04774d51",
+    "name": "Wicket Keeping Pads",
+    "image": null,
+    "parentId": "6972616682d6f72c04774d47",
+    "createdAt": "2026-01-22T17:41:59.151Z",
+    "updatedAt": "2026-01-22T17:41:59.151Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616782d6f72c04774d53",
+    "name": "Knee pads",
+    "image": null,
+    "parentId": "6972616682d6f72c04774d47",
+    "createdAt": "2026-01-22T17:41:59.187Z",
+    "updatedAt": "2026-01-22T17:41:59.187Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616782d6f72c04774d55",
+    "name": "Football",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151331/nevyra/Categories/sports/qvkuirxs52ilb1cbab8m.jpg",
+    "parentId": "694e19876427cdce58640994",
+    "createdAt": "2026-01-22T17:41:59.222Z",
+    "updatedAt": "2026-03-10T14:02:14.950Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616782d6f72c04774d57",
+    "name": "Football",
+    "image": null,
+    "parentId": "6972616782d6f72c04774d55",
+    "createdAt": "2026-01-22T17:41:59.258Z",
+    "updatedAt": "2026-01-22T17:41:59.258Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616782d6f72c04774d59",
+    "name": "Football Shoes",
+    "image": null,
+    "parentId": "6972616782d6f72c04774d55",
+    "createdAt": "2026-01-22T17:41:59.294Z",
+    "updatedAt": "2026-01-22T17:41:59.294Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616782d6f72c04774d5b",
+    "name": "Shin Guards",
+    "image": null,
+    "parentId": "6972616782d6f72c04774d55",
+    "createdAt": "2026-01-22T17:41:59.329Z",
+    "updatedAt": "2026-01-22T17:41:59.329Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616782d6f72c04774d5d",
+    "name": "Goal Posts",
+    "image": null,
+    "parentId": "6972616782d6f72c04774d55",
+    "createdAt": "2026-01-22T17:41:59.366Z",
+    "updatedAt": "2026-01-22T17:41:59.366Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616782d6f72c04774d5f",
+    "name": "Racquet Sports",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151347/nevyra/Categories/sports/eh44f0r2l3ic2l3tipeh.jpg",
+    "parentId": "694e19876427cdce58640994",
+    "createdAt": "2026-01-22T17:41:59.402Z",
+    "updatedAt": "2026-03-10T14:02:30.613Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616782d6f72c04774d61",
+    "name": "Badminton Rackets",
+    "image": null,
+    "parentId": "6972616782d6f72c04774d5f",
+    "createdAt": "2026-01-22T17:41:59.437Z",
+    "updatedAt": "2026-01-22T17:41:59.437Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616782d6f72c04774d63",
+    "name": "Shuttlecocks",
+    "image": null,
+    "parentId": "6972616782d6f72c04774d5f",
+    "createdAt": "2026-01-22T17:41:59.473Z",
+    "updatedAt": "2026-01-22T17:41:59.473Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616782d6f72c04774d65",
+    "name": "Badminton Nets",
+    "image": null,
+    "parentId": "6972616782d6f72c04774d5f",
+    "createdAt": "2026-01-22T17:41:59.508Z",
+    "updatedAt": "2026-01-22T17:41:59.508Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616782d6f72c04774d67",
+    "name": "Grip Tapes",
+    "image": null,
+    "parentId": "6972616782d6f72c04774d5f",
+    "createdAt": "2026-01-22T17:41:59.544Z",
+    "updatedAt": "2026-01-22T17:41:59.544Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616782d6f72c04774d69",
+    "name": "Tennis Rackets",
+    "image": null,
+    "parentId": "6972616782d6f72c04774d5f",
+    "createdAt": "2026-01-22T17:41:59.580Z",
+    "updatedAt": "2026-01-22T17:41:59.580Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616782d6f72c04774d6b",
+    "name": "Tennis Balls",
+    "image": null,
+    "parentId": "6972616782d6f72c04774d5f",
+    "createdAt": "2026-01-22T17:41:59.616Z",
+    "updatedAt": "2026-01-22T17:41:59.616Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616782d6f72c04774d6d",
+    "name": "Tennis Nets",
+    "image": null,
+    "parentId": "6972616782d6f72c04774d5f",
+    "createdAt": "2026-01-22T17:41:59.652Z",
+    "updatedAt": "2026-01-22T17:41:59.652Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616782d6f72c04774d6f",
+    "name": "Table Tennis Bats",
+    "image": null,
+    "parentId": "6972616782d6f72c04774d5f",
+    "createdAt": "2026-01-22T17:41:59.687Z",
+    "updatedAt": "2026-01-22T17:41:59.687Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616782d6f72c04774d71",
+    "name": "Table Tennis Balls",
+    "image": null,
+    "parentId": "6972616782d6f72c04774d5f",
+    "createdAt": "2026-01-22T17:41:59.722Z",
+    "updatedAt": "2026-01-22T17:41:59.722Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616782d6f72c04774d73",
+    "name": "TT Tables",
+    "image": null,
+    "parentId": "6972616782d6f72c04774d5f",
+    "createdAt": "2026-01-22T17:41:59.758Z",
+    "updatedAt": "2026-01-22T17:41:59.758Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616782d6f72c04774d75",
+    "name": "Basketball",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151310/nevyra/Categories/sports/rpupzfdkm69bx27ya0dw.jpg",
+    "parentId": "694e19876427cdce58640994",
+    "createdAt": "2026-01-22T17:41:59.794Z",
+    "updatedAt": "2026-03-10T14:01:53.684Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616782d6f72c04774d77",
+    "name": "Basketball",
+    "image": null,
+    "parentId": "6972616782d6f72c04774d75",
+    "createdAt": "2026-01-22T17:41:59.829Z",
+    "updatedAt": "2026-01-22T17:41:59.829Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616782d6f72c04774d79",
+    "name": "Basketball Ring",
+    "image": null,
+    "parentId": "6972616782d6f72c04774d75",
+    "createdAt": "2026-01-22T17:41:59.866Z",
+    "updatedAt": "2026-01-22T17:41:59.866Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616782d6f72c04774d7b",
+    "name": "Basketball Net",
+    "image": null,
+    "parentId": "6972616782d6f72c04774d75",
+    "createdAt": "2026-01-22T17:41:59.901Z",
+    "updatedAt": "2026-01-22T17:41:59.901Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616782d6f72c04774d7d",
+    "name": "Indoor Games",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151340/nevyra/Categories/sports/lyyjuwync7bhfhgybcgt.jpg",
+    "parentId": "694e19876427cdce58640994",
+    "createdAt": "2026-01-22T17:41:59.936Z",
+    "updatedAt": "2026-03-10T14:02:23.481Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616782d6f72c04774d7f",
+    "name": "Carrom Boards",
+    "image": null,
+    "parentId": "6972616782d6f72c04774d7d",
+    "createdAt": "2026-01-22T17:41:59.972Z",
+    "updatedAt": "2026-01-22T17:41:59.972Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616882d6f72c04774d81",
+    "name": "Chess Boards",
+    "image": null,
+    "parentId": "6972616782d6f72c04774d7d",
+    "createdAt": "2026-01-22T17:42:00.008Z",
+    "updatedAt": "2026-01-22T17:42:00.008Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616882d6f72c04774d83",
+    "name": "Fitness & Gym",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151326/nevyra/Categories/sports/dnjioooydrsxz5ciuotr.jpg",
+    "parentId": "694e19876427cdce58640994",
+    "createdAt": "2026-01-22T17:42:00.044Z",
+    "updatedAt": "2026-03-10T14:02:09.492Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616882d6f72c04774d85",
+    "name": "Dumbbells",
+    "image": null,
+    "parentId": "6972616882d6f72c04774d83",
+    "createdAt": "2026-01-22T17:42:00.080Z",
+    "updatedAt": "2026-01-22T17:42:00.080Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616882d6f72c04774d87",
+    "name": "Barbells",
+    "image": null,
+    "parentId": "6972616882d6f72c04774d83",
+    "createdAt": "2026-01-22T17:42:00.115Z",
+    "updatedAt": "2026-01-22T17:42:00.115Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616882d6f72c04774d89",
+    "name": "Weight Plates",
+    "image": null,
+    "parentId": "6972616882d6f72c04774d83",
+    "createdAt": "2026-01-22T17:42:00.151Z",
+    "updatedAt": "2026-01-22T17:42:00.151Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616882d6f72c04774d8b",
+    "name": "Resistance Bands",
+    "image": null,
+    "parentId": "6972616882d6f72c04774d83",
+    "createdAt": "2026-01-22T17:42:00.193Z",
+    "updatedAt": "2026-01-22T17:42:00.193Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616882d6f72c04774d8d",
+    "name": "Skipping Ropes",
+    "image": null,
+    "parentId": "6972616882d6f72c04774d83",
+    "createdAt": "2026-01-22T17:42:00.228Z",
+    "updatedAt": "2026-01-22T17:42:00.228Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616882d6f72c04774d8f",
+    "name": "Yoga Mats",
+    "image": null,
+    "parentId": "6972616882d6f72c04774d83",
+    "createdAt": "2026-01-22T17:42:00.265Z",
+    "updatedAt": "2026-01-22T17:42:00.265Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616882d6f72c04774d91",
+    "name": "Exercise Balls",
+    "image": null,
+    "parentId": "6972616882d6f72c04774d83",
+    "createdAt": "2026-01-22T17:42:00.301Z",
+    "updatedAt": "2026-01-22T17:42:00.301Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616882d6f72c04774d93",
+    "name": "Cycling & Skating",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151319/nevyra/Categories/sports/ssiwgl9sxcqdottd2a2y.jpg",
+    "parentId": "694e19876427cdce58640994",
+    "createdAt": "2026-01-22T17:42:00.337Z",
+    "updatedAt": "2026-03-10T14:02:05.452Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616882d6f72c04774d95",
+    "name": "Cycles",
+    "image": null,
+    "parentId": "6972616882d6f72c04774d93",
+    "createdAt": "2026-01-22T17:42:00.373Z",
+    "updatedAt": "2026-01-22T17:42:00.373Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616882d6f72c04774d97",
+    "name": "Cycling Helmets",
+    "image": null,
+    "parentId": "6972616882d6f72c04774d93",
+    "createdAt": "2026-01-22T17:42:00.407Z",
+    "updatedAt": "2026-01-22T17:42:00.407Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616882d6f72c04774d99",
+    "name": "Skates",
+    "image": null,
+    "parentId": "6972616882d6f72c04774d93",
+    "createdAt": "2026-01-22T17:42:00.443Z",
+    "updatedAt": "2026-01-22T17:42:00.443Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616882d6f72c04774d9b",
+    "name": "Skateboards",
+    "image": null,
+    "parentId": "6972616882d6f72c04774d93",
+    "createdAt": "2026-01-22T17:42:00.478Z",
+    "updatedAt": "2026-01-22T17:42:00.478Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616882d6f72c04774d9d",
+    "name": "Gear & Accessories",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151335/nevyra/Categories/sports/q9whjaitmdhwenn3ul0w.jpg",
+    "parentId": "694e19876427cdce58640994",
+    "createdAt": "2026-01-22T17:42:00.515Z",
+    "updatedAt": "2026-03-10T14:02:18.943Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616882d6f72c04774d9f",
+    "name": "Sports Shoes",
+    "image": null,
+    "parentId": "6972616882d6f72c04774d9d",
+    "createdAt": "2026-01-22T17:42:00.552Z",
+    "updatedAt": "2026-01-22T17:42:00.552Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616882d6f72c04774da1",
+    "name": "Sports Gloves",
+    "image": null,
+    "parentId": "6972616882d6f72c04774d9d",
+    "createdAt": "2026-01-22T17:42:00.587Z",
+    "updatedAt": "2026-01-22T17:42:00.587Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616882d6f72c04774da3",
+    "name": "Sports Bags",
+    "image": null,
+    "parentId": "6972616882d6f72c04774d9d",
+    "createdAt": "2026-01-22T17:42:00.622Z",
+    "updatedAt": "2026-01-22T17:42:00.622Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616882d6f72c04774da5",
+    "name": "Water Bottles",
+    "image": null,
+    "parentId": "6972616882d6f72c04774d9d",
+    "createdAt": "2026-01-22T17:42:00.658Z",
+    "updatedAt": "2026-01-22T17:42:00.658Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616882d6f72c04774da8",
+    "name": "Ceiling & Lighting",
+    "image": null,
+    "parentId": "6950c49f0873823fd059be98",
+    "createdAt": "2026-01-22T17:42:00.728Z",
+    "updatedAt": "2026-01-22T17:42:00.728Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616882d6f72c04774daa",
+    "name": "POP Ceiling",
+    "image": null,
+    "parentId": "6972616882d6f72c04774da8",
+    "createdAt": "2026-01-22T17:42:00.764Z",
+    "updatedAt": "2026-01-22T17:42:00.764Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616882d6f72c04774dac",
+    "name": "LED Ceiling Lights",
+    "image": null,
+    "parentId": "6972616882d6f72c04774da8",
+    "createdAt": "2026-01-22T17:42:00.800Z",
+    "updatedAt": "2026-01-22T17:42:00.800Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616882d6f72c04774dae",
+    "name": "Chandeliers",
+    "image": null,
+    "parentId": "6972616882d6f72c04774da8",
+    "createdAt": "2026-01-22T17:42:00.835Z",
+    "updatedAt": "2026-01-22T17:42:00.835Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616882d6f72c04774db0",
+    "name": "Wall Lights",
+    "image": null,
+    "parentId": "6972616882d6f72c04774da8",
+    "createdAt": "2026-01-22T17:42:00.874Z",
+    "updatedAt": "2026-01-22T17:42:00.874Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616882d6f72c04774db2",
+    "name": "Spot Lights",
+    "image": null,
+    "parentId": "6972616882d6f72c04774da8",
+    "createdAt": "2026-01-22T17:42:00.909Z",
+    "updatedAt": "2026-01-22T17:42:00.909Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616882d6f72c04774db4",
+    "name": "Doors & Windows",
+    "image": null,
+    "parentId": "6950c49f0873823fd059be98",
+    "createdAt": "2026-01-22T17:42:00.944Z",
+    "updatedAt": "2026-01-22T17:42:00.944Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616882d6f72c04774db6",
+    "name": "Main Door",
+    "image": null,
+    "parentId": "6972616882d6f72c04774db4",
+    "createdAt": "2026-01-22T17:42:00.980Z",
+    "updatedAt": "2026-01-22T17:42:00.980Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616982d6f72c04774db8",
+    "name": "Bedroom Doors",
+    "image": null,
+    "parentId": "6972616882d6f72c04774db4",
+    "createdAt": "2026-01-22T17:42:01.016Z",
+    "updatedAt": "2026-01-22T17:42:01.016Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616982d6f72c04774dba",
+    "name": "PVC / UPVC Doors",
+    "image": null,
+    "parentId": "6972616882d6f72c04774db4",
+    "createdAt": "2026-01-22T17:42:01.052Z",
+    "updatedAt": "2026-01-22T17:42:01.052Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616982d6f72c04774dbc",
+    "name": "Door Frames",
+    "image": null,
+    "parentId": "6972616882d6f72c04774db4",
+    "createdAt": "2026-01-22T17:42:01.087Z",
+    "updatedAt": "2026-01-22T17:42:01.087Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616982d6f72c04774dbe",
+    "name": "Door Handles & Locks",
+    "image": null,
+    "parentId": "6972616882d6f72c04774db4",
+    "createdAt": "2026-01-22T17:42:01.122Z",
+    "updatedAt": "2026-01-22T17:42:01.122Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616982d6f72c04774dc0",
+    "name": "Windows & Grills",
+    "image": null,
+    "parentId": "6972616882d6f72c04774db4",
+    "createdAt": "2026-01-22T17:42:01.158Z",
+    "updatedAt": "2026-01-22T17:42:01.158Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616982d6f72c04774dc2",
+    "name": "Walls & Flooring",
+    "image": null,
+    "parentId": "6950c49f0873823fd059be98",
+    "createdAt": "2026-01-22T17:42:01.193Z",
+    "updatedAt": "2026-01-22T17:42:01.193Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616982d6f72c04774dc4",
+    "name": "Texture Paint",
+    "image": null,
+    "parentId": "6972616982d6f72c04774dc2",
+    "createdAt": "2026-01-22T17:42:01.228Z",
+    "updatedAt": "2026-01-22T17:42:01.228Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616982d6f72c04774dc6",
+    "name": "Wallpaper",
+    "image": null,
+    "parentId": "6972616982d6f72c04774dc2",
+    "createdAt": "2026-01-22T17:42:01.263Z",
+    "updatedAt": "2026-01-22T17:42:01.263Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616982d6f72c04774dc8",
+    "name": "Wall Panels (PVC / WPC)",
+    "image": null,
+    "parentId": "6972616982d6f72c04774dc2",
+    "createdAt": "2026-01-22T17:42:01.298Z",
+    "updatedAt": "2026-01-22T17:42:01.298Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616982d6f72c04774dca",
+    "name": "Wall Stickers & Decals",
+    "image": null,
+    "parentId": "6972616982d6f72c04774dc2",
+    "createdAt": "2026-01-22T17:42:01.333Z",
+    "updatedAt": "2026-01-22T17:42:01.333Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616982d6f72c04774dcc",
+    "name": "Floor Tiles",
+    "image": null,
+    "parentId": "6972616982d6f72c04774dc2",
+    "createdAt": "2026-01-22T17:42:01.367Z",
+    "updatedAt": "2026-01-22T17:42:01.367Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616982d6f72c04774dce",
+    "name": "Wooden Flooring",
+    "image": null,
+    "parentId": "6972616982d6f72c04774dc2",
+    "createdAt": "2026-01-22T17:42:01.402Z",
+    "updatedAt": "2026-01-22T17:42:01.402Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616982d6f72c04774dd0",
+    "name": "Marble & Granite",
+    "image": null,
+    "parentId": "6972616982d6f72c04774dc2",
+    "createdAt": "2026-01-22T17:42:01.439Z",
+    "updatedAt": "2026-01-22T17:42:01.439Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616982d6f72c04774dd2",
+    "name": "Tile Adhesives & Grout",
+    "image": null,
+    "parentId": "6972616982d6f72c04774dc2",
+    "createdAt": "2026-01-22T17:42:01.473Z",
+    "updatedAt": "2026-01-22T17:42:01.473Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616982d6f72c04774dd4",
+    "name": "Paint Brushes & Rollers",
+    "image": null,
+    "parentId": "6972616982d6f72c04774dc2",
+    "createdAt": "2026-01-22T17:42:01.508Z",
+    "updatedAt": "2026-01-22T17:42:01.508Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616982d6f72c04774dd6",
+    "name": "Curtains & Blinds",
+    "image": null,
+    "parentId": "6950c49f0873823fd059be98",
+    "createdAt": "2026-01-22T17:42:01.543Z",
+    "updatedAt": "2026-01-22T17:42:01.543Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616982d6f72c04774dd8",
+    "name": "Curtains",
+    "image": null,
+    "parentId": "6972616982d6f72c04774dd6",
+    "createdAt": "2026-01-22T17:42:01.577Z",
+    "updatedAt": "2026-01-22T17:42:01.577Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616982d6f72c04774dda",
+    "name": "Curtain Rods & Tracks",
+    "image": null,
+    "parentId": "6972616982d6f72c04774dd6",
+    "createdAt": "2026-01-22T17:42:01.614Z",
+    "updatedAt": "2026-01-22T17:42:01.614Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616982d6f72c04774ddc",
+    "name": "Blinds (Roller / Venetian)",
+    "image": null,
+    "parentId": "6972616982d6f72c04774dd6",
+    "createdAt": "2026-01-22T17:42:01.649Z",
+    "updatedAt": "2026-01-22T17:42:01.649Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616982d6f72c04774dde",
+    "name": "Window Sheers",
+    "image": null,
+    "parentId": "6972616982d6f72c04774dd6",
+    "createdAt": "2026-01-22T17:42:01.684Z",
+    "updatedAt": "2026-01-22T17:42:01.684Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616982d6f72c04774de0",
+    "name": "Furniture",
+    "image": null,
+    "parentId": "6950c49f0873823fd059be98",
+    "createdAt": "2026-01-22T17:42:01.720Z",
+    "updatedAt": "2026-01-22T17:42:01.720Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616982d6f72c04774de2",
+    "name": "Sofa Sets",
+    "image": null,
+    "parentId": "6972616982d6f72c04774de0",
+    "createdAt": "2026-01-22T17:42:01.757Z",
+    "updatedAt": "2026-01-22T17:42:01.757Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616982d6f72c04774de4",
+    "name": "Beds",
+    "image": null,
+    "parentId": "6972616982d6f72c04774de0",
+    "createdAt": "2026-01-22T17:42:01.792Z",
+    "updatedAt": "2026-01-22T17:42:01.792Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616982d6f72c04774de6",
+    "name": "Wardrobes",
+    "image": null,
+    "parentId": "6972616982d6f72c04774de0",
+    "createdAt": "2026-01-22T17:42:01.827Z",
+    "updatedAt": "2026-01-22T17:42:01.827Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616982d6f72c04774de8",
+    "name": "TV Units",
+    "image": null,
+    "parentId": "6972616982d6f72c04774de0",
+    "createdAt": "2026-01-22T17:42:01.863Z",
+    "updatedAt": "2026-01-22T17:42:01.863Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616982d6f72c04774dea",
+    "name": "Dining Tables",
+    "image": null,
+    "parentId": "6972616982d6f72c04774de0",
+    "createdAt": "2026-01-22T17:42:01.921Z",
+    "updatedAt": "2026-01-22T17:42:01.921Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616982d6f72c04774dec",
+    "name": "Decor & Plants",
+    "image": null,
+    "parentId": "6950c49f0873823fd059be98",
+    "createdAt": "2026-01-22T17:42:01.957Z",
+    "updatedAt": "2026-01-22T17:42:01.957Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616982d6f72c04774dee",
+    "name": "Wall Art & Frames",
+    "image": null,
+    "parentId": "6972616982d6f72c04774dec",
+    "createdAt": "2026-01-22T17:42:01.993Z",
+    "updatedAt": "2026-01-22T17:42:01.993Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616a82d6f72c04774df0",
+    "name": "Mirrors",
+    "image": null,
+    "parentId": "6972616982d6f72c04774dec",
+    "createdAt": "2026-01-22T17:42:02.029Z",
+    "updatedAt": "2026-01-22T17:42:02.029Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616a82d6f72c04774df2",
+    "name": "Clocks",
+    "image": null,
+    "parentId": "6972616982d6f72c04774dec",
+    "createdAt": "2026-01-22T17:42:02.064Z",
+    "updatedAt": "2026-01-22T17:42:02.064Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616a82d6f72c04774df4",
+    "name": "Showpieces",
+    "image": null,
+    "parentId": "6972616982d6f72c04774dec",
+    "createdAt": "2026-01-22T17:42:02.098Z",
+    "updatedAt": "2026-01-22T17:42:02.098Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616a82d6f72c04774df6",
+    "name": "Indoor Plants & Pots",
+    "image": null,
+    "parentId": "6972616982d6f72c04774dec",
+    "createdAt": "2026-01-22T17:42:02.133Z",
+    "updatedAt": "2026-01-22T17:42:02.133Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616a82d6f72c04774df8",
+    "name": "Storage & Hardware",
+    "image": null,
+    "parentId": "6950c49f0873823fd059be98",
+    "createdAt": "2026-01-22T17:42:02.169Z",
+    "updatedAt": "2026-01-22T17:42:02.169Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616a82d6f72c04774dfa",
+    "name": "Shelves & Racks",
+    "image": null,
+    "parentId": "6972616a82d6f72c04774df8",
+    "createdAt": "2026-01-22T17:42:02.203Z",
+    "updatedAt": "2026-01-22T17:42:02.203Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616a82d6f72c04774dfc",
+    "name": "Shoe Racks",
+    "image": null,
+    "parentId": "6972616a82d6f72c04774df8",
+    "createdAt": "2026-01-22T17:42:02.238Z",
+    "updatedAt": "2026-01-22T17:42:02.238Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616a82d6f72c04774dfe",
+    "name": "Cabinets",
+    "image": null,
+    "parentId": "6972616a82d6f72c04774df8",
+    "createdAt": "2026-01-22T17:42:02.274Z",
+    "updatedAt": "2026-01-22T17:42:02.274Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616a82d6f72c04774e00",
+    "name": "Storage Boxes",
+    "image": null,
+    "parentId": "6972616a82d6f72c04774df8",
+    "createdAt": "2026-01-22T17:42:02.309Z",
+    "updatedAt": "2026-01-22T17:42:02.309Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616a82d6f72c04774e02",
+    "name": "Hardware Fittings",
+    "image": null,
+    "parentId": "6972616a82d6f72c04774df8",
+    "createdAt": "2026-01-22T17:42:02.344Z",
+    "updatedAt": "2026-01-22T17:42:02.344Z",
+    "__v": 0
+  }
+]

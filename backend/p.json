@@ -1,0 +1,95 @@
+{
+  "_id": "6969d0282367644aeec9c694",
+  "seller": null,
+  "title": "Digital Blood Pressure Monitor",
+  "price": 9000,
+  "mrp": 2500,
+  "discount": 40,
+  "category": "Medical & Pharmacy",
+  "subCategory": "Medical Devices",
+  "images": [
+    "https://images.unsplash.com/photo-1560343090-f0409e92791a?auto=format&fit=crop&q=80&w=800",
+    "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=800"
+  ],
+  "inStock": true,
+  "rating": 4.5,
+  "reviews": 402,
+  "stockQuantity": 100,
+  "lowStockThreshold": 5,
+  "soldCount": 0,
+  "attributes": {
+    "BRAND": "Nevyra Select",
+    "PRODUCT_ORIGIN": "India",
+    "FORM": "Various",
+    "USAGE": "Daily Health",
+    "EXPIRY_DATE": "24 Months from MFG",
+    "PRESCRIPTION_REQUIRED": "No"
+  },
+  "additionalSpecifications": {
+    "Modelnumber": [
+      "\"nv-5967\"",
+      "\"sku_code\""
+    ]
+  },
+  "__v": 4,
+  "createdAt": "2026-01-16T05:44:08.747Z",
+  "updatedAt": "2026-03-13T10:54:19.295Z",
+  "description": "Experience the best of Personal Care with our high-quality Digital Blood Pressure Monitor. Part of the Medical & Pharmacy collection, this product is designed for reliability and performance. Whether for personal use or professional needs, it offers exceptional value and craftsmanship.",
+  "originalPrice": 15000,
+  "variantCombinations": [
+    {
+      "attributes": {
+        "color": "red"
+      },
+      "price": 9000,
+      "originalPrice": 15000,
+      "stockQuantity": 0,
+      "inStock": true,
+      "images": [
+        "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773399194/nevyra/products/hb7k9n7czj2kc0cm9zoa.jpg"
+      ],
+      "sku": "",
+      "_id": "69b3ecdb57415c5dadf8b9fe"
+    },
+    {
+      "attributes": {
+        "color": "green"
+      },
+      "price": 8000,
+      "originalPrice": 15000,
+      "stockQuantity": 100,
+      "inStock": true,
+      "images": [
+        "https://placehold.co/600x400?text=Mock+Upload",
+        "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773399223/nevyra/products/ndmwwn8l2bypvnkbfc5z.jpg"
+      ],
+      "sku": "",
+      "_id": "69b3ecdb57415c5dadf8b9ff"
+    },
+    {
+      "attributes": {
+        "color": "blue"
+      },
+      "price": 7000,
+      "originalPrice": 15000,
+      "stockQuantity": 100,
+      "inStock": true,
+      "images": [
+        "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773398811/nevyra/products/vwsakn40fabzke4oq13o.jpg"
+      ],
+      "sku": "",
+      "_id": "69b3ecdb57415c5dadf8ba00"
+    }
+  ],
+  "variantOptions": [
+    {
+      "name": "color",
+      "values": [
+        "red",
+        "green",
+        "blue"
+      ],
+      "_id": "69b3ecdb57415c5dadf8b9fd"
+    }
+  ]
+}

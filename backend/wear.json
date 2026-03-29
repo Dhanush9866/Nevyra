@@ -1,0 +1,110 @@
+[
+  {
+    "_id": "6972615b82d6f72c04774acb",
+    "name": "Men's wear",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151193/nevyra/Categories/fashion-beauty/zxhfiq2gcsdjyi6dhuqq.jpg",
+    "parentId": "694e19856427cdce5864093a",
+    "createdAt": "2026-01-22T17:41:47.618Z",
+    "updatedAt": "2026-03-10T13:59:55.276Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615c82d6f72c04774b0b",
+    "name": "Gym wear",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:48.762Z",
+    "updatedAt": "2026-01-22T17:41:48.762Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615c82d6f72c04774b0d",
+    "name": "Winter wear",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:48.797Z",
+    "updatedAt": "2026-01-22T17:41:48.797Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615c82d6f72c04774b0f",
+    "name": "Rain wear",
+    "image": null,
+    "parentId": "6972615b82d6f72c04774acb",
+    "createdAt": "2026-01-22T17:41:48.833Z",
+    "updatedAt": "2026-01-22T17:41:48.833Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615c82d6f72c04774b13",
+    "name": "Women's wear",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151189/nevyra/Categories/fashion-beauty/b01dhpdzzuzapoa8af89.jpg",
+    "parentId": "694e19856427cdce5864093a",
+    "createdAt": "2026-01-22T17:41:48.905Z",
+    "updatedAt": "2026-03-10T13:59:52.691Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615c82d6f72c04774b17",
+    "name": "Topwear",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:48.977Z",
+    "updatedAt": "2026-01-22T17:41:48.977Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615d82d6f72c04774b39",
+    "name": "Shapewear",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:49.582Z",
+    "updatedAt": "2026-01-22T17:41:49.582Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615d82d6f72c04774b3b",
+    "name": "Swim & Beachwear",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:49.617Z",
+    "updatedAt": "2026-01-22T17:41:49.617Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615d82d6f72c04774b3f",
+    "name": "Sports Wear",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:49.688Z",
+    "updatedAt": "2026-01-22T17:41:49.688Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615d82d6f72c04774b41",
+    "name": "Winter Wear",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:49.724Z",
+    "updatedAt": "2026-01-22T17:41:49.724Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972615e82d6f72c04774b55",
+    "name": "Saree Shapewear",
+    "image": null,
+    "parentId": "6972615c82d6f72c04774b13",
+    "createdAt": "2026-01-22T17:41:50.079Z",
+    "updatedAt": "2026-01-22T17:41:50.079Z",
+    "__v": 0
+  },
+  {
+    "_id": "6972616282d6f72c04774c58",
+    "name": "Smart Watches & Wearables",
+    "image": "https://res.cloudinary.com/dv4dqyiqk/image/upload/v1773151225/nevyra/Categories/devices/ntwbo2zhfwzysgrujfey.jpg",
+    "parentId": "694e19856427cdce58640955",
+    "createdAt": "2026-01-22T17:41:54.648Z",
+    "updatedAt": "2026-03-10T14:00:27.839Z",
+    "__v": 0
+  }
+]
