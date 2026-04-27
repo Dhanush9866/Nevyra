@@ -38,12 +38,23 @@ export interface Product {
   specifications?: { [key: string]: string };
   features?: string[];
   soldCount?: number;
+  variantOptions?: { name: string; values: string[] }[];
+  variantCombinations?: {
+    attributes: { [key: string]: string };
+    price: number;
+    originalPrice?: number;
+    stockQuantity?: number;
+    inStock?: boolean;
+    images?: string[];
+    sku?: string;
+  }[];
 }
 
 export interface CartItem {
   id: string;
   product: Product;
   quantity: number;
+  selectedVariants?: { [key: string]: string };
 }
 
 export interface Review {

@@ -27,6 +27,7 @@ export const [CartProvider, useCart] = createContextHook(() => {
           id: item._id || item.id,
           product: item.productId,
           quantity: item.quantity,
+          selectedVariants: item.selectedFeatures,
         }));
         setItems(mappedItems);
         // Do NOT save backend items to local 'guest' cart storage to avoid duplication loops
@@ -57,7 +58,7 @@ export const [CartProvider, useCart] = createContextHook(() => {
     try {
       // Simplistic sync: add each local item to backend
       for (const item of items) {
-        await apiService.addToCart(item.product.id, item.quantity);
+        await apiService.addToCart(item.product.id, item.quantity, item.selectedVariants);
       }
       // Clear guest cart after syncing to prevent duplicate syncs
       await AsyncStorage.removeItem('cart');
@@ -73,10 +74,10 @@ export const [CartProvider, useCart] = createContextHook(() => {
     }
   }, [isAuthenticated]);
 
-  const addToCart = useCallback(async (product: Product, quantity: number = 1) => {
+  const addToCart = useCallback(async (product: Product, quantity: number = 1, selectedVariants?: { [key: string]: string }) => {
     if (isAuthenticated) {
       try {
-        const response = await apiService.addToCart(product.id, quantity);
+        const response = await apiService.addToCart(product.id, quantity, selectedVariants);
         if (response.success) {
           fetchCart();
           return { success: true };
@@ -89,16 +90,19 @@ export const [CartProvider, useCart] = createContextHook(() => {
 
     // Fallback/Local logic
     setItems((prev) => {
-      const existingItem = prev.find((item) => item.product.id === product.id);
+      const existingItem = prev.find((item) => 
+        item.product.id === product.id && 
+        JSON.stringify(item.selectedVariants || {}) === JSON.stringify(selectedVariants || {})
+      );
       let newItems;
       if (existingItem) {
         newItems = prev.map((item) =>
-          item.product.id === product.id
+          item.product.id === product.id && JSON.stringify(item.selectedVariants || {}) === JSON.stringify(selectedVariants || {})
             ? { ...item, quantity: item.quantity + quantity }
             : item
         );
       } else {
-        newItems = [...prev, { id: Date.now().toString(), product, quantity }];
+        newItems = [...prev, { id: Date.now().toString(), product, quantity, selectedVariants }];
       }
       AsyncStorage.setItem('cart', JSON.stringify(newItems));
       return newItems;

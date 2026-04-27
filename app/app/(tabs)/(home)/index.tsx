@@ -25,6 +25,7 @@ import ProductListItem from '@/components/molecules/ProductListItem';
 import HorizontalProductSection from '@/components/organisms/HorizontalProductSection';
 import VerticalProductSection from '@/components/organisms/VerticalProductSection';
 import HomeBannerCarousel from '@/components/organisms/HomeBannerCarousel';
+import AddressBottomSheet from '@/components/organisms/AddressBottomSheet';
 import { HomeScreenSkeleton } from '@/components/skeletons';
 import Colors from '@/constants/colors';
 import Spacing from '@/constants/spacing';
@@ -63,6 +64,7 @@ export default function HomeScreen() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const [isAddressSheetVisible, setIsAddressSheetVisible] = useState(false);
 
   const currentAddress = selectedAddress || addresses.find(a => a.isDefault) || addresses[0];
   const addressDisplay = currentAddress
@@ -346,10 +348,7 @@ export default function HomeScreen() {
           <TouchableOpacity
             style={styles.addressBar}
             activeOpacity={0.7}
-            onPress={() => router.push({
-              pathname: '/checkout/address-list',
-              params: { source: 'home' }
-            } as any)}
+            onPress={() => setIsAddressSheetVisible(true)}
           >
             <MapPin size={16} color={Colors.white} />
             <AppText variant="caption" color="rgba(255,255,255,0.9)" style={{ marginLeft: 4 }}>
@@ -430,6 +429,11 @@ export default function HomeScreen() {
             tintColor={Colors.primary}
           />
         }
+      />
+
+      <AddressBottomSheet 
+        visible={isAddressSheetVisible} 
+        onClose={() => setIsAddressSheetVisible(false)} 
       />
     </View>
   );

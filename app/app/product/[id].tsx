@@ -1,4 +1,4 @@
-import { useCallback, useState, useRef } from 'react';
+import React, { useCallback, useState, useRef, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity, StatusBar, Alert, Share, FlatList, Dimensions, NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack, useFocusEffect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -37,6 +37,7 @@ export default function ProductDetailScreen() {
   const displayAddress = selectedAddress || addresses?.find(a => a.isDefault) || addresses?.[0];
   const [showToast, setShowToast] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [selectedVariants, setSelectedVariants] = useState<{ [key: string]: string }>({});
   const screenWidth = Dimensions.get('window').width;
 
   const onImageScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -97,6 +98,32 @@ export default function ProductDetailScreen() {
   const similarProducts = similarData?.data || [];
   const reviews = reviewsData?.data || [];
   const latestReview = reviews.length > 0 ? reviews[0] : null;
+
+  useEffect(() => {
+    if (product?.variantOptions?.length) {
+      const defaultVars: { [key: string]: string } = {};
+      product.variantOptions.forEach((opt: any) => {
+        if (opt.values && opt.values.length > 0) {
+          defaultVars[opt.name] = opt.values[0];
+        }
+      });
+      setSelectedVariants(defaultVars);
+    }
+  }, [product]);
+
+  const currentCombination = React.useMemo(() => {
+    if (!product?.variantCombinations || Object.keys(selectedVariants).length === 0) return null;
+    return product.variantCombinations.find((combo: any) => {
+      if (!combo.attributes) return false;
+      return Object.entries(selectedVariants).every(
+        ([key, value]) => combo.attributes[key] === value
+      );
+    });
+  }, [product, selectedVariants]);
+
+  const displayPrice = currentCombination?.price !== undefined ? currentCombination.price : product?.price;
+  const displayOriginalPrice = currentCombination?.originalPrice !== undefined ? currentCombination.originalPrice : product?.originalPrice;
+  const displayImages = (currentCombination?.images && currentCombination.images.length > 0) ? currentCombination.images : product?.images;
 
   if (isLoading) {
     return <ProductDetailScreenSkeleton />;
@@ -179,7 +206,7 @@ export default function ProductDetailScreen() {
         >
           <View style={styles.imageContainer}>
             <FlatList
-              data={product.images && product.images.length > 0 ? product.images : [null]} // Fallback for no images
+              data={displayImages && displayImages.length > 0 ? displayImages : [null]} // Fallback for no images
               keyExtractor={(_, index) => index.toString()}
               horizontal
               pagingEnabled
@@ -198,9 +225,9 @@ export default function ProductDetailScreen() {
             />
 
             {/* Pagination Dots */}
-            {product.images && product.images.length > 1 && (
+            {displayImages && displayImages.length > 1 && (
               <View style={styles.paginationContainer}>
-                {product.images.map((_: any, index: number) => (
+                {displayImages.map((_: any, index: number) => (
                   <View
                     key={index}
                     style={[
@@ -249,11 +276,68 @@ export default function ProductDetailScreen() {
             </View>
 
             <PriceTag
-              price={product.price}
-              originalPrice={product.originalPrice}
+              price={displayPrice}
+              originalPrice={displayOriginalPrice}
               discount={product.discount}
               size="lg"
             />
+
+            {/* VARIANTS SECTION */}
+            {product.variantOptions && product.variantOptions.length > 0 && (
+              <View style={styles.variantsSection}>
+                {product.variantOptions.map((option: any, index: number) => (
+                  <View key={index} style={styles.variantGroup}>
+                    <AppText variant="body" weight="bold" style={styles.variantTitle}>{option.name}</AppText>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.variantOptionsList}>
+                      {option.values.map((value: string, vIndex: number) => {
+                        const isSelected = selectedVariants[option.name] === value;
+                        
+                        // Find an image for this specific variant value
+                        let variantImage = null;
+                        if (product.variantCombinations) {
+                          const matchingCombo = product.variantCombinations.find((combo: any) => 
+                            combo.attributes && combo.attributes[option.name] === value
+                          );
+                          if (matchingCombo && matchingCombo.images && matchingCombo.images.length > 0) {
+                            variantImage = matchingCombo.images[0];
+                          }
+                        }
+
+                        return (
+                          <TouchableOpacity
+                            key={vIndex}
+                            style={[
+                              variantImage ? styles.variantImageOptionBox : styles.variantOptionBox, 
+                              isSelected && (variantImage ? styles.variantImageOptionBoxSelected : styles.variantOptionBoxSelected)
+                            ]}
+                            onPress={() => {
+                              setSelectedVariants(prev => ({ ...prev, [option.name]: value }));
+                              setActiveImageIndex(0); // Reset image index on variant change
+                            }}
+                          >
+                            {variantImage ? (
+                              <View style={styles.variantImageWrapper}>
+                                <Image source={{ uri: variantImage }} style={styles.variantThumbnail} contentFit="cover" />
+                                {option.name.toLowerCase() !== 'colour' && option.name.toLowerCase() !== 'color' && (
+                                   // Optionally hide text if it's purely a color swatch, but let's keep it for clarity
+                                   <AppText variant="caption" style={styles.variantImageText} color={isSelected ? Colors.primary : Colors.text}>
+                                     {value}
+                                   </AppText>
+                                )}
+                              </View>
+                            ) : (
+                              <AppText variant="body" color={isSelected ? Colors.white : Colors.text} weight={isSelected ? "bold" : "normal"}>
+                                {value}
+                              </AppText>
+                            )}
+                          </TouchableOpacity>
+                        )
+                      })}
+                    </ScrollView>
+                  </View>
+                ))}
+              </View>
+            )}
 
             <View style={styles.section}>
               <AppText variant="h4" weight="bold">
@@ -435,7 +519,7 @@ export default function ProductDetailScreen() {
               title="Add to Cart"
               variant="outline"
               onPress={() => {
-                addToCart(product);
+                addToCart({...product, price: displayPrice, originalPrice: displayOriginalPrice, images: displayImages }, 1, selectedVariants);
                 setShowToast(true);
                 setTimeout(() => setShowToast(false), 4000);
               }}
@@ -447,8 +531,9 @@ export default function ProductDetailScreen() {
                 // For Buy Now, we create a temporary CartItem and set it as the ONLY item in checkout
                 const item: CartItem = {
                   id: Date.now().toString(),
-                  product: product,
+                  product: {...product, price: displayPrice, originalPrice: displayOriginalPrice, images: displayImages },
                   quantity: 1,
+                  selectedVariants: selectedVariants,
                 };
                 setCheckoutItems([item], 'buy_now');
                 router.push('/checkout/address-list' as any);
@@ -603,6 +688,62 @@ const styles = StyleSheet.create({
   },
   ratingOverview: {
     gap: Spacing.lg,
+  },
+  variantsSection: {
+    gap: Spacing.md,
+    marginTop: Spacing.xs,
+  },
+  variantGroup: {
+    gap: Spacing.sm,
+  },
+  variantTitle: {
+    marginBottom: 2,
+  },
+  variantOptionsList: {
+    gap: Spacing.sm,
+    paddingRight: Spacing.xl,
+  },
+  variantOptionBox: {
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm,
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    borderRadius: 8,
+    backgroundColor: Colors.white,
+  },
+  variantOptionBoxSelected: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+  },
+  variantImageOptionBox: {
+    padding: 4,
+    borderWidth: 1,
+    borderColor: '#E5E7EB', // Lighter border for images
+    borderRadius: 8,
+    backgroundColor: Colors.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 50,
+  },
+  variantImageOptionBoxSelected: {
+    borderColor: Colors.primary,
+    borderWidth: 2,
+    padding: 3, // slightly less padding because border is thicker
+    backgroundColor: '#F8F4FF',
+  },
+  variantImageWrapper: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  variantThumbnail: {
+    width: 48,
+    height: 48,
+    borderRadius: 6,
+  },
+  variantImageText: {
+    fontSize: 10,
+    fontWeight: '500',
+    marginTop: 4,
   },
 
   specificationsContainer: {
