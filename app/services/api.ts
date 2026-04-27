@@ -69,6 +69,8 @@ class ApiService {
         ...(p.additionalSpecifications || {})
       },
       soldCount: p.soldCount || 0,
+      variantOptions: p.variantOptions || [],
+      variantCombinations: p.variantCombinations || [],
     };
   }
 

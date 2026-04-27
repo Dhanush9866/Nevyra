@@ -263,7 +263,7 @@ export default function CategoriesScreen() {
                           <Image
                             source={{ uri: sub.image || DEFAULT_IMAGE }}
                             style={styles.gridImage}
-                            contentFit="contain"
+                            contentFit="cover"
                           />
                         </View>
                         <AppText variant="caption" style={styles.gridText} numberOfLines={2}>
@@ -436,14 +436,17 @@ const styles = StyleSheet.create({
   },
   gridImageContainer: {
     width: '100%',
-    aspectRatio: 1, // Keep it square-ish or let image define height
+    aspectRatio: 1,
+    backgroundColor: '#F6F8FA',
+    borderRadius: 12,
     marginBottom: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#F0F0F0',
   },
   gridImage: {
-    width: '60%',
-    height: '60%',
+    width: '100%',
+    height: '100%',
   },
   gridText: {
     textAlign: 'center',
