@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Image, ActivityIndicator } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   ChevronDown,
   Trash2,
@@ -32,6 +33,7 @@ const BACKGROUND_LIGHT = '#F1F3F6';
 
 export default function CartScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { items, totalAmount, removeFromCart, updateQuantity, isLoading, refreshCart } = useCart();
   const { addresses } = useAuth();
   const { setCheckoutItems, selectedAddress } = useCheckout();
@@ -134,7 +136,7 @@ export default function CartScreen() {
       </ScrollView>
 
       {/* Footer */}
-      <View style={styles.footerContainer}>
+      <View style={[styles.footerContainer, { paddingBottom: Math.max(insets.bottom, 20) }]}>
         {/* Savings Banner */}
         <View style={styles.savingsBanner}>
           <View style={styles.savingsIcon}>

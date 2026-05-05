@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { useRouter, Stack } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AppText from '@/components/atoms/AppText';
 import Button from '@/components/atoms/Button';
 import Colors from '@/constants/colors';
@@ -12,6 +13,7 @@ import CartItemCard from '@/components/molecules/CartItemCard';
 
 export default function OrderReviewScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { totalAmount: cartTotal, items: cartItems } = useCart();
   const { selectedAddress, setSelectedAddress, checkoutItems } = useCheckout();
   const { addresses } = useAuth();
@@ -109,7 +111,7 @@ export default function OrderReviewScreen() {
           </View>
         </ScrollView>
 
-        <View style={styles.footer}>
+        <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 12) }]}>
           <View style={styles.totalAmountLabel}>
             <AppText variant="h4" weight="bold">₹{displayTotal.toLocaleString('en-IN')}</AppText>
             <AppText variant="caption" color={Colors.primary}>View Price Details</AppText>

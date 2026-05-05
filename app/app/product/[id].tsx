@@ -326,7 +326,7 @@ export default function ProductDetailScreen() {
                                 )}
                               </View>
                             ) : (
-                              <AppText variant="body" color={isSelected ? Colors.white : Colors.text} weight={isSelected ? "bold" : "normal"}>
+                              <AppText variant="body" color={isSelected ? Colors.white : Colors.text} weight={isSelected ? "bold" : "regular"}>
                                 {value}
                               </AppText>
                             )}
