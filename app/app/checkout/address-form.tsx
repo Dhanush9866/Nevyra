@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, TextInput, Alert } from 'react-native';
+import { View, StyleSheet, ScrollView, TextInput, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { useRouter, Stack, useLocalSearchParams } from 'expo-router';
 import { User, Phone, MapPin } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Button from '@/components/atoms/Button';
 import Colors from '@/constants/colors';
 import Spacing from '@/constants/spacing';
@@ -12,6 +13,7 @@ import { Address } from '@/types';
 export default function AddressFormScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
+  const insets = useSafeAreaInsets();
   const { addAddress, updateAddress } = useAuth();
 
   const editMode = params.editMode === 'true';
@@ -72,10 +74,16 @@ export default function AddressFormScreen() {
   return (
     <>
       <Stack.Screen options={{ title: editMode ? 'Edit Address' : 'Add Address' }} />
-      <View style={styles.container}>
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.container}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 88 : 0}
+      >
         <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.content}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
           <InputField
             icon={User}
@@ -120,7 +128,7 @@ export default function AddressFormScreen() {
           />
         </ScrollView>
 
-        <View style={styles.footer}>
+        <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, Spacing.base) }]}>
           <Button
             title={editMode ? 'Update Address' : 'Save Address'}
             onPress={handleSave}
@@ -128,10 +136,11 @@ export default function AddressFormScreen() {
             fullWidth
           />
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </>
   );
 }
+
 
 function InputField({
   icon: Icon,

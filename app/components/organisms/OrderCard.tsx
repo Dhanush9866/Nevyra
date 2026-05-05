@@ -20,6 +20,7 @@ const STATUS_CONFIG: Record<
   }
 > = {
   pending: { label: 'Pending', variant: 'warning' },
+  processing: { label: 'Processing', variant: 'info' },
   confirmed: { label: 'Confirmed', variant: 'info' },
   shipped: { label: 'Shipped', variant: 'primary' },
   out_for_delivery: { label: 'Out for Delivery', variant: 'info' },

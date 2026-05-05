@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Edit2, Trash2 } from 'lucide-react-native';
 import AppText from '@/components/atoms/AppText';
 import Button from '@/components/atoms/Button';
@@ -30,6 +31,7 @@ const AddressSelector: React.FC<AddressSelectorProps> = ({
   continueButtonText = 'Continue',
   showContinueButton = true,
 }) => {
+  const insets = useSafeAreaInsets();
   return (
     <View style={styles.container}>
       <ScrollView
@@ -121,7 +123,7 @@ const AddressSelector: React.FC<AddressSelectorProps> = ({
         )}
       </ScrollView>
 
-      <View style={styles.footer}>
+      <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, Spacing.base) }]}>
         <Button
           title="Add New Address"
           onPress={onAddNew}

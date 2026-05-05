@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { X, Check } from 'lucide-react-native';
 import AppText from '@/components/atoms/AppText';
 import Button from '@/components/atoms/Button';
@@ -32,6 +33,7 @@ const RATINGS = [
 export default function FilterScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
+  const insets = useSafeAreaInsets();
 
   const [selectedSort, setSelectedSort] = useState(params.sort as string || 'popularity');
   const [selectedPrice, setSelectedPrice] = useState(params.priceRange as string || '');
@@ -126,7 +128,7 @@ export default function FilterScreen() {
             </View>
           </Section>
         </ScrollView>
-        <View style={styles.footer}>
+        <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, Spacing.base) }]}>
           <Button title="Apply Filters" onPress={handleApply} fullWidth />
         </View>
       </View>
