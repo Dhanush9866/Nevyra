@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 
-const API_BASE_URL = Constants.expoConfig?.extra?.apiUrl || 'http://10.227.125.42:8000/api/v1'; // Use local IP instead of localhost for mobile devices
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || Constants.expoConfig?.extra?.apiUrl || 'http://10.227.125.42:8000/api/v1'; // Use local IP instead of localhost for mobile devices
 
 class ApiService {
   private baseURL: string;

@@ -2,9 +2,11 @@
 const mongoose = require("mongoose");
 const userSchema = new mongoose.Schema({ email: String, phone: String });
 const User = mongoose.model("User", userSchema);
+require("dotenv").config();
+
 const listUsers = async () => {
     try {
-        const uri = "mongodb+srv://hosannaking2019:YWafeOL8X8dkaSYn@cluster0.rdtscmx.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+        const uri = process.env.MONGO_URI || "mongodb://localhost:27017/nevyra";
         await mongoose.connect(uri);
         const users = await User.find({}, { email: 1, phone: 1, isAdmin: 1 });
         console.log(`Count: ${users.length}`);

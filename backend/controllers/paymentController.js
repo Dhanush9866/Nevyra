@@ -2,16 +2,16 @@ const Razorpay = require('razorpay');
 
 // Initialize Razorpay instance with credentials from environment variables
 const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID || "rzp_test_Hi1GYpZ5GO1ona", // Fallback to current if env missing
-  key_secret: process.env.RAZORPAY_KEY_SECRET || "MD1ZzE5z6dXc5LovE5byCQTm",
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
 // Test Razorpay connection
 const testRazorpayConnection = async (req, res) => {
   try {
     console.log('Testing Razorpay connection...');
-    console.log('Key ID:', "rzp_test_Hi1GYpZ5GO1ona");
-    console.log('Key Secret length:', "MD1ZzE5z6dXc5LovE5byCQTm".length);
+    console.log('Key ID:', process.env.RAZORPAY_KEY_ID);
+    console.log('Key Secret length:', process.env.RAZORPAY_KEY_SECRET ? process.env.RAZORPAY_KEY_SECRET.length : 0);
 
     // Just test if we can create a simple order without authentication
     const testOptions = {
@@ -64,7 +64,7 @@ const createOrder = async (req, res) => {
       amount: amount * 100,
       currency,
       receipt: receipt || `receipt_${Date.now()}`,
-      key_id: "rzp_test_Hi1GYpZ5GO1ona"
+      key_id: process.env.RAZORPAY_KEY_ID
     });
 
     const options = {
@@ -181,7 +181,7 @@ const verifyPayment = async (req, res) => {
 
     // Create the expected signature
     const crypto = require('crypto');
-    const secret = process.env.RAZORPAY_KEY_SECRET || "MD1ZzE5z6dXc5LovE5byCQTm";
+    const secret = process.env.RAZORPAY_KEY_SECRET;
     const expectedSignature = crypto
       .createHmac('sha256', secret)
       .update(body.toString())

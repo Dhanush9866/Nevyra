@@ -8,9 +8,11 @@ const userSchema = new mongoose.Schema({
 });
 const User = mongoose.model("User", userSchema);
 
+require("dotenv").config();
+
 const deleteUser = async () => {
     try {
-        const uri = "mongodb+srv://hosannaking2019:YWafeOL8X8dkaSYn@cluster0.rdtscmx.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+        const uri = process.env.MONGO_URI || "mongodb://localhost:27017/nevyra";
         await mongoose.connect(uri);
         console.log("Connected.");
 
