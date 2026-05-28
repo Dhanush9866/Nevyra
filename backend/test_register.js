@@ -4,9 +4,11 @@ const mongoose = require("mongoose");
 const userSchema = new mongoose.Schema({ email: String, phone: String, firstName: String, lastName: String, password: String });
 const User = mongoose.model("User", userSchema);
 
+require("dotenv").config();
+
 const testRegister = async () => {
     try {
-        const uri = "mongodb+srv://hosannaking2019:YWafeOL8X8dkaSYn@cluster0.rdtscmx.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+        const uri = process.env.MONGO_URI || "mongodb://localhost:27017/nevyra";
         await mongoose.connect(uri);
         console.log("Connected.");
 

@@ -2,8 +2,10 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const User = require("./models/User");
 
+require("dotenv").config();
+
 // MongoDB Atlas connection string
-const MONGO_URI = "mongodb+srv://hosannaking2019:YWafeOL8X8dkaSYn@cluster0.rdtscmx.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/nevyra";
 
 async function createTestUser() {
   try {

@@ -167,7 +167,7 @@ const Checkout = () => {
         const isMockOrder = orderRes.data.orderId?.startsWith('order_mock_');
 
         const options: any = {
-          key: "rzp_test_Hi1GYpZ5GO1ona", // Public Test Key
+          key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_Hi1GYpZ5GO1ona", // Public Test Key
           amount: orderRes.data.amount,
           currency: "INR",
           name: "Nevyra",

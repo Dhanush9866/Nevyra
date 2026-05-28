@@ -12,7 +12,7 @@ import { useCart } from '@/store/CartContext';
 import { apiService } from '@/services/api';
 import Constants from 'expo-constants';
 
-const RAZORPAY_KEY_ID = Constants.expoConfig?.extra?.razorpayKeyId || "rzp_test_Rbm66o8JPEj0P8";
+const RAZORPAY_KEY_ID = process.env.EXPO_PUBLIC_RAZORPAY_KEY_ID || Constants.expoConfig?.extra?.razorpayKeyId || "rzp_test_Rbm66o8JPEj0P8";
 
 const paymentMethods = [
   { id: 'razorpay', name: 'Razorpay', icon: Smartphone, subtitle: 'Pay via Card, UPI, Netbanking' },

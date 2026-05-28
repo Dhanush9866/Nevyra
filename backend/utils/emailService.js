@@ -3,14 +3,14 @@ const nodemailer = require('nodemailer');
 const transporter = nodemailer.createTransport({
   service: 'gmail', // or your email provider
   auth: {
-    user: process.env.EMAIL_USER || "laptoptest7788@gmail.com",
-    pass: process.env.EMAIL_PASS || "uqfiabjkiqudrgdw",
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
 });
 
 async function sendOTPEmail(to, otp) {
   const mailOptions = {
-    from: process.env.EMAIL_USER || "laptoptest7788@gmail.com",
+    from: process.env.EMAIL_USER,
     to,
     subject: 'Your Password Reset OTP',
     text: `Your OTP for password reset is: ${otp}. It is valid for 10 minutes.`,
@@ -21,7 +21,7 @@ async function sendOTPEmail(to, otp) {
 
 async function sendVerificationEmail(to, name) {
   const mailOptions = {
-    from: process.env.EMAIL_USER || "laptoptest7788@gmail.com",
+    from: process.env.EMAIL_USER,
     to,
     subject: 'Your Seller Account is Approved!',
     text: `Hello ${name},\n\nYour seller account has been successfully verified/approved by our admin team.\n\nYou can now log in to the Seller Hub and start selling.\n\nLogin here: http://localhost:8081/login\n\nBest Regards,\nNevyra Team`,
@@ -31,10 +31,10 @@ async function sendVerificationEmail(to, name) {
 
 async function sendContactFormEmail(data) {
   const { name, email, subject, message } = data;
-  const adminEmail = process.env.ADMIN_EMAIL || process.env.EMAIL_USER || "laptoptest7788@gmail.com";
+  const adminEmail = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
 
   const mailOptions = {
-    from: process.env.EMAIL_USER || "laptoptest7788@gmail.com",
+    from: process.env.EMAIL_USER,
     to: adminEmail,
     replyTo: email,
     subject: `New Contact Form Submission: ${subject}`,

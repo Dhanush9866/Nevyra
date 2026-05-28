@@ -1,0 +1,77 @@
+====================================================
+NEVYRA E-COMMERCE API FLOW VERIFICATION REPORT
+Generated on: 2026-05-28T08:55:39.649Z
+====================================================
+
+Connecting to database for setup/cleanup...
+✅ Connected to MongoDB.
+🧹 Cleaned up old test users.
+
+--- 1. Testing Authentication Endpoints ---
+✅ User registered successfully. Email: test_flow_1779958539649@example.com
+✅ Login successful. Token obtained.
+✅ Profile fetched: Test User
+✅ Profile updated (PATCH) successfully: UpdatedTest UpdatedUser
+✅ Forgot password OTP requested successfully.
+🔑 Direct DB Query - OTP for password reset: 606937
+✅ OTP verification endpoint success.
+✅ Password reset successful.
+✅ Re-login with new password success.
+
+--- 2. Testing Address Management Endpoints ---
+✅ Address added successfully.
+✅ Address updated (PATCH) successfully.
+✅ Fetch addresses success. Count: 1
+
+--- 3. Testing Category and Product Listing Endpoints ---
+✅ Categories fetched. Total count: 565
+📂 Test Category: Medical & Pharmacy (ID: 694e19846427cdce58640916)
+📂 Test SubCategory: Personal Care (ID: 6972615582d6f72c047749a3)
+✅ Products fetched. Count: 5
+🛍️  Test Product: Trending Shirt (ID: 69ba139c24046561fde918f3)
+✅ Similar products fetched. Count: 6
+
+--- 4. Testing Wishlist Endpoints ---
+✅ Added product to wishlist.
+✅ Wishlist fetched. Count: 1
+🗑️ Testing Wishlist deletion by Product ID: 69ba139c24046561fde918f3...
+✅ Removed from wishlist successfully using Product ID.
+🗑️ Testing Wishlist deletion by Wishlist Item ID: 6a180316aa9556732a5bf31b...
+✅ Removed from wishlist successfully using Wishlist Item ID.
+
+--- 5. Testing Cart Endpoints ---
+✅ Added product to cart.
+✅ Updated cart item quantity successfully.
+✅ Cart fetched. Item count: 1
+
+--- 6. Testing Product Review Endpoints ---
+✅ Review created successfully.
+✅ Review updated successfully.
+✅ Review deleted successfully.
+
+--- 7. Testing Payments and Checkout Endpoints ---
+✅ Payment order created. Order ID: order_mock_1779958553241
+✅ Payment signature verified (Mock).
+✅ Order placed successfully. Order Number: ORD1779958553857481
+✅ Customer orders fetched. Count: 1
+✅ Order cancelled successfully.
+
+--- 8. Testing Seller Endpoints ---
+✅ Seller profile created. Store: Test Seller Store 1779958554860
+✅ Seller KYC submitted.
+✅ Seller bank/payment details updated.
+
+--- 9. Testing Admin Endpoints & Approving Seller ---
+✅ Admin logged in successfully.
+✅ Admin approved seller 6a18031aaa9556732a5bf372. verificationStatus: verified
+
+--- 10. Testing Seller Product Management (Authorized) ---
+✅ Seller created product successfully. ID: 6a18031faa9556732a5bf37e
+✅ Seller updated product successfully.
+✅ Seller deleted product successfully.
+
+--- 11. Cleaning Up Database & Writing Report ---
+🧹 Cleaned up created test user and seller records.
+
+🎉 ALL API FLOW VERIFICATIONS COMPLETED.
+A detailed report has been generated.

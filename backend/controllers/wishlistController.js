@@ -22,7 +22,13 @@ exports.add = async (req, res, next) => {
 
 exports.remove = async (req, res, next) => {
   try {
-    await WishlistItem.deleteOne({ _id: req.params.itemId, userId: req.user.id });
+    await WishlistItem.deleteOne({
+      $or: [
+        { _id: req.params.itemId },
+        { productId: req.params.itemId }
+      ],
+      userId: req.user.id
+    });
     res.json({ success: true, message: "Removed from wishlist", data: null });
   } catch (err) { next(err); }
 };
