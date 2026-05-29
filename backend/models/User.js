@@ -27,6 +27,9 @@ const userSchema = new mongoose.Schema(
     // Forgot password fields
     resetPasswordOTP: { type: String },
     resetPasswordOTPExpires: { type: Date },
+    // Refresh token fields
+    refreshToken: { type: String },
+    refreshTokenExpires: { type: Date },
   },
   { timestamps: true }
 );

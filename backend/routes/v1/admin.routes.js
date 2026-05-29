@@ -7,6 +7,8 @@ const adminMiddleware = require("../../middlewares/adminMiddleware");
 
 // Admin Auth
 router.post("/login", adminController.login);
+router.post("/refresh-token", adminController.refreshToken);
+router.post("/logout", adminController.logout);
 router.put("/password", authMiddleware, adminMiddleware, adminController.updatePassword);
 
 // Seller Verification

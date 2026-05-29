@@ -1,9 +1,22 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 const { User } = require("../models");
 const { isEmail, isStrongPassword } = require("../utils/validators");
 const { sendOTPEmail } = require("../utils/emailService");
 
+// ---------- helpers ----------
+function generateAccessToken(payload) {
+  return jwt.sign(payload, process.env.JWT_SECRET || "secretToken", {
+    expiresIn: "15m",
+  });
+}
+
+function generateRefreshToken() {
+  return crypto.randomBytes(40).toString("hex");
+}
+
+// ---------- register ----------
 exports.register = async (req, res, next) => {
   try {
     const { firstName, lastName, email, phone, password, address } = req.body;
@@ -70,6 +83,7 @@ exports.register = async (req, res, next) => {
   }
 };
 
+// ---------- login (with refresh token) ----------
 exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -90,14 +104,6 @@ exports.login = async (req, res, next) => {
     }
 
     // Check if user is a seller and verification status
-    // Note: This logic assumes that if a user is trying to login to the seller portal, 
-    // they might be hitting a specific endpoint or we check conditionally. 
-    // However, since User and Seller are linked, we can check if a Seller profile exists.
-    // Ideally, for the general 'login' endpoint, we might not want to block regular users.
-    // But if this is the ONLY login used by sellers, we should be careful.
-    // The prompt implies we should block if they are pending *and* trying to be a seller? 
-    // Or just block if they are a seller pending?
-    // Let's check if the user has a linked seller profile.
     const { Seller } = require("../models");
     const sellerProfile = await Seller.findOne({ user: user._id });
 
@@ -116,24 +122,128 @@ exports.login = async (req, res, next) => {
         .status(401)
         .json({ success: false, message: "Invalid credentials", data: null });
     }
-    const token = jwt.sign(
-      { id: user._id, email: user.email, isAdmin: user.isAdmin },
-      process.env.JWT_SECRET || "secretToken",
-      { expiresIn: "7d" }
-    );
+
+    // Generate short-lived access token (15 min)
+    const accessToken = generateAccessToken({
+      id: user._id,
+      email: user.email,
+      isAdmin: user.isAdmin,
+    });
+
+    // Generate refresh token (7 days) and hash it for DB storage
+    const rawRefreshToken = generateRefreshToken();
+    const hashedRefreshToken = await bcrypt.hash(rawRefreshToken, 10);
+    user.refreshToken = hashedRefreshToken;
+    user.refreshTokenExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+    await user.save();
+
     return res.json({
       success: true,
       message: "Login successful",
-      data: { token },
+      data: {
+        token: accessToken,
+        accessToken,
+        refreshToken: rawRefreshToken,
+        expiresIn: 900, // 15 min in seconds
+      },
     });
   } catch (err) {
     next(err);
   }
 };
 
+// ---------- refresh token ----------
+exports.refreshToken = async (req, res, next) => {
+  try {
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Refresh token is required" });
+    }
+
+    // Find a user whose refresh token hasn't expired
+    const users = await User.find({
+      refreshTokenExpires: { $gt: new Date() },
+      refreshToken: { $ne: null },
+    });
+
+    // Check each user's hashed token against the provided raw token
+    let matchedUser = null;
+    for (const u of users) {
+      const isMatch = await bcrypt.compare(refreshToken, u.refreshToken);
+      if (isMatch) {
+        matchedUser = u;
+        break;
+      }
+    }
+
+    if (!matchedUser) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid or expired refresh token" });
+    }
+
+    // Issue new access token
+    const accessToken = generateAccessToken({
+      id: matchedUser._id,
+      email: matchedUser.email,
+      isAdmin: matchedUser.isAdmin,
+    });
+
+    return res.json({
+      success: true,
+      message: "Token refreshed",
+      data: {
+        token: accessToken,
+        accessToken,
+        expiresIn: 900,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ---------- logout ----------
+exports.logout = async (req, res, next) => {
+  try {
+    const { refreshToken } = req.body;
+
+    if (req.user) {
+      // If authenticated, clear refresh token for this user
+      const user = await User.findById(req.user.id);
+      if (user) {
+        user.refreshToken = undefined;
+        user.refreshTokenExpires = undefined;
+        await user.save();
+      }
+    } else if (refreshToken) {
+      // Fallback: find user by refresh token and clear it
+      const users = await User.find({
+        refreshToken: { $ne: null },
+      });
+      for (const u of users) {
+        const isMatch = await bcrypt.compare(refreshToken, u.refreshToken);
+        if (isMatch) {
+          u.refreshToken = undefined;
+          u.refreshTokenExpires = undefined;
+          await u.save();
+          break;
+        }
+      }
+    }
+
+    return res.json({ success: true, message: "Logged out successfully" });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ---------- profile ----------
 exports.profile = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user.id).select("-password");
+    const user = await User.findById(req.user.id).select("-password -refreshToken -refreshTokenExpires");
     if (!user) {
       return res
         .status(404)
@@ -145,6 +255,7 @@ exports.profile = async (req, res, next) => {
   }
 };
 
+// ---------- updateProfile ----------
 exports.updateProfile = async (req, res, next) => {
   try {
     const userId = req.user.id;
@@ -202,6 +313,8 @@ exports.updateProfile = async (req, res, next) => {
     await user.save();
     const userData = user.toObject();
     delete userData.password;
+    delete userData.refreshToken;
+    delete userData.refreshTokenExpires;
     return res.json({
       success: true,
       message: "Profile updated",
@@ -212,6 +325,7 @@ exports.updateProfile = async (req, res, next) => {
   }
 };
 
+// ---------- forgotPassword (graceful SMTP) ----------
 exports.forgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
@@ -227,13 +341,24 @@ exports.forgotPassword = async (req, res, next) => {
     user.resetPasswordOTP = otp;
     user.resetPasswordOTPExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 min
     await user.save();
-    await sendOTPEmail(email, otp);
-    return res.json({ success: true, message: "OTP sent to your email" });
+
+    // Gracefully handle SMTP failures — OTP is already saved
+    try {
+      await sendOTPEmail(email, otp);
+      return res.json({ success: true, message: "OTP sent to your email" });
+    } catch (emailErr) {
+      console.error("Failed to send OTP email:", emailErr);
+      return res.json({
+        success: true,
+        message: "OTP generated. Email delivery may be delayed — please try again or contact support.",
+      });
+    }
   } catch (err) {
     next(err);
   }
 };
 
+// ---------- resetPassword ----------
 exports.resetPassword = async (req, res, next) => {
   try {
     const { email, otp, newPassword } = req.body;
@@ -263,6 +388,7 @@ exports.resetPassword = async (req, res, next) => {
   }
 };
 
+// ---------- changePassword ----------
 exports.changePassword = async (req, res, next) => {
   try {
     const { oldPassword, newPassword } = req.body;
@@ -415,6 +541,10 @@ exports.verifyOTP = async (req, res, next) => {
   }
 };
 
+// ==========================================
+// ADDRESS MANAGEMENT
+// ==========================================
+
 exports.getAddresses = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);
@@ -446,7 +576,9 @@ exports.addAddress = async (req, res, next) => {
   }
 };
 
-// Add single address update by index
+// ---------- index-based (deprecated – kept for backward compatibility) ----------
+
+// Update single address by index (DEPRECATED – use updateAddressById instead)
 exports.updateAddressByIndex = async (req, res, next) => {
   try {
     const idx = parseInt(req.params.index, 10);
@@ -466,7 +598,7 @@ exports.updateAddressByIndex = async (req, res, next) => {
   }
 };
 
-// Add single address delete by index
+// Delete single address by index (DEPRECATED – use deleteAddressById instead)
 exports.deleteAddressByIndex = async (req, res, next) => {
   try {
     const idx = parseInt(req.params.index, 10);
@@ -481,6 +613,62 @@ exports.deleteAddressByIndex = async (req, res, next) => {
     next(err);
   }
 };
+
+// ---------- ObjectId-based (new) ----------
+
+// Update address by its Mongoose subdocument _id
+exports.updateAddressById = async (req, res, next) => {
+  try {
+    const { addressId } = req.params;
+    const { firstName, lastName, email, phone, addressLine1, addressLine2, city, state, zipCode } = req.body;
+    if (!firstName || !lastName || !phone || !addressLine1 || !city || !state || !zipCode) {
+      return res.status(400).json({ success: false, message: "Required address fields missing", data: null });
+    }
+    const user = await User.findById(req.user.id);
+    if (!user || !user.addresses) {
+      return res.status(404).json({ success: false, message: "User not found", data: null });
+    }
+    const address = user.addresses.id(addressId);
+    if (!address) {
+      return res.status(404).json({ success: false, message: "Address not found", data: null });
+    }
+    address.firstName = firstName;
+    address.lastName = lastName;
+    address.email = email;
+    address.phone = phone;
+    address.addressLine1 = addressLine1;
+    address.addressLine2 = addressLine2;
+    address.city = city;
+    address.state = state;
+    address.zipCode = zipCode;
+    await user.save();
+    return res.json({ success: true, message: "Address updated", data: user.addresses });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Delete address by its Mongoose subdocument _id
+exports.deleteAddressById = async (req, res, next) => {
+  try {
+    const { addressId } = req.params;
+    const user = await User.findById(req.user.id);
+    if (!user || !user.addresses) {
+      return res.status(404).json({ success: false, message: "User not found", data: null });
+    }
+    const address = user.addresses.id(addressId);
+    if (!address) {
+      return res.status(404).json({ success: false, message: "Address not found", data: null });
+    }
+    address.deleteOne();
+    await user.save();
+    return res.json({ success: true, message: "Address deleted", data: user.addresses });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ==========================================
 
 exports.getSellerProfile = async (req, res, next) => {
   try {

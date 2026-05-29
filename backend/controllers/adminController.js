@@ -1,7 +1,20 @@
 const Admin = require("../models/Admin");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 
+// ---------- helpers ----------
+function generateAccessToken(payload) {
+  return jwt.sign(payload, process.env.JWT_SECRET || "secretToken", {
+    expiresIn: "15m",
+  });
+}
+
+function generateRefreshToken() {
+  return crypto.randomBytes(40).toString("hex");
+}
+
+// ---------- login (with refresh token) ----------
 exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -16,16 +29,105 @@ exports.login = async (req, res, next) => {
     if (!match) {
       return res.status(401).json({ success: false, message: "Invalid credentials" });
     }
-    const token = jwt.sign(
-      { id: admin._id, email: admin.email, isAdmin: true },
-      process.env.JWT_SECRET || "secretToken",
-      { expiresIn: "7d" }
-    );
+
+    // Generate short-lived access token (15 min)
+    const accessToken = generateAccessToken({
+      id: admin._id,
+      email: admin.email,
+      isAdmin: true,
+    });
+
+    // Generate refresh token (7 days) and hash it for DB storage
+    const rawRefreshToken = generateRefreshToken();
+    const hashedRefreshToken = await bcrypt.hash(rawRefreshToken, 10);
+    admin.refreshToken = hashedRefreshToken;
+    admin.refreshTokenExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+    await admin.save();
+
     return res.json({
       success: true,
       message: "Login successful",
-      data: { token },
+      data: {
+        token: accessToken,
+        accessToken,
+        refreshToken: rawRefreshToken,
+        expiresIn: 900,
+      },
     });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ---------- admin refresh token ----------
+exports.refreshToken = async (req, res, next) => {
+  try {
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+      return res.status(400).json({ success: false, message: "Refresh token is required" });
+    }
+
+    const admins = await Admin.find({
+      refreshTokenExpires: { $gt: new Date() },
+      refreshToken: { $ne: null },
+    });
+
+    let matchedAdmin = null;
+    for (const a of admins) {
+      const isMatch = await bcrypt.compare(refreshToken, a.refreshToken);
+      if (isMatch) {
+        matchedAdmin = a;
+        break;
+      }
+    }
+
+    if (!matchedAdmin) {
+      return res.status(401).json({ success: false, message: "Invalid or expired refresh token" });
+    }
+
+    const accessToken = generateAccessToken({
+      id: matchedAdmin._id,
+      email: matchedAdmin.email,
+      isAdmin: true,
+    });
+
+    return res.json({
+      success: true,
+      message: "Token refreshed",
+      data: {
+        token: accessToken,
+        accessToken,
+        expiresIn: 900,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ---------- admin logout ----------
+exports.logout = async (req, res, next) => {
+  try {
+    if (req.user) {
+      const admin = await Admin.findById(req.user.id);
+      if (admin) {
+        admin.refreshToken = undefined;
+        admin.refreshTokenExpires = undefined;
+        await admin.save();
+      }
+    } else if (req.body.refreshToken) {
+      const admins = await Admin.find({ refreshToken: { $ne: null } });
+      for (const a of admins) {
+        const isMatch = await bcrypt.compare(req.body.refreshToken, a.refreshToken);
+        if (isMatch) {
+          a.refreshToken = undefined;
+          a.refreshTokenExpires = undefined;
+          await a.save();
+          break;
+        }
+      }
+    }
+    return res.json({ success: true, message: "Logged out successfully" });
   } catch (err) {
     next(err);
   }

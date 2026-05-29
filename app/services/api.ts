@@ -5,18 +5,22 @@ const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || Constants.expoConfig?.ex
 
 class ApiService {
   private baseURL: string;
+  private isRefreshing: boolean = false;
+  private refreshPromise: Promise<string | null> | null = null;
 
   constructor(baseURL: string) {
     this.baseURL = baseURL;
   }
+
   private async request<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit = {},
+    _isRetry: boolean = false
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
 
     // Add auth token if available
-    const token = await AsyncStorage.getItem('token');
+    const token = await AsyncStorage.getItem('accessToken') || await AsyncStorage.getItem('token');
 
     const config: RequestInit = {
       headers: {
@@ -35,9 +39,15 @@ class ApiService {
       const data = await response.json();
 
       if (!response.ok) {
-        if (response.status === 401) {
-          await AsyncStorage.removeItem('token');
-          await AsyncStorage.removeItem('user');
+        // On 401 — attempt silent refresh (once)
+        if (response.status === 401 && !_isRetry) {
+          const newToken = await this.attemptTokenRefresh();
+          if (newToken) {
+            // Retry the original request with the new token
+            return this.request<T>(endpoint, options, true);
+          }
+          // Refresh failed — clear auth and fall through to throw
+          await this.clearAuth();
         }
         throw new Error(data.message || 'Something went wrong');
       }
@@ -47,6 +57,58 @@ class ApiService {
       console.error(`API Request Failed: ${method} ${url}`, error);
       throw error;
     }
+  }
+
+  /**
+   * Attempt to refresh the access token using the stored refresh token.
+   * Returns the new access token or null if refresh failed.
+   * Deduplicates concurrent refresh attempts.
+   */
+  private async attemptTokenRefresh(): Promise<string | null> {
+    // If already refreshing, wait for the in-flight promise
+    if (this.isRefreshing && this.refreshPromise) {
+      return this.refreshPromise;
+    }
+
+    this.isRefreshing = true;
+    this.refreshPromise = (async () => {
+      try {
+        const refreshToken = await AsyncStorage.getItem('refreshToken');
+        if (!refreshToken) return null;
+
+        const url = `${this.baseURL}/auth/refresh-token`;
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refreshToken }),
+        });
+
+        if (!response.ok) return null;
+
+        const data = await response.json();
+        if (data.success && data.data?.accessToken) {
+          await AsyncStorage.setItem('accessToken', data.data.accessToken);
+          await AsyncStorage.setItem('token', data.data.accessToken); // backward compat
+          return data.data.accessToken;
+        }
+        return null;
+      } catch (err) {
+        console.error('Token refresh failed:', err);
+        return null;
+      } finally {
+        this.isRefreshing = false;
+        this.refreshPromise = null;
+      }
+    })();
+
+    return this.refreshPromise;
+  }
+
+  /**
+   * Clear all auth-related storage.
+   */
+  private async clearAuth(): Promise<void> {
+    await AsyncStorage.multiRemove(['token', 'accessToken', 'refreshToken', 'user']);
   }
 
   private mapBackendProduct(p: any) {
@@ -66,7 +128,7 @@ class ApiService {
       brand: p.brand || 'Zythova',
       specifications: {
         ...(p.attributes || {}),
-        ...(p.additionalSpecifications || {})
+        ...(p.additionalSpecifications || {}),
       },
       soldCount: p.soldCount || 0,
       variantOptions: p.variantOptions || [],
@@ -166,7 +228,7 @@ class ApiService {
 
   // Auth
   async login(credentials: any) {
-    const response = await this.request<{ success: boolean; message: string; data: { token: string } }>(
+    const response = await this.request<{ success: boolean; message: string; data: { token: string; accessToken: string; refreshToken: string; expiresIn: number } }>(
       '/auth/login',
       {
         method: 'POST',
@@ -174,8 +236,15 @@ class ApiService {
       }
     );
 
-    if (response.success && response.data.token) {
-      await AsyncStorage.setItem('token', response.data.token);
+    if (response.success && response.data) {
+      // Store access token (both keys for backward compat)
+      const accessToken = response.data.accessToken || response.data.token;
+      await AsyncStorage.setItem('accessToken', accessToken);
+      await AsyncStorage.setItem('token', accessToken);
+      // Store refresh token
+      if (response.data.refreshToken) {
+        await AsyncStorage.setItem('refreshToken', response.data.refreshToken);
+      }
     }
 
     return response;
@@ -194,7 +263,22 @@ class ApiService {
   }
 
   async logout() {
-    await AsyncStorage.removeItem('token');
+    try {
+      const refreshToken = await AsyncStorage.getItem('refreshToken');
+      // Notify server to invalidate refresh token
+      await this.request<{ success: boolean; message: string }>(
+        '/auth/logout',
+        {
+          method: 'POST',
+          body: JSON.stringify({ refreshToken: refreshToken || undefined }),
+        }
+      );
+    } catch (err) {
+      // Best-effort; don't block logout if server call fails
+      console.error('Server logout failed:', err);
+    } finally {
+      await this.clearAuth();
+    }
   }
 
   async getProfile() {
@@ -253,7 +337,7 @@ class ApiService {
 
   async uploadImage(imageUri: string) {
     const url = `${this.baseURL}/upload/image`;
-    const token = await AsyncStorage.getItem('token');
+    const token = await AsyncStorage.getItem('accessToken') || await AsyncStorage.getItem('token');
 
     console.log('[ApiService] Uploading image to:', url);
     console.log('[ApiService] Image URI:', imageUri);
@@ -317,11 +401,11 @@ class ApiService {
   }
 
   async isAuthenticated() {
-    const token = await AsyncStorage.getItem('token');
+    const token = await AsyncStorage.getItem('accessToken') || await AsyncStorage.getItem('token');
     return !!token;
   }
 
-  // Address
+  // Address (using ObjectId-based routes)
   async getAddresses() {
     return this.request<{ success: boolean; data: any[]; message?: string }>('/auth/addresses');
   }
@@ -333,15 +417,15 @@ class ApiService {
     });
   }
 
-  async updateAddress(index: number, addressData: any) {
-    return this.request<{ success: boolean; data: any[]; message?: string }>(`/auth/addresses/${index}`, {
+  async updateAddress(addressId: string, addressData: any) {
+    return this.request<{ success: boolean; data: any[]; message?: string }>(`/auth/addresses/by-id/${addressId}`, {
       method: 'PATCH',
       body: JSON.stringify(addressData),
     });
   }
 
-  async deleteAddress(index: number) {
-    return this.request<{ success: boolean; data: any[]; message?: string }>(`/auth/addresses/${index}`, {
+  async deleteAddress(addressId: string) {
+    return this.request<{ success: boolean; data: any[]; message?: string }>(`/auth/addresses/by-id/${addressId}`, {
       method: 'DELETE',
     });
   }
