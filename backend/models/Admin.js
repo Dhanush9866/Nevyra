@@ -7,8 +7,11 @@ const adminSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true, match: /.+\@.+\..+/ },
     phone: { type: String, unique: true, sparse: true },
     password: { type: String, required: true },
+    // Refresh token fields
+    refreshToken: { type: String },
+    refreshTokenExpires: { type: Date },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Admin", adminSchema); 
+module.exports = mongoose.model("Admin", adminSchema);

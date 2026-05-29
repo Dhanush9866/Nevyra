@@ -9,6 +9,8 @@ interface GridItem {
   title: string;
   image: string;
   offer: string;
+  category?: string;
+  subcategory?: string;
 }
 
 interface CategoryGroup {
@@ -24,8 +26,14 @@ const HomeCategoryGrid: React.FC<HomeCategoryGridProps> = ({ groups }) => {
   const navigate = useNavigate();
 
   const handleItemClick = (item: GridItem) => {
-    // Navigate to product listing with subCategory filter matching the item title
-    navigate(`/category/all?subCategory=${encodeURIComponent(item.title)}`);
+    // Navigate to product listing with category and subCategory filter if they exist
+    let url = `/category/all`;
+    const params = new URLSearchParams();
+    if (item.category) params.append('category', item.category);
+    if (item.subcategory) params.append('subCategory', item.subcategory);
+    else params.append('subCategory', item.title);
+    
+    navigate(`${url}?${params.toString()}`);
   };
 
   return (

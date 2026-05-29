@@ -3,9 +3,7 @@ require("dotenv").config();
 
 const connectDB = async () => {
   try {
-    const fs = require('fs');
     const uri = process.env.MONGO_URI || "mongodb://localhost:27017/nevyra";
-    fs.writeFileSync('debug_mongo_uri.txt', `URI: ${uri}\nTimestamp: ${new Date().toISOString()}`);
     const conn = await mongoose.connect(uri);
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {

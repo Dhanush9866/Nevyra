@@ -7,9 +7,13 @@ const authMiddleware = require("../../middlewares/authMiddleware");
 // User Profile (Duplicate of auth/profile for legacy support)
 router.get("/profile", authMiddleware, authController.profile);
 
-// Address Management (Duplicate of auth/addresses for legacy support)
+// Address Management – ObjectId-based (preferred)
 router.get("/addresses", authMiddleware, authController.getAddresses);
 router.post("/addresses", authMiddleware, authController.addAddress);
+router.patch("/addresses/by-id/:addressId", authMiddleware, authController.updateAddressById);
+router.delete("/addresses/by-id/:addressId", authMiddleware, authController.deleteAddressById);
+
+// Address Management – Index-based (DEPRECATED – kept for backward compatibility)
 router.put("/addresses/:index", authMiddleware, authController.updateAddressByIndex);
 router.delete("/addresses/:index", authMiddleware, authController.deleteAddressByIndex);
 

@@ -16,7 +16,6 @@ async function sendOTPEmail(to, otp) {
     text: `Your OTP for password reset is: ${otp}. It is valid for 10 minutes.`,
   };
   return transporter.sendMail(mailOptions);
-  return transporter.sendMail(mailOptions);
 }
 
 async function sendVerificationEmail(to, name) {
